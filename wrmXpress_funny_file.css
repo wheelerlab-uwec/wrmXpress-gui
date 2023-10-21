@@ -1,0 +1,63 @@
+/* styles.css */
+
+/* Body background and text color */
+body {
+    background-color: black;
+    color: white;
+}
+
+/* Header background color */
+h1 {
+    background-color: #FFA500; /* Orange */
+    padding: 10px;
+    border-radius: 5px;
+    color: black;
+}
+
+/* Button styles */
+button {
+    background-color: #008000; /* Green */
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+/* Styling for radio buttons */
+input[type="radio"] {
+    margin-right: 5px;
+    vertical-align: middle;
+}
+
+/* Styling for checkboxes */
+input[type="checkbox"] {
+    margin-right: 5px;
+    vertical-align: middle;
+}
+
+/* Styles for radio buttons */
+.radio-label {
+    font-size: 16px;
+    margin-bottom: 5px;
+    background-color: #008000; /* Green */
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+/* Styles for checkboxes */
+.checkbox-label {
+    font-size: 16px;
+    margin-bottom: 5px;
+    background-color: #008000; /* Green */
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+/* Add your additional custom styles here */
