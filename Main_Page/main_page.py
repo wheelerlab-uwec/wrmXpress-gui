@@ -238,6 +238,8 @@ def info_page_content():
             html.H6("Welcome to the Information Page"),
             html.H6("What is wrmXpress"),
             html.H6("What is a file path"),
+            html.P("A path is a string of characters used to uniquely identify a location in a directory structure. It is composed by following the directory tree hierarchy in which components, separated by a delimiting character, represent each directory"),
+            dcc.Link("File Path.", href="https://en.wikipedia.org/wiki/Path_(computing)", target="_blank"),
             html.H6("What is a yaml file"),
             html.H6("The Developers"),
             html.H6("Front End"),
@@ -252,7 +254,6 @@ info_page = dbc.Modal(
         info_page_content(),
         dbc.ModalFooter([
             # Buttons for the Info Page Modal
-            dbc.Button("Thank the Developers", id="thank-developers-info-modal", className="ml-auto"),
             dbc.Button("Close", id="close-info-modal", className="ml-auto"),
         ]),
         html.Div(id="info-page-status")  # Placeholder for saving status
