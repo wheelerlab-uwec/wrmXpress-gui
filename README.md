@@ -1,2 +1,2 @@
 # wrmXpress-gui
-A GUI for wrmXpress using Daash 
+A GUI for wrmXpress using Dash.
