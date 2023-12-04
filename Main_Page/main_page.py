@@ -232,6 +232,34 @@ def save_page_content():
             dbc.Input(id= "file-path-for-saved-yaml-file", placeholder="Please enter the full filepath for your yaml file:", type="text"),
                             ]
     )
+def info_page_content():
+    return dbc.ModalBody(
+        [
+            html.H6("Welcome to the Information Page"),
+            html.H6("What is wrmXpress"),
+            html.H6("What is a file path"),
+            html.H6("What is a yaml file"),
+            html.H6("The Developers"),
+            html.H6("Front End"),
+            html.H6("Back End"),
+                            ]
+    )
+
+# Create the Save Page Modal
+info_page = dbc.Modal(
+    [
+        dbc.ModalHeader("Information Page"),
+        info_page_content(),
+        dbc.ModalFooter([
+            # Buttons for the Info Page Modal
+            dbc.Button("Thank the Developers", id="thank-developers-info-modal", className="ml-auto"),
+            dbc.Button("Close", id="close-info-modal", className="ml-auto"),
+        ]),
+        html.Div(id="info-page-status")  # Placeholder for saving status
+    ],
+    id="info-page-modal",
+    size="xl"
+)
 
 # Create the Save Page Modal
 save_page = dbc.Modal(
@@ -255,6 +283,8 @@ app.layout = html.Div([
             dbc.Nav(
                 [
                     dbc.NavItem(dbc.Button("Save Page", id="open-save-modal", color="primary")),
+                    dbc.NavItem(dbc.Button("Info Page", id="open-info-modal", color="primary")),
+
                 ],
                 className="ml-auto",  # Set the left margin to auto
             ),
@@ -277,6 +307,7 @@ app.layout = html.Div([
         ),
     ]),
     save_page,
+    info_page,
 ])
 
 @app.callback(
@@ -374,17 +405,25 @@ def save_page_to_yaml(
         return f"Data Saved to {filepathforyamlfile}"
     return ""
 
-
 # Ensure that the IDs used in these callback functions correspond to components in the layout
 @app.callback(
-    Output("save-page-modal", "is_open"),
-    [Input("open-save-modal", "n_clicks"), Input("close-save-modal", "n_clicks")],
-    [State("save-page-modal", "is_open")],
+    [Output("save-page-modal", "is_open"),
+     Output("info-page-modal", "is_open")],
+    [Input("open-save-modal", "n_clicks"), Input("close-save-modal", "n_clicks"),
+     Input("open-info-modal", "n_clicks"), Input("close-info-modal", "n_clicks")],
+    [State("save-page-modal", "is_open"),
+     State("info-page-modal", "is_open")],
 )
-def toggle_save_page_modal(open_clicks, close_clicks, is_open):
-    if open_clicks or close_clicks:
-        return not is_open
-    return is_open
+def toggle_modals(open_save_clicks, close_save_clicks, open_info_clicks, close_info_clicks, is_save_open, is_info_open):
+    ctx = dash.callback_context
+
+    if ctx.triggered_id in ["open-save-modal", "close-save-modal"]:
+        return not is_save_open, False
+    elif ctx.triggered_id in ["open-info-modal", "close-info-modal"]:
+        return False, not is_info_open
+    else:
+        return is_save_open, is_info_open
+
 
 if __name__ == '__main__':
     app.run_server(debug=True)
