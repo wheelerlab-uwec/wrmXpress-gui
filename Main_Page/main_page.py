@@ -12,9 +12,79 @@ import base64
 
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP], suppress_callback_exceptions=True)
 
+gummy_worm_file_path = "wrmXpress-gui/Main_Page/Figures/gummy_worms.png"
+wrmXpress_logo_file_path = "wrmXpress-gui/Main_Page/Figures/wrmXpress_logo.png"
+uwec_logo_file_path = "wrmXpress-gui/Main_Page/Figures/uwec_logo.png"
+uw_logo_file_path = "wrmXpress-gui/Main_Page/Figures/uw_logo.png"
+wheeler_lab_file_path = "wrmXpress-gui/Main_Page/Figures/wheeler_lab_logo.png"
+
 user_input_yaml_file = {}
 preview_input_yaml_file = {}
 
+# Helper Functions
+def run_terminal_file(wrapper_py_file_path, yaml_file_path, plate_file_path):
+    """
+    Running wrmXpress through the terminal
+    ======================================
+    Inputs:
+        wrapper_py_file_path: 
+            file path to the wrapper python file (wrmXpress)
+        yaml_file_path:
+            file path to the yaml file for the corresponding plate
+        plate_file_path:
+            file path for the corresponding plate
+
+    Returns:    
+        wrmXpress product
+    """
+    import subprocess
+
+    #Command to run wrmXpress 
+    command = f"python {wrapper_py_file_path} {yaml_file_path} {plate_file_path}" 
+
+    # Run the command in the terminal
+    result = subprocess.run(command, shell=True, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    # Check the result
+    if result.returncode == 0:
+        return "Successful"
+    else:
+        return "Not Successful"
+def convert_png_to_image(file_path):
+    """
+    converting a file path of image into an image that can be displayed in Dash
+    ===========================================================================
+    Inputs:
+        file_path:
+            file path to the image
+
+    Returns:
+        image which has been encoded into bit 64
+    """
+    #imports
+    import cv2
+    import base64
+    import os
+
+    # Obtaining the file extension
+    file_extension = os.path.splitext(file_path)[1] 
+
+    # Load the image using cv2
+    image = cv2.imread(file_path)
+
+    # Convert the image to Base64
+    ret, buffer = cv2.imencode(f'{file_extension}', image)
+    img_base64 = base64.b64encode(buffer).decode('utf-8')
+
+    # Returning encoded image
+    return img_base64
+
+gummy_wrm = convert_png_to_image(gummy_worm_file_path)
+wrmXpress_img = convert_png_to_image(wrmXpress_logo_file_path)
+uwec_img = convert_png_to_image(uwec_logo_file_path)
+uw_img = convert_png_to_image(uw_logo_file_path)
+wheeler_lab_logo = convert_png_to_image(wheeler_lab_file_path)
+
+# Functionality and page layout functions
 def create_imaging_settings():
     return dbc.AccordionItem(
                 [
