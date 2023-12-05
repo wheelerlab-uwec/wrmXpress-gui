@@ -14,11 +14,11 @@ import base64
 
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP], suppress_callback_exceptions=True)
 
-gummy_worm_file_path = "wrmXpress_github/wrmXpress-gui/Main_Page/Figures/gummy_worms.png"
-wrmXpress_logo_file_path = "wrmXpress_github/wrmXpress-gui/Main_Page/Figures/wrmXpress_logo.png"
-uwec_logo_file_path = "wrmXpress_github/wrmXpress-gui/Main_Page/Figures/uwec_logo.png"
-uw_logo_file_path = "wrmXpress_github/wrmXpress-gui/Main_Page/Figures/uw_logo.png"
-wheeler_lab_file_path = "wrmXpress_github/wrmXpress-gui/Main_Page/Figures/wheeler_lab_logo.png"
+gummy_worm_file_path = "wrmXpress-gui/Main_Page/Figures/gummy_worms.png"
+wrmXpress_logo_file_path = "wrmXpress-gui/Main_Page/Figures/wrmXpress_logo.png"
+uwec_logo_file_path = "wrmXpress-gui/Main_Page/Figures/uwec_logo.png"
+uw_logo_file_path = "wrmXpress-gui/Main_Page/Figures/uw_logo.png"
+wheeler_lab_file_path = "wrmXpress-gui/Main_Page/Figures/wheeler_lab_logo.png"
 
 user_input_yaml_file = {}
 preview_input_yaml_file = {}
