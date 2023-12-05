@@ -6,6 +6,8 @@ dash-core-components==2.0.0
     # via dash
 dash-html-components==2.0.0
     # via dash
+dash-bootstrap-components
+    # via dash
 dash-table==5.0.0
     # via dash
 flask==2.2.2
@@ -42,8 +44,6 @@ opencv-python
     #allows images, this contains the cv2 library
 subprocess
     #running scripts via the terminal
-cv2 
-    #visualizing images in Dash
 base64
     #converting images into bit 64 images for Dash
 os

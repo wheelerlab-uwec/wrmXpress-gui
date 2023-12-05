@@ -78,14 +78,22 @@ def convert_png_to_image(file_path):
     # Returning encoded image
     return img_base64
 
-gummy_wrm = convert_png_to_image(gummy_worm_file_path)
-wrmXpress_img = convert_png_to_image(wrmXpress_logo_file_path)
-uwec_img = convert_png_to_image(uwec_logo_file_path)
-uw_img = convert_png_to_image(uw_logo_file_path)
-wheeler_lab_logo = convert_png_to_image(wheeler_lab_file_path)
+#gummy_wrm = convert_png_to_image(gummy_worm_file_path)
+#wrmXpress_img = convert_png_to_image(wrmXpress_logo_file_path)
+#uwec_img = convert_png_to_image(uwec_logo_file_path)
+#uw_img = convert_png_to_image(uw_logo_file_path)
+#wheeler_lab_logo = convert_png_to_image(wheeler_lab_file_path)
 
 # Functionality and page layout functions
 def create_imaging_settings():
+    """
+    Creating the Structure and Layout of the Imaging Settings Accordian Item
+    ========================================================================
+    Inputs:
+        None
+    Returns:
+        Accordian Item with elements for Imaging Settings
+    """
     return dbc.AccordionItem(
                 [
                     html.H6("Imaging Mode:"),
@@ -115,9 +123,9 @@ def create_imaging_settings():
                         value="imagexpress",
                     ),
                     html.H6("Multi Well Rows"),
-                    dbc.Input(id="multi-well-rows", placeholder="Please insert the multi well rows.", type="number"),
+                    dbc.Input(id="multi-well-rows", placeholder="Please insert the multi well rows.", type="number", value = 0),
                     html.H6("Multi Well Columns"),
-                    dbc.Input(id="multi-well-cols", placeholder="Please insert the multi well columns.", type="number"),
+                    dbc.Input(id="multi-well-cols", placeholder="Please insert the multi well columns.", type="number", value = 0),
                     html.H6("Multi Well Detection:"),
                     dbc.RadioItems(
                         id="multi-well-detection",
@@ -136,6 +144,14 @@ def create_imaging_settings():
                 title="Instrument Settings"
             )
 def create_worm_information():
+    """
+    Creating the Structure and Layout of the Worm Information Accordian Item
+    ========================================================================
+    Inputs:
+        None
+    Returns:
+        Accordian Item with elements for Wrom Information
+    """
     return dbc.AccordionItem(
                 [
                     html.H6("Species:"),
@@ -171,6 +187,14 @@ def create_worm_information():
                 title="Worm Information"
             )
 def create_module_selection():
+    """
+    Creating the Structure and Layout of the Module Selection Accordian Item
+    ========================================================================
+    Inputs:
+        None
+    Returns:
+        Accordian Item with elements for Module Selection
+    """
     return dbc.AccordionItem(
                 [
                     html.H4("Motility"),
@@ -215,7 +239,7 @@ def create_module_selection():
                         value="False",
                     ),
                     html.H6("Conversion Rescale Multiplier"),
-                    dbc.Input(id="conversion-rescale-multiplier", placeholder="Please insert the rescale multiplier:", type="number"),
+                    dbc.Input(id="conversion-rescale-multiplier", placeholder="Please insert the rescale multiplier:", type="text"),
                     html.H4("Segmentation"),
                     html.H6("Segment Run"),
                     dbc.RadioItems(
@@ -280,6 +304,14 @@ def create_module_selection():
                 title="Module Selection"
             )
 def create_run_time_settings():
+    """
+    Creating the Structure and Layout of the Run Time Settings Accordian Item
+    ========================================================================
+    Inputs:
+        None
+    Returns:
+        Accordian Item with elements for Run Time Settings
+    """
     return dbc.AccordionItem([
                 html.H6("Wells"),
                 dbc.Input(id="wells-information", placeholder="Please insert the wells information (please seperate multiple values by a comma):", type="text"),
@@ -295,6 +327,14 @@ def create_run_time_settings():
                 title="Run-Time Settings"
             )
 def save_page_content():
+    """
+    Creating the Structure and Layout of the Save Page 
+    ========================================================================
+    Inputs:
+        None
+    Returns:
+        Accordian Item with elements for Save Page
+    """
     return dbc.ModalBody(
         [
             # Content for the Save Page Modal
@@ -303,10 +343,19 @@ def save_page_content():
                             ]
     )
 def info_page_content():
+    """
+    Creating the Structure and Layout of the Information Page
+    ========================================================================
+    Inputs:
+        None
+    Returns:
+        Accordian Item with elements for the Information Page
+    """
     return dbc.ModalBody(
         [
             html.H6("Welcome to the Information Page"),
             html.H6("What is wrmXpress"),
+            html.P("wrmXpress stands as a groundbreaking unified framework for the analysis of diverse phenotypic imaging data in high-throughput and high-content experiments involving free-living and parasitic nematodes and flatworms. In response to the limitations of existing tools, wrmXpress transcends silos by providing a versatile solution capable of handling large datasets and generating relevant phenotypic measurements across various worm species and experimental assays. This innovative software, designed to analyze a spectrum of phenotypes such as motility, development/size, fecundity, and feeding, not only addresses current research needs but also establishes itself as a platform for future extensibility, enabling the development of custom phenotypic modules. With applications in anthelmintic screening efforts spanning schistosomes, filarial nematodes, and free-living model nematodes, wrmXpress emerges as a collaborative analytical workhorse, promising to drive innovation and facilitate cooperation among investigators with diverse scientific interests."),
             html.H6("What is a file path"),
             html.P("A file path is a reference to the location of a file or a folder in a file system. It describes the hierarchical structure of directories or folders leading to a specific file or folder. A file path is used by operating systems to locate and access files. There are two types of file paths: absolute and relative."),
             html.P("Absolute Path: An absolute path provides the complete location of a file or folder from the root directory of the file system. Example (on Windows): C:\\Users\\Username\\Documents\\file.txt Example (on Unix-like systems): /home/username/documents/file.txt Relative Path: A relative path specifies the location of a file or folder relative to the current working directory. Example: If the current working directory is /home/username/, a relative path to the file might be documents/file.txt. Relative paths are dependent on the current working directory, so they may change if the working directory changes. In both types of paths, directories or folders are separated by a delimiter (e.g., \\ on Windows or / on Unix-like systems), and the file name is typically specified at the end of the path. Understanding and correctly specifying file paths is crucial for navigating and working with files in computer systems."),
@@ -449,7 +498,7 @@ def save_page_to_yaml(
                 "convert": {
                     "run": bool(conversionrun),
                     "save_video": bool(conversionscalevideo),
-                    "rescale_multiplier": conversionrescalemultiplier
+                    "rescale_multiplier": float(conversionrescalemultiplier)
                 },
                 "segment": {
                     "run": bool(segmentrun),
