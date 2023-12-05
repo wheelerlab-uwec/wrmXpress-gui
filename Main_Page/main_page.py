@@ -407,7 +407,7 @@ def preview_page_content():
 
             # Center the Image component
             html.Img(
-                src=f'data:image/png;base64, {wrmXpress_logo}',  # Replace with your image URL
+                src=f'data:image/png;base64, {gummy_wrm}',  # Replace with your image URL
                 style={'width': '500px', 'display': 'block', 'margin': 'auto', 'margin-bottom': '10px'},  # Center the image
             ),
 
