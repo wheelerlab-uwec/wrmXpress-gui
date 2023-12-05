@@ -9,14 +9,16 @@ import plotly.graph_objs as go
 import os
 import pathlib
 import base64
+import cv2
+import base64
 
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP], suppress_callback_exceptions=True)
 
-gummy_worm_file_path = "wrmXpress-gui/Main_Page/Figures/gummy_worms.png"
-wrmXpress_logo_file_path = "wrmXpress-gui/Main_Page/Figures/wrmXpress_logo.png"
-uwec_logo_file_path = "wrmXpress-gui/Main_Page/Figures/uwec_logo.png"
-uw_logo_file_path = "wrmXpress-gui/Main_Page/Figures/uw_logo.png"
-wheeler_lab_file_path = "wrmXpress-gui/Main_Page/Figures/wheeler_lab_logo.png"
+gummy_worm_file_path = "wrmXpress_github/wrmXpress-gui/Main_Page/Figures/gummy_worms.png"
+wrmXpress_logo_file_path = "wrmXpress_github/wrmXpress-gui/Main_Page/Figures/wrmXpress_logo.png"
+uwec_logo_file_path = "wrmXpress_github/wrmXpress-gui/Main_Page/Figures/uwec_logo.png"
+uw_logo_file_path = "wrmXpress_github/wrmXpress-gui/Main_Page/Figures/uw_logo.png"
+wheeler_lab_file_path = "wrmXpress_github/wrmXpress-gui/Main_Page/Figures/wheeler_lab_logo.png"
 
 user_input_yaml_file = {}
 preview_input_yaml_file = {}
@@ -60,11 +62,6 @@ def convert_png_to_image(file_path):
     Returns:
         image which has been encoded into bit 64
     """
-    #imports
-    import cv2
-    import base64
-    import os
-
     # Obtaining the file extension
     file_extension = os.path.splitext(file_path)[1] 
 
@@ -78,11 +75,11 @@ def convert_png_to_image(file_path):
     # Returning encoded image
     return img_base64
 
-#gummy_wrm = convert_png_to_image(gummy_worm_file_path)
-#wrmXpress_img = convert_png_to_image(wrmXpress_logo_file_path)
-#uwec_img = convert_png_to_image(uwec_logo_file_path)
-#uw_img = convert_png_to_image(uw_logo_file_path)
-#wheeler_lab_logo = convert_png_to_image(wheeler_lab_file_path)
+gummy_wrm = convert_png_to_image(gummy_worm_file_path)
+wrmXpress_logo = convert_png_to_image(wrmXpress_logo_file_path)
+uwec_img = convert_png_to_image(uwec_logo_file_path)
+uw_img = convert_png_to_image(uw_logo_file_path)
+wheeler_lab_logo = convert_png_to_image(wheeler_lab_file_path)
 
 # Functionality and page layout functions
 def create_imaging_settings():
@@ -353,7 +350,13 @@ def info_page_content():
     """
     return dbc.ModalBody(
         [
-            html.H6("Welcome to the Information Page"),
+            html.H4("Welcome to the Information Page"),
+            html.Div(
+        html.Img(
+            src=f'data:image/png;base64, {wrmXpress_logo}',  # Replace with your image URL
+            style={'width': '500px', 'float': 'right'},  # Adjust image width and positioning
+        ),
+            ),
             html.H6("What is wrmXpress"),
             html.P("wrmXpress stands as a groundbreaking unified framework for the analysis of diverse phenotypic imaging data in high-throughput and high-content experiments involving free-living and parasitic nematodes and flatworms. In response to the limitations of existing tools, wrmXpress transcends silos by providing a versatile solution capable of handling large datasets and generating relevant phenotypic measurements across various worm species and experimental assays. This innovative software, designed to analyze a spectrum of phenotypes such as motility, development/size, fecundity, and feeding, not only addresses current research needs but also establishes itself as a platform for future extensibility, enabling the development of custom phenotypic modules. With applications in anthelmintic screening efforts spanning schistosomes, filarial nematodes, and free-living model nematodes, wrmXpress emerges as a collaborative analytical workhorse, promising to drive innovation and facilitate cooperation among investigators with diverse scientific interests."),
             html.H6("What is a file path"),
@@ -363,16 +366,81 @@ def info_page_content():
             html.H6("What is a yaml file"),
             html.P("YAML (YAML Ain't Markup Language or, sometimes, Yet Another Markup Language) is a human-readable data serialization format. It's often used for configuration files and data exchange between languages with different data structures. YAML files use indentation to represent the structure of the data, and it relies on whitespace for nesting and scope."),
             dcc.Link("YAML File", href="https://www.redhat.com/en/topics/automation/what-is-yaml", target="_blank"),
-            html.H6("The Developers"),
-            html.H6("Front End"),
-            html.H6("Back End"),
+
+            html.H5("The Developers"),
+            
+            # Front End
+            dbc.Row([
+                dbc.Col(html.H6("Front End"), width=12),  # Full width for the title
+            ]),
+            dbc.Row([
+                dbc.Col(html.Img(
+                    src=f'data:image/png;base64, {uwec_img}',  # Replace with your image URL
+                    style={'width': '200px', 'float': 'left'},  # Adjust image width and positioning
+                ), width=12),  # Full width for the image
+            ]),
+
+            # Back End
+            dbc.Row([
+                dbc.Col(html.H6("Back End"), width=12),  # Full width for the title
+            ]),
+            dbc.Row([
+                dbc.Col(html.Img(
+                    src=f'data:image/png;base64, {uw_img}',  # Replace with your image URL
+                    style={'width': '200px', 'float': 'left'},  # Adjust image width and positioning
+                ), width=12),  # Full width for the image
+            ]),
         ]
     )
+def preview_page_content():
+    """
+    Creating the Structure and Layout of the Preview Page 
+    ========================================================================
+    Inputs:
+        None
+    Returns:
+        Accordian Item with elements for Preview Page
+    """
+    return dbc.ModalBody(
+        [
+            html.H6("Preview Page Content"),
+
+            # Center the Image component
+            html.Img(
+                src=f'data:image/png;base64, {wrmXpress_logo}',  # Replace with your image URL
+                style={'width': '500px', 'display': 'block', 'margin': 'auto', 'margin-bottom': '10px'},  # Center the image
+            ),
+
+            # Add other content below the image
+            dbc.Input(id="file-path-for-preview-yaml-file", placeholder="Please enter the full filepath for your yaml file:", type="text"),
+            dbc.Input(id="file-path-to-wrapper-py", placeholder="Please Enter the File Path for the Wrapper.py File", type="text"),
+        ],
+    )
+
+
+# Create the Preview Page Modal
+preview_page = dbc.Modal(
+    [
+        dbc.ModalHeader(
+            "Preview Page"
+            ),
+        preview_page_content(),
+        dbc.ModalFooter([
+            # Buttons for the Info Page Modal
+            dbc.Button("Close", id="close-preview-modal", className="ml-auto"),
+        ]),
+        html.Div(id="preview-page-status")  # Placeholder for saving status
+    ],
+    id="preview-page-modal",
+    size="xl"
+)
 
 # Create the Save Page Modal
 info_page = dbc.Modal(
     [
-        dbc.ModalHeader("Information Page"),
+        dbc.ModalHeader(
+            "Information Page"
+            ),
         info_page_content(),
         dbc.ModalFooter([
             # Buttons for the Info Page Modal
@@ -406,7 +474,8 @@ app.layout = html.Div([
             dbc.Nav(
                 [
                     dbc.NavItem(dbc.Button("Save Page", id="open-save-modal", color="primary")),
-                    dbc.NavItem(dbc.Button("Info Page", id="open-info-modal", color="primary")),
+                    dbc.NavItem(dbc.Button("Info Page", id="open-info-modal", color="secondary")),
+                    dbc.NavItem(dbc.Button("Preview Page", id = "open-preview-modal", color = "success", n_clicks=0))
 
                 ],
                 className="ml-auto",  # Set the left margin to auto
@@ -431,6 +500,7 @@ app.layout = html.Div([
     ]),
     save_page,
     info_page,
+    preview_page,
 ])
 
 @app.callback(
@@ -531,22 +601,28 @@ def save_page_to_yaml(
 # Ensure that the IDs used in these callback functions correspond to components in the layout
 @app.callback(
     [Output("save-page-modal", "is_open"),
-     Output("info-page-modal", "is_open")],
+     Output("info-page-modal", "is_open"),
+     Output("preview-page-modal", "is_open")],
     [Input("open-save-modal", "n_clicks"), Input("close-save-modal", "n_clicks"),
-     Input("open-info-modal", "n_clicks"), Input("close-info-modal", "n_clicks")],
+     Input("open-info-modal", "n_clicks"), Input("close-info-modal", "n_clicks"),
+     Input("open-preview-modal", "n_clicks"), Input("close-preview-modal", "n_clicks")],
     [State("save-page-modal", "is_open"),
-     State("info-page-modal", "is_open")],
+     State("info-page-modal", "is_open"),
+     State("preview-page-modal", "is_open")],
 )
-def toggle_modals(open_save_clicks, close_save_clicks, open_info_clicks, close_info_clicks, is_save_open, is_info_open):
+def toggle_modals(open_save_clicks, close_save_clicks, open_info_clicks, close_info_clicks,
+                  open_preview_clicks, close_preview_clicks, is_save_open, is_info_open, is_preview_open):
     ctx = dash.callback_context
 
     if ctx.triggered_id in ["open-save-modal", "close-save-modal"]:
-        return not is_save_open, False
+        return not is_save_open, False, False
     elif ctx.triggered_id in ["open-info-modal", "close-info-modal"]:
-        return False, not is_info_open
+        return False, not is_info_open, False
+    elif ctx.triggered_id in ["open-preview-modal", "close-preview-modal"]:
+        # Toggle the preview modal based on the button click
+        return False, False, not is_preview_open
     else:
-        return is_save_open, is_info_open
-
+        return is_save_open, is_info_open, is_preview_open
 
 if __name__ == '__main__':
     app.run_server(debug=True)
