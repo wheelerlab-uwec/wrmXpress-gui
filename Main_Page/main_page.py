@@ -238,13 +238,16 @@ def info_page_content():
             html.H6("Welcome to the Information Page"),
             html.H6("What is wrmXpress"),
             html.H6("What is a file path"),
-            html.P("A path is a string of characters used to uniquely identify a location in a directory structure. It is composed by following the directory tree hierarchy in which components, separated by a delimiting character, represent each directory"),
-            dcc.Link("File Path.", href="https://en.wikipedia.org/wiki/Path_(computing)", target="_blank"),
+            html.P("A file path is a reference to the location of a file or a folder in a file system. It describes the hierarchical structure of directories or folders leading to a specific file or folder. A file path is used by operating systems to locate and access files. There are two types of file paths: absolute and relative."),
+            html.P("Absolute Path: An absolute path provides the complete location of a file or folder from the root directory of the file system. Example (on Windows): C:\\Users\\Username\\Documents\\file.txt Example (on Unix-like systems): /home/username/documents/file.txt Relative Path: A relative path specifies the location of a file or folder relative to the current working directory. Example: If the current working directory is /home/username/, a relative path to the file might be documents/file.txt. Relative paths are dependent on the current working directory, so they may change if the working directory changes. In both types of paths, directories or folders are separated by a delimiter (e.g., \\ on Windows or / on Unix-like systems), and the file name is typically specified at the end of the path. Understanding and correctly specifying file paths is crucial for navigating and working with files in computer systems."),
+            dcc.Link("File Path", href="https://en.wikipedia.org/wiki/Path_(computing)", target="_blank"),
             html.H6("What is a yaml file"),
+            html.P("YAML (YAML Ain't Markup Language or, sometimes, Yet Another Markup Language) is a human-readable data serialization format. It's often used for configuration files and data exchange between languages with different data structures. YAML files use indentation to represent the structure of the data, and it relies on whitespace for nesting and scope."),
+            dcc.Link("YAML File", href="https://www.redhat.com/en/topics/automation/what-is-yaml", target="_blank"),
             html.H6("The Developers"),
             html.H6("Front End"),
             html.H6("Back End"),
-                            ]
+        ]
     )
 
 # Create the Save Page Modal
@@ -366,28 +369,28 @@ def save_page_to_yaml(
         user_input_yaml_file = {
             "imaging_mode": [imagingmode],
             "file_structure": [filestructure],
-            "multi-well-rows": multiwellrows,
-            "multi-well-cols": multiwellcols,
+            "multi-well-rows": int(multiwellrows),
+            "multi-well-cols": int(multiwellcols),
             "multi-well-detection": [multiwelldetection],
             "species": [species],
             "stages": [stages],
             "modules": {
-                "motility": {"run": motilityrun},
+                "motility": {"run": bool(motilityrun)},
                 "convert": {
-                    "run": conversionrun,
-                    "save_video": conversionscalevideo,
+                    "run": bool(conversionrun),
+                    "save_video": bool(conversionscalevideo),
                     "rescale_multiplier": conversionrescalemultiplier
                 },
                 "segment": {
-                    "run": segmentrun,
+                    "run": bool(segmentrun),
                     "wavelength": [wavelength]
                 },
                 "cellprofilier": {
-                    "run": cellprofilierrun,
+                    "run": bool(cellprofilierrun),
                     "pipeline": [cellprofilierpipeline]
                 },
                 "dx": {
-                    "run": diagnosticdx
+                    "run": bool(diagnosticdx)
                 }
             },
             "wells": [wellsinformation],
