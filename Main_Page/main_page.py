@@ -92,54 +92,64 @@ def create_imaging_settings():
         Accordian Item with elements for Imaging Settings
     """
     return dbc.AccordionItem(
-                [
-                    html.H6("Imaging Mode:"),
-                    dbc.RadioItems(
-                        id="imaging-mode",
-                        className="btn-group",
-                        inputClassName="btn-check",
-                        labelClassName="btn btn-outline-primary",
-                        labelCheckedClassName="active",
-                        options=[
-                            {"label": "Single Well", "value": "single-well"},
-                            {"label": "Multi Well", "value": "multi-well"},
-                        ],
-                        value="single-well",
-                    ),
-                    html.H6("File Structure:"),
-                    dbc.RadioItems(
-                        id="file-structure",
-                        className="btn-group",
-                        inputClassName="btn-check",
-                        labelClassName="btn btn-outline-primary",
-                        labelCheckedClassName="active",
-                        options=[
-                            {"label": "Image Express", "value": "imagexpress"},
-                            {"label": "AVI", "value": "avi"},
-                        ],
-                        value="imagexpress",
-                    ),
-                    html.H6("Multi Well Rows"),
-                    dbc.Input(id="multi-well-rows", placeholder="Please insert the multi well rows.", type="number", value = 0),
-                    html.H6("Multi Well Columns"),
-                    dbc.Input(id="multi-well-cols", placeholder="Please insert the multi well columns.", type="number", value = 0),
-                    html.H6("Multi Well Detection:"),
-                    dbc.RadioItems(
-                        id="multi-well-detection",
-                        className="btn-group",
-                        inputClassName="btn-check",
-                        labelClassName="btn btn-outline-primary",
-                        labelCheckedClassName="active",
-                        options=[
-                            {"label": "Auto", "value": "auto"},
-                            {"label": "Grid", "value": "grid"},
-                        ],
-                        value="auto",
-                    ),
+        [
+            html.H6("Imaging Mode:"),
+            dbc.RadioItems(
+                id="imaging-mode",
+                className="btn-group",
+                inputClassName="btn-check",
+                labelClassName="btn btn-outline-primary",
+                labelCheckedClassName="active",
+                options=[
+                    {"label": "Single Well", "value": "single-well"},
+                    {"label": "Multi Well", "value": "multi-well"},
                 ],
-                id="instrument-settings-file-structure",
-                title="Instrument Settings"
-            )
+                value="single-well",
+            ),
+            html.H6("File Structure:"),
+            dbc.RadioItems(
+                id="file-structure",
+                className="btn-group",
+                inputClassName="btn-check",
+                labelClassName="btn btn-outline-primary",
+                labelCheckedClassName="active",
+                options=[
+                    {"label": "Image Express", "value": "imagexpress"},
+                    {"label": "AVI", "value": "avi"},
+                ],
+                value="imagexpress",
+            ),
+            # New section for Multi-Well Options
+            dbc.Row([
+                html.H6("Multi-Well Options"),
+                dbc.Col(html.H6("Multi Well Rows"), width=6),
+                dbc.Col(dbc.Input(id="multi-well-rows", placeholder="Please insert the multi well rows.", type="number"), width=6),
+                dbc.Col(html.H6("Multi Well Columns"), width=6),
+                dbc.Col(dbc.Input(id="multi-well-cols", placeholder="Please insert the multi well columns.", type="number"), width=6),
+            ], id='multi-well-options-row', style={'display': 'flex'}),  # Initially hidden
+
+            # New section for additional dropdown
+            dbc.Row([
+                html.H6("Additional Options"),
+                dbc.RadioItems(
+                    id="multi-well-detection",
+                    className="btn-group",
+                    inputClassName="btn-check",
+                    labelClassName="btn btn-outline-primary",
+                    labelCheckedClassName="active",
+                    options=[
+                        {"label": "Auto", "value": "auto"},
+                        {"label": "Grid", "value": "grid"},
+                    ],
+                    value="auto",
+                ),
+            ], id='additional-options-row', style={'display': 'flex'}),  # Initially hidden
+        ],
+        id="instrument-settings-file-structure",
+        title="Instrument Settings"
+    )
+
+
 def create_worm_information():
     """
     Creating the Structure and Layout of the Worm Information Accordian Item
@@ -502,6 +512,23 @@ app.layout = html.Div([
     info_page,
     preview_page,
 ])
+@app.callback(
+    [Output('multi-well-options-row', 'style'),
+     Output('additional-options-row', 'style')],
+    [Input('imaging-mode', 'value'),
+     Input('file-structure', 'value')]
+)
+def update_options_visibility(imaging_mode, file_structure):
+    multi_well_options_style = {'display': 'none'}
+    additional_options_style = {'display': 'none'}
+
+    if imaging_mode == 'multi-well':
+        multi_well_options_style = {'display': 'flex'}
+
+        if file_structure == 'avi':
+            additional_options_style = {'display': 'flex'}
+
+    return multi_well_options_style, additional_options_style
 
 @app.callback(
         Output("save-page-status", "children"),
