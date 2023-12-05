@@ -263,10 +263,10 @@ def create_module_selection():
                     ),
                     html.H6("Wavelength"),
                     dbc.Input(id="segmentation-wavelength", placeholder="Please insert the segmentation wavelength (please seperate multiple values by a comma):", type="text"),
-                    html.H4("Cell Profilier"),
-                    html.H6("Cell Profilier Run"),
+                    html.H4("Cell Profiler"),
+                    html.H6("Cell Profiler Run"),
                     dbc.RadioItems(
-                        id="cell-profilier-run",
+                        id="cell-profiler-run",
                         className="btn-group",
                         inputClassName="btn-check",
                         labelClassName="btn btn-outline-primary",
@@ -277,9 +277,9 @@ def create_module_selection():
                         ],
                         value="False",
                     ),
-                    html.H6("Cell Profilier Pipeline"),
+                    html.H6("Cell Profiler Pipeline"),
                     dbc.RadioItems(
-                        id="cell-profilier-pipeline",
+                        id="cell-profiler-pipeline",
                         className="btn-group",
                         inputClassName="btn-check",
                         labelClassName="btn btn-outline-primary",
@@ -547,8 +547,8 @@ def update_options_visibility(imaging_mode, file_structure):
             State("conversion-rescale-multiplier","value"),
             State("segment-run","value"),
             State("segmentation-wavelength",'value'),
-            State("cell-profilier-run","value"),
-            State("cell-profilier-pipeline","value"),
+            State("cell-profiler-run","value"),
+            State("cell-profiler-pipeline","value"),
             State("diagnostics-dx","value"),
             State("wells-information", "value"),
             State("work-directory","value"),
@@ -572,8 +572,8 @@ def save_page_to_yaml(
     conversionrescalemultiplier,
     segmentrun,
     wavelength,
-    cellprofilierrun,
-    cellprofilierpipeline,
+    cellprofilerrun,
+    cellprofilerpipeline,
     diagnosticdx,
     wellsinformation,
     workdirectory,
@@ -601,9 +601,9 @@ def save_page_to_yaml(
                     "run": bool(segmentrun),
                     "wavelength": [wavelength]
                 },
-                "cellprofilier": {
-                    "run": bool(cellprofilierrun),
-                    "pipeline": [cellprofilierpipeline]
+                "cellprofiler": {
+                    "run": bool(cellprofilerrun),
+                    "pipeline": [cellprofilerpipeline]
                 },
                 "dx": {
                     "run": bool(diagnosticdx)
@@ -717,8 +717,8 @@ def open_save_page_modal(open_clicks, is_open):
      State("conversion-rescale-multiplier", "value"),
      State("segment-run", "value"),
      State("segmentation-wavelength", "value"),
-     State("cell-profilier-run", "value"),
-     State("cell-profilier-pipeline", "value"),
+     State("cell-profiler-run", "value"),
+     State("cell-profiler-pipeline", "value"),
      State("diagnostics-dx", "value"),
      State("wells-information", "value"),
      State("work-directory", "value"),
@@ -730,8 +730,8 @@ def update_user_input_yaml_file(open_clicks, close_clicks, well_for_preview_id,
                                 imaging_mode, file_structure, multi_well_rows, multi_well_cols,
                                 multi_well_detection, species, stages, motility_run,
                                 conversion_run, conversion_scale_video, conversion_rescale_multiplier,
-                                segment_run, segmentation_wavelength, cell_profilier_run,
-                                cell_profilier_pipeline, diagnostics_dx, wells_information,
+                                segment_run, segmentation_wavelength, cell_profiler_run,
+                                cell_profiler_pipeline, diagnostics_dx, wells_information,
                                 work_directory, input_directory, output_directory, file_path):
     
     # Initialize the user_input_yaml_file dictionary
@@ -754,9 +754,9 @@ def update_user_input_yaml_file(open_clicks, close_clicks, well_for_preview_id,
                 "run": segment_run,
                 "wavelength": [float(value) for value in segmentation_wavelength.split(',')]
             },
-            "cellprofilier": {
-                "run": cell_profilier_run,
-                "pipeline": [cell_profilier_pipeline]
+            "cellprofiler": {
+                "run": cell_profiler_run,
+                "pipeline": [cell_profiler_pipeline]
             },
             "dx": {
                 "run": diagnostics_dx
@@ -790,9 +790,9 @@ def update_user_input_yaml_file(open_clicks, close_clicks, well_for_preview_id,
                 "run": segment_run,
                 "wavelength": [float(value) for value in segmentation_wavelength.split(',')]
             },
-            "cellprofilier": {
-                "run": cell_profilier_run,
-                "pipeline": [cell_profilier_pipeline]
+            "cellprofiler": {
+                "run": cell_profiler_run,
+                "pipeline": [cell_profiler_pipeline]
             },
             "dx": {
                 "run": diagnostics_dx
