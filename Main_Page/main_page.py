@@ -345,8 +345,8 @@ def save_page_content():
     return dbc.ModalBody(
         [
             # Content for the Save Page Modal
-            html.H6("Save Page Content"),
-            dbc.Input(id= "file-path-for-saved-yaml-file", placeholder="Please enter the full filepath for your yaml file:", type="text"),
+            html.H6("Write a YAML for running wrmXpress remotely"),
+            dbc.Input(id= "file-path-for-saved-yaml-file", placeholder="Please enter the full path for your YAML file:", type="text"),
                             ]
     )
 def info_page_content():
