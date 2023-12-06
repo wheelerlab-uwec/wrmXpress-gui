@@ -29,6 +29,7 @@ col_vals = ['True', 'False', 'False', 'False',
             'False', 'False', 'False', 'False']
 
 df = pd.DataFrame(OrderedDict([
+    ('row', ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']),
     ('01', col_vals),
     ('02', col_vals),
     ('03', col_vals),
@@ -375,27 +376,37 @@ def create_run_time_settings():
                         data=df.to_dict('records'),
 
                         columns=[
-                            {'id': '01', 'name': '01', 'presentation': 'dropdown'},
-                            {'id': '02', 'name': '02', 'presentation': 'dropdown'},
-                            {'id': '03', 'name': '03', 'presentation': 'dropdown'},
-                            {'id': '04', 'name': '04', 'presentation': 'dropdown'},
-                            {'id': '05', 'name': '05', 'presentation': 'dropdown'},
-                            {'id': '06', 'name': '06', 'presentation': 'dropdown'},
-                            {'id': '07', 'name': '07', 'presentation': 'dropdown'},
-                            {'id': '08', 'name': '08', 'presentation': 'dropdown'},
-                            {'id': '09', 'name': '09', 'presentation': 'dropdown'},
-                            {'id': '10', 'name': '10', 'presentation': 'dropdown'},
-                            {'id': '11', 'name': '11', 'presentation': 'dropdown'},
-                            {'id': '12', 'name': '12', 'presentation': 'dropdown'},
+                            {'id': 'row', 'name': ["", "Row"], 'editable': False},
+                            {'id': '01', 'name': ["Column", "01"], 'presentation': 'dropdown'},
+                            {'id': '02', 'name': ["Column", "02"], 'presentation': 'dropdown'},
+                            {'id': '03', 'name': ["Column", "03"], 'presentation': 'dropdown'},
+                            {'id': '04', 'name': ["Column", "04"], 'presentation': 'dropdown'},
+                            {'id': '05', 'name': ["Column", "05"], 'presentation': 'dropdown'},
+                            {'id': '06', 'name': ["Column", "06"], 'presentation': 'dropdown'},
+                            {'id': '07', 'name': ["Column", "07"], 'presentation': 'dropdown'},
+                            {'id': '08', 'name': ["Column", "08"], 'presentation': 'dropdown'},
+                            {'id': '09', 'name': ["Column", "09"], 'presentation': 'dropdown'},
+                            {'id': '10', 'name': ["Column", "10"], 'presentation': 'dropdown'},
+                            {'id': '11', 'name': ["Column", "11"], 'presentation': 'dropdown'},
+                            {'id': '12', 'name': ["Column", "12"], 'presentation': 'dropdown'},
                         ],
+                        
+                        merge_duplicate_headers=True,
+                        tooltip_header={'01': 'Select "True" for all wells to be analyzed.'},
+
+                        # Style headers with a dotted underline to indicate a tooltip
+                        style_header_conditional=[{
+                            'if': {'column_id': '01'},
+                            'textDecoration': 'underline',
+                            'textDecorationStyle': 'dotted',
+                        }],
+                        style_cell={'textAlign': 'center'},
                         editable=True,
                         css=[{"selector": ".Select-menu-outer",
                               "rule": "display: block !important"}],
                         markdown_options={
                             'html': True  # Enable HTML rendering for markdown cells
                         },
-                        # Adjust the size of the table
-                        style_table={'height': '300px', 'overflowY': 'auto'},
                         dropdown={
                             '01': {
                                 'options': [
