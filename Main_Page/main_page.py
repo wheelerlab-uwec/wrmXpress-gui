@@ -3,7 +3,9 @@ from dash import dcc, html
 from dash.dependencies import Input, Output, State
 from dash import callback_context
 from dash.exceptions import PreventUpdate
+from dash import dash_table
 import dash_bootstrap_components as dbc
+import pandas as pd
 import yaml
 import plotly.graph_objs as go
 import os
@@ -13,6 +15,13 @@ import cv2
 import base64
 
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP], suppress_callback_exceptions=True)
+
+# Create a DataFrame with 11 columns and 8 rows
+columns = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11']
+rows = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
+
+data = {col: [False] * len(rows) for col in columns}
+df = pd.DataFrame(data, index=rows)
 
 gummy_worm_file_path = "Main_Page/Figures/gummy_worms.png"
 wrmXpress_logo_file_path = "Main_Page/Figures/wrmXpress_logo.png"
@@ -148,8 +157,6 @@ def create_imaging_settings():
         id="instrument-settings-file-structure",
         title="Instrument Settings"
     )
-
-
 def create_worm_information():
     """
     Creating the Structure and Layout of the Worm Information Accordian Item
@@ -312,27 +319,62 @@ def create_module_selection():
             )
 def create_run_time_settings():
     """
-    Creating the Structure and Layout of the Run Time Settings Accordian Item
+    Creating the Structure and Layout of the Run Time Settings Accordion Item
     ========================================================================
     Inputs:
         None
     Returns:
-        Accordian Item with elements for Run Time Settings
+        Accordion Item with elements for Run Time Settings
     """
-    return dbc.AccordionItem([
-                html.H6("Wells"),
-                dbc.Input(id="wells-information", placeholder="Please insert the wells information (please seperate multiple values by a comma):", type="text"),
-                html.H4("Directories"),
-                html.H6("Work"),
-                dbc.Input(id="work-directory", placeholder="Please insert the work directory:", type="text"),
-                html.H6("Input"),
-                dbc.Input(id="input-directory", placeholder="Please insert the input directory:", type="text"),
-                html.H6("Output"),
-                dbc.Input(id="output-directory", placeholder="Please insert the output directory:", type="text"),
-            ],
+    return dbc.AccordionItem(
+        [
+            html.Div(
+                [
+                    dash_table.DataTable(
+                        id='table-dropdown',
+                        data=df.to_dict('records'),
+                        columns=[
+                            {'id': col, 'name': col, 'presentation': 'input', 'editable': True}
+                            if col in ['01', '02', '03', '04', '05', "06", "07", "08", "09", "10", "11"] # Use 'input' presentation for columns with dropdown
+                            else {'id': col, 'name': col, 'presentation': 'markdown', 'editable': True}
+                            for col in df.columns
+                        ],
+
+                        editable=True,
+                        markdown_options={
+                            'html': True  # Enable HTML rendering for markdown cells
+                        },
+                        # Adjust the size of the table
+                        style_table={'height': '300px', 'overflowY': 'auto'},
+                        dropdown={
+                            col: {
+                                'options': [
+                                    {'label': 'True', 'value': True},
+                                    {'label': 'False', 'value': False}
+                                ],
+                                'clearable': False
+                            }
+                            for col in df.columns if col in ['01', '02', '03', '04', '05', "06", "07", "08", "09", "10", "11"]
+                        }
+                    ),
+                    html.Div(id='table-dropdown-container'),
+                    html.H6("Wells"),
+                    dbc.Input(id="wells-information", placeholder="Please insert the wells information (please separate multiple values by a comma):", type="text"),
+                    html.H4("Directories"),
+                    html.H6("Work"),
+                    dbc.Input(id="work-directory", placeholder="Please insert the work directory:", type="text"),
+                    html.H6("Input"),
+                    dbc.Input(id="input-directory", placeholder="Please insert the input directory:", type="text"),
+                    html.H6("Output"),
+                    dbc.Input(id="output-directory", placeholder="Please insert the output directory:", type="text"),
+                ],
                 id="run-time-settings",
-                title="Run-Time Settings"
             )
+        ],
+        title="Run-Time Settings"
+    )
+
+
 def save_page_content():
     """
     Creating the Structure and Layout of the Save Page 
@@ -437,6 +479,7 @@ preview_page = dbc.Modal(
         preview_page_content(),
         dbc.ModalFooter([
             # Buttons for the Info Page Modal
+            dbc.Button("Preview", id = "preview-preview-button", className="ml-auto", color="success"),
             dbc.Button("Close", id="close-preview-modal", className="ml-auto"),
         ]),
         html.Div(id="preview-page-status")  # Placeholder for saving status
@@ -478,6 +521,7 @@ save_page = dbc.Modal(
     size="xl"
 )
 
+# Main Page Layout
 app.layout = html.Div([
     dbc.Navbar(
         dbc.Container(
@@ -512,6 +556,12 @@ app.layout = html.Div([
     info_page,
     preview_page,
 ])
+
+@app.callback(Output('tbl_out', 'children'), Input('tbl', 'active_cell'))
+def update_graphs(active_cell):
+    return str(active_cell) if active_cell else "Click the table"
+
+# Call Back for pop up multi well
 @app.callback(
     [Output('multi-well-options-row', 'style'),
      Output('additional-options-row', 'style')],
@@ -530,6 +580,105 @@ def update_options_visibility(imaging_mode, file_structure):
 
     return multi_well_options_style, additional_options_style
 
+# Preview page call back
+@app.callback(
+        Output("preview-page-status", "children"),
+        [Input("preview-preview-button", "n_clicks")],
+        [
+            State("imaging-mode", "value"),
+            State("file-structure", "value"),
+            State("multi-well-rows", "value"),
+            State("multi-well-cols", "value"),
+            State("multi-well-detection","value"),
+            State("species","value"),
+            State("stages", 'value'),
+            State("motility-run","value"),
+            State("conversion-run","value"),
+            State("conversion-scale-video","value"),
+            State("conversion-rescale-multiplier","value"),
+            State("segment-run","value"),
+            State("segmentation-wavelength",'value'),
+            State("cell-profilier-run","value"),
+            State("cell-profilier-pipeline","value"),
+            State("diagnostics-dx","value"),
+            State("wells-information", "value"),
+            State("work-directory","value"),
+            State("input-directory", "value"),
+            State("output-directory","value"),
+            State("file-path-for-preview-yaml-file", "value"),
+            State("file-path-to-wrapper-py","value"),
+            ]
+            )
+def save_page_to_yaml(
+    n_clicks, 
+    imagingmode, 
+    filestructure, 
+    multiwellrows, 
+    multiwellcols, 
+    multiwelldetection,
+    species,
+    stages,
+    motilityrun,
+    conversionrun,
+    conversionscalevideo,
+    conversionrescalemultiplier,
+    segmentrun,
+    wavelength,
+    cellprofilierrun,
+    cellprofilierpipeline,
+    diagnosticdx,
+    wellsinformation,
+    workdirectory,
+    inputdirectory,
+    outputdirectory,
+    filepathforyamlfile,
+    wrapper_py_file_path,
+):
+    if n_clicks:
+        preview_input_yaml_file = {
+            "imaging_mode": [imagingmode],
+            "file_structure": [filestructure],
+            "multi-well-rows": multiwellrows,
+            "multi-well-cols": multiwellcols,
+            "multi-well-detection": [multiwelldetection],
+            "species": [species],
+            "stages": [stages],
+            "modules": {
+                "motility": {"run": bool(motilityrun)},
+                "convert": {
+                    "run": bool(conversionrun),
+                    "save_video": bool(conversionscalevideo),
+                    "rescale_multiplier": conversionrescalemultiplier
+                },
+                "segment": {
+                    "run": bool(segmentrun),
+                    "wavelength": [wavelength]
+                },
+                "cellprofilier": {
+                    "run": bool(cellprofilierrun),
+                    "pipeline": [cellprofilierpipeline]
+                },
+                "dx": {
+                    "run": bool(diagnosticdx)
+                }
+            },
+            "wells": [wellsinformation],
+            "directories": {
+                "work": [workdirectory],
+                "input": [inputdirectory],
+                "output": [outputdirectory]
+            }
+        }
+        # Create the full filepath using os.path.join
+        output_file = os.path.join(filepathforyamlfile + ".yaml")
+
+        # Dump preview data to YAML file
+        with open(output_file, 'w') as yaml_file:
+            yaml.dump(preview_input_yaml_file, yaml_file, default_flow_style=False)
+        return f"Data Saved to {filepathforyamlfile}"
+    return ""
+
+# Save Page Call Back
 @app.callback(
         Output("save-page-status", "children"),
         [Input("save-page-button", "n_clicks")],
@@ -585,8 +734,8 @@ def save_page_to_yaml(
         user_input_yaml_file = {
             "imaging_mode": [imagingmode],
             "file_structure": [filestructure],
-            "multi-well-rows": int(multiwellrows),
-            "multi-well-cols": int(multiwellcols),
+            "multi-well-rows": multiwellrows,
+            "multi-well-cols": multiwellcols,
             "multi-well-detection": [multiwelldetection],
             "species": [species],
             "stages": [stages],
@@ -595,7 +744,7 @@ def save_page_to_yaml(
                 "convert": {
                     "run": bool(conversionrun),
                     "save_video": bool(conversionscalevideo),
-                    "rescale_multiplier": float(conversionrescalemultiplier)
+                    "rescale_multiplier": conversionrescalemultiplier
                 },
                 "segment": {
                     "run": bool(segmentrun),
