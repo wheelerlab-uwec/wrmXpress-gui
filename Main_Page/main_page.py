@@ -13,7 +13,6 @@ import os
 import pathlib
 import base64
 import cv2
-import base64
 
 app = dash.Dash(__name__, external_stylesheets=[
                 dbc.themes.BOOTSTRAP], suppress_callback_exceptions=True)
@@ -112,6 +111,7 @@ def convert_png_to_image(file_path):
 
 
 gummy_wrm = convert_png_to_image(gummy_worm_file_path)
+info_symbol = "data:image/svg+xml;utf8;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCI+PHBhdGggZmlsbD0ibm9uZSIgZD0iTTAgMGgyNHYyNEgwWiIgZGF0YS1uYW1lPSJQYXRoIDM2NzIiLz48cGF0aCBmaWxsPSIjNTI1ODYzIiBkPSJNNS4yMTEgMTguNzg3YTkuNiA5LjYgMCAxIDEgNi43ODggMi44MTQgOS42IDkuNiAwIDAgMS02Ljc4OC0yLjgxNFptMS4yNzQtMTIuM0E3LjgwNiA3LjgwNiAwIDEgMCAxMiA0LjIwNmE3LjgwOCA3LjgwOCAwIDAgMC01LjUxNSAyLjI3OFptNC4xNjMgOS44Nzl2LTQuOGExLjM1MiAxLjM1MiAwIDAgMSAyLjcgMHY0LjhhMS4zNTIgMS4zNTIgMCAwIDEtMi43IDBabS4wMTctOC43QTEuMzM1IDEuMzM1IDAgMSAxIDEyIDkuMDMzYTEuMzUgMS4zNSAwIDAgMS0xLjMzNS0xLjM2OVoiIGRhdGEtbmFtZT0iUGF0aCAyNjgzIi8+PC9zdmc+"
 wrmXpress_logo = convert_png_to_image(wrmXpress_logo_file_path)
 uwec_img = convert_png_to_image(uwec_logo_file_path)
 uw_img = convert_png_to_image(uw_logo_file_path)
@@ -131,7 +131,13 @@ def create_imaging_settings():
     """
     return dbc.AccordionItem(
         [
-            html.H6("Imaging Mode:"),
+            html.H6("Imaging Mode:", id='imaging-mode-header'),
+            html.Img(src=info_symbol,
+                     id='imaging-mode-symbol'),
+            dbc.Tooltip(
+                "Select Single Well if each video or image only includes a single well. Select Multi Well if each video/image contains multiple wells that need to be split.",
+                target="imaging-mode-symbol"
+            ),
             dbc.RadioItems(
                 id="imaging-mode",
                 className="btn-group",
@@ -145,6 +151,12 @@ def create_imaging_settings():
                 value="single-well",
             ),
             html.H6("File Structure:"),
+            html.Img(src=info_symbol,
+                     id='file-structure-symbol'),
+            dbc.Tooltip(
+                "Select ImageXpress if the data is saved in an IX-like structure. Select AVI if the data is a single video saved as an AVI.",
+                target="file-structure-symbol"
+            ),
             dbc.RadioItems(
                 id="file-structure",
                 className="btn-group",
@@ -152,7 +164,7 @@ def create_imaging_settings():
                 labelClassName="btn btn-outline-primary",
                 labelCheckedClassName="active",
                 options=[
-                    {"label": "Image Express", "value": "imagexpress"},
+                    {"label": "ImageXpress", "value": "imagexpress"},
                     {"label": "AVI", "value": "avi"},
                 ],
                 value="imagexpress",
@@ -209,9 +221,9 @@ def create_worm_information():
                 labelClassName="btn btn-outline-primary",
                 labelCheckedClassName="active",
                 options=[
-                    {"label": "Bma", "value": "Bma"},
-                    {"label": "Cel", "value": "Cel"},
-                    {"label": "Sma", "value": "Sma"}
+                    {"label": "Brugia malayi", "value": "Bma"},
+                    {"label": "Caenorhabditis elegans", "value": "Cel"},
+                    {"label": "Schistosoma mansoni", "value": "Sma"}
                 ],
                 value="Bma",
             ),
@@ -246,7 +258,13 @@ def create_module_selection():
     """
     return dbc.AccordionItem(
         [
-            html.H4("Motility"),
+            html.H4("Motility", style={'display':'inline-block'}),
+            html.Img(src=info_symbol,
+                     id='motility-symbol',
+                     style={'display':'inline-block', 'width': '1.5%', 'height': '1.5%', 'padding-bottom': 10}),
+            dbc.Tooltip(
+                "Uses an optical flow algorithm to measure total motility of the well.",
+                target="motility-symbol"),
             html.H6("Motility Run"),
             dbc.RadioItems(
                 id="motility-run",
@@ -258,9 +276,17 @@ def create_module_selection():
                     {"label": "True", "value": "True"},
                     {"label": "False", "value": "False"}
                 ],
-                value="True",
+                value="True"
             ),
-            html.H4("Conversion"),
+            html.Br(),
+            html.H4("Conversion",
+                style={'padding-top':30, 'display':'inline-block'}),
+            html.Img(src=info_symbol,
+                     id='conversion-symbol',
+                     style={'display':'inline-block', 'width': '1.5%', 'height': '1.5%', 'padding-bottom': 10}),
+            dbc.Tooltip(
+                "Convert an IX-like video file-structure (directories of time points) to a structure that contains directories of wells. This new structure will be saved to Output",
+                target="conversion-symbol"),
             html.H6("Conversion Run"),
             dbc.RadioItems(
                 id="conversion-run",
@@ -272,9 +298,17 @@ def create_module_selection():
                     {"label": "True", "value": "True"},
                     {"label": "False", "value": "False"}
                 ],
-                value="False",
+                value="False"
             ),
-            html.H6("Conversion Scale Video"),
+            html.Br(),
+            html.H6("Conversion Scale Video",
+            style={'display':'inline-block'}),
+            html.Img(src=info_symbol,
+                     id='rescale-symbol',
+                     style={'display':'inline-block', 'width': '1.5%', 'height': '1.5%', 'padding-bottom': 10}),
+            dbc.Tooltip(
+                "Rescale the video to be smaller or larger than the original. Useful for reducing the file size of a video to be included in a presentation. Use a float as the multiplier (smaller than 1 will make a smaller video).",
+                target="rescale-symbol"),
             dbc.RadioItems(
                 id="conversion-scale-video",
                 className="btn-group",
@@ -289,8 +323,10 @@ def create_module_selection():
             ),
             html.H6("Conversion Rescale Multiplier"),
             dbc.Input(id="conversion-rescale-multiplier",
-                      placeholder="Please insert the rescale multiplier:", type="text"),
-            html.H4("Segmentation"),
+                      placeholder="Please insert the rescale multiplier:", 
+                      type="text"),
+            html.H4("Segmentation",
+                style={'padding-top':30}),
             html.H6("Segment Run"),
             dbc.RadioItems(
                 id="segment-run",
@@ -307,7 +343,8 @@ def create_module_selection():
             html.H6("Wavelength"),
             dbc.Input(id="segmentation-wavelength",
                       placeholder="Please insert the segmentation wavelength (please seperate multiple values by a comma):", type="text"),
-            html.H4("Cell Profiler"),
+            html.H4("Cell Profiler",
+                style={'padding-top':30}),
             html.H6("Cell Profiler Run"),
             dbc.RadioItems(
                 id="cell-profiler-run",
@@ -337,7 +374,8 @@ def create_module_selection():
                 ],
                 value="wormsize_intensity_cellpose",
             ),
-            html.H4("Diagnostics"),
+            html.H4("Diagnostics",
+                style={'padding-top':30}),
             html.H6("dx"),
             dbc.RadioItems(
                 id="diagnostics-dx",
