@@ -18,7 +18,8 @@ app = dash.Dash(__name__, external_stylesheets=[
                 dbc.themes.BOOTSTRAP], suppress_callback_exceptions=True)
 
 # Create a DataFrame with 11 columns and 8 rows
-columns = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12']
+columns = ['01', '02', '03', '04', '05',
+           '06', '07', '08', '09', '10', '11', '12']
 rows = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
 
 # data = {col: [False] * len(rows) for col in columns}
@@ -258,124 +259,152 @@ def create_module_selection():
     """
     return dbc.AccordionItem(
         [
-            html.H4("Motility", style={'display':'inline-block'}),
-            html.Img(src=info_symbol,
-                     id='motility-symbol',
-                     style={'display':'inline-block', 'width': '1.5%', 'height': '1.5%', 'padding-bottom': 10}),
-            dbc.Tooltip(
-                "Uses an optical flow algorithm to measure total motility of the well.",
-                target="motility-symbol"),
-            html.H6("Motility Run"),
-            dbc.RadioItems(
-                id="motility-run",
-                className="btn-group",
-                inputClassName="btn-check",
-                labelClassName="btn btn-outline-primary",
-                labelCheckedClassName="active",
-                options=[
-                    {"label": "True", "value": "True"},
-                    {"label": "False", "value": "False"}
-                ],
-                value="True"
-            ),
-            html.Br(),
-            html.H4("Conversion",
-                style={'padding-top':30, 'display':'inline-block'}),
-            html.Img(src=info_symbol,
-                     id='conversion-symbol',
-                     style={'display':'inline-block', 'width': '1.5%', 'height': '1.5%', 'padding-bottom': 10}),
-            dbc.Tooltip(
-                "Convert an IX-like video file-structure (directories of time points) to a structure that contains directories of wells. This new structure will be saved to Output",
-                target="conversion-symbol"),
-            html.H6("Conversion Run"),
-            dbc.RadioItems(
-                id="conversion-run",
-                className="btn-group",
-                inputClassName="btn-check",
-                labelClassName="btn btn-outline-primary",
-                labelCheckedClassName="active",
-                options=[
-                    {"label": "True", "value": "True"},
-                    {"label": "False", "value": "False"}
-                ],
-                value="False"
-            ),
-            html.Br(),
-            html.H6("Conversion Scale Video",
-            style={'display':'inline-block'}),
-            html.Img(src=info_symbol,
-                     id='rescale-symbol',
-                     style={'display':'inline-block', 'width': '1.5%', 'height': '1.5%', 'padding-bottom': 10}),
-            dbc.Tooltip(
-                "Rescale the video to be smaller or larger than the original. Useful for reducing the file size of a video to be included in a presentation. Use a float as the multiplier (smaller than 1 will make a smaller video).",
-                target="rescale-symbol"),
-            dbc.RadioItems(
-                id="conversion-scale-video",
-                className="btn-group",
-                inputClassName="btn-check",
-                labelClassName="btn btn-outline-primary",
-                labelCheckedClassName="active",
-                options=[
-                    {"label": "True", "value": "True"},
-                    {"label": "False", "value": "False"}
-                ],
-                value="False",
-            ),
-            html.H6("Conversion Rescale Multiplier"),
-            dbc.Input(id="conversion-rescale-multiplier",
-                      placeholder="Please insert the rescale multiplier:", 
-                      type="text"),
-            html.H4("Segmentation",
-                style={'padding-top':30}),
-            html.H6("Segment Run"),
-            dbc.RadioItems(
-                id="segment-run",
-                className="btn-group",
-                inputClassName="btn-check",
-                labelClassName="btn btn-outline-primary",
-                labelCheckedClassName="active",
-                options=[
-                    {"label": "True", "value": "True"},
-                    {"label": "False", "value": "False"}
-                ],
-                value="True",
-            ),
-            html.H6("Wavelength"),
-            dbc.Input(id="segmentation-wavelength",
-                      placeholder="Please insert the segmentation wavelength (please seperate multiple values by a comma):", type="text"),
-            html.H4("Cell Profiler",
-                style={'padding-top':30}),
-            html.H6("Cell Profiler Run"),
-            dbc.RadioItems(
-                id="cell-profiler-run",
-                className="btn-group",
-                inputClassName="btn-check",
-                labelClassName="btn btn-outline-primary",
-                labelCheckedClassName="active",
-                options=[
-                    {"label": "True", "value": "True"},
-                    {"label": "False", "value": "False"}
-                ],
-                value="False",
-            ),
-            html.H6("Cell Profiler Pipeline"),
-            dbc.RadioItems(
-                id="cell-profiler-pipeline",
-                className="btn-group",
-                inputClassName="btn-check",
-                labelClassName="btn btn-outline-primary",
-                labelCheckedClassName="active",
-                options=[
-                    {"label": "Worm Size, Intensity, Cell Pose",
-                     "value": "wormsize_intensity_cellpose"},
-                    {"label": "Mf Celltox", "value": "mf_celltox"},
-                    {"label": "Wormsize", "value": "wormsize"},
-                    {"label": "Wormsize Trans", "value": "wormsize_trans"}
-                ],
-                value="wormsize_intensity_cellpose",
-            ),
+            # Create separate tabs for video/image analysis
+            dcc.Tabs(id="module-tabs", value="tab-modules", children=[
+
+                # Video analysis tab
+                dcc.Tab(label="Video Analysis", value='video-analysis-tab', children=[
+
+                    # Motility module
+                    html.H4("Motility", style={'display': 'inline-block'}),
+                    html.Img(src=info_symbol,
+                             id='motility-symbol',
+                             style={'display': 'inline-block', 'width': '1.5%', 'height': '1.5%', 'padding-bottom': 10}),
+                    dbc.Tooltip(
+                        "Uses an optical flow algorithm to measure total motility of the well.",
+                        target="motility-symbol"),
+                    html.H6("Motility Run"),
+                    dbc.RadioItems(
+                        id="motility-run",
+                        className="btn-group",
+                        inputClassName="btn-check",
+                        labelClassName="btn btn-outline-primary",
+                        labelCheckedClassName="active",
+                        options=[
+                            {"label": "True", "value": "True"},
+                            {"label": "False", "value": "False"}
+                        ],
+                        value="True"
+                    ),
+                    html.Br(),
+
+                    # Conversion module
+                    html.H4("Conversion",
+                            style={'padding-top': 30, 'display': 'inline-block'}),
+                    html.Img(src=info_symbol,
+                             id='conversion-symbol',
+                             style={'display': 'inline-block', 'width': '1.5%', 'height': '1.5%', 'padding-bottom': 10}),
+                    dbc.Tooltip(
+                        "Convert an IX-like video file-structure (directories of time points) to a structure that contains directories of wells. This new structure will be saved to Output",
+                        target="conversion-symbol"),
+                    html.H6("Conversion Run"),
+                    dbc.RadioItems(
+                        id="conversion-run",
+                        className="btn-group",
+                        inputClassName="btn-check",
+                        labelClassName="btn btn-outline-primary",
+                        labelCheckedClassName="active",
+                        options=[
+                            {"label": "True", "value": "True"},
+                            {"label": "False", "value": "False"}
+                        ],
+                        value="False"
+                    ),
+                    html.Br(),
+                    html.H6("Conversion Scale Video",
+                            style={'display': 'inline-block'}),
+                    html.Img(src=info_symbol,
+                             id='rescale-symbol',
+                             style={'display': 'inline-block', 'width': '1.5%', 'height': '1.5%', 'padding-bottom': 10}),
+                    dbc.Tooltip(
+                        "Rescale the video to be smaller or larger than the original. Useful for reducing the file size of a video to be included in a presentation. Use a float as the multiplier (smaller than 1 will make a smaller video).",
+                        target="rescale-symbol"),
+                    dbc.RadioItems(
+                        id="conversion-scale-video",
+                        className="btn-group",
+                        inputClassName="btn-check",
+                        labelClassName="btn btn-outline-primary",
+                        labelCheckedClassName="active",
+                        options=[
+                            {"label": "True", "value": "True"},
+                            {"label": "False", "value": "False"}
+                        ],
+                        value="False",
+                    ),
+                    html.H6("Conversion Rescale Multiplier"),
+                    dbc.Input(id="conversion-rescale-multiplier",
+                              placeholder="Please insert the rescale multiplier:",
+                              type="text"),
+
+                    # Segementation module
+                    html.H4("Segmentation",
+                            style={'padding-top': 30}),
+                    html.H6("Segment Run"),
+                    dbc.RadioItems(
+                        id="segment-run",
+                        className="btn-group",
+                        inputClassName="btn-check",
+                        labelClassName="btn btn-outline-primary",
+                        labelCheckedClassName="active",
+                        options=[
+                            {"label": "True", "value": "True"},
+                            {"label": "False", "value": "False"}
+                        ],
+                        value="True",
+                    ),
+                    html.H6("Wavelength"),
+                    dbc.Input(id="segmentation-wavelength",
+                              placeholder="Please insert the segmentation wavelength (please seperate multiple values by a comma):", type="text")
+                ]),
+
+                # Image analysis tab
+                dcc.Tab(label="Image Analysis (CellProfiler)", value='still-analysis-tab', children=[
+
+                    # Cell Profiler module
+                    html.H4("Cell Profiler",
+                            style={'padding-top': 30}),
+                    html.H6("Cell Profiler Run"),
+                    dbc.RadioItems(
+                        id="cell-profiler-run",
+                        className="btn-group",
+                        inputClassName="btn-check",
+                        labelClassName="btn btn-outline-primary",
+                        labelCheckedClassName="active",
+                        options=[
+                            {"label": "True", "value": "True"},
+                            {"label": "False", "value": "False"}
+                        ],
+                        value="False",
+                    ),
+                    html.H6("Cell Profiler Pipeline"),
+                    dbc.RadioItems(
+                        id="cell-profiler-pipeline",
+                        className="btn-group",
+                        inputClassName="btn-check",
+                        labelClassName="btn btn-outline-primary",
+                        labelCheckedClassName="active",
+                        options=[
+                            {"label": "Worm Size, Intensity, Cell Pose",
+                             "value": "wormsize_intensity_cellpose"},
+                            {"label": "Mf Celltox", "value": "mf_celltox"},
+                            {"label": "Wormsize", "value": "wormsize"},
+                            {"label": "Wormsize Trans", "value": "wormsize_trans"}
+                        ],
+                        value="wormsize_intensity_cellpose",
+                    )
+                ])]),
+
+            html.Hr(),
+
+            # Diagnostic Module
             html.H4("Diagnostics",
-                style={'padding-top':30}),
+                    style={'display': 'inline-block'}),
+            html.Img(src=info_symbol,
+                     id='dx-symbol',
+                     style={'display': 'inline-block', 'width': '1.5%', 'height': '1.5%', 'padding-bottom': 10}),
+            dbc.Tooltip(
+                "Generate and export diagnostic images (recommended).",
+                target="dx-symbol"),
             html.H6("dx"),
             dbc.RadioItems(
                 id="diagnostics-dx",
@@ -388,7 +417,7 @@ def create_module_selection():
                     {"label": "False", "value": "False"}
                 ],
                 value="True",
-            ),
+            )
         ],
         id="module-selection",
         title="Module Selection"
@@ -414,23 +443,37 @@ def create_run_time_settings():
                         data=df.to_dict('records'),
 
                         columns=[
-                            {'id': 'row', 'name': ["", "Row"], 'editable': False},
-                            {'id': '01', 'name': ["Column", "01"], 'presentation': 'dropdown'},
-                            {'id': '02', 'name': ["Column", "02"], 'presentation': 'dropdown'},
-                            {'id': '03', 'name': ["Column", "03"], 'presentation': 'dropdown'},
-                            {'id': '04', 'name': ["Column", "04"], 'presentation': 'dropdown'},
-                            {'id': '05', 'name': ["Column", "05"], 'presentation': 'dropdown'},
-                            {'id': '06', 'name': ["Column", "06"], 'presentation': 'dropdown'},
-                            {'id': '07', 'name': ["Column", "07"], 'presentation': 'dropdown'},
-                            {'id': '08', 'name': ["Column", "08"], 'presentation': 'dropdown'},
-                            {'id': '09', 'name': ["Column", "09"], 'presentation': 'dropdown'},
-                            {'id': '10', 'name': ["Column", "10"], 'presentation': 'dropdown'},
-                            {'id': '11', 'name': ["Column", "11"], 'presentation': 'dropdown'},
-                            {'id': '12', 'name': ["Column", "12"], 'presentation': 'dropdown'},
+                            {'id': 'row', 'name': [
+                                "", "Row"], 'editable': False},
+                            {'id': '01', 'name': [
+                                "Column", "01"], 'presentation': 'dropdown'},
+                            {'id': '02', 'name': [
+                                "Column", "02"], 'presentation': 'dropdown'},
+                            {'id': '03', 'name': [
+                                "Column", "03"], 'presentation': 'dropdown'},
+                            {'id': '04', 'name': [
+                                "Column", "04"], 'presentation': 'dropdown'},
+                            {'id': '05', 'name': [
+                                "Column", "05"], 'presentation': 'dropdown'},
+                            {'id': '06', 'name': [
+                                "Column", "06"], 'presentation': 'dropdown'},
+                            {'id': '07', 'name': [
+                                "Column", "07"], 'presentation': 'dropdown'},
+                            {'id': '08', 'name': [
+                                "Column", "08"], 'presentation': 'dropdown'},
+                            {'id': '09', 'name': [
+                                "Column", "09"], 'presentation': 'dropdown'},
+                            {'id': '10', 'name': [
+                                "Column", "10"], 'presentation': 'dropdown'},
+                            {'id': '11', 'name': [
+                                "Column", "11"], 'presentation': 'dropdown'},
+                            {'id': '12', 'name': [
+                                "Column", "12"], 'presentation': 'dropdown'},
                         ],
-                        
+
                         merge_duplicate_headers=True,
-                        tooltip_header={'01': 'Select "True" for all wells to be analyzed.'},
+                        tooltip_header={
+                            '01': 'Select "True" for all wells to be analyzed.'},
 
                         # Style headers with a dotted underline to indicate a tooltip
                         style_header_conditional=[{
