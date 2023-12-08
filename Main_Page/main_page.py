@@ -17,33 +17,6 @@ import cv2
 app = dash.Dash(__name__, external_stylesheets=[
                 dbc.themes.BOOTSTRAP], suppress_callback_exceptions=True)
 
-# Create a DataFrame with 11 columns and 8 rows
-columns = ['01', '02', '03', '04', '05',
-           '06', '07', '08', '09', '10', '11', '12']
-rows = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
-
-# data = {col: [False] * len(rows) for col in columns}
-# df = pd.DataFrame(data, index=rows)
-
-col_vals = ['True', 'False', 'False', 'False',
-            'False', 'False', 'False', 'False']
-
-df = pd.DataFrame(OrderedDict([
-    ('row', ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']),
-    ('01', col_vals),
-    ('02', col_vals),
-    ('03', col_vals),
-    ('04', col_vals),
-    ('05', col_vals),
-    ('06', col_vals),
-    ('07', col_vals),
-    ('08', col_vals),
-    ('09', col_vals),
-    ('10', col_vals),
-    ('11', col_vals),
-    ('12', col_vals),
-]))
-
 gummy_worm_file_path = "Main_Page/Figures/gummy_worms.png"
 wrmXpress_logo_file_path = "Main_Page/Figures/wrmXpress_logo.png"
 uwec_logo_file_path = "Main_Page/Figures/uwec_logo.png"
@@ -120,7 +93,163 @@ wheeler_lab_logo = convert_png_to_image(wheeler_lab_file_path)
 
 # Functionality and page layout functions
 
+def table_selection_content():
+    """
+    Creating the Structure and Layout of the Table Selection for Wells
+    ========================================================================
+    Inputs:
+        None
+    Returns:
+        Interactive Table for the User to select the wells in which they hope to analyze
+    """
+    # Create a DataFrame with 11 columns and 8 rows
+    columns = ['01', '02', '03', '04', '05',
+            '06', '07', '08', '09', '10', '11', '12']
+    rows = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
 
+    col_vals = ['True', 'False', 'False', 'False',
+                'False', 'False', 'False', 'False']
+
+    df = pd.DataFrame(OrderedDict([
+        ('row', ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']),
+        ('01', col_vals),
+        ('02', col_vals),
+        ('03', col_vals),
+        ('04', col_vals),
+        ('05', col_vals),
+        ('06', col_vals),
+        ('07', col_vals),
+        ('08', col_vals),
+        ('09', col_vals),
+        ('10', col_vals),
+        ('11', col_vals),
+        ('12', col_vals),
+    ]))
+    return dash_table.DataTable(
+                        id='table-dropdown',
+                        data=df.to_dict('records'),
+
+                        columns=[
+                            {'id': 'row', 'name': [
+                                "", "Row"], 'editable': False},
+                            {'id': '01', 'name': [
+                                "Column", "01"], 'presentation': 'dropdown'},
+                            {'id': '02', 'name': [
+                                "Column", "02"], 'presentation': 'dropdown'},
+                            {'id': '03', 'name': [
+                                "Column", "03"], 'presentation': 'dropdown'},
+                            {'id': '04', 'name': [
+                                "Column", "04"], 'presentation': 'dropdown'},
+                            {'id': '05', 'name': [
+                                "Column", "05"], 'presentation': 'dropdown'},
+                            {'id': '06', 'name': [
+                                "Column", "06"], 'presentation': 'dropdown'},
+                            {'id': '07', 'name': [
+                                "Column", "07"], 'presentation': 'dropdown'},
+                            {'id': '08', 'name': [
+                                "Column", "08"], 'presentation': 'dropdown'},
+                            {'id': '09', 'name': [
+                                "Column", "09"], 'presentation': 'dropdown'},
+                            {'id': '10', 'name': [
+                                "Column", "10"], 'presentation': 'dropdown'},
+                            {'id': '11', 'name': [
+                                "Column", "11"], 'presentation': 'dropdown'},
+                            {'id': '12', 'name': [
+                                "Column", "12"], 'presentation': 'dropdown'},
+                        ],
+
+                        merge_duplicate_headers=True,
+                        tooltip_header={
+                            '01': 'Select "True" for all wells to be analyzed.'},
+
+                        # Style headers with a dotted underline to indicate a tooltip
+                        style_header_conditional=[{
+                            'if': {'column_id': '01'},
+                            'textDecoration': 'underline',
+                            'textDecorationStyle': 'dotted',
+                        }],
+                        style_cell={'textAlign': 'center'},
+                        editable=True,
+                        css=[{"selector": ".Select-menu-outer",
+                              "rule": "display: block !important"}],
+                        markdown_options={
+                            'html': True  # Enable HTML rendering for markdown cells
+                        },
+                        dropdown={
+                            '01': {
+                                'options': [
+                                    {'label': i, 'value': i}
+                                    for i in df['01'].unique()
+                                ]
+                            },
+                            '02': {
+                                'options': [
+                                    {'label': i, 'value': i}
+                                    for i in df['01'].unique()
+                                ]
+                            },
+                            '03': {
+                                'options': [
+                                    {'label': i, 'value': i}
+                                    for i in df['01'].unique()
+                                ]
+                            },
+                            '04': {
+                                'options': [
+                                    {'label': i, 'value': i}
+                                    for i in df['01'].unique()
+                                ]
+                            },
+                            '05': {
+                                'options': [
+                                    {'label': i, 'value': i}
+                                    for i in df['01'].unique()
+                                ]
+                            },
+                            '06': {
+                                'options': [
+                                    {'label': i, 'value': i}
+                                    for i in df['01'].unique()
+                                ]
+                            },
+                            '07': {
+                                'options': [
+                                    {'label': i, 'value': i}
+                                    for i in df['01'].unique()
+                                ]
+                            },
+                            '08': {
+                                'options': [
+                                    {'label': i, 'value': i}
+                                    for i in df['01'].unique()
+                                ]
+                            },
+                            '09': {
+                                'options': [
+                                    {'label': i, 'value': i}
+                                    for i in df['01'].unique()
+                                ]
+                            },
+                            '10': {
+                                'options': [
+                                    {'label': i, 'value': i}
+                                    for i in df['01'].unique()
+                                ]
+                            },
+                            '11': {
+                                'options': [
+                                    {'label': i, 'value': i}
+                                    for i in df['01'].unique()
+                                ]
+                            },
+                            '12': {
+                                'options': [
+                                    {'label': i, 'value': i}
+                                    for i in df['01'].unique()
+                                ]
+                            }
+                        }
+                    )
 def create_imaging_settings():
     """
     Creating the Structure and Layout of the Imaging Settings Accordian Item
@@ -438,131 +567,7 @@ def create_run_time_settings():
             html.H6("Select the wells to be analyzed."),
             html.Div(
                 [
-                    dash_table.DataTable(
-                        id='table-dropdown',
-                        data=df.to_dict('records'),
-
-                        columns=[
-                            {'id': 'row', 'name': [
-                                "", "Row"], 'editable': False},
-                            {'id': '01', 'name': [
-                                "Column", "01"], 'presentation': 'dropdown'},
-                            {'id': '02', 'name': [
-                                "Column", "02"], 'presentation': 'dropdown'},
-                            {'id': '03', 'name': [
-                                "Column", "03"], 'presentation': 'dropdown'},
-                            {'id': '04', 'name': [
-                                "Column", "04"], 'presentation': 'dropdown'},
-                            {'id': '05', 'name': [
-                                "Column", "05"], 'presentation': 'dropdown'},
-                            {'id': '06', 'name': [
-                                "Column", "06"], 'presentation': 'dropdown'},
-                            {'id': '07', 'name': [
-                                "Column", "07"], 'presentation': 'dropdown'},
-                            {'id': '08', 'name': [
-                                "Column", "08"], 'presentation': 'dropdown'},
-                            {'id': '09', 'name': [
-                                "Column", "09"], 'presentation': 'dropdown'},
-                            {'id': '10', 'name': [
-                                "Column", "10"], 'presentation': 'dropdown'},
-                            {'id': '11', 'name': [
-                                "Column", "11"], 'presentation': 'dropdown'},
-                            {'id': '12', 'name': [
-                                "Column", "12"], 'presentation': 'dropdown'},
-                        ],
-
-                        merge_duplicate_headers=True,
-                        tooltip_header={
-                            '01': 'Select "True" for all wells to be analyzed.'},
-
-                        # Style headers with a dotted underline to indicate a tooltip
-                        style_header_conditional=[{
-                            'if': {'column_id': '01'},
-                            'textDecoration': 'underline',
-                            'textDecorationStyle': 'dotted',
-                        }],
-                        style_cell={'textAlign': 'center'},
-                        editable=True,
-                        css=[{"selector": ".Select-menu-outer",
-                              "rule": "display: block !important"}],
-                        markdown_options={
-                            'html': True  # Enable HTML rendering for markdown cells
-                        },
-                        dropdown={
-                            '01': {
-                                'options': [
-                                    {'label': i, 'value': i}
-                                    for i in df['01'].unique()
-                                ]
-                            },
-                            '02': {
-                                'options': [
-                                    {'label': i, 'value': i}
-                                    for i in df['01'].unique()
-                                ]
-                            },
-                            '03': {
-                                'options': [
-                                    {'label': i, 'value': i}
-                                    for i in df['01'].unique()
-                                ]
-                            },
-                            '04': {
-                                'options': [
-                                    {'label': i, 'value': i}
-                                    for i in df['01'].unique()
-                                ]
-                            },
-                            '05': {
-                                'options': [
-                                    {'label': i, 'value': i}
-                                    for i in df['01'].unique()
-                                ]
-                            },
-                            '06': {
-                                'options': [
-                                    {'label': i, 'value': i}
-                                    for i in df['01'].unique()
-                                ]
-                            },
-                            '07': {
-                                'options': [
-                                    {'label': i, 'value': i}
-                                    for i in df['01'].unique()
-                                ]
-                            },
-                            '08': {
-                                'options': [
-                                    {'label': i, 'value': i}
-                                    for i in df['01'].unique()
-                                ]
-                            },
-                            '09': {
-                                'options': [
-                                    {'label': i, 'value': i}
-                                    for i in df['01'].unique()
-                                ]
-                            },
-                            '10': {
-                                'options': [
-                                    {'label': i, 'value': i}
-                                    for i in df['01'].unique()
-                                ]
-                            },
-                            '11': {
-                                'options': [
-                                    {'label': i, 'value': i}
-                                    for i in df['01'].unique()
-                                ]
-                            },
-                            '12': {
-                                'options': [
-                                    {'label': i, 'value': i}
-                                    for i in df['01'].unique()
-                                ]
-                            }
-                        }
-                    ),
+                    table_selection_content(),
                     html.Div(id='table-dropdown-container'),
                     html.H6("Wells"),
                     dbc.Input(
