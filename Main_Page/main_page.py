@@ -46,6 +46,8 @@ df = pd.DataFrame(OrderedDict([
     ('12', col_vals),
 ]))
 
+# Initialize images
+
 gummy_worm_file_path = "Main_Page/Figures/gummy_worms.png"
 wrmXpress_logo_file_path = "Main_Page/Figures/wrmXpress_logo.png"
 uwec_logo_file_path = "Main_Page/Figures/uwec_logo.png"
@@ -120,86 +122,121 @@ uwec_img = convert_png_to_image(uwec_logo_file_path)
 uw_img = convert_png_to_image(uw_logo_file_path)
 wheeler_lab_logo = convert_png_to_image(wheeler_lab_file_path)
 
-# Functionality and page layout functions
+########################################################################
+####                                                                ####
+####                    MAIN ACCORDION STRUCTURE                    ####
+####                                                                ####
+########################################################################
 
 
-def create_imaging_settings():
+def create_instrument_settings():
     """
-    Creating the Structure and Layout of the Imaging Settings Accordian Item
+    Creating the Structure and Layout of the Instrument Settings Accordian Item
     ========================================================================
     Inputs:
         None
     Returns:
-        Accordian Item with elements for Imaging Settings
+        Accordian Item with elements for Instrument Settings
     """
-    return dbc.AccordionItem(
-        [
-            html.H6("Imaging Mode:", id='imaging-mode-header'),
-            html.Img(src=info_symbol,
-                     id='imaging-mode-symbol'),
-            dbc.Tooltip(
-                "Select Single Well if each video or image only includes a single well. Select Multi Well if each video/image contains multiple wells that need to be split.",
-                target="imaging-mode-symbol"
-            ),
-            dbc.RadioItems(
-                id="imaging-mode",
-                className="btn-group",
-                inputClassName="btn-check",
-                labelClassName="btn btn-outline-primary",
-                labelCheckedClassName="active",
-                options=[
-                    {"label": "Single Well", "value": "single-well"},
-                    {"label": "Multi Well", "value": "multi-well"},
-                ],
-                value="single-well",
-            ),
-            html.H6("File Structure:"),
-            html.Img(src=info_symbol,
-                     id='file-structure-symbol'),
-            dbc.Tooltip(
-                "Select ImageXpress if the data is saved in an IX-like structure. Select AVI if the data is a single video saved as an AVI.",
-                target="file-structure-symbol"
-            ),
-            dbc.RadioItems(
-                id="file-structure",
-                className="btn-group",
-                inputClassName="btn-check",
-                labelClassName="btn btn-outline-primary",
-                labelCheckedClassName="active",
-                options=[
-                    {"label": "ImageXpress", "value": "imagexpress"},
-                    {"label": "AVI", "value": "avi"},
-                ],
-                value="imagexpress",
-            ),
-            # New section for Multi-Well Options
+    return dbc.AccordionItem([
+        html.Div([
             dbc.Row([
-                html.H6("Multi-Well Options"),
-                dbc.Col(html.H6("Multi Well Rows"), width=6),
-                dbc.Col(dbc.Input(id="multi-well-rows",
-                        placeholder="Please insert the multi well rows.", type="number"), width=6),
-                dbc.Col(html.H6("Multi Well Columns"), width=6),
-                dbc.Col(dbc.Input(id="multi-well-cols",
-                        placeholder="Please insert the multi well columns.", type="number"), width=6),
-            ], id='multi-well-options-row', style={'display': 'flex'}),  # Initially hidden
-
-            # New section for additional dropdown
+                html.H6("Imaging Mode:", id='imaging-mode-header'),
+                dbc.Col([
+                    html.Img(src=info_symbol,
+                             id='imaging-mode-symbol'),
+                    dbc.Tooltip(
+                        "Select Single Well if each video or image only includes a single well. Select Multi Well if each video/image contains multiple wells that need to be split.",
+                        placement='bottom',
+                        target="imaging-mode-symbol"
+                    ),
+                    dbc.RadioItems(
+                        id="imaging-mode",
+                        className="btn-group",
+                        inputClassName="btn-check",
+                        labelClassName="btn btn-outline-primary",
+                        labelCheckedClassName="active",
+                        options=[
+                            {"label": "Single Well", "value": "single-well"},
+                            {"label": "Multi Well", "value": "multi-well"},
+                        ],
+                        value="single-well",
+                    )
+                ],
+                    width="auto"),
+                dbc.Col([
+                    html.Div("Settings for multiple wells per image:"),
+                    dbc.Input(id="multi-well-rows",
+                        placeholder="Number of rows per image.",
+                        type="number"),
+                    dbc.Input(id="multi-well-cols",
+                        placeholder="Number of columns per image.",
+                        type="number"),
+                ],
+                    width='auto',
+                    id='multi-well-options-row',
+                    style={'display': 'flex'}  # Initially hidden
+                )
+            ],
+            align="center")
+        ]),
+        html.Br(),
+        html.Div(
             dbc.Row([
-                html.H6("Additional Options"),
-                dbc.RadioItems(
-                    id="multi-well-detection",
-                    className="btn-group",
-                    inputClassName="btn-check",
-                    labelClassName="btn btn-outline-primary",
-                    labelCheckedClassName="active",
-                    options=[
-                        {"label": "Auto", "value": "auto"},
-                        {"label": "Grid", "value": "grid"},
-                    ],
-                    value="auto",
-                ),
-            ], id='additional-options-row', style={'display': 'flex'}),  # Initially hidden
-        ],
+                html.H6("File Structure:"),
+                dbc.Col([
+                    html.Img(src=info_symbol,
+                             id='file-structure-symbol'),
+                    dbc.Tooltip(
+                        "Select ImageXpress if the data is saved in an IX-like structure. Select AVI if the data is a single video saved as an AVI.",
+                        placement='bottom',
+                        target="file-structure-symbol"
+                    ),
+                    dbc.RadioItems(
+                        id="file-structure",
+                        className="btn-group",
+                        inputClassName="btn-check",
+                        labelClassName="btn btn-outline-primary",
+                        labelCheckedClassName="active",
+                        options=[
+                            {"label": "ImageXpress", "value": "imagexpress"},
+                            {"label": "AVI", "value": "avi"},
+                        ],
+                        value="imagexpress",
+                    )
+                ],
+                    width='auto'),
+                dbc.Col([
+                    html.Div(html.P("Cropping options:",
+                             style={"textDecoration": "underline", "cursor": "pointer"},
+                             id='crop-options')),
+                    dbc.Tooltip(
+                        "Select the method of cropping wells. \
+                            Auto: incorporates a Hough transform in an attempt to automatically identify circular wells.\
+                            Grid: Crops a grid based on the provided number of columns and rows.",
+                        placement='bottom',
+                        target="crop-options"
+                    ),
+                    dbc.RadioItems(
+                        id="multi-well-detection",
+                        className="btn-group",
+                        inputClassName="btn-check",
+                        labelClassName="btn btn-outline-primary",
+                        labelCheckedClassName="active",
+                        options=[
+                            {"label": "Auto", "value": "auto"},
+                            {"label": "Grid", "value": "grid"},
+                        ],
+                        value="auto",
+                    ),
+                ],
+                    width='auto',
+                    id='additional-options-row',
+                    style={'display': 'flex'})  # Initially hidden
+            ],
+            align="center")
+        ),
+    ],
         id="instrument-settings-file-structure",
         title="Instrument Settings"
     )
@@ -825,7 +862,7 @@ app.layout = html.Div([
     dbc.Container([
         dbc.Accordion(
             [
-                create_imaging_settings(),
+                create_instrument_settings(),
                 create_worm_information(),
                 create_module_selection(),
                 create_run_time_settings(),
