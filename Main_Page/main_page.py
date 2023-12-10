@@ -1,18 +1,20 @@
-import dash
-from dash import dcc, html
-from dash.dependencies import Input, Output, State
-from dash import callback_context
-from dash.exceptions import PreventUpdate
-from dash import dash_table
-from collections import OrderedDict
-import dash_bootstrap_components as dbc
-import pandas as pd
-import yaml
-import plotly.graph_objs as go
+import base64
 import os
 import pathlib
-import base64
+from collections import OrderedDict
+
 import cv2
+import dash
+import dash_bootstrap_components as dbc
+import numpy as np
+import pandas as pd
+import plotly.express as px
+import plotly.graph_objs as go
+import yaml
+from dash import callback_context, dash_table, dcc, html
+from dash.dependencies import Input, Output, State
+from dash.exceptions import PreventUpdate
+from PIL import Image
 
 app = dash.Dash(__name__, external_stylesheets=[
                 dbc.themes.BOOTSTRAP], suppress_callback_exceptions=True)
@@ -435,7 +437,20 @@ def create_run_time_settings():
     """
     return dbc.AccordionItem(
         [
-            html.H6("Select the wells to be analyzed."),
+            html.H4("Directories"),
+            html.H6("Work"),
+            dbc.Input(
+                id="work-directory", placeholder="Please insert the work directory:", type="text"),
+            html.H6("Input"),
+            dbc.Input(
+                id="input-directory", placeholder="Please insert the input directory:", type="text"),
+            html.H6("Output"),
+            dbc.Input(
+                id="output-directory", placeholder="Please insert the output directory:", type="text"),
+            html.Br(),
+
+            html.H4("Wells"),
+            html.P("Select the wells to be analyzed."),
             html.Div(
                 [
                     dash_table.DataTable(
@@ -567,16 +582,6 @@ def create_run_time_settings():
                     html.H6("Wells"),
                     dbc.Input(
                         id="wells-information", placeholder="Please insert the wells information (please separate multiple values by a comma):", type="text"),
-                    html.H4("Directories"),
-                    html.H6("Work"),
-                    dbc.Input(
-                        id="work-directory", placeholder="Please insert the work directory:", type="text"),
-                    html.H6("Input"),
-                    dbc.Input(
-                        id="input-directory", placeholder="Please insert the input directory:", type="text"),
-                    html.H6("Output"),
-                    dbc.Input(
-                        id="output-directory", placeholder="Please insert the output directory:", type="text"),
                 ],
                 id="run-time-settings",
             )
@@ -680,23 +685,66 @@ def preview_page_content():
     """
     return dbc.ModalBody(
         [
-            html.H6("Preview Page Content"),
-
-            # Center the Image component
-            html.Img(
-                # Replace with your image URL
-                src=f'data:image/png;base64, {gummy_wrm}',
-                style={'width': '500px', 'display': 'block', 'margin': 'auto',
-                       'margin-bottom': '10px'},  # Center the image
-            ),
-
-            # Add other content below the image
-            dbc.Input(id="file-path-for-preview-yaml-file",
-                      placeholder="Please enter the full filepath for your yaml file:", type="text"),
-            dbc.Input(id="file-path-to-wrapper-py",
-                      placeholder="Please Enter the File Path for the Wrapper.py File", type="text"),
+            html.Div([
+                dbc.Button('Load first input image',
+                           id='submit-val', className="d-grid gap-2 col-6 mx-auto", color="primary", n_clicks=0),
+                html.Br(),
+                html.Br(),
+                html.Div([
+                    dbc.Row([
+                        dbc.Col([
+                            html.P(id='input-path-output'),
+                            "Input image: ",
+                            dcc.Graph(
+                                id='input-preview',
+                                # style={'height':'30%', 'width':'30%'}
+                            )
+                        ]),
+                        dbc.Col([
+                            html.P(),
+                            "Analysis preview: ",
+                            dcc.Graph(
+                                id='analysis-preview',
+                                # style={'height':'30%', 'width':'30%'}
+                            )
+                        ])
+                    ])
+                ]
+                )]),
+            html.Br(),
+            html.Div([
+                dbc.Input(id="file-path-for-preview-yaml-file",
+                          placeholder="Please enter the full filepath for your yaml file:", type="text"),
+                dbc.Input(id="file-path-to-wrapper-py",
+                          placeholder="Please Enter the File Path for the Wrapper.py File", type="text"),
+            ])
         ],
     )
+
+
+@app.callback(
+    Output('input-path-output', 'children'),
+    Output('input-preview', 'figure'),
+    Input('submit-val', 'n_clicks'),
+    State("input-directory", "value"),
+    prevent_initial_call=True
+)
+def update_preview_image(n_clicks, input_dir_state):
+
+    path_split = pathlib.PurePath(str(input_dir_state))
+    dir_path = str(path_split.parts[-1])
+    plate_base = dir_path.split("_", 1)[0]
+
+    if n_clicks >= 1:
+        # assumes IX-like file structure
+        img_path = input_dir_state + f'/TimePoint_1/{plate_base}_A01.TIF'
+        img = np.array(Image.open(img_path))
+        fig = px.imshow(img, color_continuous_scale="gray")
+        fig.update_layout(coloraxis_showscale=False)
+        fig.update_xaxes(showticklabels=False)
+        fig.update_yaxes(showticklabels=False)
+        return f'Input path: {input_dir_state}', fig
+    n_clicks = 0
 
 
 # Create the Preview Page Modal
@@ -706,6 +754,7 @@ preview_page = dbc.Modal(
             "Preview Page"
         ),
         preview_page_content(),
+
         dbc.ModalFooter([
             # Buttons for the Info Page Modal
             dbc.Button("Preview", id="preview-preview-button",
