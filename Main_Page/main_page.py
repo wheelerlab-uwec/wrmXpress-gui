@@ -837,28 +837,115 @@ save_page = dbc.Modal(
     size="xl"
 )
 
+header = dbc.Navbar(
+    dbc.Container(
+        [
+            html.A(
+                dbc.Row([
+                    dbc.Col(html.Img(src='https://github.com/zamanianlab/wrmXpress/blob/main/img/logo/output.png?raw=true',
+                                     height="50px")),
+                    dbc.Col(dbc.NavbarBrand("wrmXpress",
+                                            className="ms-2"))],
+                        align="center",
+                        className="g-0"
+                        ),
+                href="https://github.com/zamanianlab/wrmxpress",
+                style={"textDecoration": "none"},
+            ),
+            dbc.Row(
+                [
+                    dbc.NavbarToggler(id="navbar-toggler"),
+                    dbc.Collapse(
+                        dbc.Nav(
+                            [
+                                dbc.NavItem(dbc.NavLink(
+                                    "Info & Docs",
+                                    id="open-info-modal",
+                                    style={'cursor':'pointer'}),
+                                    className="me-auto"),
+                                dbc.NavItem(dbc.NavLink(
+                                    "Save YAML", 
+                                    id="open-save-modal", 
+                                    style={'cursor':'pointer'})),
+                                dbc.NavItem(dbc.NavLink(
+                                    "Preview & Run", 
+                                    id="open-preview-modal", 
+                                    style={'cursor':'pointer'}))
+                            ],
+                            className="w-100"
+                        ),
+                        id="navbar-collapse",
+                        is_open=False,
+                        navbar=True
+                    )
+                ],
+                # the row should expand to fill the available horizontal space
+                className="flex-grow-1",
+                align='center'
+            )
+        ]
+    )
+)
+
+
 # Main Page Layout
 app.layout = html.Div([
-    dbc.Navbar(
-        dbc.Container(
-            dbc.Nav(
-                [
-                    dbc.NavItem(dbc.Button(
-                        "Save Page", id="open-save-modal", color="primary")),
-                    dbc.NavItem(dbc.Button(
-                        "Info Page", id="open-info-modal", color="secondary")),
-                    dbc.NavItem(dbc.Button(
-                        "Preview Page", id="open-preview-modal", color="success", n_clicks=0))
-
-                ],
-                className="ml-auto",  # Set the left margin to auto
-            ),
-            fluid=True,
-        ),
-        color="light",
-        dark=False,
-        sticky="top",
-    ),
+    # html.A(
+    #     dbc.Row([
+    #         dbc.Col(html.Img(src='https://github.com/zamanianlab/wrmXpress/blob/main/img/logo/output.png?raw=true',
+    #                          height="50px")),
+    #         dbc.Col(dbc.NavbarBrand("wrmXpress",
+    #                                 className="ms-2"))],
+    #             align="center",
+    #             className="g-0"
+    #             ),
+    #     href="https://github.com/zamanianlab/wrmxpress",
+    #     style={"textDecoration": "none"},
+    # ),
+    
+    # dbc.Navbar(
+    #     dbc.Container(
+    #         dbc.Nav(
+    #             dbc.Row([
+    #                 dbc.Col([
+    #                     html.A(
+    #                         dbc.Row([
+    #                             dbc.Col(html.Img(src='https://github.com/zamanianlab/wrmXpress/blob/main/img/logo/output.png?raw=true',
+    #                                              height="50px")),
+    #                             dbc.Col(dbc.NavbarBrand("wrmXpress",
+    #                                                     className="ms-2"))],
+    #                                 align="center",
+    #                                 className="g-0"
+    #                                 ),
+    #                         href="https://github.com/zamanianlab/wrmxpress",
+    #                         style={"textDecoration": "none"},
+    #                     )
+    #                 ]),
+    #                 dbc.Col([
+    #                     dbc.Row([
+    #                         dbc.Col(
+    #                             dbc.NavItem(dbc.Button(
+    #                                 "Save Page", id="open-save-modal", color="primary"))),
+    #                         dbc.Col(
+    #                             dbc.NavItem(dbc.Button(
+    #                                 "Preview Page", id="open-preview-modal", color="success", n_clicks=0))
+    #                         )
+    #                     ])
+    #                 ]),
+    #                 # dbc.Col([
+    #                 #     dbc.NavItem(dbc.Button(
+    #                 #         "Info Page", id="open-info-modal", color="secondary"))
+    #                 # ])
+    #             ]),
+    #             className="ml-auto",  # Set the left margin to auto
+    #         ),
+    #         fluid=True,
+    #     ),
+    #     color="light",
+    #     dark=False,
+    #     sticky="top",
+    # ),
+    header,
     dbc.Container([
         dbc.Accordion(
             [
