@@ -17,7 +17,8 @@ from dash.exceptions import PreventUpdate
 from PIL import Image
 
 app = dash.Dash(__name__, external_stylesheets=[
-                dbc.themes.BOOTSTRAP], suppress_callback_exceptions=True)
+                dbc.themes.SPACELAB], 
+                suppress_callback_exceptions=True)
 
 # Create a DataFrame with 11 columns and 8 rows
 columns = ['01', '02', '03', '04', '05',
@@ -124,23 +125,60 @@ wheeler_lab_logo = convert_png_to_image(wheeler_lab_file_path)
 
 ########################################################################
 ####                                                                ####
+####                             NAVBAR                             ####
+####                                                                ####
+########################################################################
+
+header = dbc.Navbar(
+    dbc.Container(
+        [
+            html.A(
+                html.Img(src='https://github.com/zamanianlab/wrmXpress/blob/main/img/logo/output.png?raw=true',
+                             height="100px"),
+                href="https://github.com/zamanianlab/wrmxpress",
+                style={"textDecoration": "none"},
+                className='ms-5'
+            ),
+
+                    dbc.NavbarToggler(id="navbar-toggler", n_clicks=0),
+                    dbc.Collapse(
+                        dbc.Nav(
+                            [
+                                dbc.NavItem(dbc.NavLink(
+                                    "Info & Usage",
+                                    id="open-info-modal",
+                                    style={'cursor': 'pointer'})),
+                                dbc.NavItem(dbc.NavLink(
+                                    "Save YAML",
+                                    id="open-save-modal",
+                                    style={'cursor': 'pointer'})),
+                                dbc.NavItem(dbc.NavLink(
+                                    "Preview & Run",
+                                    id="open-preview-modal",
+                                    style={'cursor': 'pointer'}))
+                            ],
+                            className="w-100 justify-content-end"
+                        ),
+                        id="navbar-collapse",
+                        is_open=False,
+                        navbar=True
+                    )
+        ]
+    ),
+    color='white',
+    fixed='top'
+)
+
+########################################################################
+####                                                                ####
 ####                    MAIN ACCORDION STRUCTURE                    ####
 ####                                                                ####
 ########################################################################
 
 
-def create_instrument_settings():
-    """
-    Creating the Structure and Layout of the Instrument Settings Accordian Item
-    ========================================================================
-    Inputs:
-        None
-    Returns:
-        Accordian Item with elements for Instrument Settings
-    """
-    return dbc.AccordionItem([
-        html.Div([
-            dbc.Row([
+instrument_settings = dbc.AccordionItem([
+    html.Div([
+        dbc.Row([
                 html.H6("Imaging Mode:", id='imaging-mode-header'),
                 dbc.Col([
                     html.Img(src=info_symbol,
@@ -177,12 +215,12 @@ def create_instrument_settings():
                     id='multi-well-options-row',
                     style={'display': 'flex'}  # Initially hidden
                 )
-            ],
-            align="center")
-        ]),
-        html.Br(),
-        html.Div(
-            dbc.Row([
+                ],
+                align="center")
+    ]),
+    html.Br(),
+    html.Div(
+        dbc.Row([
                 html.H6("File Structure:"),
                 dbc.Col([
                     html.Img(src=info_symbol,
@@ -208,7 +246,8 @@ def create_instrument_settings():
                     width='auto'),
                 dbc.Col([
                     html.Div(html.P("Cropping options:",
-                             style={"textDecoration": "underline", "cursor": "pointer"},
+                             style={"textDecoration": "underline",
+                                    "cursor": "pointer"},
                              id='crop-options')),
                     dbc.Tooltip(
                         "Select the method of cropping wells. \
@@ -233,70 +272,52 @@ def create_instrument_settings():
                     width='auto',
                     id='additional-options-row',
                     style={'display': 'flex'})  # Initially hidden
+                ],
+                align="center")
+    ),
+],
+    id="instrument-settings-file-structure",
+    title="Instrument Settings"
+)
+
+
+worm_information = dbc.AccordionItem(
+    [
+        html.H6("Species:"),
+        dbc.RadioItems(
+            id="species",
+            className="btn-group",
+            inputClassName="btn-check",
+            labelClassName="btn btn-outline-primary",
+            labelCheckedClassName="active",
+            options=[
+                {"label": "Brugia malayi", "value": "Bma"},
+                {"label": "Caenorhabditis elegans", "value": "Cel"},
+                {"label": "Schistosoma mansoni", "value": "Sma"}
             ],
-            align="center")
+            value="Bma",
+        ),
+        html.H6("Stages:"),
+        dbc.RadioItems(
+            id="stages",
+            className="btn-group",
+            inputClassName="btn-check",
+            labelClassName="btn btn-outline-primary",
+            labelCheckedClassName="active",
+            options=[
+                {"label": "Mf", "value": "Mf"},
+                {"label": "Adult", "value": "Adult"},
+                {"label": "Mixed", "value": "Mixed"},
+            ],
+            value="Mf",
         ),
     ],
-        id="instrument-settings-file-structure",
-        title="Instrument Settings"
-    )
+    id="worm-information",
+    title="Worm Information"
+)
 
 
-def create_worm_information():
-    """
-    Creating the Structure and Layout of the Worm Information Accordian Item
-    ========================================================================
-    Inputs:
-        None
-    Returns:
-        Accordian Item with elements for Wrom Information
-    """
-    return dbc.AccordionItem(
-        [
-            html.H6("Species:"),
-            dbc.RadioItems(
-                id="species",
-                className="btn-group",
-                inputClassName="btn-check",
-                labelClassName="btn btn-outline-primary",
-                labelCheckedClassName="active",
-                options=[
-                    {"label": "Brugia malayi", "value": "Bma"},
-                    {"label": "Caenorhabditis elegans", "value": "Cel"},
-                    {"label": "Schistosoma mansoni", "value": "Sma"}
-                ],
-                value="Bma",
-            ),
-            html.H6("Stages:"),
-            dbc.RadioItems(
-                id="stages",
-                className="btn-group",
-                inputClassName="btn-check",
-                labelClassName="btn btn-outline-primary",
-                labelCheckedClassName="active",
-                options=[
-                    {"label": "Mf", "value": "Mf"},
-                    {"label": "Adult", "value": "Adult"},
-                    {"label": "Mixed", "value": "Mixed"},
-                ],
-                value="Mf",
-            ),
-        ],
-        id="worm-information",
-        title="Worm Information"
-    )
-
-
-def create_module_selection():
-    """
-    Creating the Structure and Layout of the Module Selection Accordian Item
-    ========================================================================
-    Inputs:
-        None
-    Returns:
-        Accordian Item with elements for Module Selection
-    """
-    return dbc.AccordionItem(
+module_selection = dbc.AccordionItem(
         [
             # Create separate tabs for video/image analysis
             dcc.Tabs(id="module-tabs", value="tab-modules", children=[
@@ -463,272 +484,253 @@ def create_module_selection():
     )
 
 
-def create_run_time_settings():
-    """
-    Creating the Structure and Layout of the Run Time Settings Accordion Item
-    ========================================================================
-    Inputs:
-        None
-    Returns:
-        Accordion Item with elements for Run Time Settings
-    """
-    return dbc.AccordionItem(
-        [
-            html.H4("Directories"),
-            html.H6("Work"),
-            dbc.Input(
-                id="work-directory", placeholder="Please insert the work directory:", type="text"),
-            html.H6("Input"),
-            dbc.Input(
-                id="input-directory", placeholder="Please insert the input directory:", type="text"),
-            html.H6("Output"),
-            dbc.Input(
-                id="output-directory", placeholder="Please insert the output directory:", type="text"),
-            html.Br(),
+run_time_settings = dbc.AccordionItem(
+    [
+        html.H4("Directories"),
+        html.H6("Work"),
+        dbc.Input(
+            id="work-directory", placeholder="Please insert the work directory:", type="text"),
+        html.H6("Input"),
+        dbc.Input(
+            id="input-directory", placeholder="Please insert the input directory:", type="text"),
+        html.H6("Output"),
+        dbc.Input(
+            id="output-directory", placeholder="Please insert the output directory:", type="text"),
+        html.Br(),
 
-            html.H4("Wells"),
-            html.P("Select the wells to be analyzed."),
-            html.Div(
-                [
-                    dash_table.DataTable(
-                        id='table-dropdown',
-                        data=df.to_dict('records'),
+        html.H4("Wells"),
+        html.P("Select the wells to be analyzed."),
+        html.Div(
+            [
+                dash_table.DataTable(
+                    id='table-dropdown',
+                    data=df.to_dict('records'),
 
-                        columns=[
-                            {'id': 'row', 'name': [
-                                "", "Row"], 'editable': False},
-                            {'id': '01', 'name': [
-                                "Column", "01"], 'presentation': 'dropdown'},
-                            {'id': '02', 'name': [
-                                "Column", "02"], 'presentation': 'dropdown'},
-                            {'id': '03', 'name': [
-                                "Column", "03"], 'presentation': 'dropdown'},
-                            {'id': '04', 'name': [
-                                "Column", "04"], 'presentation': 'dropdown'},
-                            {'id': '05', 'name': [
-                                "Column", "05"], 'presentation': 'dropdown'},
-                            {'id': '06', 'name': [
-                                "Column", "06"], 'presentation': 'dropdown'},
-                            {'id': '07', 'name': [
-                                "Column", "07"], 'presentation': 'dropdown'},
-                            {'id': '08', 'name': [
-                                "Column", "08"], 'presentation': 'dropdown'},
-                            {'id': '09', 'name': [
-                                "Column", "09"], 'presentation': 'dropdown'},
-                            {'id': '10', 'name': [
-                                "Column", "10"], 'presentation': 'dropdown'},
-                            {'id': '11', 'name': [
-                                "Column", "11"], 'presentation': 'dropdown'},
-                            {'id': '12', 'name': [
-                                "Column", "12"], 'presentation': 'dropdown'},
-                        ],
+                    columns=[
+                        {'id': 'row', 'name': [
+                            "", "Row"], 'editable': False},
+                        {'id': '01', 'name': [
+                            "Column", "01"], 'presentation': 'dropdown'},
+                        {'id': '02', 'name': [
+                            "Column", "02"], 'presentation': 'dropdown'},
+                        {'id': '03', 'name': [
+                            "Column", "03"], 'presentation': 'dropdown'},
+                        {'id': '04', 'name': [
+                            "Column", "04"], 'presentation': 'dropdown'},
+                        {'id': '05', 'name': [
+                            "Column", "05"], 'presentation': 'dropdown'},
+                        {'id': '06', 'name': [
+                            "Column", "06"], 'presentation': 'dropdown'},
+                        {'id': '07', 'name': [
+                            "Column", "07"], 'presentation': 'dropdown'},
+                        {'id': '08', 'name': [
+                            "Column", "08"], 'presentation': 'dropdown'},
+                        {'id': '09', 'name': [
+                            "Column", "09"], 'presentation': 'dropdown'},
+                        {'id': '10', 'name': [
+                            "Column", "10"], 'presentation': 'dropdown'},
+                        {'id': '11', 'name': [
+                            "Column", "11"], 'presentation': 'dropdown'},
+                        {'id': '12', 'name': [
+                            "Column", "12"], 'presentation': 'dropdown'},
+                    ],
 
-                        merge_duplicate_headers=True,
-                        tooltip_header={
-                            '01': 'Select "True" for all wells to be analyzed.'},
+                    merge_duplicate_headers=True,
+                    tooltip_header={
+                        '01': 'Select "True" for all wells to be analyzed.'},
 
-                        # Style headers with a dotted underline to indicate a tooltip
-                        style_header_conditional=[{
-                            'if': {'column_id': '01'},
-                            'textDecoration': 'underline',
-                            'textDecorationStyle': 'dotted',
-                        }],
-                        style_cell={'textAlign': 'center'},
-                        editable=True,
-                        css=[{"selector": ".Select-menu-outer",
-                              "rule": "display: block !important"}],
-                        markdown_options={
-                            'html': True  # Enable HTML rendering for markdown cells
+                    # Style headers with a dotted underline to indicate a tooltip
+                    style_header_conditional=[{
+                        'if': {'column_id': '01'},
+                        'textDecoration': 'underline',
+                        'textDecorationStyle': 'dotted',
+                    }],
+                    style_cell={'textAlign': 'center'},
+                    editable=True,
+                    css=[{"selector": ".Select-menu-outer",
+                          "rule": "display: block !important"}],
+                    markdown_options={
+                        'html': True  # Enable HTML rendering for markdown cells
+                    },
+                    dropdown={
+                        '01': {
+                            'options': [
+                                {'label': i, 'value': i}
+                                for i in df['01'].unique()
+                            ]
                         },
-                        dropdown={
-                            '01': {
-                                'options': [
-                                    {'label': i, 'value': i}
-                                    for i in df['01'].unique()
-                                ]
-                            },
-                            '02': {
-                                'options': [
-                                    {'label': i, 'value': i}
-                                    for i in df['01'].unique()
-                                ]
-                            },
-                            '03': {
-                                'options': [
-                                    {'label': i, 'value': i}
-                                    for i in df['01'].unique()
-                                ]
-                            },
-                            '04': {
-                                'options': [
-                                    {'label': i, 'value': i}
-                                    for i in df['01'].unique()
-                                ]
-                            },
-                            '05': {
-                                'options': [
-                                    {'label': i, 'value': i}
-                                    for i in df['01'].unique()
-                                ]
-                            },
-                            '06': {
-                                'options': [
-                                    {'label': i, 'value': i}
-                                    for i in df['01'].unique()
-                                ]
-                            },
-                            '07': {
-                                'options': [
-                                    {'label': i, 'value': i}
-                                    for i in df['01'].unique()
-                                ]
-                            },
-                            '08': {
-                                'options': [
-                                    {'label': i, 'value': i}
-                                    for i in df['01'].unique()
-                                ]
-                            },
-                            '09': {
-                                'options': [
-                                    {'label': i, 'value': i}
-                                    for i in df['01'].unique()
-                                ]
-                            },
-                            '10': {
-                                'options': [
-                                    {'label': i, 'value': i}
-                                    for i in df['01'].unique()
-                                ]
-                            },
-                            '11': {
-                                'options': [
-                                    {'label': i, 'value': i}
-                                    for i in df['01'].unique()
-                                ]
-                            },
-                            '12': {
-                                'options': [
-                                    {'label': i, 'value': i}
-                                    for i in df['01'].unique()
-                                ]
-                            }
+                        '02': {
+                            'options': [
+                                {'label': i, 'value': i}
+                                for i in df['01'].unique()
+                            ]
+                        },
+                        '03': {
+                            'options': [
+                                {'label': i, 'value': i}
+                                for i in df['01'].unique()
+                            ]
+                        },
+                        '04': {
+                            'options': [
+                                {'label': i, 'value': i}
+                                for i in df['01'].unique()
+                            ]
+                        },
+                        '05': {
+                            'options': [
+                                {'label': i, 'value': i}
+                                for i in df['01'].unique()
+                            ]
+                        },
+                        '06': {
+                            'options': [
+                                {'label': i, 'value': i}
+                                for i in df['01'].unique()
+                            ]
+                        },
+                        '07': {
+                            'options': [
+                                {'label': i, 'value': i}
+                                for i in df['01'].unique()
+                            ]
+                        },
+                        '08': {
+                            'options': [
+                                {'label': i, 'value': i}
+                                for i in df['01'].unique()
+                            ]
+                        },
+                        '09': {
+                            'options': [
+                                {'label': i, 'value': i}
+                                for i in df['01'].unique()
+                            ]
+                        },
+                        '10': {
+                            'options': [
+                                {'label': i, 'value': i}
+                                for i in df['01'].unique()
+                            ]
+                        },
+                        '11': {
+                            'options': [
+                                {'label': i, 'value': i}
+                                for i in df['01'].unique()
+                            ]
+                        },
+                        '12': {
+                            'options': [
+                                {'label': i, 'value': i}
+                                for i in df['01'].unique()
+                            ]
                         }
-                    ),
-                    html.Div(id='table-dropdown-container'),
-                    html.H6("Wells"),
-                    dbc.Input(
-                        id="wells-information", placeholder="Please insert the wells information (please separate multiple values by a comma):", type="text"),
-                ],
-                id="run-time-settings",
-            )
-        ],
-        title="Run-Time Settings"
-    )
-
-
-def save_page_content():
-    """
-    Creating the Structure and Layout of the Save Page 
-    ========================================================================
-    Inputs:
-        None
-    Returns:
-        Accordian Item with elements for Save Page
-    """
-    return dbc.ModalBody(
-        [
-            # Content for the Save Page Modal
-            html.H6("Write a YAML for running wrmXpress remotely"),
-            dbc.Input(id="file-path-for-saved-yaml-file",
-                      placeholder="Please enter the full path for your YAML file:", type="text"),
-        ]
-    )
-
-
-def info_page_content():
-    """
-    Creating the Structure and Layout of the Information Page
-    ========================================================================
-    Inputs:
-        None
-    Returns:
-        Accordian Item with elements for the Information Page
-    """
-    return dbc.ModalBody(
-        [
-            html.H4("Welcome to the Information Page"),
-            html.Div(
-                html.Img(
-                    # Replace with your image URL
-                    src=f'data:image/png;base64, {wrmXpress_logo}',
-                    # Adjust image width and positioning
-                    style={'width': '500px', 'float': 'right'},
+                    }
                 ),
-            ),
-            html.H6("What is wrmXpress"),
-            html.P("wrmXpress stands as a groundbreaking unified framework for the analysis of diverse phenotypic imaging data in high-throughput and high-content experiments involving free-living and parasitic nematodes and flatworms. In response to the limitations of existing tools, wrmXpress transcends silos by providing a versatile solution capable of handling large datasets and generating relevant phenotypic measurements across various worm species and experimental assays. This innovative software, designed to analyze a spectrum of phenotypes such as motility, development/size, fecundity, and feeding, not only addresses current research needs but also establishes itself as a platform for future extensibility, enabling the development of custom phenotypic modules. With applications in anthelmintic screening efforts spanning schistosomes, filarial nematodes, and free-living model nematodes, wrmXpress emerges as a collaborative analytical workhorse, promising to drive innovation and facilitate cooperation among investigators with diverse scientific interests."),
-            html.H6("What is a file path"),
-            html.P("A file path is a reference to the location of a file or a folder in a file system. It describes the hierarchical structure of directories or folders leading to a specific file or folder. A file path is used by operating systems to locate and access files. There are two types of file paths: absolute and relative."),
-            html.P("Absolute Path: An absolute path provides the complete location of a file or folder from the root directory of the file system. Example (on Windows): C:\\Users\\Username\\Documents\\file.txt Example (on Unix-like systems): /home/username/documents/file.txt Relative Path: A relative path specifies the location of a file or folder relative to the current working directory. Example: If the current working directory is /home/username/, a relative path to the file might be documents/file.txt. Relative paths are dependent on the current working directory, so they may change if the working directory changes. In both types of paths, directories or folders are separated by a delimiter (e.g., \\ on Windows or / on Unix-like systems), and the file name is typically specified at the end of the path. Understanding and correctly specifying file paths is crucial for navigating and working with files in computer systems."),
-            dcc.Link(
-                "File Path", href="https://en.wikipedia.org/wiki/Path_(computing)", target="_blank"),
-            html.H6("What is a yaml file"),
-            html.P("YAML (YAML Ain't Markup Language or, sometimes, Yet Another Markup Language) is a human-readable data serialization format. It's often used for configuration files and data exchange between languages with different data structures. YAML files use indentation to represent the structure of the data, and it relies on whitespace for nesting and scope."),
-            dcc.Link(
-                "YAML File", href="https://www.redhat.com/en/topics/automation/what-is-yaml", target="_blank"),
+                html.Div(id='table-dropdown-container'),
+                html.H6("Wells"),
+                dbc.Input(
+                    id="wells-information", placeholder="Please insert the wells information (please separate multiple values by a comma):", type="text"),
+            ],
+            id="run-time-settings",
+        )
+    ],
+    title="Run-Time Settings"
+)
 
-            html.H5("The Developers"),
 
-            # Front End
-            dbc.Row([
-                # Full width for the title
-                dbc.Col(html.H6("Front End"), width=12),
+
+########################################################################
+####                                                                ####
+####                             MODALS                             ####
+####                                                                ####
+########################################################################
+
+save_page_content = dbc.ModalBody(
+    [
+        # Content for the Save Page Modal
+        html.H6("Write a YAML for running wrmXpress remotely:"),
+        dbc.Input(id="file-path-for-saved-yaml-file",
+                  placeholder="Enter the full save path...", type="text"),
+    ]
+)
+
+
+info_page_content = dbc.ModalBody(
+    [
+        html.P("wrmXpress is a unified framework for the analysis of diverse phenotypic imaging data in high-throughput and high-content experiments involving free-living and parasitic nematodes and flatworms. wrmXpress is a versatile solution capable of handling large datasets and generating relevant phenotypic measurements across various worm species and experimental assays. This software, designed to analyze a spectrum of phenotypes such as motility, development/size, fecundity, and feeding, not only addresses current research needs but also establishes itself as a platform for future extensibility, enabling the development of custom phenotypic modules."),
+
+        html.H3("Usage"),
+        html.P("There are two options for running wrmXpress:"),
+
+
+        dbc.Row(
+            [
+                dbc.Col([
+                    dbc.Card([
+                        dbc.CardBody(
+                            [
+                                html.H5("Remotely", className="card-title"),
+                                dcc.Markdown(
+                                    "wrmXpress was originally designed to be invoked remotely, using a high-performance or high-throughput computer. There are many ways to go about this, but we recommend encapsulating the entire process in a Docker container. The container should include the Python libraries required by wrmXpress (see the [Zamanian Lab's Dockerfile/conda environment](https://github.com/zamanianlab/Docker/tree/main/chtc-wrmxpress) for an example), the cloned [wrmXpress repository](https://github.com/zamanianlab/wrmXpress), the input data in a directory called `input/`, and a YAML file that configures the analysis. A user can use this graphical user interface (GUI) to produce the YAML by selecting the options and modules and clicking Save YAML.",
+                                    className="card-text")
+                            ]
+                        )
+                    ],
+                        color='light')
+                ]),
+                dbc.Col([
+                    dbc.Card([
+                        dbc.CardBody(
+                             [
+                                 html.H5("Locally", className="card-title"),
+                                 dcc.Markdown("Many analyses, such as those that include a few dozen separate videos or images, can be performed on a desktop computer without the need for high-performance or high-throughput computing. For these, a user can use this GUI to select the options and modules and run the analysis by clicking the Preview and Run button.",
+                                              className="card-text")
+                             ]
+                             )
+                    ],
+                        color='light')
+                ])
             ]),
-            dbc.Row([
-                dbc.Col(html.Img(
-                    # Replace with your image URL
-                    src=f'data:image/png;base64, {uwec_img}',
-                    # Adjust image width and positioning
-                    style={'width': '200px', 'float': 'left'},
-                ), width=12),  # Full width for the image
-            ]),
+        html.Br(),
+        html.H3("The Developers"),
+        dcc.Markdown(
+            "wrmXpress is entirely open-source. The code for the back-end is maintained by the [Zamanian Lab](https://www.zamanianlab.org/) at the University of Wisconsin-Madison and can be found [here](https://github.com/zamanianlab/wrmXpress). The code for the front-end is maintained by the [Wheeler Lab](wheelerlab.bio) at the University of Wisconsin-Eau Claire and can be found [here](https://github.com/wheelerlab-uwec/wrmXpress-gui)."),
+        html.Br(),
+        dbc.Row(
+            [
+                dbc.Col(
+                    [html.Img(
+                        src='https://assets.super.so/6d48c8d3-6e72-45c3-a5b9-04514883421e/images/9da71b53-e8f2-4234-9e55-e50d302f5c46/Lab_logo.svg',
+                        style={'width':'30%'}
+                    ),
+                    html.Img(
+                        src='https://lib02.uwec.edu/Omeka/files/original/37b67b60cca3c3ad308515aab27a66afe6c75b2f.gif',
+                        style={'width':'30%'}
+                    )],
+                    style={'textAlign':'center'}
+                ),
+                dbc.Col(
+                    [html.Img(
+                        src='https://upload.wikimedia.org/wikipedia/commons/thumb/a/aa/University_of_Wisconsin_seal.svg/512px-University_of_Wisconsin_seal.svg.png',
+                        style={'width':'30%'}
+                    )],
+                    style={'textAlign':'center'}
+                )
+            ])
+    ]
+)
 
-            # Back End
-            dbc.Row([
-                # Full width for the title
-                dbc.Col(html.H6("Back End"), width=12),
-            ]),
-            dbc.Row([
-                dbc.Col(html.Img(
-                    # Replace with your image URL
-                    src=f'data:image/png;base64, {uw_img}',
-                    # Adjust image width and positioning
-                    style={'width': '200px', 'float': 'left'},
-                ), width=12),  # Full width for the image
-            ]),
-        ]
-    )
 
-
-def preview_page_content():
-    """
-    Creating the Structure and Layout of the Preview Page 
-    ========================================================================
-    Inputs:
-        None
-    Returns:
-        Accordian Item with elements for Preview Page
-    """
-    return dbc.ModalBody(
-        [
+preview_page_content = dbc.ModalBody(
+    [
+        html.Div([
+            dbc.Button('Load first input image',
+                       id='submit-val', className="d-grid gap-2 col-6 mx-auto", color="primary", n_clicks=0),
+            html.Br(),
+            html.Br(),
             html.Div([
-                dbc.Button('Load first input image',
-                           id='submit-val', className="d-grid gap-2 col-6 mx-auto", color="primary", n_clicks=0),
-                html.Br(),
-                html.Br(),
-                html.Div([
-                    dbc.Row([
+                dbc.Row([
                         dbc.Col([
                             html.P(id='input-path-output'),
                             "Input image: ",
@@ -745,20 +747,142 @@ def preview_page_content():
                                 # style={'height':'30%', 'width':'30%'}
                             )
                         ])
-                    ])
-                ]
-                )]),
-            html.Br(),
-            html.Div([
-                dbc.Input(id="file-path-for-preview-yaml-file",
-                          placeholder="Please enter the full filepath for your yaml file:", type="text"),
-                dbc.Input(id="file-path-to-wrapper-py",
-                          placeholder="Please Enter the File Path for the Wrapper.py File", type="text"),
-            ])
-        ],
-    )
+                        ])
+            ]
+            )]),
+        html.Br(),
+        html.Div([
+            dbc.Input(id="file-path-for-preview-yaml-file",
+                      placeholder="Please enter the full filepath for your yaml file:", type="text"),
+            dbc.Input(id="file-path-to-wrapper-py",
+                      placeholder="Please Enter the File Path for the Wrapper.py File", type="text"),
+        ])
+    ],
+)
 
 
+# Create the Preview Page Modal
+preview_page = dbc.Modal(
+    [
+        dbc.ModalHeader(
+            "Preview Page"
+        ),
+        preview_page_content,
+
+        dbc.ModalFooter([
+            # Buttons for the Info Page Modal
+            dbc.Button("Preview", id="preview-preview-button",
+                       className="ml-auto", color="success"),
+            dbc.Button("Close", id="close-preview-modal", className="ml-auto"),
+        ]),
+        html.Div(id="preview-page-status")  # Placeholder for saving status
+    ],
+    id="preview-page-modal",
+    size="xl"
+)
+
+# Create the Save Page Modal
+info_page = dbc.Modal(
+    [
+        dbc.ModalHeader(
+            "Information & Usage"
+        ),
+        info_page_content,
+        dbc.ModalFooter([
+            # Buttons for the Info Page Modal
+            dbc.Button("Close", id="close-info-modal", className="ml-auto"),
+        ]),
+        html.Div(id="info-page-status")  # Placeholder for saving status
+    ],
+    id="info-page-modal",
+    size="xl"
+)
+
+# Create the Save Page Modal
+save_page = dbc.Modal(
+    [
+        dbc.ModalHeader("Save Page"),
+        save_page_content,
+        dbc.ModalFooter([
+            # Buttons for the Save Page Modal
+            dbc.Button("Save", id="save-page-button", className="ml-auto"),
+            dbc.Button("Close", id="close-save-modal", className="ml-auto"),
+        ]),
+        html.Div(id="save-page-status")  # Placeholder for saving status
+    ],
+    id="save-page-modal",
+    size="l"
+)
+
+
+########################################################################
+####                                                                ####
+####                             LAYOUT                             ####
+####                                                                ####
+########################################################################
+
+app.layout = html.Div([
+    # Navbar
+    header,
+
+    # Accordion
+    dbc.Container([
+        dbc.Accordion(
+            [
+                instrument_settings,
+                worm_information,
+                module_selection,
+                run_time_settings,
+            ],
+            start_collapsed=False,
+            always_open=True,
+        ),
+    ],
+    style={"paddingTop":"150px"}),
+
+    # Modals (popup screens)
+    save_page,
+    info_page,
+    preview_page,
+])
+
+########################################################################
+####                                                                ####
+####                           CALLBACKS                            ####
+####                                                                ####
+########################################################################
+
+# Collapsing navbar
+@app.callback(
+    Output("navbar-collapse", "is_open"),
+    [Input("navbar-toggler", "n_clicks")],
+    [State("navbar-collapse", "is_open")],
+)
+def toggle_navbar_collapse(n, is_open):
+    if n:
+        return not is_open
+    return is_open
+
+# Appearing multi-well options
+@app.callback(
+    [Output('multi-well-options-row', 'style'),
+     Output('additional-options-row', 'style')],
+    [Input('imaging-mode', 'value'),
+     Input('file-structure', 'value')]
+)
+def update_options_visibility(imaging_mode, file_structure):
+    multi_well_options_style = {'display': 'none'}
+    additional_options_style = {'display': 'none'}
+
+    if imaging_mode == 'multi-well':
+        multi_well_options_style = {'display': 'flex'}
+
+        if file_structure == 'avi':
+            additional_options_style = {'display': 'flex'}
+
+    return multi_well_options_style, additional_options_style
+
+# Load first image in Preview page
 @app.callback(
     Output('input-path-output', 'children'),
     Output('input-preview', 'figure'),
@@ -784,214 +908,7 @@ def update_preview_image(n_clicks, input_dir_state):
     n_clicks = 0
 
 
-# Create the Preview Page Modal
-preview_page = dbc.Modal(
-    [
-        dbc.ModalHeader(
-            "Preview Page"
-        ),
-        preview_page_content(),
-
-        dbc.ModalFooter([
-            # Buttons for the Info Page Modal
-            dbc.Button("Preview", id="preview-preview-button",
-                       className="ml-auto", color="success"),
-            dbc.Button("Close", id="close-preview-modal", className="ml-auto"),
-        ]),
-        html.Div(id="preview-page-status")  # Placeholder for saving status
-    ],
-    id="preview-page-modal",
-    size="xl"
-)
-
-# Create the Save Page Modal
-info_page = dbc.Modal(
-    [
-        dbc.ModalHeader(
-            "Information Page"
-        ),
-        info_page_content(),
-        dbc.ModalFooter([
-            # Buttons for the Info Page Modal
-            dbc.Button("Close", id="close-info-modal", className="ml-auto"),
-        ]),
-        html.Div(id="info-page-status")  # Placeholder for saving status
-    ],
-    id="info-page-modal",
-    size="xl"
-)
-
-# Create the Save Page Modal
-save_page = dbc.Modal(
-    [
-        dbc.ModalHeader("Save Page"),
-        save_page_content(),
-        dbc.ModalFooter([
-            # Buttons for the Save Page Modal
-            dbc.Button("Save", id="save-page-button", className="ml-auto"),
-            dbc.Button("Close", id="close-save-modal", className="ml-auto"),
-        ]),
-        html.Div(id="save-page-status")  # Placeholder for saving status
-    ],
-    id="save-page-modal",
-    size="xl"
-)
-
-header = dbc.Navbar(
-    dbc.Container(
-        [
-            html.A(
-                dbc.Row([
-                    dbc.Col(html.Img(src='https://github.com/zamanianlab/wrmXpress/blob/main/img/logo/output.png?raw=true',
-                                     height="50px")),
-                    dbc.Col(dbc.NavbarBrand("wrmXpress",
-                                            className="ms-2"))],
-                        align="center",
-                        className="g-0"
-                        ),
-                href="https://github.com/zamanianlab/wrmxpress",
-                style={"textDecoration": "none"},
-            ),
-            dbc.Row(
-                [
-                    dbc.NavbarToggler(id="navbar-toggler"),
-                    dbc.Collapse(
-                        dbc.Nav(
-                            [
-                                dbc.NavItem(dbc.NavLink(
-                                    "Info & Docs",
-                                    id="open-info-modal",
-                                    style={'cursor':'pointer'}),
-                                    className="me-auto"),
-                                dbc.NavItem(dbc.NavLink(
-                                    "Save YAML", 
-                                    id="open-save-modal", 
-                                    style={'cursor':'pointer'})),
-                                dbc.NavItem(dbc.NavLink(
-                                    "Preview & Run", 
-                                    id="open-preview-modal", 
-                                    style={'cursor':'pointer'}))
-                            ],
-                            className="w-100"
-                        ),
-                        id="navbar-collapse",
-                        is_open=False,
-                        navbar=True
-                    )
-                ],
-                # the row should expand to fill the available horizontal space
-                className="flex-grow-1",
-                align='center'
-            )
-        ]
-    )
-)
-
-
-# Main Page Layout
-app.layout = html.Div([
-    # html.A(
-    #     dbc.Row([
-    #         dbc.Col(html.Img(src='https://github.com/zamanianlab/wrmXpress/blob/main/img/logo/output.png?raw=true',
-    #                          height="50px")),
-    #         dbc.Col(dbc.NavbarBrand("wrmXpress",
-    #                                 className="ms-2"))],
-    #             align="center",
-    #             className="g-0"
-    #             ),
-    #     href="https://github.com/zamanianlab/wrmxpress",
-    #     style={"textDecoration": "none"},
-    # ),
-    
-    # dbc.Navbar(
-    #     dbc.Container(
-    #         dbc.Nav(
-    #             dbc.Row([
-    #                 dbc.Col([
-    #                     html.A(
-    #                         dbc.Row([
-    #                             dbc.Col(html.Img(src='https://github.com/zamanianlab/wrmXpress/blob/main/img/logo/output.png?raw=true',
-    #                                              height="50px")),
-    #                             dbc.Col(dbc.NavbarBrand("wrmXpress",
-    #                                                     className="ms-2"))],
-    #                                 align="center",
-    #                                 className="g-0"
-    #                                 ),
-    #                         href="https://github.com/zamanianlab/wrmxpress",
-    #                         style={"textDecoration": "none"},
-    #                     )
-    #                 ]),
-    #                 dbc.Col([
-    #                     dbc.Row([
-    #                         dbc.Col(
-    #                             dbc.NavItem(dbc.Button(
-    #                                 "Save Page", id="open-save-modal", color="primary"))),
-    #                         dbc.Col(
-    #                             dbc.NavItem(dbc.Button(
-    #                                 "Preview Page", id="open-preview-modal", color="success", n_clicks=0))
-    #                         )
-    #                     ])
-    #                 ]),
-    #                 # dbc.Col([
-    #                 #     dbc.NavItem(dbc.Button(
-    #                 #         "Info Page", id="open-info-modal", color="secondary"))
-    #                 # ])
-    #             ]),
-    #             className="ml-auto",  # Set the left margin to auto
-    #         ),
-    #         fluid=True,
-    #     ),
-    #     color="light",
-    #     dark=False,
-    #     sticky="top",
-    # ),
-    header,
-    dbc.Container([
-        dbc.Accordion(
-            [
-                create_instrument_settings(),
-                create_worm_information(),
-                create_module_selection(),
-                create_run_time_settings(),
-            ],
-            start_collapsed=False,
-            always_open=True,
-        ),
-    ]),
-    save_page,
-    info_page,
-    preview_page,
-])
-
-
-@app.callback(Output('tbl_out', 'children'), Input('tbl', 'active_cell'))
-def update_graphs(active_cell):
-    return str(active_cell) if active_cell else "Click the table"
-
-# Call Back for pop up multi well
-
-
-@app.callback(
-    [Output('multi-well-options-row', 'style'),
-     Output('additional-options-row', 'style')],
-    [Input('imaging-mode', 'value'),
-     Input('file-structure', 'value')]
-)
-def update_options_visibility(imaging_mode, file_structure):
-    multi_well_options_style = {'display': 'none'}
-    additional_options_style = {'display': 'none'}
-
-    if imaging_mode == 'multi-well':
-        multi_well_options_style = {'display': 'flex'}
-
-        if file_structure == 'avi':
-            additional_options_style = {'display': 'flex'}
-
-    return multi_well_options_style, additional_options_style
-
-# Preview page call back
-
-
+# Write YAML from preview page
 @app.callback(
     Output("preview-page-status", "children"),
     [Input("preview-preview-button", "n_clicks")],
@@ -1090,9 +1007,7 @@ def save_page_to_yaml(
         return f"Data Saved to {filepathforyamlfile}"
     return ""
 
-# Save Page Call Back
-
-
+# Write YAML from save page
 @app.callback(
     Output("save-page-status", "children"),
     [Input("save-page-button", "n_clicks")],
@@ -1189,9 +1104,7 @@ def save_page_to_yaml(
         return f"Data Saved to {filepathforyamlfile}"
     return ""
 
-# Ensure that the IDs used in these callback functions correspond to components in the layout
-
-
+# Open Info, Preview, and Save modals
 @app.callback(
     [Output("save-page-modal", "is_open"),
      Output("info-page-modal", "is_open"),
@@ -1220,175 +1133,3 @@ def toggle_modals(open_save_clicks, close_save_clicks, open_info_clicks, close_i
 
 if __name__ == '__main__':
     app.run_server(debug=True)
-
-"""
-@app.callback(
-    [Output("preview-page-modal", "is_open"),
-     Output("save-page-modal", "is_open")],
-    [Input("preview-wrmXpress-product", "n_clicks"),
-     Input("save-wrmXpress-yaml-file-from-preview-page", "n_clicks")],
-    [State("preview-page-modal", "is_open"),
-     State("save-page-modal", "is_open")]
-)
-def navigate_to_save_page(preview_clicks, save_clicks, preview_is_open, save_is_open):
-    ctx = callback_context
-    triggered_id = ctx.triggered_id
-
-    if triggered_id == "preview-wrmXpress-product.n_clicks":
-        # The "Preview" button was clicked, close the Save Page Modal
-        return not preview_is_open, False
-    elif triggered_id == "save-wrmXpress-yaml-file-from-preview-page.n_clicks":
-        # The "Save" button was clicked, open the Save Page Modal
-        return False, not save_is_open
-    else:
-        raise PreventUpdate
-    
-@app.callback(
-    Output("save-page-modal", "is_open"),
-    [Input("open-save-modal", "n_clicks"), Input("close-save-modal", "n_clicks")],
-    [State("save-page-modal", "is_open")],
-)
-
-def toggle_save_page_modal(open_clicks, close_clicks, is_open):
-    if open_clicks or close_clicks:
-        return not is_open
-    return is_open
-
-@app.callback(
-    Output("save-page-modal", "is_open"),
-    [Input("open-save-modal", "n_clicks")],
-    [State("save-page-modal", "is_open")],
-)
-
-def open_save_page_modal(open_clicks, is_open):
-    if open_clicks:
-        return True
-    return is_open
-
-@app.callback(
-    [Output("wells-information", "value"),
-     Output("save-status", "children")],  # New Output for saving status
-    [Input("open-preview-modal", "n_clicks"),
-     Input("close-modal", "n_clicks"),
-     Input("well-for-preview-id", "value")],
-    [State("imaging-mode", "value"),
-     State("file-structure", "value"),
-     State("multi-well-rows", "value"),
-     State("multi-well-cols", "value"),
-     State("multi-well-detection", "value"),
-     State("species", "value"),
-     State("stages", "value"),
-     State("motility-run", "value"),
-     State("conversion-run", "value"),
-     State("conversion-scale-video", "value"),
-     State("conversion-rescale-multiplier", "value"),
-     State("segment-run", "value"),
-     State("segmentation-wavelength", "value"),
-     State("cell-profiler-run", "value"),
-     State("cell-profiler-pipeline", "value"),
-     State("diagnostics-dx", "value"),
-     State("wells-information", "value"),
-     State("work-directory", "value"),
-     State("input-directory", "value"),
-     State("output-directory", "value"),
-     State("file-path-for-preview-yaml-file", "value")]  # New State for the output file path
-)
-def update_user_input_yaml_file(open_clicks, close_clicks, well_for_preview_id,
-                                imaging_mode, file_structure, multi_well_rows, multi_well_cols,
-                                multi_well_detection, species, stages, motility_run,
-                                conversion_run, conversion_scale_video, conversion_rescale_multiplier,
-                                segment_run, segmentation_wavelength, cell_profiler_run,
-                                cell_profiler_pipeline, diagnostics_dx, wells_information,
-                                work_directory, input_directory, output_directory, file_path):
-    
-    # Initialize the user_input_yaml_file dictionary
-    user_input_yaml_file = {
-        "imaging_mode": [imaging_mode],
-        "file_structure": [file_structure],
-        "multi-well-rows": multi_well_rows,
-        "multi-well-cols": multi_well_cols,
-        "multi-well-detection": [multi_well_detection],
-        "species": [species],
-        "stages": [stages],
-        "modules": {
-            "motility": {"run": motility_run},
-            "convert": {
-                "run": conversion_run,
-                "save_video": conversion_scale_video,
-                "rescale_multiplier": conversion_rescale_multiplier
-            },
-            "segment": {
-                "run": segment_run,
-                "wavelength": [float(value) for value in segmentation_wavelength.split(',')]
-            },
-            "cellprofiler": {
-                "run": cell_profiler_run,
-                "pipeline": [cell_profiler_pipeline]
-            },
-            "dx": {
-                "run": diagnostics_dx
-            }
-        },
-        "wells": [float(value) for value in wells_information.split(",")],
-        "directories": {
-            "work": [work_directory],
-            "input": [input_directory],
-            "output": [output_directory]
-        }
-    }
-
-    # Initialize the preview_input_yaml_file dictionary
-    preview_input_yaml_file = {
-        "imaging_mode": [imaging_mode],
-        "file_structure": [file_structure],
-        "multi-well-rows": multi_well_rows,
-        "multi-well-cols": multi_well_cols,
-        "multi-well-detection": [multi_well_detection],
-        "species": [species],
-        "stages": [stages],
-        "modules": {
-            "motility": {"run": motility_run},
-            "convert": {
-                "run": conversion_run,
-                "save_video": conversion_scale_video,
-                "rescale_multiplier": conversion_rescale_multiplier
-            },
-            "segment": {
-                "run": segment_run,
-                "wavelength": [float(value) for value in segmentation_wavelength.split(',')]
-            },
-            "cellprofiler": {
-                "run": cell_profiler_run,
-                "pipeline": [cell_profiler_pipeline]
-            },
-            "dx": {
-                "run": diagnostics_dx
-            }
-        },
-        "wells": [float(value) for value in wells_information.split(",")],
-        "directories": {
-            "work": [work_directory],
-            "input": [input_directory],
-            "output": [output_directory]
-        }
-    }
-
-    # Create the full filepath using os.path.join
-    output_file = os.path.join(file_path, ".yaml")
-
-    # Dump preview data to YAML file
-    with open(output_file, 'w') as yaml_file:
-        yaml.dump(preview_input_yaml_file, yaml_file, default_flow_style=False)
-
-    # Determine which button was clicked
-    ctx = callback_context
-    triggered_id = ctx.triggered_id
-    if triggered_id is None:
-        raise PreventUpdate
-
-    # Determine whether to open or close the modal
-    if open_clicks or close_clicks:
-        return well_for_preview_id, f"Saved preview data to {output_file}"
-
-    return "", f"Saved preview data to {output_file}"
-"""
