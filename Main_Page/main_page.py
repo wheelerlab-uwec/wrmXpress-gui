@@ -1,6 +1,7 @@
 import base64
 import os
 import pathlib
+import itertools
 from collections import OrderedDict
 
 import cv2
@@ -15,38 +16,12 @@ from dash import callback_context, dash_table, dcc, html
 from dash.dependencies import Input, Output, State
 from dash.exceptions import PreventUpdate
 from PIL import Image
+from components.selection_table import selection_table, selection_table_ag
 
 app = dash.Dash(__name__, external_stylesheets=[
                 dbc.themes.SPACELAB], 
                 suppress_callback_exceptions=True)
 
-
-# Create a DataFrame with 11 columns and 8 rows
-columns = ['01', '02', '03', '04', '05',
-           '06', '07', '08', '09', '10', '11', '12']
-rows = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
-
-# data = {col: [False] * len(rows) for col in columns}
-# df = pd.DataFrame(data, index=rows)
-
-col_vals = ['True', 'False', 'False', 'False',
-            'False', 'False', 'False', 'False']
-
-df = pd.DataFrame(OrderedDict([
-    ('row', ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']),
-    ('01', col_vals),
-    ('02', col_vals),
-    ('03', col_vals),
-    ('04', col_vals),
-    ('05', col_vals),
-    ('06', col_vals),
-    ('07', col_vals),
-    ('08', col_vals),
-    ('09', col_vals),
-    ('10', col_vals),
-    ('11', col_vals),
-    ('12', col_vals),
-]))
 
 # Initialize images
 
@@ -487,7 +462,6 @@ module_selection = dbc.AccordionItem(
     )
 
 
-
 run_time_settings = dbc.AccordionItem(
     [
         html.H4("Directories"),
@@ -503,142 +477,21 @@ run_time_settings = dbc.AccordionItem(
         html.Br(),
 
         html.H4("Wells"),
-        html.P("Select the wells to be analyzed."),
-        html.Div(
-            [
-                dash_table.DataTable(
-                    id='table-dropdown',
-                    data=df.to_dict('records'),
-
-                    columns=[
-                        {'id': 'row', 'name': [
-                            "", "Row"], 'editable': False},
-                        {'id': '01', 'name': [
-                            "Column", "01"], 'presentation': 'dropdown'},
-                        {'id': '02', 'name': [
-                            "Column", "02"], 'presentation': 'dropdown'},
-                        {'id': '03', 'name': [
-                            "Column", "03"], 'presentation': 'dropdown'},
-                        {'id': '04', 'name': [
-                            "Column", "04"], 'presentation': 'dropdown'},
-                        {'id': '05', 'name': [
-                            "Column", "05"], 'presentation': 'dropdown'},
-                        {'id': '06', 'name': [
-                            "Column", "06"], 'presentation': 'dropdown'},
-                        {'id': '07', 'name': [
-                            "Column", "07"], 'presentation': 'dropdown'},
-                        {'id': '08', 'name': [
-                            "Column", "08"], 'presentation': 'dropdown'},
-                        {'id': '09', 'name': [
-                            "Column", "09"], 'presentation': 'dropdown'},
-                        {'id': '10', 'name': [
-                            "Column", "10"], 'presentation': 'dropdown'},
-                        {'id': '11', 'name': [
-                            "Column", "11"], 'presentation': 'dropdown'},
-                        {'id': '12', 'name': [
-                            "Column", "12"], 'presentation': 'dropdown'},
-                    ],
-
-                    merge_duplicate_headers=True,
-                    tooltip_header={
-                        '01': 'Select "True" for all wells to be analyzed.'},
-
-                    # Style headers with a dotted underline to indicate a tooltip
-                    style_header_conditional=[{
-                        'if': {'column_id': '01'},
-                        'textDecoration': 'underline',
-                        'textDecorationStyle': 'dotted',
-                    }],
-                    style_cell={'textAlign': 'center'},
-                    editable=True,
-                    css=[{"selector": ".Select-menu-outer",
-                          "rule": "display: block !important"}],
-                    markdown_options={
-                        'html': True  # Enable HTML rendering for markdown cells
-                    },
-                    dropdown={
-                        '01': {
-                            'options': [
-                                {'label': i, 'value': i}
-                                for i in df['01'].unique()
-                            ]
-                        },
-                        '02': {
-                            'options': [
-                                {'label': i, 'value': i}
-                                for i in df['01'].unique()
-                            ]
-                        },
-                        '03': {
-                            'options': [
-                                {'label': i, 'value': i}
-                                for i in df['01'].unique()
-                            ]
-                        },
-                        '04': {
-                            'options': [
-                                {'label': i, 'value': i}
-                                for i in df['01'].unique()
-                            ]
-                        },
-                        '05': {
-                            'options': [
-                                {'label': i, 'value': i}
-                                for i in df['01'].unique()
-                            ]
-                        },
-                        '06': {
-                            'options': [
-                                {'label': i, 'value': i}
-                                for i in df['01'].unique()
-                            ]
-                        },
-                        '07': {
-                            'options': [
-                                {'label': i, 'value': i}
-                                for i in df['01'].unique()
-                            ]
-                        },
-                        '08': {
-                            'options': [
-                                {'label': i, 'value': i}
-                                for i in df['01'].unique()
-                            ]
-                        },
-                        '09': {
-                            'options': [
-                                {'label': i, 'value': i}
-                                for i in df['01'].unique()
-                            ]
-                        },
-                        '10': {
-                            'options': [
-                                {'label': i, 'value': i}
-                                for i in df['01'].unique()
-                            ]
-                        },
-                        '11': {
-                            'options': [
-                                {'label': i, 'value': i}
-                                for i in df['01'].unique()
-                            ]
-                        },
-                        '12': {
-                            'options': [
-                                {'label': i, 'value': i}
-                                for i in df['01'].unique()
-                            ]
-                        }
-                    }
-                ),
-                html.Div(id='table-dropdown-container'),
-                html.H6("Wells"),
-                dbc.Input(
-                    id="wells-information", placeholder="Please insert the wells information (please separate multiple values by a comma):", type="text"),
-            ],
-            id="run-time-settings",
+        html.P("Edit the following table such that well IDs are only present for wells to be analyzed.\
+            Alternatively, edit the following field to include a list of comma-separated well IDs. \
+                This list will override the contents of the table."),
+        selection_table,
+        html.Br(),
+        html.P("List of wells to be analyzed:"),
+        dbc.Card(
+            dbc.CardBody(
+                html.P(
+                    id='well-selection-list'
+                )
+            )
         )
     ],
+    id="run-time-settings",
     title="Run-Time Settings"
 )
 
@@ -652,7 +505,7 @@ run_time_settings = dbc.AccordionItem(
 save_page_content = dbc.ModalBody(
     [
         # Content for the Save Page Modal
-        html.H6("Write a YAML for running wrmXpress remotely:"),
+        dcc.Markdown("Write a YAML for running wrmXpress remotely. Include a full path and file name ending in `.yaml`."),
         dbc.Input(id="file-path-for-saved-yaml-file",
                   placeholder="Enter the full save path...", type="text"),
     ]
@@ -755,10 +608,13 @@ preview_page_content = dbc.ModalBody(
             )]),
         html.Br(),
         html.Div([
+            dcc.Markdown("Write a YAML for running wrmXpress remotely. Include a full path and file name ending in `.yaml`."),
             dbc.Input(id="file-path-for-preview-yaml-file",
-                      placeholder="Please enter the full filepath for your yaml file:", type="text"),
+                      placeholder="Enter the full save path...", type="text"),
+            html.Br(), 
+            dcc.Markdown("Enter the path to the `wrapper.py` file provided by wrmXpress."),
             dbc.Input(id="file-path-to-wrapper-py",
-                      placeholder="Please Enter the File Path for the Wrapper.py File", type="text"),
+                      placeholder="Enter the full path...", type="text"),
         ])
     ],
 )
@@ -885,6 +741,28 @@ def update_options_visibility(imaging_mode, file_structure):
 
     return multi_well_options_style, additional_options_style
 
+
+# Populate list of wells to be analyzed
+@app.callback(
+    Output('well-selection-list', 'children'),
+    Input('well-selection-table', 'data')
+)
+def update_wells(table_contents):
+    values_list = [list(d.values()) for d in table_contents]
+    flattened_list = list(itertools.chain.from_iterable(values_list))
+    filtered_list = []
+    for item in flattened_list:
+        if item is None:
+            continue
+        elif len(item) == 1:
+            continue
+        else:
+            filtered_list.append(item + ", ")
+    # filtered_list = [item for item in flattened_list if item is None or len(item) > 1]
+    sorted_list = sorted(filtered_list)
+
+    return sorted_list
+
 # Load first image in Preview page
 @app.callback(
     Output('input-path-output', 'children'),
@@ -932,7 +810,7 @@ def update_preview_image(n_clicks, input_dir_state):
         State("cell-profiler-run", "value"),
         State("cell-profiler-pipeline", "value"),
         State("diagnostics-dx", "value"),
-        State("wells-information", "value"),
+        State("well-selection-list", "children"),
         State("work-directory", "value"),
         State("input-directory", "value"),
         State("output-directory", "value"),
@@ -958,7 +836,7 @@ def save_page_to_yaml(
     cellprofilerrun,
     cellprofilerpipeline,
     diagnosticdx,
-    wellsinformation,
+    wellselection,
     workdirectory,
     inputdirectory,
     outputdirectory,
@@ -966,6 +844,8 @@ def save_page_to_yaml(
     wrapper_py_file_path,
 ):
     if n_clicks:
+        well_list = [s.replace(", ", '') for s in wellselection]
+        
         preview_input_yaml_file = {
             "imaging_mode": [imagingmode],
             "file_structure": [filestructure],
@@ -993,7 +873,7 @@ def save_page_to_yaml(
                     "run": bool(diagnosticdx)
                 }
             },
-            "wells": [wellsinformation],
+            "wells": well_list,
             "directories": {
                 "work": [workdirectory],
                 "input": [inputdirectory],
@@ -1001,7 +881,7 @@ def save_page_to_yaml(
             }
         }
         # Create the full filepath using os.path.join
-        output_file = os.path.join(filepathforyamlfile + ".yaml")
+        output_file = os.path.join(filepathforyamlfile)
 
         # Dump preview data to YAML file
         with open(output_file, 'w') as yaml_file:
@@ -1031,7 +911,7 @@ def save_page_to_yaml(
         State("cell-profiler-run", "value"),
         State("cell-profiler-pipeline", "value"),
         State("diagnostics-dx", "value"),
-        State("wells-information", "value"),
+        State("well-selection-list", "children"),
         State("work-directory", "value"),
         State("input-directory", "value"),
         State("output-directory", "value"),
@@ -1056,13 +936,15 @@ def save_page_to_yaml(
     cellprofilerrun,
     cellprofilerpipeline,
     diagnosticdx,
-    wellsinformation,
+    wellselection,
     workdirectory,
     inputdirectory,
     outputdirectory,
     filepathforyamlfile
 ):
     if n_clicks:
+        well_list = [s.replace(", ", '') for s in wellselection]
+        
         user_input_yaml_file = {
             "imaging_mode": [imagingmode],
             "file_structure": [filestructure],
@@ -1090,7 +972,7 @@ def save_page_to_yaml(
                     "run": bool(diagnosticdx)
                 }
             },
-            "wells": [wellsinformation],
+            "wells": well_list,
             "directories": {
                 "work": [workdirectory],
                 "input": [inputdirectory],
@@ -1098,7 +980,7 @@ def save_page_to_yaml(
             }
         }
         # Create the full filepath using os.path.join
-        output_file = os.path.join(filepathforyamlfile + ".yaml")
+        output_file = os.path.join(filepathforyamlfile)
 
         # Dump preview data to YAML file
         with open(output_file, 'w') as yaml_file:
