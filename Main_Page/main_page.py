@@ -20,6 +20,7 @@ app = dash.Dash(__name__, external_stylesheets=[
                 dbc.themes.SPACELAB], 
                 suppress_callback_exceptions=True)
 
+
 # Create a DataFrame with 11 columns and 8 rows
 columns = ['01', '02', '03', '04', '05',
            '06', '07', '08', '09', '10', '11', '12']
@@ -48,6 +49,7 @@ df = pd.DataFrame(OrderedDict([
 ]))
 
 # Initialize images
+
 
 gummy_worm_file_path = "Main_Page/Figures/gummy_worms.png"
 wrmXpress_logo_file_path = "Main_Page/Figures/wrmXpress_logo.png"
@@ -122,6 +124,7 @@ wrmXpress_logo = convert_png_to_image(wrmXpress_logo_file_path)
 uwec_img = convert_png_to_image(uwec_logo_file_path)
 uw_img = convert_png_to_image(uw_logo_file_path)
 wheeler_lab_logo = convert_png_to_image(wheeler_lab_file_path)
+
 
 ########################################################################
 ####                                                                ####
@@ -484,6 +487,7 @@ module_selection = dbc.AccordionItem(
     )
 
 
+
 run_time_settings = dbc.AccordionItem(
     [
         html.H4("Directories"),
@@ -637,7 +641,6 @@ run_time_settings = dbc.AccordionItem(
     ],
     title="Run-Time Settings"
 )
-
 
 
 ########################################################################
