@@ -4,7 +4,11 @@ A GUI for wrmXpress using Dash.
 
 ## Install and run
 
-1. Create Conda environment using `Main_Page/environment.yml`
-2. Enter Conda environment
-3. Run main_page.py via `python main_page.py`
-4. Copy and paste the generated IP address (e.g., <http://127.0.0.1:8050/>) into a browser
+***Prerequisites*** - Install [Docker Engine](https://docs.docker.com/engine/install/)
+
+1. Clone this repository
+2. Navigate to the cloned repository and build the Docker image:
+    `docker build -t wrmxpress_gui .`
+3. Run the Docker, exposing the output to the exact port:
+    `docker run -h localhost -p 9002:9000 -d --name wrmxpress_gui  wrmxpress_gui`
+4. Navigate to the port by inserting `http://localhost:9002/` into a browser search bar.
