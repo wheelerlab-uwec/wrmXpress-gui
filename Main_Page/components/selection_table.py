@@ -3,7 +3,7 @@ import dash
 import dash_bootstrap_components as dbc
 from dash import callback_context, dash_table, dcc, html
 from dash.dependencies import Input, Output, State
-import dash_ag_grid as dag
+# import dash_ag_grid as dag
 
 # Create row names
 rows = list('ABCDEFGH')
@@ -33,20 +33,20 @@ selection_table = html.Div(
     )
 )
 
-selection_table_ag = html.Div([
-    dbc.Button('Select all wells',
-               color='primary',
-               className='me-1 mb-4',
-               id='row-selection-button'),
-    html.Br(),
-    dag.AgGrid(
-        columnDefs=[{"field": col} for col in df.columns],
-        rowData=df.to_dict("records"),
-        columnSize='sizeToFit',
-        dashGridOptions={
-            "rowSelection": "multiple",
-            "rowMultiSelectWithClick": True
-        },
-        id='well-selection-table'
-    )]
-)
+# selection_table_ag = html.Div([
+#     dbc.Button('Select all wells',
+#                color='primary',
+#                className='me-1 mb-4',
+#                id='row-selection-button'),
+#     html.Br(),
+#     dag.AgGrid(
+#         columnDefs=[{"field": col} for col in df.columns],
+#         rowData=df.to_dict("records"),
+#         columnSize='sizeToFit',
+#         dashGridOptions={
+#             "rowSelection": "multiple",
+#             "rowMultiSelectWithClick": True
+#         },
+#         id='well-selection-table'
+#     )]
+# )

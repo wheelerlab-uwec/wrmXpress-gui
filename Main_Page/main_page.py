@@ -16,7 +16,7 @@ from dash import callback_context, dash_table, dcc, html
 from dash.dependencies import Input, Output, State
 from dash.exceptions import PreventUpdate
 from PIL import Image
-from components.selection_table import selection_table, selection_table_ag
+from components.selection_table import selection_table
 
 app = dash.Dash(__name__, external_stylesheets=[
                 dbc.themes.SPACELAB], 
@@ -845,7 +845,7 @@ def save_page_to_yaml(
 ):
     if n_clicks:
         well_list = [s.replace(", ", '') for s in wellselection]
-        
+
         preview_input_yaml_file = {
             "imaging_mode": [imagingmode],
             "file_structure": [filestructure],
@@ -1017,4 +1017,4 @@ def toggle_modals(open_save_clicks, close_save_clicks, open_info_clicks, close_i
 
 
 if __name__ == '__main__':
-    app.run_server(debug=True)
+    app.run_server(debug=False, host='0.0.0.0', port=9000)

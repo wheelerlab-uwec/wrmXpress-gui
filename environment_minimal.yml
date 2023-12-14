@@ -1,0 +1,22 @@
+name: wrmxpress_gui_minimal
+channels:
+  - anaconda
+  - conda-forge
+  - defaults
+dependencies:
+  - dash
+  - dash-bootstrap-components
+  - dash-core-components
+  - dash-html-components
+  - dash-table
+  - ffmpeg
+  - flask
+  - flask-compress
+  - numpy
+  - conda-forge::opencv
+  - pandas
+  - pillow
+  - plotly
+  - waitress
+  - pyyaml
+  - yaml
