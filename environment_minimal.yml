@@ -17,5 +17,6 @@ dependencies:
   - pandas
   - pillow
   - plotly
+  - waitress
   - pyyaml
   - yaml

@@ -1017,4 +1017,4 @@ def toggle_modals(open_save_clicks, close_save_clicks, open_info_clicks, close_i
 
 
 if __name__ == '__main__':
-    app.run_server(debug=True, host='0.0.0.0', port=9000)
+    app.run_server(debug=False, host='0.0.0.0', port=9000)

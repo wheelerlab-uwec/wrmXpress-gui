@@ -23,11 +23,13 @@ COPY Main_Page/components/selection_table.py components/
 COPY Main_Page/main_page.py .
 
 # Activate the Conda environment
-SHELL ["conda", "run", "-n", "wrmxpress_gui_minimal", "/bin/bash", "-c"]
+# SHELL ["conda", "run", "-n", "wrmxpress_gui_minimal", "/bin/bash", "-c"]
 
 # Demonstrate the environment is activated:
-RUN echo "Make sure cv2 is installed:"
-RUN python -c "import cv2"
+# RUN echo "Make sure cv2 is installed:"
+# RUN python -c "import cv2"
+
+EXPOSE 9000
 
 # The code to run when container is started:
 # COPY Main_Page/main_page.py entrypoint.sh ./
