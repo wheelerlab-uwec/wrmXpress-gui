@@ -2,14 +2,27 @@
 
 A GUI for wrmXpress using Dash.
 
-## Install and run
+## Installation and usage
 
-***Prerequisites*** - Install [Docker Engine](https://docs.docker.com/engine/install/)
+***Prerequisites*** - Install [Docker Desktop](https://www.docker.com/products/docker-desktop/)
 
-1. Navigate to the Docker Hub repository at 
-2. Using Docker Desktop, pull the latest wrmXpress_gui image from Docker Hub:
-   1. asdf
-3. In the Images pane and Local tab, click the Run symbol:
-4. Under optional settings, set the Host port to 9000.
-5. Click Run.
-6. Click the link to 9000:9000 or navitage to `http://localhost:9000` to view the app.
+1. Start the Docker engine and open up the Dashboard.
+2. Use the search bar to find and pull the latest wheelern/wrmXpress_gui image from DockerHub. Choose the most recent tag. The compressed image size is >1.5 GB, so it will take a few minutes to pull.
+
+    <img src="readme_img/dd1.png" alt="step 2" width="300" />
+
+3. In the Images pane and Local tab, click the Run symbol.
+
+    <img src="readme_img/dd2.png" alt="step 3" width="300" />
+
+4. Under Optional settings, set the Host port to 9000 and click Run.
+
+    <img src="readme_img/dd3.png" alt="step 3" width="300" />
+
+5. Click the link to 9000:9000 or navigate to `http://localhost:9000` to view the app.
+
+    <img src="readme_img/dd4.png" alt="step 4" width="300" />
+
+6. Follow the guidance in the GUI to prepare and run your analysis.
+
+    <img src="readme_img/dd5.png" alt="step 5" width="300" />
