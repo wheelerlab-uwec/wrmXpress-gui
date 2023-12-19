@@ -2,11 +2,13 @@
 
 A Dash GUI for wrmXpress
 
-### Releases
+## Releases
+
 ![GitHub release (with filter)](https://img.shields.io/github/v/release/wheelerlab-uwec/wrmXpress-gui)
 ![GitHub Release Date - Published_At](https://img.shields.io/github/release-date/wheelerlab-uwec/wrmxpress-gui)
 
-### Builds
+## Builds
+
 [![GitHub Workflow Status (with event)](https://img.shields.io/github/actions/workflow/status/wheelerlab-uwec/wrmxpress-gui/push-docker-image.yml?event=release)](https://hub.docker.com/r/wheelern/wrmxpress_gui/tags)
 ![Docker Image Size (tag)](https://img.shields.io/docker/image-size/wheelern/wrmxpress_gui/latest)
 ![Docker Pulls](https://img.shields.io/docker/pulls/wheelern/wrmxpress_gui)

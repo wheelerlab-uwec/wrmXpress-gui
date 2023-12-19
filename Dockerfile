@@ -14,13 +14,10 @@ COPY environment_minimal.yml .
 # Create a Conda environment from the environment.yml file
 RUN conda env create --name wrmxpress_gui_minimal -f environment_minimal.yml
 
-# Copy the main_page.py file to the container
-RUN mkdir components/
-RUN mkdir Main_Page/
-RUN mkdir Main_Page/Figures/
-COPY Main_Page/Figures/* Main_Page/Figures/
-COPY Main_Page/components/selection_table.py components/
-COPY Main_Page/main_page.py .
+# Copy files to the image
+RUN mkdir app
+COPY app/* app/
+COPY app.py .
 
 # Activate the Conda environment
 # SHELL ["conda", "run", "-n", "wrmxpress_gui_minimal", "/bin/bash", "-c"]
@@ -33,4 +30,4 @@ EXPOSE 9000
 
 # The code to run when container is started:
 # COPY Main_Page/main_page.py entrypoint.sh ./
-ENTRYPOINT ["conda", "run", "-n", "wrmxpress_gui_minimal", "python", "main_page.py"]
+ENTRYPOINT ["conda", "run", "-n", "wrmxpress_gui_minimal", "python", "app.py"]
