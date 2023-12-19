@@ -16,8 +16,11 @@ from dash import callback_context, dash_table, dcc, html
 from dash.dependencies import Input, Output, State
 from dash.exceptions import PreventUpdate
 from PIL import Image
+
+# Importing Components
 from components.selection_table import selection_table
 from components.instrument_settings import instrument_settings
+from components.header import header
 
 app = dash.Dash(__name__, external_stylesheets=[
                 dbc.themes.SPACELAB], 
@@ -33,45 +36,6 @@ info_symbol = "data:image/svg+xml;utf8;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My
 ####                                                                ####
 ########################################################################
 
-header = dbc.Navbar(
-    dbc.Container(
-        [
-            html.A(
-                html.Img(src='https://github.com/zamanianlab/wrmXpress/blob/main/img/logo/output.png?raw=true',
-                             height="100px"),
-                href="https://github.com/zamanianlab/wrmxpress",
-                style={"textDecoration": "none"},
-                className='ms-5'
-            ),
-
-                    dbc.NavbarToggler(id="navbar-toggler", n_clicks=0),
-                    dbc.Collapse(
-                        dbc.Nav(
-                            [
-                                dbc.NavItem(dbc.NavLink(
-                                    "Info & Usage",
-                                    id="open-info-modal",
-                                    style={'cursor': 'pointer'})),
-                                dbc.NavItem(dbc.NavLink(
-                                    "Save YAML",
-                                    id="open-save-modal",
-                                    style={'cursor': 'pointer'})),
-                                dbc.NavItem(dbc.NavLink(
-                                    "Preview & Run",
-                                    id="open-preview-modal",
-                                    style={'cursor': 'pointer'}))
-                            ],
-                            className="w-100 justify-content-end"
-                        ),
-                        id="navbar-collapse",
-                        is_open=False,
-                        navbar=True
-                    )
-        ]
-    ),
-    color='white',
-    fixed='top'
-)
 
 ########################################################################
 ####                                                                ####
