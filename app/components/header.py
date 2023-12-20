@@ -12,13 +12,14 @@ from dash import callback_context, dash_table, dcc, html
 ####                              Layout                            ####
 ####                                                                ####
 ########################################################################
+# Navbar
 header = dbc.Navbar(
     dbc.Container(
         [
             html.A(
-                html.Img(src='https://github.com/zamanianlab/wrmXpress/blob/main/img/logo/output.png?raw=true',
+                html.Img(src='https://github.com/zamanianlab/wrmXpress/blob/main/img/logo/output.png?raw=true', # wrmXpress image
                              height="100px"),
-                href="https://github.com/zamanianlab/wrmxpress",
+                href="https://github.com/zamanianlab/wrmxpress", # clicked takes user to wrmXpress github 
                 style={"textDecoration": "none"},
                 className='ms-5'
             ),
@@ -27,6 +28,7 @@ header = dbc.Navbar(
                     dbc.Collapse(
                         dbc.Nav(
                             [
+                                # Buttons for the Navbar
                                 dbc.NavItem(dbc.NavLink(
                                     "Info & Usage",
                                     id="open-info-modal",
@@ -43,11 +45,11 @@ header = dbc.Navbar(
                             className="w-100 justify-content-end"
                         ),
                         id="navbar-collapse",
-                        is_open=False,
+                        is_open=False, # is open
                         navbar=True
                     )
         ]
     ),
     color='white',
-    fixed='top'
+    fixed='top' # fixed to the top of the screen
 )

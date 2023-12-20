@@ -51,6 +51,7 @@ app.layout = html.Div([
     dbc.Container([
         dbc.Accordion(
             [
+                # Order of the Accordian item in which they appear in the app
                 instrument_settings,
                 worm_information,
                 module_selection,
@@ -208,7 +209,8 @@ def save_page_to_yaml(
 ):
     if n_clicks:
         well_list = [s.replace(", ", '') for s in wellselection]
-
+        
+        # Formatting YAML file with correct layout
         preview_input_yaml_file = {
             "imaging_mode": [imagingmode],
             "file_structure": [filestructure],
@@ -307,7 +309,8 @@ def save_page_to_yaml(
 ):
     if n_clicks:
         well_list = [s.replace(", ", '') for s in wellselection]
-        
+
+        # Formatting YAML file with correct layout
         user_input_yaml_file = {
             "imaging_mode": [imagingmode],
             "file_structure": [filestructure],
