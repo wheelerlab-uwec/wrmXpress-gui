@@ -23,15 +23,15 @@ from dash.exceptions import PreventUpdate
 from PIL import Image
 
 # Importing Components
-from components.selection_table import selection_table
-from components.instrument_settings import instrument_settings
-from components.header import header
-from components.worm_information import worm_information
-from components.module_selection import module_selection
-from components.run_time_settings import run_time_settings
-from components.save_page_content import save_page
-from components.info_page_content import info_page
-from components.preview_page_content import preview_page
+from app.components.selection_table import selection_table
+from app.components.instrument_settings import instrument_settings
+from app.components.header import header
+from app.components.worm_information import worm_information
+from app.components.module_selection import module_selection
+from app.components.run_time_settings import run_time_settings
+from app.components.save_page_content import save_page
+from app.components.info_page_content import info_page
+from app.components.preview_page_content import preview_page
 
 app = dash.Dash(__name__, external_stylesheets=[
                 dbc.themes.SPACELAB], 

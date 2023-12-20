@@ -3,7 +3,7 @@
 ####                             Imports                            ####
 ####                                                                ####
 ########################################################################
-from components.selection_table import selection_table
+from app.components.selection_table import selection_table
 import dash
 import dash_bootstrap_components as dbc
 from dash import callback_context, dash_table, dcc, html
