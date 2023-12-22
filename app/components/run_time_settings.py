@@ -13,6 +13,7 @@ from dash import callback_context, dash_table, dcc, html
 ####                              Layout                            ####
 ####                                                                ####
 ########################################################################
+# Run time accordian items for main page layout
 run_time_settings = dbc.AccordionItem(
     [
         html.H4("Directories"),
@@ -31,6 +32,7 @@ run_time_settings = dbc.AccordionItem(
         html.P("Edit the following table such that well IDs are only present for wells to be analyzed.\
             Alternatively, edit the following field to include a list of comma-separated well IDs. \
                 This list will override the contents of the table."),
+        # Selection Table from selection_table.py acquired from imports
         selection_table,
         html.Br(),
         html.P("List of wells to be analyzed:"),

@@ -355,7 +355,7 @@ def save_page_to_yaml(
         return f"Data Saved to {filepathforyamlfile}"
     return ""
 
-# Open Info, Preview, and Save modals
+# Open and Close Info, Preview, and Save modals
 @app.callback(
     [Output("save-page-modal", "is_open"),
      Output("info-page-modal", "is_open"),
@@ -376,7 +376,6 @@ def toggle_modals(open_save_clicks, close_save_clicks, open_info_clicks, close_i
     elif ctx.triggered_id in ["open-info-modal", "close-info-modal"]:
         return False, not is_info_open, False
     elif ctx.triggered_id in ["open-preview-modal", "close-preview-modal"]:
-        # Toggle the preview modal based on the button click
         return False, False, not is_preview_open
     else:
         return is_save_open, is_info_open, is_preview_open
