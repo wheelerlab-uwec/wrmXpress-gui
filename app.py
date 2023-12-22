@@ -32,6 +32,9 @@ from app.components.run_time_settings import run_time_settings
 from app.components.save_page_content import save_page
 from app.components.info_page_content import info_page
 from app.components.preview_page_content import preview_page
+from app.components.configure_analysis import configure_analysis
+from app.components.meta_data_ import meta_data
+from app.components.tabs_content import tabs_content
 
 app = dash.Dash(__name__, external_stylesheets=[
                 dbc.themes.SPACELAB], 
@@ -43,30 +46,15 @@ app = dash.Dash(__name__, external_stylesheets=[
 ####                                                                ####
 ########################################################################
 
-app.layout = html.Div([
-    # Navbar
-    header,
-    # Accordion
-    dbc.Container([
-        dbc.Accordion(
-            [
-                # Order of the Accordian item in which they appear in the app
-                instrument_settings,
-                worm_information,
-                module_selection,
-                run_time_settings,
-            ],
-            start_collapsed=False,
-            always_open=True,
-        ),
-    ],
-    style={"paddingTop":"150px"}),
-
-    # Modals (popup screens)
-    save_page,
-    info_page,
-    preview_page,
-])
+app.layout = html.Div([header, 
+                       # Adding vertical space so tabs content not hidden behind navbar
+                       html.H4("",style={'padding-top': 80, 'display': 'inline-block'}),
+                       tabs_content, 
+                       # Modals (popup screens)
+                        save_page,
+                        info_page,
+                        preview_page,
+                       ])
 
 ########################################################################
 ####                                                                ####
