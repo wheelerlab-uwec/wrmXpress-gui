@@ -46,7 +46,6 @@ app = dash.Dash(__name__, external_stylesheets=[
 app.layout = html.Div([
     # Navbar
     header,
-
     # Accordion
     dbc.Container([
         dbc.Accordion(
