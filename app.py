@@ -35,10 +35,12 @@ from app.components.preview_page_content import preview_page
 from app.components.configure_analysis import configure_analysis
 from app.components.meta_data_ import meta_data
 from app.components.tabs_content import tabs_content
+from app.components.create_df_from_user_input import create_df_from_inputs
 
 app = dash.Dash(__name__, external_stylesheets=[
                 dbc.themes.SPACELAB], 
                 suppress_callback_exceptions=True)
+
 
 ########################################################################
 ####                                                                ####
@@ -61,6 +63,86 @@ app.layout = html.Div([header,
 ####                           CALLBACKS                            ####
 ####                                                                ####
 ########################################################################
+
+# Create a callback to update the table based on user inputs
+@app.callback(
+    [Output("table-container-batch", "children"),
+     Output("table-container-species", "children"),
+     Output("table-container-strains", "children"),
+     Output("table-container-stages", "children"),
+     Output("table-container-treatments", "children"),
+     Output("table-container-conc", "children"),
+     Output("table-container-other", "children")
+     ],
+    [Input("multi-well-rows", "value"),
+     Input("multi-well-cols", "value")]
+)
+def update_table(rows, cols):
+    default_cols = 12
+    default_rows = 8
+    if rows is None:
+        rows = default_rows
+    if cols is None:
+        cols = default_cols
+
+    df = create_df_from_inputs(rows, cols)
+    table_batch = dash_table.DataTable(
+        data=df.to_dict('records'),
+        columns=[{'name': col, 'id': col} for col in df.columns],
+        editable=True,
+        style_table={'overflowX': 'auto'},
+        style_cell={'textAlign': 'center'},
+        id='dynamic-table-container-batch'
+    )
+    table_species = dash_table.DataTable(
+        data=df.to_dict('records'),
+        columns=[{'name': col, 'id': col} for col in df.columns],
+        editable=True,
+        style_table={'overflowX': 'auto'},
+        style_cell={'textAlign': 'center'},
+        id='dynamic-table-container-species'
+    )
+    table_stages = dash_table.DataTable(
+        data=df.to_dict('records'),
+        columns=[{'name': col, 'id': col} for col in df.columns],
+        editable=True,
+        style_table={'overflowX': 'auto'},
+        style_cell={'textAlign': 'center'},
+        id='dynamic-table-container-stages'
+    )
+    table_strains = dash_table.DataTable(
+        data=df.to_dict('records'),
+        columns=[{'name': col, 'id': col} for col in df.columns],
+        editable=True,
+        style_table={'overflowX': 'auto'},
+        style_cell={'textAlign': 'center'},
+        id='dynamic-table-container-strains'
+    )
+    table_treatment = dash_table.DataTable(
+        data=df.to_dict('records'),
+        columns=[{'name': col, 'id': col} for col in df.columns],
+        editable=True,
+        style_table={'overflowX': 'auto'},
+        style_cell={'textAlign': 'center'},
+        id='dynamic-table-container-species'
+    )
+    table_conc = dash_table.DataTable(
+        data=df.to_dict('records'),
+        columns=[{'name': col, 'id': col} for col in df.columns],
+        editable=True,
+        style_table={'overflowX': 'auto'},
+        style_cell={'textAlign': 'center'},
+        id='dynamic-table-container-conc'
+    )
+    table_other = dash_table.DataTable(
+        data=df.to_dict('records'),
+        columns=[{'name': col, 'id': col} for col in df.columns],
+        editable=True,
+        style_table={'overflowX': 'auto'},
+        style_cell={'textAlign': 'center'},
+        id='dynamic-table-container-other'
+    )
+    return table_batch, table_species, table_strains, table_stages, table_treatment, table_conc, table_other
 
 # Collapsing navbar
 @app.callback(

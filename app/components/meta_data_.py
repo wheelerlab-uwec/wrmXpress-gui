@@ -26,7 +26,7 @@ from app.components.header import header
 from app.components.save_page_content import save_page
 from app.components.info_page_content import info_page
 from app.components.preview_page_content import preview_page
-from app.components.empty_tables_for_now import table
+from app.components.create_df_from_user_input import create_df_from_inputs 
 
 ########################################################################
 ####                                                                ####
@@ -36,13 +36,27 @@ from app.components.empty_tables_for_now import table
 
 meta_data = dbc.Container([
     dcc.Tabs(id='metadata-tabs', value='tab-modules', children=[
-        dcc.Tab(label='Batch', value="batch-data-tab", children=[table]),
-        dcc.Tab(label="Species", value="species-data-tab", children=[table]),
-        dcc.Tab(label="Strains", value="strain-data-tab", children=[table]),
-        dcc.Tab(label="Stages", value="stages-data-tab", children=[table]),
-        dcc.Tab(label="Treatments", value="treatment-data-tab", children=[table]),
-        dcc.Tab(label="Concentration", value='concentration-data-tab', children=[table]),
-        dcc.Tab(label="Other", value='other-data-tab', children=[table]),
+        dcc.Tab(label='Batch', value="batch-data-tab", children=[
+                html.Div(id="table-container-batch"),
+        ]),
+        dcc.Tab(label="Species", value = "species-data-tab", children=[
+            html.Div(id = "table-container-species")
+        ]),
+       dcc.Tab(label="Strains", value = "strains-data-tab", children=[
+            html.Div(id = "table-container-strains")
+        ]),
+        dcc.Tab(label="Stages", value = "stages-data-tab", children=[
+            html.Div(id = "table-container-stages")
+        ]),
+        dcc.Tab(label="Treatments", value = "treatment-data-tab", children=[
+            html.Div(id = "table-container-treatments")
+        ]),
+        dcc.Tab(label="Concentrations", value = "concentration-data-tab", children=[
+            html.Div(id = "table-container-conc")
+        ]),
+        dcc.Tab(label="Other", value = "other-data-tab", children=[
+            html.Div(id = "table-container-other")
+        ]),
     ]),
 ],
     style={"paddingTop": "150px"})
