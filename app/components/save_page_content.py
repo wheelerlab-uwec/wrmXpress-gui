@@ -3,9 +3,8 @@
 ####                             Imports                            ####
 ####                                                                ####
 ########################################################################
-import dash
 import dash_bootstrap_components as dbc
-from dash import callback_context, dash_table, dcc, html
+from dash import dcc, html
 
 ########################################################################
 ####                                                                ####
