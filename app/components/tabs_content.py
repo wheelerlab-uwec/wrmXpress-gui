@@ -17,7 +17,7 @@ from app.components.meta_data_ import meta_data
 # Tabs Content
 tabs_content = dbc.Container(
     [
-        dcc.Tabs(id="tabs", value='tab-modules', children=[
+        dcc.Tabs(id="tabs", value='video_analysis-tab', children=[
             dcc.Tab(label="Configure Analysis", value="video_analysis-tab", children=[
                 configure_analysis
             ]),

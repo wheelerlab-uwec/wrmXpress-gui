@@ -30,4 +30,4 @@ configure_analysis = dbc.Container([
                 always_open=True,
             ),
         ],
-        style={"paddingTop":"150px"})
+        style={"paddingTop":"80px"}) # Adjust the white space between tab and accordian elements

@@ -16,7 +16,7 @@ from dash.dependencies import Input, Output, State
 from PIL import Image
 
 # Importing Components
-from app.components.create_df_from_user_input import create_df_from_inputs
+from app.components.create_df_from_user_input import create_df_from_inputs, create_empty_df_from_inputs
 
 def get_callbacks(app):
     # Create a callback to update the table based on user inputs
@@ -27,10 +27,11 @@ def get_callbacks(app):
         Output("table-container-stages", "children"),
         Output("table-container-treatments", "children"),
         Output("table-container-conc", "children"),
-        Output("table-container-other", "children")
+        Output("table-container-other", "children"),
+        Output("well-selection-table", 'children')
         ],
-        [Input("multi-well-rows", "value"),
-        Input("multi-well-cols", "value")]
+        [Input("total-num-rows", "value"),
+        Input("total-well-cols", "value")]
     )
     def update_table(rows, cols):
         default_cols = 12
@@ -41,63 +42,80 @@ def get_callbacks(app):
             cols = default_cols
 
         df = create_df_from_inputs(rows, cols)
+        df_empty = create_empty_df_from_inputs(rows, cols)
         table_batch = dash_table.DataTable(
-            data=df.to_dict('records'),
-            columns=[{'name': col, 'id': col} for col in df.columns],
+            data=df_empty.reset_index().to_dict('records'),
+            columns=[{'name': 'Row', 'id': 'index', 'editable': False}] +
+            [{'name': col, 'id': col} for col in df.columns],
             editable=True,
             style_table={'overflowX': 'auto'},
             style_cell={'textAlign': 'center'},
             id='dynamic-table-container-batch'
         )
         table_species = dash_table.DataTable(
-            data=df.to_dict('records'),
-            columns=[{'name': col, 'id': col} for col in df.columns],
+            data=df_empty.reset_index().to_dict('records'),
+            columns=[{'name': 'Row', 'id': 'index', 'editable': False}] +
+            [{'name': col, 'id': col} for col in df.columns],
             editable=True,
             style_table={'overflowX': 'auto'},
             style_cell={'textAlign': 'center'},
             id='dynamic-table-container-species'
         )
         table_stages = dash_table.DataTable(
-            data=df.to_dict('records'),
-            columns=[{'name': col, 'id': col} for col in df.columns],
+            data=df_empty.reset_index().to_dict('records'),
+            columns=[{'name': 'Row', 'id': 'index', 'editable': False}] +
+            [{'name': col, 'id': col} for col in df.columns],
             editable=True,
             style_table={'overflowX': 'auto'},
             style_cell={'textAlign': 'center'},
             id='dynamic-table-container-stages'
         )
         table_strains = dash_table.DataTable(
-            data=df.to_dict('records'),
-            columns=[{'name': col, 'id': col} for col in df.columns],
+            data=df_empty.reset_index().to_dict('records'),
+            columns=[{'name': 'Row', 'id': 'index', 'editable': False}] +
+            [{'name': col, 'id': col} for col in df.columns],
             editable=True,
             style_table={'overflowX': 'auto'},
             style_cell={'textAlign': 'center'},
             id='dynamic-table-container-strains'
         )
         table_treatment = dash_table.DataTable(
-            data=df.to_dict('records'),
-            columns=[{'name': col, 'id': col} for col in df.columns],
+            data=df_empty.reset_index().to_dict('records'),
+            columns=[{'name': 'Row', 'id': 'index', 'editable': False}] +
+            [{'name': col, 'id': col} for col in df.columns],
             editable=True,
             style_table={'overflowX': 'auto'},
             style_cell={'textAlign': 'center'},
             id='dynamic-table-container-species'
         )
         table_conc = dash_table.DataTable(
-            data=df.to_dict('records'),
-            columns=[{'name': col, 'id': col} for col in df.columns],
+            data=df_empty.reset_index().to_dict('records'),
+            columns=[{'name': 'Row', 'id': 'index', 'editable': False}] +
+            [{'name': col, 'id': col} for col in df.columns],
             editable=True,
             style_table={'overflowX': 'auto'},
             style_cell={'textAlign': 'center'},
             id='dynamic-table-container-conc'
         )
         table_other = dash_table.DataTable(
-            data=df.to_dict('records'),
-            columns=[{'name': col, 'id': col} for col in df.columns],
+            data=df_empty.reset_index().to_dict('records'),
+            columns=[{'name': 'Row', 'id': 'index', 'editable': False}] +
+            [{'name': col, 'id': col} for col in df.columns],
             editable=True,
             style_table={'overflowX': 'auto'},
             style_cell={'textAlign': 'center'},
             id='dynamic-table-container-other'
         )
-        return table_batch, table_species, table_strains, table_stages, table_treatment, table_conc, table_other
+        well_selection = dash_table.DataTable(
+            data=df.reset_index().to_dict('records'),
+            columns=[{'name': 'Row', 'id': 'index', 'editable': False}] +
+            [{'name': col, 'id': col} for col in df.columns],
+            editable=True,
+            style_table={'overflowX': 'auto'},
+            style_cell={'textAlign': 'center'},
+            id='dynamic-table-container-well-selection-table'
+        )
+        return table_batch, table_species, table_strains, table_stages, table_treatment, table_conc, table_other, well_selection
 
     # Collapsing navbar
     @app.callback(
@@ -133,7 +151,7 @@ def get_callbacks(app):
     # Populate list of wells to be analyzed
     @app.callback(
         Output('well-selection-list', 'children'),
-        Input('well-selection-table', 'data')
+        Input('dynamic-table-container-well-selection-table', 'data')
     )
     def update_wells(table_contents):
         values_list = [list(d.values()) for d in table_contents]

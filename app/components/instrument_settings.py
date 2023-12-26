@@ -113,7 +113,54 @@ instrument_settings = dbc.AccordionItem([
                 ],
                 align="center")
     ),
-],
+        html.Br(),
+            dbc.Row(
+                [
+                    # Label for Plate Format
+                    dbc.Col(html.H6("Plate Format:")),
+                ],
+                align="center"
+            ),
+            dbc.Row(
+                [
+                    # First Column: Image, Tooltip
+                    dbc.Col(
+                        [
+                            html.Img(
+                                src=info_symbol,
+                                id="tot-num-cols-and-rows-symbol"
+                            ),
+                            dbc.Tooltip(
+                                "Input the total number of rows and columns that will be analyzed.",
+                                placement="bottom",
+                                target="tot-num-cols-and-rows-symbol"
+                            )
+                        ],
+                        width="auto"
+                    ),
+                    # Second Column: Input for Total Number of Columns
+                    dbc.Col(
+                        dbc.Input(
+                            id="total-well-cols",
+                            placeholder="Number of Columns.",
+                            type="number"
+                        ),
+                        width="auto"
+                    ),
+                    # Third Column: Input for Total Number of Rows
+                    dbc.Col(
+                        dbc.Input(
+                            id="total-num-rows",
+                            placeholder="Number of Rows.",
+                            type="number"
+                        ),
+                        width="auto",
+                        id="plate-foramt-options-row"
+                    )
+                ],
+                align="center"
+            )
+        ],
     id="instrument-settings-file-structure",
     title="Instrument Settings"
 )

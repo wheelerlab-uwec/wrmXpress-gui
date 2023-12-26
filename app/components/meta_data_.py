@@ -13,7 +13,7 @@ from dash import dcc, html
 ########################################################################
 
 meta_data = dbc.Container([
-    dcc.Tabs(id='metadata-tabs', value='tab-modules', children=[
+    dcc.Tabs(id='metadata-tabs', value='batch-data-tab', children=[
         dcc.Tab(label='Batch', value="batch-data-tab", children=[
                 html.Div(id="table-container-batch"),
         ]),
@@ -37,4 +37,4 @@ meta_data = dbc.Container([
         ]),
     ]),
 ],
-    style={"paddingTop": "150px"})
+    style={"paddingTop": "80px"}) # adjust white space between metadata tab and tabs of metadata content
