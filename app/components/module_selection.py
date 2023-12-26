@@ -3,10 +3,10 @@
 ####                             Imports                            ####
 ####                                                                ####
 ########################################################################
-import dash
 import dash_bootstrap_components as dbc
-from dash import callback_context, dash_table, dcc, html
+from dash import dcc, html
 
+# Initalizing the Info button image
 info_symbol = "data:image/svg+xml;utf8;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCI+PHBhdGggZmlsbD0ibm9uZSIgZD0iTTAgMGgyNHYyNEgwWiIgZGF0YS1uYW1lPSJQYXRoIDM2NzIiLz48cGF0aCBmaWxsPSIjNTI1ODYzIiBkPSJNNS4yMTEgMTguNzg3YTkuNiA5LjYgMCAxIDEgNi43ODggMi44MTQgOS42IDkuNiAwIDAgMS02Ljc4OC0yLjgxNFptMS4yNzQtMTIuM0E3LjgwNiA3LjgwNiAwIDEgMCAxMiA0LjIwNmE3LjgwOCA3LjgwOCAwIDAgMC01LjUxNSAyLjI3OFptNC4xNjMgOS44Nzl2LTQuOGExLjM1MiAxLjM1MiAwIDAgMSAyLjcgMHY0LjhhMS4zNTIgMS4zNTIgMCAwIDEtMi43IDBabS4wMTctOC43QTEuMzM1IDEuMzM1IDAgMSAxIDEyIDkuMDMzYTEuMzUgMS4zNSAwIDAgMS0xLjMzNS0xLjM2OVoiIGRhdGEtbmFtZT0iUGF0aCAyNjgzIi8+PC9zdmc+"
 
 ########################################################################
@@ -24,13 +24,16 @@ module_selection = dbc.AccordionItem(
 
                     # Motility module
                     html.H4("Motility", style={'display': 'inline-block'}),
+                    # Using the info button image
                     html.Img(src=info_symbol,
                              id='motility-symbol',
                              style={'display': 'inline-block', 'width': '1.5%', 'height': '1.5%', 'padding-bottom': 10}),
+                    # Tooltip item for the info button which displays message when cursor over info button
                     dbc.Tooltip(
                         "Uses an optical flow algorithm to measure total motility of the well.",
                         target="motility-symbol"),
                     html.H6("Motility Run"),
+                    # Radio buttons for motility run 
                     dbc.RadioItems(
                         id="motility-run",
                         className="btn-group",
@@ -48,13 +51,16 @@ module_selection = dbc.AccordionItem(
                     # Conversion module
                     html.H4("Conversion",
                             style={'padding-top': 30, 'display': 'inline-block'}),
+                    # Using info button image
                     html.Img(src=info_symbol,
                              id='conversion-symbol',
                              style={'display': 'inline-block', 'width': '1.5%', 'height': '1.5%', 'padding-bottom': 10}),
+                    # Utalizing tooltip item for info button image
                     dbc.Tooltip(
                         "Convert an IX-like video file-structure (directories of time points) to a structure that contains directories of wells. This new structure will be saved to Output",
                         target="conversion-symbol"),
                     html.H6("Conversion Run"),
+                    # Radio buttons for conversion run
                     dbc.RadioItems(
                         id="conversion-run",
                         className="btn-group",
@@ -70,12 +76,15 @@ module_selection = dbc.AccordionItem(
                     html.Br(),
                     html.H6("Conversion Scale Video",
                             style={'display': 'inline-block'}),
+                    # Utalizing info button image
                     html.Img(src=info_symbol,
                              id='rescale-symbol',
                              style={'display': 'inline-block', 'width': '1.5%', 'height': '1.5%', 'padding-bottom': 10}),
+                    # Using tooltip item for info button image
                     dbc.Tooltip(
                         "Rescale the video to be smaller or larger than the original. Useful for reducing the file size of a video to be included in a presentation. Use a float as the multiplier (smaller than 1 will make a smaller video).",
                         target="rescale-symbol"),
+                    # Radio button items for conversion scale video
                     dbc.RadioItems(
                         id="conversion-scale-video",
                         className="btn-group",
@@ -89,6 +98,7 @@ module_selection = dbc.AccordionItem(
                         value="False",
                     ),
                     html.H6("Conversion Rescale Multiplier"),
+                    # Input of text for rescale multiplier
                     dbc.Input(id="conversion-rescale-multiplier",
                               placeholder="Please insert the rescale multiplier:",
                               type="text"),
@@ -97,6 +107,7 @@ module_selection = dbc.AccordionItem(
                     html.H4("Segmentation",
                             style={'padding-top': 30}),
                     html.H6("Segment Run"),
+                    # Radio button items for segment run 
                     dbc.RadioItems(
                         id="segment-run",
                         className="btn-group",
@@ -110,6 +121,7 @@ module_selection = dbc.AccordionItem(
                         value="True",
                     ),
                     html.H6("Wavelength"),
+                    # Input of text for wavelength
                     dbc.Input(id="segmentation-wavelength",
                               placeholder="Please insert the segmentation wavelength (please seperate multiple values by a comma):", type="text")
                 ]),
@@ -121,6 +133,7 @@ module_selection = dbc.AccordionItem(
                     html.H4("Cell Profiler",
                             style={'padding-top': 30}),
                     html.H6("Cell Profiler Run"),
+                    # Radio button items for cell profiler run
                     dbc.RadioItems(
                         id="cell-profiler-run",
                         className="btn-group",
@@ -134,6 +147,7 @@ module_selection = dbc.AccordionItem(
                         value="False",
                     ),
                     html.H6("Cell Profiler Pipeline"),
+                    # Radio buttons for cell profiler pipeline
                     dbc.RadioItems(
                         id="cell-profiler-pipeline",
                         className="btn-group",
@@ -156,13 +170,16 @@ module_selection = dbc.AccordionItem(
             # Diagnostic Module
             html.H4("Diagnostics",
                     style={'display': 'inline-block'}),
+            # Using info button image
             html.Img(src=info_symbol,
                      id='dx-symbol',
                      style={'display': 'inline-block', 'width': '1.5%', 'height': '1.5%', 'padding-bottom': 10}),
+            # Utalizng tooltip item for info button image
             dbc.Tooltip(
                 "Generate and export diagnostic images (recommended).",
                 target="dx-symbol"),
             html.H6("dx"),
+            # Radio buttons for dx
             dbc.RadioItems(
                 id="diagnostics-dx",
                 className="btn-group",

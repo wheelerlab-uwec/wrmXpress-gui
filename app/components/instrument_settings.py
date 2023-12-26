@@ -3,12 +3,10 @@
 ####                             Imports                            ####
 ####                                                                ####
 ########################################################################
-import dash
 import dash_bootstrap_components as dbc
-from dash import callback_context, dash_table, dcc, html
-from dash.dependencies import Input, Output, State
-from dash.exceptions import PreventUpdate
+from dash import html
 
+# Information symbol for tooltip
 info_symbol = "data:image/svg+xml;utf8;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCI+PHBhdGggZmlsbD0ibm9uZSIgZD0iTTAgMGgyNHYyNEgwWiIgZGF0YS1uYW1lPSJQYXRoIDM2NzIiLz48cGF0aCBmaWxsPSIjNTI1ODYzIiBkPSJNNS4yMTEgMTguNzg3YTkuNiA5LjYgMCAxIDEgNi43ODggMi44MTQgOS42IDkuNiAwIDAgMS02Ljc4OC0yLjgxNFptMS4yNzQtMTIuM0E3LjgwNiA3LjgwNiAwIDEgMCAxMiA0LjIwNmE3LjgwOCA3LjgwOCAwIDAgMC01LjUxNSAyLjI3OFptNC4xNjMgOS44Nzl2LTQuOGExLjM1MiAxLjM1MiAwIDAgMSAyLjcgMHY0LjhhMS4zNTIgMS4zNTIgMCAwIDEtMi43IDBabS4wMTctOC43QTEuMzM1IDEuMzM1IDAgMSAxIDEyIDkuMDMzYTEuMzUgMS4zNSAwIDAgMS0xLjMzNS0xLjM2OVoiIGRhdGEtbmFtZT0iUGF0aCAyNjgzIi8+PC9zdmc+"
 
 ########################################################################
@@ -115,7 +113,54 @@ instrument_settings = dbc.AccordionItem([
                 ],
                 align="center")
     ),
-],
+        html.Br(),
+            dbc.Row(
+                [
+                    # Label for Plate Format
+                    dbc.Col(html.H6("Plate Format:")),
+                ],
+                align="center"
+            ),
+            dbc.Row(
+                [
+                    # First Column: Image, Tooltip
+                    dbc.Col(
+                        [
+                            html.Img(
+                                src=info_symbol,
+                                id="tot-num-cols-and-rows-symbol"
+                            ),
+                            dbc.Tooltip(
+                                "Input the total number of rows and columns in the plate.",
+                                placement="bottom",
+                                target="tot-num-cols-and-rows-symbol"
+                            )
+                        ],
+                        width="auto"
+                    ),
+                    # Second Column: Input for Total Number of Columns
+                    dbc.Col(
+                        dbc.Input(
+                            id="total-well-cols",
+                            placeholder="Number of columns.",
+                            type="number"
+                        ),
+                        width="auto"
+                    ),
+                    # Third Column: Input for Total Number of Rows
+                    dbc.Col(
+                        dbc.Input(
+                            id="total-num-rows",
+                            placeholder="Number of rows.",
+                            type="number"
+                        ),
+                        width="auto",
+                        id="plate-foramt-options-row"
+                    )
+                ],
+                align="center"
+            )
+        ],
     id="instrument-settings-file-structure",
     title="Instrument Settings"
 )

@@ -3,18 +3,19 @@
 ####                             Imports                            ####
 ####                                                                ####
 ########################################################################
-import dash
 import dash_bootstrap_components as dbc
-from dash import callback_context, dash_table, dcc, html
+from dash import html
 
 ########################################################################
 ####                                                                ####
 ####                              Layout                            ####
 ####                                                                ####
 ########################################################################
+# Worm Information accordian items
 worm_information = dbc.AccordionItem(
     [
         html.H6("Species:"),
+        # Radio button items for species
         dbc.RadioItems(
             id="species",
             className="btn-group",
@@ -29,6 +30,7 @@ worm_information = dbc.AccordionItem(
             value="Bma",
         ),
         html.H6("Stages:"),
+        # Radio button items for stage information
         dbc.RadioItems(
             id="stages",
             className="btn-group",
