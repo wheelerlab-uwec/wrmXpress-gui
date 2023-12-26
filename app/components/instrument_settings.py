@@ -131,7 +131,7 @@ instrument_settings = dbc.AccordionItem([
                                 id="tot-num-cols-and-rows-symbol"
                             ),
                             dbc.Tooltip(
-                                "Input the total number of rows and columns that will be analyzed.",
+                                "Input the total number of rows and columns in the plate.",
                                 placement="bottom",
                                 target="tot-num-cols-and-rows-symbol"
                             )
@@ -142,7 +142,7 @@ instrument_settings = dbc.AccordionItem([
                     dbc.Col(
                         dbc.Input(
                             id="total-well-cols",
-                            placeholder="Number of Columns.",
+                            placeholder="Number of columns.",
                             type="number"
                         ),
                         width="auto"
@@ -151,7 +151,7 @@ instrument_settings = dbc.AccordionItem([
                     dbc.Col(
                         dbc.Input(
                             id="total-num-rows",
-                            placeholder="Number of Rows.",
+                            placeholder="Number of rows.",
                             type="number"
                         ),
                         width="auto",

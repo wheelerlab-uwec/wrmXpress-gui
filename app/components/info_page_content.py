@@ -79,7 +79,7 @@ info_page_content = dbc.ModalBody(
                 dbc.Col(
                     [html.Img(
                         # Link to UW seal
-                        src='https://upload.wikimedia.org/wikipedia/commons/thumb/a/aa/University_of_Wisconsin_seal.svg/512px-University_of_Wisconsin_seal.svg.png',
+                        src='https://upload.wikimedia.org/wikipedia/commons/4/45/Seal_of_the_University_of_Wisconsin.svg',
                         style={'width':'30%'}
                     )],
                     style={'textAlign':'center'}
