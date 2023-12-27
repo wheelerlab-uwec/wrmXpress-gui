@@ -8,12 +8,14 @@ import pathlib
 import itertools
 
 import dash
+import docker
 import numpy as np
 import plotly.express as px
 import yaml
 from dash import dash_table
 from dash.dependencies import Input, Output, State
 from PIL import Image
+from pathlib import Path
 
 # Importing Components
 from app.components.create_df_from_user_input import create_df_from_inputs, create_empty_df_from_inputs
@@ -175,23 +177,25 @@ def get_callbacks(app):
         Output('input-preview', 'figure'),
         Input('submit-val', 'n_clicks'),
         State("input-directory", "value"),
+        State('mounted-volume', 'value'),
+        State('plate-name', 'value'),
         prevent_initial_call=True
     )
-    def update_preview_image(n_clicks, input_dir_state):
+    def update_preview_image(n_clicks, input, volume, platename):
 
-        path_split = pathlib.PurePath(str(input_dir_state))
-        dir_path = str(path_split.parts[-1])
-        plate_base = dir_path.split("_", 1)[0]
+        # path_split = pathlib.PurePath(str(input_dir_state))
+        # dir_path = str(path_split.parts[-1])
+        plate_base = platename.split("_", 1)[0]
 
         if n_clicks >= 1:
             # assumes IX-like file structure
-            img_path = input_dir_state + f'/TimePoint_1/{plate_base}_A01.TIF'
+            img_path = Path(volume, input, f'{platename}/TimePoint_1/{plate_base}_A01.TIF')
             img = np.array(Image.open(img_path))
             fig = px.imshow(img, color_continuous_scale="gray")
             fig.update_layout(coloraxis_showscale=False)
             fig.update_xaxes(showticklabels=False)
             fig.update_yaxes(showticklabels=False)
-            return f'Input path: {input_dir_state}', fig
+            return f'Input path: {img_path}', fig
         n_clicks = 0
 
 
@@ -396,6 +400,32 @@ def get_callbacks(app):
                         default_flow_style=False)
             return f"Data Saved to {filepathforyamlfile}"
         return ""
+
+
+    # Run analysis
+    @app.callback(
+            Output('analysis-preview-message', 'children'),
+            Input('run-button', 'n_clicks'),
+            State('plate-name', 'value'),
+            State('mounted-volume', 'value')
+    )
+    def run_analysis(nclicks, platename, volume):
+        if nclicks:
+            client = docker.from_env()
+            print(client)
+
+            # this is working-ish, but it looks for that YAML in /input/
+            command = f"python wrmXpress/wrapper.py {platename}.yml {platename}"
+            
+            container = client.containers.run('zamanianlab/wrmxpress', command=f"{command}", detach=True, 
+                                  volumes={f'{volume}/input/': {'bind': '/input/', 'mode': 'rw'},
+                                            f'{volume}/output/': {'bind': '/output/', 'mode': 'rw'},
+                                            f'{volume}/work/': {'bind': '/work/', 'mode': 'rw'},
+                                            f'{volume}/{platename}.yml': {'bind': f'/{platename}.yml', 'mode': 'rw'}
+                                            })
+        return command
+            
+
 
     # Open and Close Info, Preview, and Save modals
     @app.callback(

@@ -16,15 +16,22 @@ from dash import html
 run_time_settings = dbc.AccordionItem(
     [
         html.H4("Directories"),
-        html.H6("Work"),
+        html.H6("Volume"),
         dbc.Input(
-            id="work-directory", placeholder="Please insert the work directory:", type="text"),
+            id="mounted-volume", placeholder="Please insert the path to the local mounted volume:", type="text"),
+        html.H6("Plate/Folder"),
+        dbc.Input(
+            id="plate-name", placeholder="Please insert the plate name:", type="text"),
         html.H6("Input"),
         dbc.Input(
             id="input-directory", placeholder="Please insert the input directory:", type="text"),
         html.H6("Output"),
         dbc.Input(
             id="output-directory", placeholder="Please insert the output directory:", type="text"),
+        html.H6("Work"),
+        dbc.Input(
+            id="work-directory", placeholder="Please insert the work directory:", type="text"),
+
         html.Br(),
 
         html.H4("Wells"),

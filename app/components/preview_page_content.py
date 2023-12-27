@@ -32,7 +32,7 @@ preview_page_content = dbc.ModalBody(
                             )
                         ]),
                         dbc.Col([
-                            html.P(),
+                            html.P(id='analysis-preview-message',),
                             "Analysis preview: ",
                             # Second image of wrmXpress product after analysis of same well
                             dcc.Graph(
@@ -48,10 +48,6 @@ preview_page_content = dbc.ModalBody(
             dcc.Markdown("Write a YAML for running wrmXpress remotely. Include a full path and file name ending in `.yaml`."),
             dbc.Input(id="file-path-for-preview-yaml-file",
                       placeholder="Enter the full save path...", type="text"),
-            html.Br(), 
-            dcc.Markdown("Enter the path to the `wrapper.py` file provided by wrmXpress."),
-            dbc.Input(id="file-path-to-wrapper-py",
-                      placeholder="Enter the full path...", type="text"),
         ])
     ],
 )
@@ -75,6 +71,8 @@ preview_page = dbc.Modal(
         dbc.ModalFooter([
             # Buttons for the Info Page Modal
             dbc.Button("Preview", id="preview-preview-button",
+                       className="ml-auto", color="success"),
+                       dbc.Button("Run", id="run-button",
                        className="ml-auto", color="success"),
             dbc.Button("Close", id="close-preview-modal", className="ml-auto"),
         ]),

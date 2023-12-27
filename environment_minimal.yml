@@ -9,6 +9,7 @@ dependencies:
   - dash-core-components
   - dash-html-components
   - dash-table
+  - docker-py
   - ffmpeg
   - flask
   - flask-compress
