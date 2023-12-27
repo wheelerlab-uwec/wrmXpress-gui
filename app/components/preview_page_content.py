@@ -70,7 +70,7 @@ preview_page = dbc.Modal(
         # Modal Footer
         dbc.ModalFooter([
             # Buttons for the Info Page Modal
-            dbc.Button("Preview", id="preview-preview-button",
+            dbc.Button("Preview", id="preview-button",
                        className="ml-auto", color="success"),
                        dbc.Button("Run", id="run-button",
                        className="ml-auto", color="success"),

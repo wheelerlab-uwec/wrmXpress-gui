@@ -202,7 +202,7 @@ def get_callbacks(app):
     # Write YAML from preview page
     @app.callback(
         Output("preview-page-status", "children"),
-        [Input("preview-preview-button", "n_clicks")],
+        [Input("preview-button", "n_clicks")],
         [
             State("imaging-mode", "value"),
             State("file-structure", "value"),
@@ -414,7 +414,6 @@ def get_callbacks(app):
             client = docker.from_env()
             print(client)
 
-            # this is working-ish, but it looks for that YAML in /input/
             command = f"python wrmXpress/wrapper.py {platename}.yml {platename}"
             
             container = client.containers.run('zamanianlab/wrmxpress', command=f"{command}", detach=True, 
@@ -423,7 +422,7 @@ def get_callbacks(app):
                                             f'{volume}/work/': {'bind': '/work/', 'mode': 'rw'},
                                             f'{volume}/{platename}.yml': {'bind': f'/{platename}.yml', 'mode': 'rw'}
                                             })
-        return command
+            return command
             
 
 
