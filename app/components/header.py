@@ -5,6 +5,7 @@
 ########################################################################
 import dash_bootstrap_components as dbc
 from dash import html
+from dash.dependencies import Input, Output, State
 
 ########################################################################
 ####                                                                ####
@@ -52,3 +53,21 @@ header = dbc.Navbar(
     color='white',
     fixed='top' # fixed to the top of the screen
 )
+
+########################################################################
+####                                                                ####
+####                              Callbacks                         ####
+####                                                                ####
+########################################################################
+
+def collapsing_navbar(app):
+    # Collapsing navbar
+    @app.callback(
+        Output("navbar-collapse", "is_open"),
+        [Input("navbar-toggler", "n_clicks")],
+        [State("navbar-collapse", "is_open")],
+    )
+    def toggle_navbar_collapse(n, is_open):
+        if n:
+            return not is_open
+        return is_open

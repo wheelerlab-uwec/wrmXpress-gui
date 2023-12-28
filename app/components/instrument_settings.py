@@ -5,6 +5,7 @@
 ########################################################################
 import dash_bootstrap_components as dbc
 from dash import html
+from dash.dependencies import Input, Output, State
 
 # Information symbol for tooltip
 info_symbol = "data:image/svg+xml;utf8;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCI+PHBhdGggZmlsbD0ibm9uZSIgZD0iTTAgMGgyNHYyNEgwWiIgZGF0YS1uYW1lPSJQYXRoIDM2NzIiLz48cGF0aCBmaWxsPSIjNTI1ODYzIiBkPSJNNS4yMTEgMTguNzg3YTkuNiA5LjYgMCAxIDEgNi43ODggMi44MTQgOS42IDkuNiAwIDAgMS02Ljc4OC0yLjgxNFptMS4yNzQtMTIuM0E3LjgwNiA3LjgwNiAwIDEgMCAxMiA0LjIwNmE3LjgwOCA3LjgwOCAwIDAgMC01LjUxNSAyLjI3OFptNC4xNjMgOS44Nzl2LTQuOGExLjM1MiAxLjM1MiAwIDAgMSAyLjcgMHY0LjhhMS4zNTIgMS4zNTIgMCAwIDEtMi43IDBabS4wMTctOC43QTEuMzM1IDEuMzM1IDAgMSAxIDEyIDkuMDMzYTEuMzUgMS4zNSAwIDAgMS0xLjMzNS0xLjM2OVoiIGRhdGEtbmFtZT0iUGF0aCAyNjgzIi8+PC9zdmc+"
@@ -164,3 +165,28 @@ instrument_settings = dbc.AccordionItem([
     id="instrument-settings-file-structure",
     title="Instrument Settings"
 )
+
+########################################################################
+####                                                                ####
+####                              Callback                          ####
+####                                                                ####
+########################################################################
+def hidden_multi_row_col_feature(app):
+    # Appearing multi-well options
+    @app.callback(
+        [Output('multi-well-options-row', 'style'),
+        Output('additional-options-row', 'style')],
+        [Input('imaging-mode', 'value'),
+        Input('file-structure', 'value')]
+    )
+    def update_options_visibility(imaging_mode, file_structure):
+        multi_well_options_style = {'display': 'none'}
+        additional_options_style = {'display': 'none'}
+
+        if imaging_mode == 'multi-well':
+            multi_well_options_style = {'display': 'flex'}
+
+            if file_structure == 'avi':
+                additional_options_style = {'display': 'flex'}
+
+        return multi_well_options_style, additional_options_style
