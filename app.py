@@ -8,12 +8,15 @@ import dash_bootstrap_components as dbc
 from dash import html
 
 # Importing Components
-from app.components.header import header
-from app.components.save_page_content import save_page
-from app.components.info_page_content import info_page
-from app.components.preview_page_content import preview_page
+from app.components.header import header, collapsing_navbar
+from app.pages.save_page_content import save_page, save_page_yaml
+from app.pages.info_page_content import info_page
+from app.pages.preview_page_content import preview_page, save_yaml_from_preview, load_first_img
 from app.components.tabs_content import tabs_content
-from app.components.callbacks import get_callbacks
+from app.components.change_page_callback import get_callbacks
+from app.components.meta_data_ import update_metadata_tables
+from app.components.run_time_settings import update_well_selection_table, populate_list_of_wells
+from app.components.instrument_settings import hidden_multi_row_col_feature
 
 app = dash.Dash(__name__, external_stylesheets=[
                 dbc.themes.SPACELAB], 
@@ -43,7 +46,14 @@ app.layout = html.Div([header,
 ########################################################################
 
 get_callbacks(app)
-
+collapsing_navbar(app)
+save_page_yaml(app)
+save_yaml_from_preview(app)
+update_metadata_tables(app)
+update_well_selection_table(app)
+hidden_multi_row_col_feature(app)
+populate_list_of_wells(app)
+load_first_img(app)
 
 ########################################################################
 ####                                                                ####
