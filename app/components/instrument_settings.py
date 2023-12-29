@@ -160,7 +160,40 @@ instrument_settings = dbc.AccordionItem([
                     )
                 ],
                 align="center"
-            )
+            ),
+            html.Br(),
+    html.Div(
+        dbc.Row([
+                # Label for Circle or Square image Masking
+                html.H6("Image Masking:"),
+                dbc.Col([
+                    html.Img(src=info_symbol,
+                            id="circ-or-square-img-mask"),
+                    dbc.Tooltip(
+                                "Please Input if you wish to use circle or square image masking",
+                                placement="bottom",
+                                target="circ-or-square-img-mask"
+                            ),
+                    dbc.RadioItems(
+                        id="circ-or-square-img-masking",
+                        className="btn-group",
+                        inputClassName="btn-check",
+                        labelClassName="btn btn-outline-primary",
+                        labelCheckedClassName="active",
+                        options=[
+                            {"label": "Circle", "value": "circle"},
+                            {"label": "Square", "value": "square"},
+                        ],
+                        value="circle",
+                    ),
+                ],
+                    width='auto'),
+                dbc.Col([ 
+                ],
+                   )  
+                ],
+                align="center")
+    )
         ],
     id="instrument-settings-file-structure",
     title="Instrument Settings"
