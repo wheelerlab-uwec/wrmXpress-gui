@@ -50,17 +50,7 @@ preview_page_content = dbc.ModalBody(
                         ])
                         ])
             ]
-            )]),
-        html.Br(),
-        html.Div([
-            dcc.Markdown("Write a YAML for running wrmXpress remotely. Include a full path and file name ending in `.yaml`."),
-            dbc.Input(id="file-path-for-preview-yaml-file",
-                      placeholder="Enter the full save path...", type="text"),
-            html.Br(), 
-            dcc.Markdown("Enter the path to the `wrapper.py` file provided by wrmXpress."),
-            dbc.Input(id="file-path-to-wrapper-py",
-                      placeholder="Enter the full path...", type="text"),
-        ])
+            )])
     ],
 )
 
@@ -98,108 +88,6 @@ preview_page = dbc.Modal(
 ####                                                                ####
 ########################################################################
 
-def save_yaml_from_preview(app):
-    # Write YAML from preview page
-    @app.callback(
-        Output("preview-page-status", "children"),
-        [Input("preview-preview-button", "n_clicks")],
-        [
-            State("imaging-mode", "value"),
-            State("file-structure", "value"),
-            State("multi-well-rows", "value"),
-            State("multi-well-cols", "value"),
-            State("multi-well-detection", "value"),
-            State("species", "value"),
-            State("stages", 'value'),
-            State("motility-run", "value"),
-            State("conversion-run", "value"),
-            State("conversion-scale-video", "value"),
-            State("conversion-rescale-multiplier", "value"),
-            State("segment-run", "value"),
-            State("segmentation-wavelength", 'value'),
-            State("cell-profiler-run", "value"),
-            State("cell-profiler-pipeline", "value"),
-            State("diagnostics-dx", "value"),
-            State("well-selection-list", "children"),
-            State("work-directory", "value"),
-            State("input-directory", "value"),
-            State("output-directory", "value"),
-            State("file-path-for-preview-yaml-file", "value"),
-            State("file-path-to-wrapper-py", "value"),
-        ]
-    )
-    def save_page_to_yaml(
-        n_clicks,
-        imagingmode,
-        filestructure,
-        multiwellrows,
-        multiwellcols,
-        multiwelldetection,
-        species,
-        stages,
-        motilityrun,
-        conversionrun,
-        conversionscalevideo,
-        conversionrescalemultiplier,
-        segmentrun,
-        wavelength,
-        cellprofilerrun,
-        cellprofilerpipeline,
-        diagnosticdx,
-        wellselection,
-        workdirectory,
-        inputdirectory,
-        outputdirectory,
-        filepathforyamlfile,
-        wrapper_py_file_path,
-    ):
-        if n_clicks:
-            well_list = [s.replace(", ", '') for s in wellselection]
-            
-            # Formatting YAML file with correct layout
-            preview_input_yaml_file = {
-                "imaging_mode": [imagingmode],
-                "file_structure": [filestructure],
-                "multi-well-rows": multiwellrows,
-                "multi-well-cols": multiwellcols,
-                "multi-well-detection": [multiwelldetection],
-                "species": [species],
-                "stages": [stages],
-                "modules": {
-                    "motility": {"run": bool(motilityrun)},
-                    "convert": {
-                        "run": bool(conversionrun),
-                        "save_video": bool(conversionscalevideo),
-                        "rescale_multiplier": conversionrescalemultiplier
-                    },
-                    "segment": {
-                        "run": bool(segmentrun),
-                        "wavelength": [wavelength]
-                    },
-                    "cellprofiler": {
-                        "run": bool(cellprofilerrun),
-                        "pipeline": [cellprofilerpipeline]
-                    },
-                    "dx": {
-                        "run": bool(diagnosticdx)
-                    }
-                },
-                "wells": well_list,
-                "directories": {
-                    "work": [workdirectory],
-                    "input": [inputdirectory],
-                    "output": [outputdirectory]
-                }
-            }
-            # Create the full filepath using os.path.join
-            output_file = os.path.join(filepathforyamlfile)
-
-            # Dump preview data to YAML file
-            with open(output_file, 'w') as yaml_file:
-                yaml.dump(preview_input_yaml_file, yaml_file,
-                        default_flow_style=False)
-            return f"Data Saved to {filepathforyamlfile}"
-        return ""
     
 def load_first_img(app):
     # Load first image in Preview page
