@@ -57,9 +57,6 @@ preview_page_content = dbc.ModalBody(
             dbc.Input(id="file-path-for-preview-yaml-file",
                       placeholder="Enter the full save path...", type="text"),
             html.Br(), 
-            dcc.Markdown("Enter the path to the `wrapper.py` file provided by wrmXpress."),
-            dbc.Input(id="file-path-to-wrapper-py",
-                      placeholder="Enter the full path...", type="text"),
         ])
     ],
 )
@@ -125,7 +122,6 @@ def save_yaml_from_preview(app):
             State("input-directory", "value"),
             State("output-directory", "value"),
             State("file-path-for-preview-yaml-file", "value"),
-            State("file-path-to-wrapper-py", "value"),
         ]
     )
     def save_page_to_yaml(
@@ -151,7 +147,6 @@ def save_yaml_from_preview(app):
         inputdirectory,
         outputdirectory,
         filepathforyamlfile,
-        wrapper_py_file_path,
     ):
         if n_clicks:
             well_list = [s.replace(", ", '') for s in wellselection]
