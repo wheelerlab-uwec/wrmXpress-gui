@@ -10,6 +10,7 @@ from dash import dash_table
 import dash
 from app.utils.create_df_from_user_input import create_empty_df_from_inputs
 
+list_new_tabs = []
 
 ########################################################################
 ####                                                                ####
@@ -77,40 +78,22 @@ def open_metadata_modal(app):
         Output("metadata-tabs", "children"),
         [Input("add-metadata-table-button-to-page", "n_clicks")],
         [State("name-of-new-metadata-table", "value"),
-        State("metadata-tabs", "children"),
-        State("total-num-rows", "value"),
-        State("total-well-cols", "value")]
+        State("metadata-tabs", "children")]
     )
-    def add_new_tab(n_clicks, new_tab_label, existing_tabs, total_rows, total_cols):
+    def add_new_tab(n_clicks, new_tab_label, existing_tabs):
         if n_clicks and new_tab_label:
-            default_cols = 12
-            default_rows = 8
-            if total_rows is None:
-                total_rows = default_rows
-            if total_cols is None:
-                total_cols = default_cols
 
-            empty_df = create_empty_df_from_inputs(total_rows, total_cols)
             # Create a new tab based on the user's input
             new_tab = dcc.Tab(
-                label=new_tab_label,
-                value=new_tab_label.lower() + "-data-tab",  # Use lowercase label for value
-                children=[
-                    html.Div(
-                        dash_table.DataTable(
-                            data=empty_df.reset_index().to_dict('records'),
-                            columns=[{'name': 'Row', 'id': 'index', 'editable': False}] +
-                                    [{'name': col, 'id': col} for col in empty_df.columns],
-                            editable=True,
-                            style_table={'overflowX': 'auto'},
-                            style_cell={'textAlign': 'center'},
-                            id=f"dynamic-table-container-{new_tab_label.lower()}"
-                        )
-                    )
+                label=f"{new_tab_label}",
+                value = f'{new_tab_label}-data-tab',
+                children = [
+                    html.Div(id=f"new-tab-ids{new_tab_label}", style={"display": "none"})  # Add this element to your layout
                 ]
             )
             # Append the new tab to the existing tabs
             existing_tabs.append(new_tab)
+            list_new_tabs.append(f"new-tab-ids{new_tab_label}")
         return existing_tabs
     
     
