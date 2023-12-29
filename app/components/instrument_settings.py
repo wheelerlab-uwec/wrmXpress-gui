@@ -160,6 +160,50 @@ instrument_settings = dbc.AccordionItem([
                     )
                 ],
                 align="center"
+            ),
+             html.Br(),
+            dbc.Row(
+                [
+                    # Label for Circle or Square image Masking
+                    dbc.Col(html.H6("Image Masking:")),
+                ],
+                align="center"
+            ),
+            dbc.Row(
+                [
+                    # First Column: Image, Tooltip
+                    dbc.Col(
+                        [
+                            html.Img(
+                                src=info_symbol,
+                                id="circ-or-square-img-mask"
+                            ),
+                            dbc.Tooltip(
+                                "Please Input if you wish to use circle or square image masking",
+                                placement="bottom",
+                                target="circ-or-square-img-mask"
+                            )
+                        ],
+                        width="auto"
+                    ),
+                    # Second Column: Input for Total Number of Columns
+                    dbc.Col(
+                        dbc.RadioItems(
+                        id="circ-or-square-img-mask",
+                        className="btn-group",
+                        inputClassName="btn-check",
+                        labelClassName="btn btn-outline-primary",
+                        labelCheckedClassName="active",
+                        options=[
+                            {"label": "Circle", "value": "circle"},
+                            {"label": "Square", "value": "square"},
+                        ],
+                        value="circle",
+                    ),
+                        width="auto"
+                    )
+                ],
+                align="center"
             )
         ],
     id="instrument-settings-file-structure",
