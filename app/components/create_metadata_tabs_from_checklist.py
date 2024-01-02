@@ -1,0 +1,50 @@
+########################################################################
+####                                                                ####
+####                             Imports                            ####
+####                                                                ####
+########################################################################
+import dash_bootstrap_components as dbc
+from dash import dcc, html
+from dash.dependencies import Input, Output, State
+from dash import dash_table
+import dash
+from app.utils.create_df_from_user_input import create_empty_df_from_inputs
+
+
+
+########################################################################
+####                                                                ####
+####                              Layout                            ####
+####                                                                ####
+########################################################################
+
+meta_data_from_input = dbc.Container([
+    dcc.Tabs(id='metadata-tabs', value='batch-data-tab', children=[
+
+    ]
+    )
+    ]
+    )
+
+########################################################################
+####                                                                ####
+####                             Callbacks                          ####
+####                                                                ####
+########################################################################
+def create_metadata_tables_from_checklist(app):
+    @app.callback(
+        Output('metadata-tabs', 'children'),
+        [Input("finalize-metadata-table-button",'n_clicks')],
+        [State("checklist-input", "value")]
+    )
+    def create_tabs_from_checklist(n_clicks, checklist_values):
+        if n_clicks and checklist_values:
+            # Create a list of dcc.Tab components from the checked items
+            tabs = [
+                dcc.Tab(label=value, value=f"{value}-tab")  # Create a Tab for each checked item
+                for value in checklist_values
+            ]
+            return tabs
+        else:
+            return []
+    

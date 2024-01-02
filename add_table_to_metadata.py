@@ -12,7 +12,8 @@ info_symbol = "data:image/svg+xml;utf8;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My
 
 # Importing Components
 from app.components.metadata_tab import meta_data, update_metadata_tables 
-from app.pages.add_metadata_modal import add_metadata_table, open_metadata_modal
+from app.components.metadata_table_checklist import metadata_checklist, add_metadata_table_checklist
+from app.components.create_metadata_tabs_from_checklist import meta_data_from_input, create_metadata_tables_from_checklist
 
 app = dash.Dash(__name__, external_stylesheets=[
                 dbc.themes.SPACELAB], 
@@ -74,6 +75,10 @@ app.layout = html.Div([
                         ),
                         html.Br(),
                         dbc.Row(
+                            metadata_checklist
+                        ),
+                        html.Br(),
+                        dbc.Row(
                             [
                                 # Label for Plate Format
                                 dbc.Col(html.H6("Add New Metadata Table:")),
@@ -111,16 +116,51 @@ app.layout = html.Div([
                                     dbc.Input(
                                         id="uneditable-input-box",
                                         value="",
-                                        disabled=True
+                                        disabled=False
                                     ),
                                     width="auto"
                                 ),
                             ],
                             align="center"
                         ),
-                       meta_data, 
-                       # Modals (popup screens)
-                       add_metadata_table,
+                        html.Br(),
+                        dbc.Row(
+                            [
+                                dbc.Col(html.H6("Finalize Metadata Tables:")),
+                            ],
+                            align = 'center'
+                        ),
+                        dbc.Row(
+                            [
+                                # First Column: Image, Tooltip
+                                dbc.Col(
+                                    [
+                                        html.Img(
+                                            src=info_symbol,
+                                            id="finalize-metadata-table-info-symbol"
+                                        ),
+                                        dbc.Tooltip(
+                                            "Please click here which will open a modal that you can insert the name of the new metadata table which you wish to create.",
+                                            placement="bottom",
+                                            target="finalize-metadata-table-info-symbol"
+                                        )
+                                    ],
+                                    width="auto"
+                                ),
+                                # Second Column: Input for Total Number of Columns
+                                dbc.Col(
+                                    dbc.Button(
+                                        "Finalize Metadata Tables", 
+                                        id="finalize-metadata-table-button", 
+                                        className="me-2", 
+                                            ),
+                                    width="auto"
+                                ),
+                            ],
+                            align="center"
+                        ),
+                        meta_data_from_input
+                       
                        ])
 
 ########################################################################
@@ -130,7 +170,8 @@ app.layout = html.Div([
 ########################################################################
 
 update_metadata_tables(app)
-open_metadata_modal(app)
+add_metadata_table_checklist(app)
+create_metadata_tables_from_checklist(app)
 
 ########################################################################
 ####                                                                ####
