@@ -105,13 +105,22 @@ app.layout = html.Div([
                                         className="me-2", 
                                             ),
                                     width="auto"
-                                )
+                                ),
+                                dbc.Col(
+                                    # Add an uneditable input box here
+                                    dbc.Input(
+                                        id="uneditable-input-box",
+                                        value="",
+                                        disabled=True
+                                    ),
+                                    width="auto"
+                                ),
                             ],
                             align="center"
                         ),
                        meta_data, 
                        # Modals (popup screens)
-                        add_metadata_table,
+                       add_metadata_table,
                        ])
 
 ########################################################################

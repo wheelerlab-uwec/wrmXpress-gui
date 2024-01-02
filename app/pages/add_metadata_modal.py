@@ -11,7 +11,6 @@ import dash
 from app.utils.create_df_from_user_input import create_empty_df_from_inputs
 
 list_new_tabs = []
-
 ########################################################################
 ####                                                                ####
 ####                              Layout                            ####
@@ -75,25 +74,29 @@ def open_metadata_modal(app):
         
     # Callback to add a new tab to meta_data based on user input
     @app.callback(
-        Output("metadata-tabs", "children"),
-        [Input("add-metadata-table-button-to-page", "n_clicks")],
+        [Output("metadata-tabs", "children"), 
+         Output("uneditable-input-box", "value")],
+        [Input("add-metadata-table-button-to-page", "n_clicks"),
+        Input('uneditable-input-box', 'value')],
         [State("name-of-new-metadata-table", "value"),
         State("metadata-tabs", "children")]
     )
-    def add_new_tab(n_clicks, new_tab_label, existing_tabs):
+    def add_new_tab(n_clicks, list_new_tabs, new_tab_label, existing_tabs):
         if n_clicks and new_tab_label:
-
+            list_new_tabs = list(list_new_tabs)
             # Create a new tab based on the user's input
             new_tab = dcc.Tab(
                 label=f"{new_tab_label}",
                 value = f'{new_tab_label}-data-tab',
                 children = [
-                    html.Div(id=f"new-tab-ids{new_tab_label}", style={"display": "none"})  # Add this element to your layout
+                    html.Div(id=f"new-tab-ids-{new_tab_label}", style={"display": "none"})  # Add this element to your layout
                 ]
             )
             # Append the new tab to the existing tabs
             existing_tabs.append(new_tab)
-            list_new_tabs.append(f"new-tab-ids{new_tab_label}")
-        return existing_tabs
+            list_new_tabs.append(f"new-tab-ids-{new_tab_label}")
+        return existing_tabs, list_new_tabs
     
     
+
+        
