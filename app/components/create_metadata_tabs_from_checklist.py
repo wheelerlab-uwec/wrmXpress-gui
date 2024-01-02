@@ -34,17 +34,39 @@ meta_data_from_input = dbc.Container([
 def create_metadata_tables_from_checklist(app):
     @app.callback(
         Output('metadata-tabs', 'children'),
-        [Input("finalize-metadata-table-button",'n_clicks')],
+        [Input('total-num-rows', 'value'),
+         Input('total-well-cols', 'value'),
+         Input("finalize-metadata-table-button", 'n_clicks')],
         [State("checklist-input", "value")]
     )
-    def create_tabs_from_checklist(n_clicks, checklist_values):
+    def create_tabs_from_checklist(num_rows, num_cols, n_clicks, checklist_values):
+        default_cols = 12
+        default_rows = 8
+        if num_rows is None:
+            num_rows = default_rows
+        if num_cols is None:
+            num_cols = default_cols
+
+        df_empty = create_empty_df_from_inputs(num_rows, num_cols)
         if n_clicks and checklist_values:
             # Create a list of dcc.Tab components from the checked items
             tabs = [
-                dcc.Tab(label=value, value=f"{value}-tab")  # Create a Tab for each checked item
+                dcc.Tab(label=value, value=f"{value}-tab", children=[
+                    html.Div(dash_table.DataTable(
+                        data=df_empty.reset_index().to_dict('records'),
+                        columns=[{'name': 'Row', 'id': 'index', 'editable': False}] +
+                        [{'name': col, 'id': col} for col in df_empty.columns],
+                        editable=True,
+                        style_table={'overflowX': 'auto'},
+                        style_cell={'textAlign': 'center'},
+                        id=f'dynamic-table-container-{value}'
+                    )
+                    )
+                ])  # Create a Tab for each checked item
                 for value in checklist_values
             ]
             return tabs
         else:
             return []
-    
+
+        
