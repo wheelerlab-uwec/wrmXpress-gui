@@ -157,6 +157,7 @@ def get_callbacks(app):
     )
     def update_wells(table_contents):
         values_list = [list(d.values()) for d in table_contents]
+        
         flattened_list = list(itertools.chain.from_iterable(values_list))
         filtered_list = []
         for item in flattened_list:
@@ -165,8 +166,7 @@ def get_callbacks(app):
             elif len(item) == 1:
                 continue
             else:
-                filtered_list.append(item + ", ")
-        # filtered_list = [item for item in flattened_list if item is None or len(item) > 1]
+                filtered_list.append(item)
         sorted_list = sorted(filtered_list)
 
         return sorted_list
@@ -179,23 +179,24 @@ def get_callbacks(app):
         State("input-directory", "value"),
         State('mounted-volume', 'value'),
         State('plate-name', 'value'),
+        State('well-selection-list', 'children'),
         prevent_initial_call=True
     )
-    def update_preview_image(n_clicks, input, volume, platename):
+    def update_preview_image(n_clicks, input, volume, platename, wells):
 
-        # path_split = pathlib.PurePath(str(input_dir_state))
-        # dir_path = str(path_split.parts[-1])
+        first_well = wells[0].replace(', ', '')
+
         plate_base = platename.split("_", 1)[0]
 
         if n_clicks >= 1:
             # assumes IX-like file structure
-            img_path = Path(volume, input, f'{platename}/TimePoint_1/{plate_base}_A01.TIF')
+            img_path = Path(volume, input, f'{platename}/TimePoint_1/{plate_base}_{first_well}.TIF')
             img = np.array(Image.open(img_path))
             fig = px.imshow(img, color_continuous_scale="gray")
             fig.update_layout(coloraxis_showscale=False)
             fig.update_xaxes(showticklabels=False)
             fig.update_yaxes(showticklabels=False)
-            return f'Input path: {img_path}', fig
+            return f'```{img_path}```', fig
         n_clicks = 0
 
 
@@ -405,16 +406,23 @@ def get_callbacks(app):
     # Run analysis
     @app.callback(
             Output('analysis-preview-message', 'children'),
-            Input('run-button', 'n_clicks'),
+            Output('analysis-preview', 'figure'),
+            Input('preview-button', 'n_clicks'),
             State('plate-name', 'value'),
-            State('mounted-volume', 'value')
+            State('mounted-volume', 'value'),
+            State("work-directory", "value"),
+            State('well-selection-list', 'children')
     )
-    def run_analysis(nclicks, platename, volume):
+    def run_analysis(nclicks, platename, volume, work, wells):
         if nclicks:
+            #   
             client = docker.from_env()
             print(client)
 
+            first_well = wells[0].replace(', ', '')
+
             command = f"python wrmXpress/wrapper.py {platename}.yml {platename}"
+            command_message = f"```python wrmXpress/wrapper.py {platename}.yml {platename}```"
             
             container = client.containers.run('zamanianlab/wrmxpress', command=f"{command}", detach=True, 
                                   volumes={f'{volume}/input/': {'bind': '/input/', 'mode': 'rw'},
@@ -422,7 +430,16 @@ def get_callbacks(app):
                                             f'{volume}/work/': {'bind': '/work/', 'mode': 'rw'},
                                             f'{volume}/{platename}.yml': {'bind': f'/{platename}.yml', 'mode': 'rw'}
                                             })
-            return command
+            
+            # assumes IX-like file structure
+            img_path = Path(volume, work, f'{platename}/{first_well}/img/{platename}_{first_well}_motility.png')
+            img = np.array(Image.open(img_path))
+            fig = px.imshow(img, color_continuous_scale="gray")
+            fig.update_layout(coloraxis_showscale=False)
+            fig.update_xaxes(showticklabels=False)
+            fig.update_yaxes(showticklabels=False)
+
+            return command_message, fig
             
 
 

@@ -41,14 +41,17 @@ run_time_settings = dbc.AccordionItem(
         # Selection Table from selection_table.py acquired from imports
         selection_table,
         html.Br(),
-        html.P("List of wells to be analyzed:"),
-        dbc.Card(
-            dbc.CardBody(
-                html.P(
-                    id='well-selection-list'
+        html.Div([
+            html.P("List of wells to be analyzed:"),
+            dbc.Card(
+                dbc.CardBody(
+                    html.P(
+                        id='well-selection-list'
+                    )
                 )
-            )
-        )
+            )],
+            style={'display':'none'})
+        
     ],
     id="run-time-settings",
     title="Run-Time Settings"
