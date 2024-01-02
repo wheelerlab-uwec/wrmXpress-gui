@@ -159,6 +159,7 @@ app.layout = html.Div([
                             ],
                             align="center"
                         ),
+                        html.Br(),
                         meta_data_from_input
                        
                        ])
