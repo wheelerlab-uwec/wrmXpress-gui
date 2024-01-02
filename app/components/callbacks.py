@@ -171,34 +171,7 @@ def get_callbacks(app):
 
         return sorted_list
 
-    # Load first image in Preview page
-    @app.callback(
-        Output('input-path-output', 'children'),
-        Output('input-preview', 'figure'),
-        Input('submit-val', 'n_clicks'),
-        State("input-directory", "value"),
-        State('mounted-volume', 'value'),
-        State('plate-name', 'value'),
-        State('well-selection-list', 'children'),
-        prevent_initial_call=True
-    )
-    def update_preview_image(n_clicks, input, volume, platename, wells):
-
-        first_well = wells[0].replace(', ', '')
-
-        plate_base = platename.split("_", 1)[0]
-
-        if n_clicks >= 1:
-            # assumes IX-like file structure
-            img_path = Path(volume, input, f'{platename}/TimePoint_1/{plate_base}_{first_well}.TIF')
-            img = np.array(Image.open(img_path))
-            fig = px.imshow(img, color_continuous_scale="gray")
-            fig.update_layout(coloraxis_showscale=False)
-            fig.update_xaxes(showticklabels=False)
-            fig.update_yaxes(showticklabels=False)
-            return f'```{img_path}```', fig
-        n_clicks = 0
-
+    
 
     # Write YAML from preview page
     @app.callback(

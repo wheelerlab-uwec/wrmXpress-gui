@@ -11,7 +11,7 @@ from dash import html
 from app.components.header import header, collapsing_navbar
 from app.pages.save_page_content import save_page, save_page_yaml
 from app.pages.info_page_content import info_page
-from app.pages.preview_page_content import preview_page, save_yaml_from_preview, load_first_img
+from app.pages.preview_page_content import preview_page, load_first_img, preview_analysis
 from app.components.tabs_content import tabs_content
 from app.components.change_page_callback import get_callbacks
 from app.components.meta_data_ import update_metadata_tables
@@ -48,12 +48,12 @@ app.layout = html.Div([header,
 get_callbacks(app)
 collapsing_navbar(app)
 save_page_yaml(app)
-save_yaml_from_preview(app)
 update_metadata_tables(app)
 update_well_selection_table(app)
 hidden_multi_row_col_feature(app)
 populate_list_of_wells(app)
 load_first_img(app)
+preview_analysis(app)
 
 ########################################################################
 ####                                                                ####
