@@ -4,7 +4,6 @@
 ####                                                                ####
 ########################################################################
 import os
-import pathlib
 import itertools
 
 import dash
@@ -18,22 +17,24 @@ from PIL import Image
 from pathlib import Path
 
 # Importing Components
-from app.components.create_df_from_user_input import create_df_from_inputs, create_empty_df_from_inputs
+from app.utils.create_df_from_user_input import create_df_from_inputs, create_empty_df_from_inputs
+from app.utils.callback_functions import prep_yaml
+
 
 def get_callbacks(app):
     # Create a callback to update the table based on user inputs
     @app.callback(
         [Output("table-container-batch", "children"),
-        Output("table-container-species", "children"),
-        Output("table-container-strains", "children"),
-        Output("table-container-stages", "children"),
-        Output("table-container-treatments", "children"),
-        Output("table-container-conc", "children"),
-        Output("table-container-other", "children"),
-        Output("well-selection-table", 'children')
-        ],
+         Output("table-container-species", "children"),
+         Output("table-container-strains", "children"),
+         Output("table-container-stages", "children"),
+         Output("table-container-treatments", "children"),
+         Output("table-container-conc", "children"),
+         Output("table-container-other", "children"),
+         Output("well-selection-table", 'children')
+         ],
         [Input("total-num-rows", "value"),
-        Input("total-well-cols", "value")]
+         Input("total-well-cols", "value")]
     )
     def update_table(rows, cols):
         default_cols = 12
@@ -133,9 +134,9 @@ def get_callbacks(app):
     # Appearing multi-well options
     @app.callback(
         [Output('multi-well-options-row', 'style'),
-        Output('additional-options-row', 'style')],
+         Output('additional-options-row', 'style')],
         [Input('imaging-mode', 'value'),
-        Input('file-structure', 'value')]
+         Input('file-structure', 'value')]
     )
     def update_options_visibility(imaging_mode, file_structure):
         multi_well_options_style = {'display': 'none'}
@@ -149,8 +150,8 @@ def get_callbacks(app):
 
         return multi_well_options_style, additional_options_style
 
-
     # Populate list of wells to be analyzed
+
     @app.callback(
         Output('well-selection-list', 'children'),
         Input('dynamic-table-container-well-selection-table', 'data')
@@ -176,260 +177,106 @@ def get_callbacks(app):
     # Write YAML from preview page
     @app.callback(
         Output("preview-page-status", "children"),
-        [Input("preview-button", "n_clicks")],
-        [
-            State("imaging-mode", "value"),
-            State("file-structure", "value"),
-            State("multi-well-rows", "value"),
-            State("multi-well-cols", "value"),
-            State("multi-well-detection", "value"),
-            State("species", "value"),
-            State("stages", 'value'),
-            State("motility-run", "value"),
-            State("conversion-run", "value"),
-            State("conversion-scale-video", "value"),
-            State("conversion-rescale-multiplier", "value"),
-            State("segment-run", "value"),
-            State("segmentation-wavelength", 'value'),
-            State("cell-profiler-run", "value"),
-            State("cell-profiler-pipeline", "value"),
-            State("diagnostics-dx", "value"),
-            State("well-selection-list", "children"),
-            State("work-directory", "value"),
-            State("input-directory", "value"),
-            State("output-directory", "value"),
-            State("file-path-for-preview-yaml-file", "value"),
-            State("file-path-to-wrapper-py", "value"),
-        ]
+        Input("preview-button", "n_clicks"),
+        State("imaging-mode", "value"),
+        State("file-structure", "value"),
+        State("multi-well-rows", "value"),
+        State("multi-well-cols", "value"),
+        State("multi-well-detection", "value"),
+        State("species", "value"),
+        State("stages", 'value'),
+        State("motility-run", "value"),
+        State("conversion-run", "value"),
+        State("conversion-scale-video", "value"),
+        State("conversion-rescale-multiplier", "value"),
+        State("segment-run", "value"),
+        State("segmentation-wavelength", 'value'),
+        State("cell-profiler-run", "value"),
+        State("cell-profiler-pipeline", "value"),
+        State("diagnostics-dx", "value"),
+        State("well-selection-list", "children"),
+        State('mounted-volume', 'value'),
+        State('plate-name', 'value')
     )
-    def save_page_to_yaml(
-        n_clicks,
-        imagingmode,
-        filestructure,
-        multiwellrows,
-        multiwellcols,
-        multiwelldetection,
-        species,
-        stages,
-        motilityrun,
-        conversionrun,
-        conversionscalevideo,
-        conversionrescalemultiplier,
-        segmentrun,
-        wavelength,
-        cellprofilerrun,
-        cellprofilerpipeline,
-        diagnosticdx,
-        wellselection,
-        workdirectory,
-        inputdirectory,
-        outputdirectory,
-        filepathforyamlfile,
-        wrapper_py_file_path,
-    ):
-        if n_clicks:
-            well_list = [s.replace(", ", '') for s in wellselection]
-            
-            # Formatting YAML file with correct layout
-            preview_input_yaml_file = {
-                "imaging_mode": [imagingmode],
-                "file_structure": [filestructure],
-                "multi-well-rows": multiwellrows,
-                "multi-well-cols": multiwellcols,
-                "multi-well-detection": [multiwelldetection],
-                "species": [species],
-                "stages": [stages],
-                "modules": {
-                    "motility": {"run": bool(motilityrun)},
-                    "convert": {
-                        "run": bool(conversionrun),
-                        "save_video": bool(conversionscalevideo),
-                        "rescale_multiplier": conversionrescalemultiplier
-                    },
-                    "segment": {
-                        "run": bool(segmentrun),
-                        "wavelength": [wavelength]
-                    },
-                    "cellprofiler": {
-                        "run": bool(cellprofilerrun),
-                        "pipeline": [cellprofilerpipeline]
-                    },
-                    "dx": {
-                        "run": bool(diagnosticdx)
-                    }
-                },
-                "wells": well_list,
-                "directories": {
-                    "work": [workdirectory],
-                    "input": [inputdirectory],
-                    "output": [outputdirectory]
-                }
-            }
-            # Create the full filepath using os.path.join
-            output_file = os.path.join(filepathforyamlfile)
+    def save_page_to_yaml(n_clicks, imagingmode, filestructure, multiwellrows, multiwellcols, multiwelldetection,
+                          species, stages, motilityrun, conversionrun, conversionscalevideo,
+                          conversionrescalemultiplier, segmentrun, wavelength, cellprofilerrun, cellprofilerpipeline,
+                          diagnosticdx, wellselection, mountedvolume, platename
+                          ):
 
-            # Dump preview data to YAML file
-            with open(output_file, 'w') as yaml_file:
-                yaml.dump(preview_input_yaml_file, yaml_file,
-                        default_flow_style=False)
-            return f"Data Saved to {filepathforyamlfile}"
-        return ""
+        if n_clicks:
+            yaml_dict = prep_yaml(imagingmode, filestructure, multiwellrows, multiwellcols, multiwelldetection,
+                                  species, stages, motilityrun, conversionrun, conversionscalevideo,
+                                  conversionrescalemultiplier, segmentrun, wavelength, cellprofilerrun,
+                                  cellprofilerpipeline, diagnosticdx, wellselection)
+
+            outpath = Path(mountedvolume, str(platename) + '.yml')
+
+            with open(outpath, 'w') as yaml_file:
+                yaml.dump(yaml_dict, yaml_file,
+                          default_flow_style=False)
+
+        return f"Configuration written to {outpath}"
 
     # Write YAML from save page
     @app.callback(
         Output("save-page-status", "children"),
-        [Input("save-page-button", "n_clicks")],
-        [
-            State("imaging-mode", "value"),
-            State("file-structure", "value"),
-            State("multi-well-rows", "value"),
-            State("multi-well-cols", "value"),
-            State("multi-well-detection", "value"),
-            State("species", "value"),
-            State("stages", 'value'),
-            State("motility-run", "value"),
-            State("conversion-run", "value"),
-            State("conversion-scale-video", "value"),
-            State("conversion-rescale-multiplier", "value"),
-            State("segment-run", "value"),
-            State("segmentation-wavelength", 'value'),
-            State("cell-profiler-run", "value"),
-            State("cell-profiler-pipeline", "value"),
-            State("diagnostics-dx", "value"),
-            State("well-selection-list", "children"),
-            State("work-directory", "value"),
-            State("input-directory", "value"),
-            State("output-directory", "value"),
-            State("file-path-for-saved-yaml-file", "value")
-        ]
+        Input("save-page-button", "n_clicks"),
+        State("imaging-mode", "value"),
+        State("file-structure", "value"),
+        State("multi-well-rows", "value"),
+        State("multi-well-cols", "value"),
+        State("multi-well-detection", "value"),
+        State("species", "value"),
+        State("stages", 'value'),
+        State("motility-run", "value"),
+        State("conversion-run", "value"),
+        State("conversion-scale-video", "value"),
+        State("conversion-rescale-multiplier", "value"),
+        State("segment-run", "value"),
+        State("segmentation-wavelength", 'value'),
+        State("cell-profiler-run", "value"),
+        State("cell-profiler-pipeline", "value"),
+        State("diagnostics-dx", "value"),
+        State("well-selection-list", "children"),
+        State('mounted-volume', 'value'),
+        State('plate-name', 'value')
     )
-    def save_page_to_yaml(
-        n_clicks,
-        imagingmode,
-        filestructure,
-        multiwellrows,
-        multiwellcols,
-        multiwelldetection,
-        species,
-        stages,
-        motilityrun,
-        conversionrun,
-        conversionscalevideo,
-        conversionrescalemultiplier,
-        segmentrun,
-        wavelength,
-        cellprofilerrun,
-        cellprofilerpipeline,
-        diagnosticdx,
-        wellselection,
-        workdirectory,
-        inputdirectory,
-        outputdirectory,
-        filepathforyamlfile
-    ):
+    def save_page_to_yaml(n_clicks, imagingmode, filestructure, multiwellrows, multiwellcols, multiwelldetection,
+                          species, stages, motilityrun, conversionrun, conversionscalevideo,
+                          conversionrescalemultiplier, segmentrun, wavelength, cellprofilerrun, cellprofilerpipeline,
+                          diagnosticdx, wellselection, mountedvolume, platename
+                          ):
+
         if n_clicks:
-            well_list = [s.replace(", ", '') for s in wellselection]
+            yaml_dict = prep_yaml(imagingmode, filestructure, multiwellrows, multiwellcols, multiwelldetection,
+                                  species, stages, motilityrun, conversionrun, conversionscalevideo,
+                                  conversionrescalemultiplier, segmentrun, wavelength, cellprofilerrun,
+                                  cellprofilerpipeline, diagnosticdx, wellselection)
 
-            # Formatting YAML file with correct layout
-            user_input_yaml_file = {
-                "imaging_mode": [imagingmode],
-                "file_structure": [filestructure],
-                "multi-well-rows": multiwellrows,
-                "multi-well-cols": multiwellcols,
-                "multi-well-detection": [multiwelldetection],
-                "species": [species],
-                "stages": [stages],
-                "modules": {
-                    "motility": {"run": bool(motilityrun)},
-                    "convert": {
-                        "run": bool(conversionrun),
-                        "save_video": bool(conversionscalevideo),
-                        "rescale_multiplier": conversionrescalemultiplier
-                    },
-                    "segment": {
-                        "run": bool(segmentrun),
-                        "wavelength": [wavelength]
-                    },
-                    "cellprofiler": {
-                        "run": bool(cellprofilerrun),
-                        "pipeline": [cellprofilerpipeline]
-                    },
-                    "dx": {
-                        "run": bool(diagnosticdx)
-                    }
-                },
-                "wells": well_list,
-                "directories": {
-                    "work": [workdirectory],
-                    "input": [inputdirectory],
-                    "output": [outputdirectory]
-                }
-            }
-            # Create the full filepath using os.path.join
-            output_file = os.path.join(filepathforyamlfile)
+            outpath = Path(mountedvolume, str(platename) + '.yml')
 
-            # Dump preview data to YAML file
-            with open(output_file, 'w') as yaml_file:
-                yaml.dump(user_input_yaml_file, yaml_file,
-                        default_flow_style=False)
-            return f"Data Saved to {filepathforyamlfile}"
-        return ""
+            with open(outpath, 'w') as yaml_file:
+                yaml.dump(yaml_dict, yaml_file,
+                          default_flow_style=False)
 
-
-    # Run analysis
-    @app.callback(
-            Output('analysis-preview-message', 'children'),
-            Output('analysis-preview', 'figure'),
-            Input('preview-button', 'n_clicks'),
-            State('plate-name', 'value'),
-            State('mounted-volume', 'value'),
-            State("work-directory", "value"),
-            State('well-selection-list', 'children')
-    )
-    def run_analysis(nclicks, platename, volume, work, wells):
-        if nclicks:
-            #   
-            client = docker.from_env()
-            print(client)
-
-            first_well = wells[0].replace(', ', '')
-
-            command = f"python wrmXpress/wrapper.py {platename}.yml {platename}"
-            command_message = f"```python wrmXpress/wrapper.py {platename}.yml {platename}```"
-            
-            container = client.containers.run('zamanianlab/wrmxpress', command=f"{command}", detach=True, 
-                                  volumes={f'{volume}/input/': {'bind': '/input/', 'mode': 'rw'},
-                                            f'{volume}/output/': {'bind': '/output/', 'mode': 'rw'},
-                                            f'{volume}/work/': {'bind': '/work/', 'mode': 'rw'},
-                                            f'{volume}/{platename}.yml': {'bind': f'/{platename}.yml', 'mode': 'rw'}
-                                            })
-            
-            # assumes IX-like file structure
-            img_path = Path(volume, work, f'{platename}/{first_well}/img/{platename}_{first_well}_motility.png')
-            img = np.array(Image.open(img_path))
-            fig = px.imshow(img, color_continuous_scale="gray")
-            fig.update_layout(coloraxis_showscale=False)
-            fig.update_xaxes(showticklabels=False)
-            fig.update_yaxes(showticklabels=False)
-
-            return command_message, fig
-            
-
+        return f"Configuration written to {outpath}"
 
     # Open and Close Info, Preview, and Save modals
+
     @app.callback(
         [Output("save-page-modal", "is_open"),
-        Output("info-page-modal", "is_open"),
-        Output("preview-page-modal", "is_open")],
+         Output("info-page-modal", "is_open"),
+         Output("preview-page-modal", "is_open")],
         [Input("open-save-modal", "n_clicks"), Input("close-save-modal", "n_clicks"),
-        Input("open-info-modal", "n_clicks"), Input("close-info-modal", "n_clicks"),
-        Input("open-preview-modal", "n_clicks"), Input("close-preview-modal", "n_clicks")],
+         Input("open-info-modal", "n_clicks"), Input("close-info-modal", "n_clicks"),
+         Input("open-preview-modal", "n_clicks"), Input("close-preview-modal", "n_clicks")],
         [State("save-page-modal", "is_open"),
-        State("info-page-modal", "is_open"),
-        State("preview-page-modal", "is_open")],
+         State("info-page-modal", "is_open"),
+         State("preview-page-modal", "is_open")],
     )
     def toggle_modals(open_save_clicks, close_save_clicks, open_info_clicks, close_info_clicks,
-                    open_preview_clicks, close_preview_clicks, is_save_open, is_info_open, is_preview_open):
+                      open_preview_clicks, close_preview_clicks, is_save_open, is_info_open, is_preview_open):
         ctx = dash.callback_context
 
         if ctx.triggered_id in ["open-save-modal", "close-save-modal"]:

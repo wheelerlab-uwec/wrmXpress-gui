@@ -23,21 +23,11 @@ run_time_settings = dbc.AccordionItem(
         html.H6("Volume"),
         dbc.Input(
             id="mounted-volume", placeholder="Please insert the path to the local mounted volume:", type="text"),
+        html.Br(),
         html.H6("Plate/Folder"),
         dbc.Input(
             id="plate-name", placeholder="Please insert the plate name:", type="text"),
-        html.H6("Input"),
-        dbc.Input(
-            id="input-directory", placeholder="Please insert the input directory:", type="text"),
-        html.H6("Output"),
-        dbc.Input(
-            id="output-directory", placeholder="Please insert the output directory:", type="text"),
-        html.H6("Work"),
-        dbc.Input(
-            id="work-directory", placeholder="Please insert the work directory:", type="text"),
-
         html.Br(),
-
         html.H4("Wells"),
         html.P("Edit the following table such that well IDs are only present for wells to be analyzed.\
             Alternatively, edit the following field to include a list of comma-separated well IDs. \
@@ -108,7 +98,7 @@ def populate_list_of_wells(app):
             elif len(item) == 1:
                 continue
             else:
-                filtered_list.append(item + ", ")
+                filtered_list.append(item)
         # filtered_list = [item for item in flattened_list if item is None or len(item) > 1]
         sorted_list = sorted(filtered_list)
 

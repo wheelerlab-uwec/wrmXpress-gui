@@ -7,10 +7,13 @@ import dash_bootstrap_components as dbc
 from dash import dcc, html
 from dash.dependencies import Input, Output, State
 import docker
+import yaml
+import time
 from pathlib import Path
 import numpy as np
 import plotly.express as px
 from PIL import Image
+from app.utils.callback_functions import prep_yaml
 
 ########################################################################
 ####                                                                ####
@@ -108,13 +111,12 @@ def load_first_img(app):
         Output('input-path-output', 'children'),
         Output('input-preview', 'figure'),
         Input('submit-val', 'n_clicks'),
-        State("input-directory", "value"),
         State('mounted-volume', 'value'),
         State('plate-name', 'value'),
         State('well-selection-list', 'children'),
         prevent_initial_call=True
     )
-    def update_preview_image(n_clicks, input, volume, platename, wells):
+    def update_preview_image(n_clicks, volume, platename, wells):
 
         first_well = wells[0].replace(', ', '')
 
@@ -122,7 +124,7 @@ def load_first_img(app):
 
         if n_clicks >= 1:
             # assumes IX-like file structure
-            img_path = Path(volume, input, f'{platename}/TimePoint_1/{plate_base}_{first_well}.TIF')
+            img_path = Path(volume, 'input', f'{platename}/TimePoint_1/{plate_base}_{first_well}.TIF')
             img = np.array(Image.open(img_path))
             fig = px.imshow(img, color_continuous_scale="gray")
             fig.update_layout(coloraxis_showscale=False)
@@ -136,19 +138,65 @@ def preview_analysis(app):
             Output('analysis-preview-message', 'children'),
             Output('analysis-preview', 'figure'),
             Input('preview-button', 'n_clicks'),
+            State('imaging-mode', 'value'),
+            State('file-structure', 'value'),
+            State('multi-well-rows', 'value'),
+            State('multi-well-cols', 'value'),
+            State('multi-well-detection', 'value'),
+            State('species', 'value'),
+            State('stages', 'value'),
+            State('motility-run', 'value'),
+            State('conversion-run', 'value'),
+            State('conversion-scale-video', 'value'),
+            State('conversion-rescale-multiplier', 'value'),
+            State('segment-run', 'value'),
+            State('segmentation-wavelength', 'value'),
+            State('cell-profiler-run', 'value'),
+            State('cell-profiler-pipeline', 'value'),
+            State('diagnostics-dx', 'value'),
             State('plate-name', 'value'),
             State('mounted-volume', 'value'),
-            State("work-directory", "value"),
             State('well-selection-list', 'children'),
         prevent_initial_call=True
     )
-    def run_analysis(nclicks, platename, volume, work, wells):
+    def run_analysis(nclicks, imagingmode, filestructure, multiwellrows, multiwellcols, multiwelldetection, species, stages, motilityrun, conversionrun, conversionscalevideo, conversionrescalemultiplier, segmentrun, wavelength, cellprofilerrun, cellprofilerpipeline, diagnosticdx, platename, volume, wells):
         if nclicks:
-            # 20210819-p01-NJW_753
+            
+            if wells == 'All':
+                first_well = 'A01'
+            else:
+                first_well = wells[0]
+
+            config = prep_yaml(
+                imagingmode,
+                filestructure,
+                multiwellrows,
+                multiwellcols,
+                multiwelldetection,
+                species,
+                stages,
+                motilityrun,
+                conversionrun,
+                conversionscalevideo,
+                conversionrescalemultiplier,
+                segmentrun,
+                wavelength,
+                cellprofilerrun,
+                cellprofilerpipeline,
+                diagnosticdx,
+                wells
+            )
+
+            # Create the full filepath using os.path.join
+            output_file = Path(volume, platename + '.yml')
+
+            # Dump preview data to YAML file
+            with open(output_file, 'w') as yaml_file:
+                yaml.dump(config, yaml_file,
+                        default_flow_style=False)
+
             client = docker.from_env()
             print(client)
-
-            first_well = wells[0].replace(', ', '')
 
             command = f"python wrmXpress/wrapper.py {platename}.yml {platename}"
             command_message = f"```python wrmXpress/wrapper.py {platename}.yml {platename}```"
@@ -160,8 +208,10 @@ def preview_analysis(app):
                                             f'{volume}/{platename}.yml': {'bind': f'/{platename}.yml', 'mode': 'rw'}
                                             })
             
+            time.sleep(5)
+            
             # assumes IX-like file structure
-            img_path = Path(volume, work, f'{platename}/{first_well}/img/{platename}_{first_well}_motility.png')
+            img_path = Path(volume, 'work', f'{platename}/{first_well}/img/{platename}_{first_well}_motility.png')
             img = np.array(Image.open(img_path))
             fig = px.imshow(img, color_continuous_scale="gray")
             fig.update_layout(coloraxis_showscale=False)
