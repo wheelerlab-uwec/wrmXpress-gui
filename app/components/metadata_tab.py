@@ -33,7 +33,7 @@ meta_data = dbc.Container(
                         dbc.Row(
                             [
                                 # Label for Plate Format
-                                dbc.Col(html.H6("Add New metadata table:")),
+                                dbc.Col(html.H6("Add new metadata table:")),
                             ],
                             align="center"
                         ),
@@ -52,6 +52,7 @@ meta_data = dbc.Container(
                                     # Add an editable input box here
                                     dbc.Input(
                                         id="uneditable-input-box",
+                                        placeholder='Table title...',
                                         value="",
                                         disabled=False
                                     ),
@@ -60,13 +61,7 @@ meta_data = dbc.Container(
                             ],
                             align="center"
                         ),
-                        html.Br(),
-                        dbc.Row(
-                            [
-                                dbc.Col(html.H6("Finalize metadata tables:")),
-                            ],
-                            align='center'
-                        ),
+                        html.Hr(),
                         dbc.Row(
                             [
                                 # First Column: Input for Total Number of Columns
@@ -74,17 +69,17 @@ meta_data = dbc.Container(
                                     dbc.Button(
                                         "Finalize Tables",
                                         id="finalize-metadata-table-button",
-                                        className="me-2",
-                                        color = 'success'
+                                        className="flex",
+                                        color='success'
                                     ),
                                     width="auto"
                                 ),
                             ],
-                            align="center"
+                            justify="center"
                         )
                     ],
                     id="offcanvas",
-                    title="Select metadata tables",
+                    title="Select metadata tables:",
                     is_open=True,
                 ),
                 html.Br(),
@@ -113,5 +108,3 @@ def open_metadata_offcanvas(app):
         if n1:
             return not is_open
         return is_open
-
-

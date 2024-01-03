@@ -17,8 +17,6 @@ from dash.dependencies import Input, Output, State
 metadata_checklist = dbc.Form([
     html.Div(
         [
-            html.H6(
-                "Choose the metadata tables:"),
             dbc.Checklist(
                 options=[
                     {"label": "Batch",
