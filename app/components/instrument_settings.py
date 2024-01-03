@@ -58,6 +58,53 @@ instrument_settings = dbc.AccordionItem([
                 align="center")
     ]),
     html.Br(),
+    dbc.Row(
+        [
+            # Label for Multi Site Imaging Mode
+            dbc.Col(html.H6("Multi Site Imaging Mode:")),
+        ],
+        align="center"
+    ),
+    dbc.Row(
+        [
+            # First Column: Image, Tooltip
+            dbc.Col(
+                [
+                    html.Img(
+                        src=info_symbol,
+                        id="multi-site-imaging-mode-info-symbol"
+                    ),
+                    dbc.Tooltip(
+                        "Input the total number of rows and columns in the plate for multi site imaging.",
+                        placement="bottom",
+                        target="multi-site-imaging-mode-info-symbol"
+                    )
+                ],
+                width="auto"
+            ),
+            # Second Column: Input for Total Number of Columns
+            dbc.Col(
+                dbc.Input(
+                    id="multi-site-well-cols",
+                    placeholder="Multi-site columns.",
+                    type="number"
+                ),
+                width="auto"
+            ),
+            # Third Column: Input for Total Number of Rows
+            dbc.Col(
+                dbc.Input(
+                    id="multi-site-num-rows",
+                    placeholder="Multi-site rows.",
+                    type="number"
+                ),
+                width="auto",
+                id="multi-site-foramt-options-row"
+            )
+        ],
+        align="center"
+    ),
+    html.Br(),
     html.Div(
         dbc.Row([
                 html.H6("File Structure:"),
