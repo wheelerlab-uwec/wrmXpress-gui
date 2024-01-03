@@ -21,7 +21,8 @@ from app.components.create_metadata_tabs_from_checklist import create_metadata_t
 from app.components.metadata_table_checklist import add_metadata_table_checklist
 
 app = dash.Dash(__name__, external_stylesheets=[
-                dbc.themes.SPACELAB],
+                dbc.themes.SPACELAB,
+                dbc.icons.FONT_AWESOME],
                 suppress_callback_exceptions=True)
 
 

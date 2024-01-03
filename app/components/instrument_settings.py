@@ -7,9 +7,6 @@ import dash_bootstrap_components as dbc
 from dash import html
 from dash.dependencies import Input, Output, State
 
-# Information symbol for tooltip
-info_symbol = "data:image/svg+xml;utf8;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCI+PHBhdGggZmlsbD0ibm9uZSIgZD0iTTAgMGgyNHYyNEgwWiIgZGF0YS1uYW1lPSJQYXRoIDM2NzIiLz48cGF0aCBmaWxsPSIjNTI1ODYzIiBkPSJNNS4yMTEgMTguNzg3YTkuNiA5LjYgMCAxIDEgNi43ODggMi44MTQgOS42IDkuNiAwIDAgMS02Ljc4OC0yLjgxNFptMS4yNzQtMTIuM0E3LjgwNiA3LjgwNiAwIDEgMCAxMiA0LjIwNmE3LjgwOCA3LjgwOCAwIDAgMC01LjUxNSAyLjI3OFptNC4xNjMgOS44Nzl2LTQuOGExLjM1MiAxLjM1MiAwIDAgMSAyLjcgMHY0LjhhMS4zNTIgMS4zNTIgMCAwIDEtMi43IDBabS4wMTctOC43QTEuMzM1IDEuMzM1IDAgMSAxIDEyIDkuMDMzYTEuMzUgMS4zNSAwIDAgMS0xLjMzNS0xLjM2OVoiIGRhdGEtbmFtZT0iUGF0aCAyNjgzIi8+PC9zdmc+"
-
 ########################################################################
 ####                                                                ####
 ####                              Layout                            ####
@@ -20,8 +17,8 @@ instrument_settings = dbc.AccordionItem([
         dbc.Row([
                 html.H6("Imaging Mode:", id='imaging-mode-header'),
                 dbc.Col([
-                    html.Img(src=info_symbol,
-                             id='imaging-mode-symbol'),
+                    html.I(className="fa-regular fa-circle-question",
+                           id='imaging-mode-symbol'),
                     dbc.Tooltip(
                         "Select Single Well if each video or image only includes a single well. Select Multi Well if each video/image contains multiple wells that need to be split.",
                         placement='bottom',
@@ -62,8 +59,8 @@ instrument_settings = dbc.AccordionItem([
         dbc.Row([
                 html.H6("File Structure:"),
                 dbc.Col([
-                    html.Img(src=info_symbol,
-                             id='file-structure-symbol'),
+                    html.I(className="fa-solid fa-circle-question",
+                           id='file-structure-symbol'),
                     dbc.Tooltip(
                         "Select ImageXpress if the data is saved in an IX-like structure. Select AVI if the data is a single video saved as an AVI.",
                         placement='bottom',
@@ -127,8 +124,8 @@ instrument_settings = dbc.AccordionItem([
             # First Column: Image, Tooltip
             dbc.Col(
                 [
-                    html.Img(
-                        src=info_symbol,
+                    html.I(
+                        className="fa-solid fa-circle-info",
                         id="tot-num-cols-and-rows-symbol"
                     ),
                     dbc.Tooltip(
@@ -167,8 +164,8 @@ instrument_settings = dbc.AccordionItem([
                 # Label for Circle or Square image Masking
                 html.H6("Image Masking:"),
                 dbc.Col([
-                    html.Img(src=info_symbol,
-                             id="circ-or-square-img-mask"),
+                    html.I(className="fa-solid fa-info",
+                           id="circ-or-square-img-mask"),
                     dbc.Tooltip(
                         "Please Input if you wish to use circle or square image masking",
                         placement="bottom",
