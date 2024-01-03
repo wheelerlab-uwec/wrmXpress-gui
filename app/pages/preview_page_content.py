@@ -5,9 +5,7 @@
 ########################################################################
 import dash_bootstrap_components as dbc
 from dash import dcc, html
-import yaml
 from dash.dependencies import Input, Output, State
-import os
 import pathlib
 import numpy as np
 import plotly.express as px
@@ -76,7 +74,7 @@ preview_page = dbc.Modal(
                        className="ml-auto", color="success"),
             dbc.Button("Close", id="close-preview-modal", className="ml-auto"),
         ]),
-        html.Div(id="preview-page-status")  
+        html.Div(id="preview-page-status")
     ],
     id="preview-page-modal",
     size="xl"
@@ -88,7 +86,7 @@ preview_page = dbc.Modal(
 ####                                                                ####
 ########################################################################
 
-    
+
 def load_first_img(app):
     # Load first image in Preview page
     @app.callback(

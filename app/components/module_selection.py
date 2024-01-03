@@ -15,12 +15,12 @@ info_symbol = "data:image/svg+xml;utf8;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My
 ####                                                                ####
 ########################################################################
 module_selection = dbc.AccordionItem(
-        [
-            # Create separate tabs for video/image analysis
-            dcc.Tabs(id="module-tabs", value="tab-modules", children=[
+    [
+        # Create separate tabs for video/image analysis
+        dcc.Tabs(id="module-tabs", value="tab-modules", children=[
 
-                # Video analysis tab
-                dcc.Tab(label="Video Analysis", value='video-analysis-tab', children=[
+            # Video analysis tab
+            dcc.Tab(label="Video Analysis", value='video-analysis-tab', children=[
 
                     # Motility module
                     html.H4("Motility", style={'display': 'inline-block'}),
@@ -33,7 +33,7 @@ module_selection = dbc.AccordionItem(
                         "Uses an optical flow algorithm to measure total motility of the well.",
                         target="motility-symbol"),
                     html.H6("Motility Run"),
-                    # Radio buttons for motility run 
+                    # Radio buttons for motility run
                     dbc.RadioItems(
                         id="motility-run",
                         className="btn-group",
@@ -107,7 +107,7 @@ module_selection = dbc.AccordionItem(
                     html.H4("Segmentation",
                             style={'padding-top': 30}),
                     html.H6("Segment Run"),
-                    # Radio button items for segment run 
+                    # Radio button items for segment run
                     dbc.RadioItems(
                         id="segment-run",
                         className="btn-group",
@@ -124,10 +124,10 @@ module_selection = dbc.AccordionItem(
                     # Input of text for wavelength
                     dbc.Input(id="segmentation-wavelength",
                               placeholder="Please insert the segmentation wavelength (please seperate multiple values by a comma):", type="text")
-                ]),
+                    ]),
 
-                # Image analysis tab
-                dcc.Tab(label="Image Analysis (CellProfiler)", value='still-analysis-tab', children=[
+            # Image analysis tab
+            dcc.Tab(label="Image Analysis (CellProfiler)", value='still-analysis-tab', children=[
 
                     # Cell Profiler module
                     html.H4("Cell Profiler",
@@ -163,18 +163,18 @@ module_selection = dbc.AccordionItem(
                         ],
                         value="wormsize_intensity_cellpose",
                     )
-                ])]),
+                    ])]),
 
-            html.Hr(),
+        html.Hr(),
 
-            # Diagnostic Module
-            html.H4("Diagnostics",
-                    style={'display': 'inline-block'}),
-            # Using info button image
+        # Diagnostic Module
+        html.H4("Diagnostics",
+                style={'display': 'inline-block'}),
+        # Using info button image
             html.Img(src=info_symbol,
                      id='dx-symbol',
                      style={'display': 'inline-block', 'width': '1.5%', 'height': '1.5%', 'padding-bottom': 10}),
-            # Utalizng tooltip item for info button image
+
             dbc.Tooltip(
                 "Generate and export diagnostic images (recommended).",
                 target="dx-symbol"),
@@ -191,8 +191,8 @@ module_selection = dbc.AccordionItem(
                     {"label": "False", "value": "False"}
                 ],
                 value="True",
-            )
-        ],
-        id="module-selection",
-        title="Module Selection"
-    )
+        )
+    ],
+    id="module-selection",
+    title="Module Selection"
+)

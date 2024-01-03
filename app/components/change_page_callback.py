@@ -37,3 +37,4 @@ def get_callbacks(app):
             return False, False, not is_preview_open
         else:
             return is_save_open, is_info_open, is_preview_open
+        

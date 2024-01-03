@@ -114,66 +114,66 @@ instrument_settings = dbc.AccordionItem([
                 ],
                 align="center")
     ),
-        html.Br(),
-            dbc.Row(
+    html.Br(),
+    dbc.Row(
+        [
+            # Label for Plate Format
+            dbc.Col(html.H6("Plate Format:")),
+        ],
+        align="center"
+    ),
+    dbc.Row(
+        [
+            # First Column: Image, Tooltip
+            dbc.Col(
                 [
-                    # Label for Plate Format
-                    dbc.Col(html.H6("Plate Format:")),
-                ],
-                align="center"
-            ),
-            dbc.Row(
-                [
-                    # First Column: Image, Tooltip
-                    dbc.Col(
-                        [
-                            html.Img(
-                                src=info_symbol,
-                                id="tot-num-cols-and-rows-symbol"
-                            ),
-                            dbc.Tooltip(
-                                "Input the total number of rows and columns in the plate.",
-                                placement="bottom",
-                                target="tot-num-cols-and-rows-symbol"
-                            )
-                        ],
-                        width="auto"
+                    html.Img(
+                        src=info_symbol,
+                        id="tot-num-cols-and-rows-symbol"
                     ),
-                    # Second Column: Input for Total Number of Columns
-                    dbc.Col(
-                        dbc.Input(
-                            id="total-well-cols",
-                            placeholder="Number of columns.",
-                            type="number"
-                        ),
-                        width="auto"
-                    ),
-                    # Third Column: Input for Total Number of Rows
-                    dbc.Col(
-                        dbc.Input(
-                            id="total-num-rows",
-                            placeholder="Number of rows.",
-                            type="number"
-                        ),
-                        width="auto",
-                        id="plate-foramt-options-row"
+                    dbc.Tooltip(
+                        "Input the total number of rows and columns in the plate.",
+                        placement="bottom",
+                        target="tot-num-cols-and-rows-symbol"
                     )
                 ],
-                align="center"
+                width="auto"
             ),
-            html.Br(),
+            # Second Column: Input for Total Number of Columns
+            dbc.Col(
+                dbc.Input(
+                    id="total-well-cols",
+                    placeholder="Number of columns.",
+                    type="number"
+                ),
+                width="auto"
+            ),
+            # Third Column: Input for Total Number of Rows
+            dbc.Col(
+                dbc.Input(
+                    id="total-num-rows",
+                    placeholder="Number of rows.",
+                    type="number"
+                ),
+                width="auto",
+                id="plate-foramt-options-row"
+            )
+        ],
+        align="center"
+    ),
+    html.Br(),
     html.Div(
         dbc.Row([
                 # Label for Circle or Square image Masking
                 html.H6("Image Masking:"),
                 dbc.Col([
                     html.Img(src=info_symbol,
-                            id="circ-or-square-img-mask"),
+                             id="circ-or-square-img-mask"),
                     dbc.Tooltip(
-                                "Please Input if you wish to use circle or square image masking",
-                                placement="bottom",
-                                target="circ-or-square-img-mask"
-                            ),
+                        "Please Input if you wish to use circle or square image masking",
+                        placement="bottom",
+                        target="circ-or-square-img-mask"
+                    ),
                     dbc.RadioItems(
                         id="circ-or-square-img-masking",
                         className="btn-group",
@@ -188,13 +188,13 @@ instrument_settings = dbc.AccordionItem([
                     ),
                 ],
                     width='auto'),
-                dbc.Col([ 
+                dbc.Col([
                 ],
-                   )  
+                )
                 ],
                 align="center")
     )
-        ],
+],
     id="instrument-settings-file-structure",
     title="Instrument Settings"
 )
@@ -204,13 +204,15 @@ instrument_settings = dbc.AccordionItem([
 ####                              Callback                          ####
 ####                                                                ####
 ########################################################################
+
+
 def hidden_multi_row_col_feature(app):
     # Appearing multi-well options
     @app.callback(
         [Output('multi-well-options-row', 'style'),
-        Output('additional-options-row', 'style')],
+         Output('additional-options-row', 'style')],
         [Input('imaging-mode', 'value'),
-        Input('file-structure', 'value')]
+         Input('file-structure', 'value')]
     )
     def update_options_visibility(imaging_mode, file_structure):
         multi_well_options_style = {'display': 'none'}
