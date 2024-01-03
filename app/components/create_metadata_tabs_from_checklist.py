@@ -34,7 +34,7 @@ meta_data_from_input = dbc.Container([
 def create_metadata_tables_from_checklist(app):
     @app.callback(
         [Output('metadata-tabs', 'children'),
-        Output('metadata-tabs', 'value')],  # Added Output for setting the selected tab
+         Output('metadata-tabs', 'value')],  # Added Output for setting the selected tab
         [Input('total-num-rows', 'value'),
          Input('total-well-cols', 'value'),
          Input("finalize-metadata-table-button", 'n_clicks')],
@@ -70,5 +70,5 @@ def create_metadata_tables_from_checklist(app):
             selected_tab = f'{checklist_values[0]}-tab'
             return tabs, selected_tab
         else:
-            return [], 'batch-data-tab'  # If no checklist values are available, return an empty list and set 'batch-data-tab' as the selected tab
-
+            # If no checklist values are available, return an empty list and set 'batch-data-tab' as the selected tab
+            return [], 'batch-data-tab'
