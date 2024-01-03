@@ -4,11 +4,8 @@
 ####                                                                ####
 ########################################################################
 import dash_bootstrap_components as dbc
-from dash import dcc, html
+from dash import html
 from dash.dependencies import Input, Output, State
-from dash import dash_table
-import dash
-from app.utils.create_df_from_user_input import create_empty_df_from_inputs
 
 
 ########################################################################
@@ -18,26 +15,34 @@ from app.utils.create_df_from_user_input import create_empty_df_from_inputs
 ########################################################################
 
 metadata_checklist = dbc.Form([
-                                html.Div(
-                                    [
-                                        dbc.Label("Choose the Metadata Tables"),
-                                        dbc.Checklist(
-                                            options=[
-                                                {"label": "Batch", "value": "batch"},
-                                                {"label": "Species", "value": "species"},
-                                                {"label": "Strains", "value": 'strains'},
-                                                {"label": "Stages", "value": "stages"},
-                                                {"label": "Treatements", "value": "treatments"},
-                                                {'label':'Concentrations', 'value':'concentration'},
-                                                {'label': "Other", 'value': 'other'},
-                                            ],
-                                            value=["batch", 'species', 'strains', 'stages', 'treatments', "concentration", "other"],
-                                            id="checklist-input",
-                                        ),
-                                    ]
-                                )
-                            ])
-
+    html.Div(
+        [
+            dbc.Label(
+                "Choose the Metadata Tables"),
+            dbc.Checklist(
+                options=[
+                    {"label": "Batch",
+                     "value": "Batch"},
+                    {"label": "Species",
+                     "value": "Species"},
+                    {"label": "Strains",
+                     "value": 'Strains'},
+                    {"label": "Stages",
+                     "value": "Stages"},
+                    {"label": "Treatments",
+                     "value": "Treatments"},
+                    {'label': 'Concentrations',
+                     'value': 'Concentrations'},
+                    {'label': "Other",
+                     'value': 'Other'},
+                ],
+                value=[
+                    "Batch", 'Species', 'Strains', 'Stages', 'Treatments', "Concentrations", "Other"],
+                id="checklist-input",
+            ),
+        ]
+    )
+])
 
 
 ########################################################################

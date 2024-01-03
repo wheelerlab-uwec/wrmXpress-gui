@@ -7,9 +7,7 @@ import dash_bootstrap_components as dbc
 from dash import dcc, html
 from dash.dependencies import Input, Output, State
 from dash import dash_table
-import dash
 from app.utils.create_df_from_user_input import create_empty_df_from_inputs
-
 
 
 ########################################################################
@@ -23,14 +21,16 @@ meta_data_from_input = dbc.Container([
 
     ]
     )
-    ]
-    )
+]
+)
 
 ########################################################################
 ####                                                                ####
 ####                             Callbacks                          ####
 ####                                                                ####
 ########################################################################
+
+
 def create_metadata_tables_from_checklist(app):
     @app.callback(
         Output('metadata-tabs', 'children'),
@@ -68,5 +68,3 @@ def create_metadata_tables_from_checklist(app):
             return tabs
         else:
             return []
-
-        
