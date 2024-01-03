@@ -33,38 +33,23 @@ meta_data = dbc.Container(
                         dbc.Row(
                             [
                                 # Label for Plate Format
-                                dbc.Col(html.H6("Add New Metadata Table:")),
+                                dbc.Col(html.H6("Add New metadata table:")),
                             ],
                             align="center"
                         ),
                         dbc.Row(
                             [
-                                # First Column: Image, Tooltip
-                                dbc.Col(
-                                    [
-                                        html.Img(
-                                            src=info_symbol,
-                                            id="add-new-metadata-table-info-symbol"
-                                        ),
-                                        dbc.Tooltip(
-                                            "Please click here which will open a modal that you can insert the name of the new metadata table which you wish to create.",
-                                            placement="bottom",
-                                            target="add-new-metadata-table-info-symbol"
-                                        )
-                                    ],
-                                    width="auto"
-                                ),
-                                # Second Column: Input for Total Number of Columns
+                                # First Column: Input for Total Number of Columns
                                 dbc.Col(
                                     dbc.Button(
-                                        "Add Metadata Table",
+                                        "Add Table",
                                         id="add-metadata-table-button",
                                         className="me-2",
                                     ),
                                     width="auto"
                                 ),
                                 dbc.Col(
-                                    # Add an uneditable input box here
+                                    # Add an editable input box here
                                     dbc.Input(
                                         id="uneditable-input-box",
                                         value="",
@@ -78,33 +63,19 @@ meta_data = dbc.Container(
                         html.Br(),
                         dbc.Row(
                             [
-                                dbc.Col(html.H6("Finalize Metadata Tables:")),
+                                dbc.Col(html.H6("Finalize metadata tables:")),
                             ],
                             align='center'
                         ),
                         dbc.Row(
                             [
-                                # First Column: Image, Tooltip
-                                dbc.Col(
-                                    [
-                                        html.Img(
-                                            src=info_symbol,
-                                            id="finalize-metadata-table-info-symbol"
-                                        ),
-                                        dbc.Tooltip(
-                                            "Please click here which will open a modal that you can insert the name of the new metadata table which you wish to create.",
-                                            placement="bottom",
-                                            target="finalize-metadata-table-info-symbol"
-                                        )
-                                    ],
-                                    width="auto"
-                                ),
-                                # Second Column: Input for Total Number of Columns
+                                # First Column: Input for Total Number of Columns
                                 dbc.Col(
                                     dbc.Button(
-                                        "Finalize Metadata Tables",
+                                        "Finalize Tables",
                                         id="finalize-metadata-table-button",
                                         className="me-2",
+                                        color = 'success'
                                     ),
                                     width="auto"
                                 ),
@@ -113,7 +84,7 @@ meta_data = dbc.Container(
                         )
                     ],
                     id="offcanvas",
-                    title="Select Metadata Tables",
+                    title="Select metadata tables",
                     is_open=True,
                 ),
                 html.Br(),

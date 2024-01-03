@@ -18,7 +18,7 @@ metadata_checklist = dbc.Form([
     html.Div(
         [
             dbc.Label(
-                "Choose the Metadata Tables"),
+                "Choose the metadata tables"),
             dbc.Checklist(
                 options=[
                     {"label": "Batch",
