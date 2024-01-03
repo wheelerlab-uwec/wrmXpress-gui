@@ -18,7 +18,7 @@ info_symbol = "data:image/svg+xml;utf8;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My
 instrument_settings = dbc.AccordionItem([
     html.Div([
         dbc.Row([
-                html.H6("Imaging Mode:", id='imaging-mode-header'),
+                html.H6("Imaging mode:", id='imaging-mode-header'),
                 dbc.Col([
                     html.Img(src=info_symbol,
                              id='imaging-mode-symbol'),
@@ -61,7 +61,7 @@ instrument_settings = dbc.AccordionItem([
     dbc.Row(
         [
             # Label for Multi Site Imaging Mode
-            dbc.Col(html.H6("Multi Site Imaging Mode:")),
+            dbc.Col(html.H6("Multi-site imaging:")),
         ],
         align="center"
     ),
@@ -75,7 +75,7 @@ instrument_settings = dbc.AccordionItem([
                         id="multi-site-imaging-mode-info-symbol"
                     ),
                     dbc.Tooltip(
-                        "Input the total number of rows and columns in the plate for multi site imaging.",
+                        "Use if each well had multiple sites imaged. Enter the number of x and y sites per well",
                         placement="bottom",
                         target="multi-site-imaging-mode-info-symbol"
                     )
@@ -86,7 +86,7 @@ instrument_settings = dbc.AccordionItem([
             dbc.Col(
                 dbc.Input(
                     id="multi-site-well-cols",
-                    placeholder="Multi-site columns.",
+                    placeholder="X-sites",
                     type="number"
                 ),
                 width="auto"
@@ -95,7 +95,7 @@ instrument_settings = dbc.AccordionItem([
             dbc.Col(
                 dbc.Input(
                     id="multi-site-num-rows",
-                    placeholder="Multi-site rows.",
+                    placeholder="Y-sites",
                     type="number"
                 ),
                 width="auto",
@@ -107,7 +107,7 @@ instrument_settings = dbc.AccordionItem([
     html.Br(),
     html.Div(
         dbc.Row([
-                html.H6("File Structure:"),
+                html.H6("File structure:"),
                 dbc.Col([
                     html.Img(src=info_symbol,
                              id='file-structure-symbol'),
@@ -165,7 +165,7 @@ instrument_settings = dbc.AccordionItem([
     dbc.Row(
         [
             # Label for Plate Format
-            dbc.Col(html.H6("Plate Format:")),
+            dbc.Col(html.H6("Plate format:")),
         ],
         align="center"
     ),
@@ -212,12 +212,12 @@ instrument_settings = dbc.AccordionItem([
     html.Div(
         dbc.Row([
                 # Label for Circle or Square image Masking
-                html.H6("Image Masking:"),
+                html.H6("Image masking:"),
                 dbc.Col([
                     html.Img(src=info_symbol,
                              id="circ-or-square-img-mask"),
                     dbc.Tooltip(
-                        "Please Input if you wish to use circle or square image masking",
+                        "Select the shape of mask to be applied.",
                         placement="bottom",
                         target="circ-or-square-img-mask"
                     ),
