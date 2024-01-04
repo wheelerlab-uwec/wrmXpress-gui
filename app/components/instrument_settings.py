@@ -70,6 +70,7 @@ instrument_settings = dbc.AccordionItem([
                     html.I(className="fa-solid fa-circle-info",
                            id="multi-site-imaging-mode-info-symbol"
                            ),
+
                     dbc.Tooltip(
                         "Use if each well had multiple sites imaged. Enter the number of x and y sites per well",
                         placement="bottom",
