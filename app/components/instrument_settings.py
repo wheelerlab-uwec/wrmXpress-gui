@@ -15,9 +15,9 @@ from dash.dependencies import Input, Output, State
 instrument_settings = dbc.AccordionItem([
     html.Div([
         dbc.Row([
-                html.H6("Imaging Mode:", id='imaging-mode-header'),
+                html.H6("Imaging mode:", id='imaging-mode-header'),
                 dbc.Col([
-                    html.I(className="fa-regular fa-circle-question",
+                    html.I(className="fa-solid fa-info",
                            id='imaging-mode-symbol'),
                     dbc.Tooltip(
                         "Select Single Well if each video or image only includes a single well. Select Multi Well if each video/image contains multiple wells that need to be split.",
@@ -55,11 +55,57 @@ instrument_settings = dbc.AccordionItem([
                 align="center")
     ]),
     html.Br(),
+    dbc.Row(
+        [
+            # Label for Multi Site Imaging Mode
+            dbc.Col(html.H6("Multi-site imaging:")),
+        ],
+        align="center"
+    ),
+    dbc.Row(
+        [
+            # First Column: Image, Tooltip
+            dbc.Col(
+                [
+                    html.I(className="fa-solid fa-info",
+                           id="multi-site-imaging-mode-info-symbol"
+                           ),
+                    dbc.Tooltip(
+                        "Use if each well had multiple sites imaged. Enter the number of x and y sites per well",
+                        placement="bottom",
+                        target="multi-site-imaging-mode-info-symbol"
+                    )
+                ],
+                width="auto"
+            ),
+            # Second Column: Input for Total Number of Columns
+            dbc.Col(
+                dbc.Input(
+                    id="multi-site-well-cols",
+                    placeholder="X-sites",
+                    type="number"
+                ),
+                width="auto"
+            ),
+            # Third Column: Input for Total Number of Rows
+            dbc.Col(
+                dbc.Input(
+                    id="multi-site-num-rows",
+                    placeholder="Y-sites",
+                    type="number"
+                ),
+                width="auto",
+                id="multi-site-foramt-options-row"
+            )
+        ],
+        align="center"
+    ),
+    html.Br(),
     html.Div(
         dbc.Row([
-                html.H6("File Structure:"),
+                html.H6("File structure:"),
                 dbc.Col([
-                    html.I(className="fa-solid fa-circle-question",
+                    html.I(className="fa-solid fa-info",
                            id='file-structure-symbol'),
                     dbc.Tooltip(
                         "Select ImageXpress if the data is saved in an IX-like structure. Select AVI if the data is a single video saved as an AVI.",
@@ -115,7 +161,7 @@ instrument_settings = dbc.AccordionItem([
     dbc.Row(
         [
             # Label for Plate Format
-            dbc.Col(html.H6("Plate Format:")),
+            dbc.Col(html.H6("Plate format:")),
         ],
         align="center"
     ),
@@ -124,10 +170,9 @@ instrument_settings = dbc.AccordionItem([
             # First Column: Image, Tooltip
             dbc.Col(
                 [
-                    html.I(
-                        className="fa-solid fa-circle-info",
-                        id="tot-num-cols-and-rows-symbol"
-                    ),
+                    html.I(className="fa-solid fa-info",
+                           id="tot-num-cols-and-rows-symbol"
+                           ),
                     dbc.Tooltip(
                         "Input the total number of rows and columns in the plate.",
                         placement="bottom",
@@ -162,12 +207,12 @@ instrument_settings = dbc.AccordionItem([
     html.Div(
         dbc.Row([
                 # Label for Circle or Square image Masking
-                html.H6("Image Masking:"),
+                html.H6("Image masking:"),
                 dbc.Col([
                     html.I(className="fa-solid fa-info",
                            id="circ-or-square-img-mask"),
                     dbc.Tooltip(
-                        "Please Input if you wish to use circle or square image masking",
+                        "Select the shape of mask to be applied.",
                         placement="bottom",
                         target="circ-or-square-img-mask"
                     ),
