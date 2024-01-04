@@ -22,7 +22,7 @@ module_selection = dbc.AccordionItem(
                     # Motility module
                     html.H4("Motility", style={'display': 'inline-block'}),
                     # Using the info button image
-                    html.I(className="fa-solid fa-info",
+                    html.I(className="fa-solid fa-circle-info",
                            id='motility-symbol',
                            style={'display': 'inline-block', 'width': '1.5%', 'height': '1.5%', 'padding-bottom': 10, 'padding-left': 5}),
                     # Tooltip item for the info button which displays message when cursor over info button
@@ -49,7 +49,7 @@ module_selection = dbc.AccordionItem(
                     html.H4("Conversion",
                             style={'padding-top': 30, 'display': 'inline-block'}),
                     # Using info button image
-                    html.I(className="fa-solid fa-info",
+                    html.I(className="fa-solid fa-circle-info",
                            id='conversion-symbol',
                            style={'display': 'inline-block', 'width': '1.5%', 'height': '1.5%', 'padding-bottom': 10,  'padding-left': 5}),
                     # Utalizing tooltip item for info button image
@@ -74,7 +74,7 @@ module_selection = dbc.AccordionItem(
                     html.H6("Conversion Scale Video",
                             style={'display': 'inline-block'}),
                     # Utalizing info button image
-                    html.I(className="fa-solid fa-info",
+                    html.I(className="fa-solid fa-circle-info",
                            id='rescale-symbol',
                            style={'display': 'inline-block', 'width': '1.5%', 'height': '1.5%', 'padding-bottom': 10,  'padding-left': 5}),
                     # Using tooltip item for info button image
@@ -168,7 +168,7 @@ module_selection = dbc.AccordionItem(
         html.H4("Diagnostics",
                 style={'display': 'inline-block'}),
         # Using info button image
-            html.I(className="fa-solid fa-info",
+            html.I(className="fa-solid fa-circle-info",
                    id='dx-symbol',
                    style={'display': 'inline-block', 'width': '1.5%', 'height': '1.5%', 'padding-bottom': 10, 'padding-left': 5}),
 

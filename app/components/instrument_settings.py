@@ -17,7 +17,7 @@ instrument_settings = dbc.AccordionItem([
         dbc.Row([
                 html.H6("Imaging mode:", id='imaging-mode-header'),
                 dbc.Col([
-                    html.I(className="fa-solid fa-info",
+                    html.I(className="fa-solid fa-circle-info",
                            id='imaging-mode-symbol'),
                     dbc.Tooltip(
                         "Select Single Well if each video or image only includes a single well. Select Multi Well if each video/image contains multiple wells that need to be split.",
@@ -67,7 +67,7 @@ instrument_settings = dbc.AccordionItem([
             # First Column: Image, Tooltip
             dbc.Col(
                 [
-                    html.I(className="fa-solid fa-info",
+                    html.I(className="fa-solid fa-circle-info",
                            id="multi-site-imaging-mode-info-symbol"
                            ),
                     dbc.Tooltip(
@@ -105,7 +105,7 @@ instrument_settings = dbc.AccordionItem([
         dbc.Row([
                 html.H6("File structure:"),
                 dbc.Col([
-                    html.I(className="fa-solid fa-info",
+                    html.I(className="fa-solid fa-circle-info",
                            id='file-structure-symbol'),
                     dbc.Tooltip(
                         "Select ImageXpress if the data is saved in an IX-like structure. Select AVI if the data is a single video saved as an AVI.",
@@ -170,7 +170,7 @@ instrument_settings = dbc.AccordionItem([
             # First Column: Image, Tooltip
             dbc.Col(
                 [
-                    html.I(className="fa-solid fa-info",
+                    html.I(className="fa-solid fa-circle-info",
                            id="tot-num-cols-and-rows-symbol"
                            ),
                     dbc.Tooltip(
@@ -209,7 +209,7 @@ instrument_settings = dbc.AccordionItem([
                 # Label for Circle or Square image Masking
                 html.H6("Image masking:"),
                 dbc.Col([
-                    html.I(className="fa-solid fa-info",
+                    html.I(className="fa-solid fa-circle-info",
                            id="circ-or-square-img-mask"),
                     dbc.Tooltip(
                         "Select the shape of mask to be applied.",
