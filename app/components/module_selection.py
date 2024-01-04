@@ -22,10 +22,9 @@ module_selection = dbc.AccordionItem(
                     # Motility module
                     html.H4("Motility", style={'display': 'inline-block'}),
                     # Using the info button image
-                    html.I(
-                        className="fa-solid fa-circle-info",
-                        id='motility-symbol',
-                        style={'display': 'inline-block', 'width': '1.5%', 'height': '1.5%', 'padding-bottom': 10}),
+                    html.I(className="fa-solid fa-info",
+                           id='motility-symbol',
+                           style={'display': 'inline-block', 'width': '1.5%', 'height': '1.5%', 'padding-bottom': 10, 'padding-left': 5}),
                     # Tooltip item for the info button which displays message when cursor over info button
                     dbc.Tooltip(
                         "Uses an optical flow algorithm to measure total motility of the well.",
@@ -50,10 +49,9 @@ module_selection = dbc.AccordionItem(
                     html.H4("Conversion",
                             style={'padding-top': 30, 'display': 'inline-block'}),
                     # Using info button image
-                    html.I(
-                        className="fa-solid fa-circle-info",
-                        id='conversion-symbol',
-                        style={'display': 'inline-block', 'width': '1.5%', 'height': '1.5%', 'padding-bottom': 10}),
+                    html.I(className="fa-solid fa-info",
+                           id='conversion-symbol',
+                           style={'display': 'inline-block', 'width': '1.5%', 'height': '1.5%', 'padding-bottom': 10,  'padding-left': 5}),
                     # Utalizing tooltip item for info button image
                     dbc.Tooltip(
                         "Convert an IX-like video file-structure (directories of time points) to a structure that contains directories of wells. This new structure will be saved to Output",
@@ -76,10 +74,9 @@ module_selection = dbc.AccordionItem(
                     html.H6("Conversion Scale Video",
                             style={'display': 'inline-block'}),
                     # Utalizing info button image
-                    html.I(
-                        className="fa-solid fa-circle-info",
-                        id='rescale-symbol',
-                        style={'display': 'inline-block', 'width': '1.5%', 'height': '1.5%', 'padding-bottom': 10}),
+                    html.I(className="fa-solid fa-info",
+                           id='rescale-symbol',
+                           style={'display': 'inline-block', 'width': '1.5%', 'height': '1.5%', 'padding-bottom': 10,  'padding-left': 5}),
                     # Using tooltip item for info button image
                     dbc.Tooltip(
                         "Rescale the video to be smaller or larger than the original. Useful for reducing the file size of a video to be included in a presentation. Use a float as the multiplier (smaller than 1 will make a smaller video).",
@@ -171,17 +168,16 @@ module_selection = dbc.AccordionItem(
         html.H4("Diagnostics",
                 style={'display': 'inline-block'}),
         # Using info button image
-            html.I(
-            className="fa-solid fa-circle-info",
-            id='dx-symbol',
-            style={'display': 'inline-block', 'width': '1.5%', 'height': '1.5%', 'padding-bottom': 10}),
+            html.I(className="fa-solid fa-info",
+                   id='dx-symbol',
+                   style={'display': 'inline-block', 'width': '1.5%', 'height': '1.5%', 'padding-bottom': 10, 'padding-left': 5}),
 
-        dbc.Tooltip(
+            dbc.Tooltip(
                 "Generate and export diagnostic images (recommended).",
                 target="dx-symbol"),
-        html.H6("dx"),
-        # Radio buttons for dx
-        dbc.RadioItems(
+            html.H6("dx"),
+            # Radio buttons for dx
+            dbc.RadioItems(
                 id="diagnostics-dx",
                 className="btn-group",
                 inputClassName="btn-check",
