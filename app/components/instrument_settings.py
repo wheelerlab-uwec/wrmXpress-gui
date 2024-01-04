@@ -7,9 +7,6 @@ import dash_bootstrap_components as dbc
 from dash import html
 from dash.dependencies import Input, Output, State
 
-# Information symbol for tooltip
-info_symbol = "data:image/svg+xml;utf8;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCI+PHBhdGggZmlsbD0ibm9uZSIgZD0iTTAgMGgyNHYyNEgwWiIgZGF0YS1uYW1lPSJQYXRoIDM2NzIiLz48cGF0aCBmaWxsPSIjNTI1ODYzIiBkPSJNNS4yMTEgMTguNzg3YTkuNiA5LjYgMCAxIDEgNi43ODggMi44MTQgOS42IDkuNiAwIDAgMS02Ljc4OC0yLjgxNFptMS4yNzQtMTIuM0E3LjgwNiA3LjgwNiAwIDEgMCAxMiA0LjIwNmE3LjgwOCA3LjgwOCAwIDAgMC01LjUxNSAyLjI3OFptNC4xNjMgOS44Nzl2LTQuOGExLjM1MiAxLjM1MiAwIDAgMSAyLjcgMHY0LjhhMS4zNTIgMS4zNTIgMCAwIDEtMi43IDBabS4wMTctOC43QTEuMzM1IDEuMzM1IDAgMSAxIDEyIDkuMDMzYTEuMzUgMS4zNSAwIDAgMS0xLjMzNS0xLjM2OVoiIGRhdGEtbmFtZT0iUGF0aCAyNjgzIi8+PC9zdmc+"
-
 ########################################################################
 ####                                                                ####
 ####                              Layout                            ####
@@ -20,8 +17,8 @@ instrument_settings = dbc.AccordionItem([
         dbc.Row([
                 html.H6("Imaging mode:", id='imaging-mode-header'),
                 dbc.Col([
-                    html.Img(src=info_symbol,
-                             id='imaging-mode-symbol'),
+                    html.I(className="fa-solid fa-circle-info",
+                           id='imaging-mode-symbol'),
                     dbc.Tooltip(
                         "Select Single Well if each video or image only includes a single well. Select Multi Well if each video/image contains multiple wells that need to be split.",
                         placement='bottom',
@@ -70,10 +67,10 @@ instrument_settings = dbc.AccordionItem([
             # First Column: Image, Tooltip
             dbc.Col(
                 [
-                    html.Img(
-                        src=info_symbol,
-                        id="multi-site-imaging-mode-info-symbol"
-                    ),
+                    html.I(className="fa-solid fa-circle-info",
+                           id="multi-site-imaging-mode-info-symbol"
+                           ),
+
                     dbc.Tooltip(
                         "Use if each well had multiple sites imaged. Enter the number of x and y sites per well",
                         placement="bottom",
@@ -109,8 +106,8 @@ instrument_settings = dbc.AccordionItem([
         dbc.Row([
                 html.H6("File structure:"),
                 dbc.Col([
-                    html.Img(src=info_symbol,
-                             id='file-structure-symbol'),
+                    html.I(className="fa-solid fa-circle-info",
+                           id='file-structure-symbol'),
                     dbc.Tooltip(
                         "Select ImageXpress if the data is saved in an IX-like structure. Select AVI if the data is a single video saved as an AVI.",
                         placement='bottom',
@@ -174,10 +171,9 @@ instrument_settings = dbc.AccordionItem([
             # First Column: Image, Tooltip
             dbc.Col(
                 [
-                    html.Img(
-                        src=info_symbol,
-                        id="tot-num-cols-and-rows-symbol"
-                    ),
+                    html.I(className="fa-solid fa-circle-info",
+                           id="tot-num-cols-and-rows-symbol"
+                           ),
                     dbc.Tooltip(
                         "Input the total number of rows and columns in the plate.",
                         placement="bottom",
@@ -214,8 +210,8 @@ instrument_settings = dbc.AccordionItem([
                 # Label for Circle or Square image Masking
                 html.H6("Image masking:"),
                 dbc.Col([
-                    html.Img(src=info_symbol,
-                             id="circ-or-square-img-mask"),
+                    html.I(className="fa-solid fa-circle-info",
+                           id="circ-or-square-img-mask"),
                     dbc.Tooltip(
                         "Select the shape of mask to be applied.",
                         placement="bottom",
