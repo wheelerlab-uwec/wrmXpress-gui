@@ -32,10 +32,9 @@ A Dash GUI for wrmXpress
     <img src="readme_img/dd2.png" alt="step 3" width="500" />
 
 5. Under Optional settings, make the following changes:
-   * Set the Host port to 9000
-   * Set the Host path to be the path to the working directory created in step #1 (in the example below, the Host path is `/Users/njwheeler/mount`)
-   * Set the Container path to `/mnt/vol1/`
-   * Under Environment variables, set the Variable to be `/var/run/docker.sock` and the Value to be `/var/run/docker.sock` (both should be the same)
+   * Under Ports, set the Host port to 9000
+   * Under Volumes, set the Host and Container paths to be the path to the working directory created in step #1 (in the example below, the Host path is `/Users/njwheeler/mount`)
+   * Add a new volume by clicking the + syumbol and set the Host and Container paths to `/var/run/docker.sock`
 
     <img src="readme_img/dd3.png" alt="step 3" width="500" />
 
