@@ -39,10 +39,9 @@ def save_metadata_tables_to_csv(app):
                 sorted_columns = sorted(current_columns_order, key=lambda col: column_order_mapping[col])
                 sorted_columns = list(sorted_columns)
                 sorted_columns = sorted_columns[1:]
-                
+
                 # Reorder the DataFrame columns
                 df = df[sorted_columns]
-                print(df)
                 # Save the DataFrame to a CSV file
                 file_path = f"/Users/zach/avacado_analytics/wrmXpress_github/wrmXpress-gui/practice_output_folder/{tab_id}.csv"
                 df.to_csv(file_path, index=False, header = False)
