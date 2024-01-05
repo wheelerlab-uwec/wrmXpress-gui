@@ -19,7 +19,11 @@ A Dash GUI for wrmXpress
 
 1. Create a folder that contains all the input images. This folder is where temporary working files/images will be stored, where output data will be written, and will be mounted as a volume in the Docker container.
 2. Start the Docker engine and open up the Dashboard.
-3. Use the search bar to find and pull the latest wheelern/wrmXpress_gui image from DockerHub. Choose the most recent tag. The compressed image size is >1.5 GB, so it will take a few minutes to pull.
+3. Use the search bar to find and pull the latest images from DockerHub:
+   * `wheelern/wrmxpress_gui`
+   * `zamanianlab/wrmxpress`
+  
+   Choose the most recent tags. The compressed images are >1.5 GB and >7 GB respectively, so they will take a few minutes to pull.
 
     <img src="readme_img/dd1.png" alt="step 2" width="500" />
 
@@ -28,10 +32,10 @@ A Dash GUI for wrmXpress
     <img src="readme_img/dd2.png" alt="step 3" width="500" />
 
 5. Under Optional settings, make the following changes:
-   - Set the Host port to 9000
-   - Set the Host path to be the path to the working directory created in step #1 (in the example below, the Host path is `/Users/njwheeler/mount`)
-   - Set the Container path to `/mnt/vol1/`
-   - Under Environment variables, set the Variable to be `/var/run/docker.sock` and the Value to be `/var/run/docker.sock` (both should be the same)
+   * Set the Host port to 9000
+   * Set the Host path to be the path to the working directory created in step #1 (in the example below, the Host path is `/Users/njwheeler/mount`)
+   * Set the Container path to `/mnt/vol1/`
+   * Under Environment variables, set the Variable to be `/var/run/docker.sock` and the Value to be `/var/run/docker.sock` (both should be the same)
 
     <img src="readme_img/dd3.png" alt="step 3" width="500" />
 
