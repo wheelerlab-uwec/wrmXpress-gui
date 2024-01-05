@@ -7,9 +7,6 @@ import dash_bootstrap_components as dbc
 from dash import html
 from dash.dependencies import Input, Output, State
 
-# Information symbol for tooltip
-info_symbol = "data:image/svg+xml;utf8;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCI+PHBhdGggZmlsbD0ibm9uZSIgZD0iTTAgMGgyNHYyNEgwWiIgZGF0YS1uYW1lPSJQYXRoIDM2NzIiLz48cGF0aCBmaWxsPSIjNTI1ODYzIiBkPSJNNS4yMTEgMTguNzg3YTkuNiA5LjYgMCAxIDEgNi43ODggMi44MTQgOS42IDkuNiAwIDAgMS02Ljc4OC0yLjgxNFptMS4yNzQtMTIuM0E3LjgwNiA3LjgwNiAwIDEgMCAxMiA0LjIwNmE3LjgwOCA3LjgwOCAwIDAgMC01LjUxNSAyLjI3OFptNC4xNjMgOS44Nzl2LTQuOGExLjM1MiAxLjM1MiAwIDAgMSAyLjcgMHY0LjhhMS4zNTIgMS4zNTIgMCAwIDEtMi43IDBabS4wMTctOC43QTEuMzM1IDEuMzM1IDAgMSAxIDEyIDkuMDMzYTEuMzUgMS4zNSAwIDAgMS0xLjMzNS0xLjM2OVoiIGRhdGEtbmFtZT0iUGF0aCAyNjgzIi8+PC9zdmc+"
-
 ########################################################################
 ####                                                                ####
 ####                              Layout                            ####
@@ -18,10 +15,10 @@ info_symbol = "data:image/svg+xml;utf8;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My
 instrument_settings = dbc.AccordionItem([
     html.Div([
         dbc.Row([
-                html.H6("Imaging Mode:", id='imaging-mode-header'),
+                html.H6("Imaging mode:", id='imaging-mode-header'),
                 dbc.Col([
-                    html.Img(src=info_symbol,
-                             id='imaging-mode-symbol'),
+                    html.I(className="fa-solid fa-circle-info",
+                           id='imaging-mode-symbol'),
                     dbc.Tooltip(
                         "Select Single Well if each video or image only includes a single well. Select Multi Well if each video/image contains multiple wells that need to be split.",
                         placement='bottom',
@@ -58,12 +55,59 @@ instrument_settings = dbc.AccordionItem([
                 align="center")
     ]),
     html.Br(),
+    dbc.Row(
+        [
+            # Label for Multi Site Imaging Mode
+            dbc.Col(html.H6("Multi-site imaging:")),
+        ],
+        align="center"
+    ),
+    dbc.Row(
+        [
+            # First Column: Image, Tooltip
+            dbc.Col(
+                [
+                    html.I(className="fa-solid fa-circle-info",
+                           id="multi-site-imaging-mode-info-symbol"
+                           ),
+
+                    dbc.Tooltip(
+                        "Use if each well had multiple sites imaged. Enter the number of x and y sites per well",
+                        placement="bottom",
+                        target="multi-site-imaging-mode-info-symbol"
+                    )
+                ],
+                width="auto"
+            ),
+            # Second Column: Input for Total Number of Columns
+            dbc.Col(
+                dbc.Input(
+                    id="multi-site-well-cols",
+                    placeholder="X-sites",
+                    type="number"
+                ),
+                width="auto"
+            ),
+            # Third Column: Input for Total Number of Rows
+            dbc.Col(
+                dbc.Input(
+                    id="multi-site-num-rows",
+                    placeholder="Y-sites",
+                    type="number"
+                ),
+                width="auto",
+                id="multi-site-foramt-options-row"
+            )
+        ],
+        align="center"
+    ),
+    html.Br(),
     html.Div(
         dbc.Row([
-                html.H6("File Structure:"),
+                html.H6("File structure:"),
                 dbc.Col([
-                    html.Img(src=info_symbol,
-                             id='file-structure-symbol'),
+                    html.I(className="fa-solid fa-circle-info",
+                           id='file-structure-symbol'),
                     dbc.Tooltip(
                         "Select ImageXpress if the data is saved in an IX-like structure. Select AVI if the data is a single video saved as an AVI.",
                         placement='bottom',
@@ -114,54 +158,86 @@ instrument_settings = dbc.AccordionItem([
                 ],
                 align="center")
     ),
-        html.Br(),
-            dbc.Row(
+    html.Br(),
+    dbc.Row(
+        [
+            # Label for Plate Format
+            dbc.Col(html.H6("Plate format:")),
+        ],
+        align="center"
+    ),
+    dbc.Row(
+        [
+            # First Column: Image, Tooltip
+            dbc.Col(
                 [
-                    # Label for Plate Format
-                    dbc.Col(html.H6("Plate Format:")),
-                ],
-                align="center"
-            ),
-            dbc.Row(
-                [
-                    # First Column: Image, Tooltip
-                    dbc.Col(
-                        [
-                            html.Img(
-                                src=info_symbol,
-                                id="tot-num-cols-and-rows-symbol"
-                            ),
-                            dbc.Tooltip(
-                                "Input the total number of rows and columns in the plate.",
-                                placement="bottom",
-                                target="tot-num-cols-and-rows-symbol"
-                            )
-                        ],
-                        width="auto"
-                    ),
-                    # Second Column: Input for Total Number of Columns
-                    dbc.Col(
-                        dbc.Input(
-                            id="total-well-cols",
-                            placeholder="Number of columns.",
-                            type="number"
-                        ),
-                        width="auto"
-                    ),
-                    # Third Column: Input for Total Number of Rows
-                    dbc.Col(
-                        dbc.Input(
-                            id="total-num-rows",
-                            placeholder="Number of rows.",
-                            type="number"
-                        ),
-                        width="auto",
-                        id="plate-foramt-options-row"
+                    html.I(className="fa-solid fa-circle-info",
+                           id="tot-num-cols-and-rows-symbol"
+                           ),
+                    dbc.Tooltip(
+                        "Input the total number of rows and columns in the plate.",
+                        placement="bottom",
+                        target="tot-num-cols-and-rows-symbol"
                     )
                 ],
-                align="center"
+                width="auto"
+            ),
+            # Second Column: Input for Total Number of Columns
+            dbc.Col(
+                dbc.Input(
+                    id="total-well-cols",
+                    placeholder="Number of columns.",
+                    type="number"
+                ),
+                width="auto"
+            ),
+            # Third Column: Input for Total Number of Rows
+            dbc.Col(
+                dbc.Input(
+                    id="total-num-rows",
+                    placeholder="Number of rows.",
+                    type="number"
+                ),
+                width="auto",
+                id="plate-foramt-options-row"
             )
         ],
+        align="center"
+    ),
+    html.Br(),
+    html.Div(
+        dbc.Row([
+                # Label for Circle or Square image Masking
+                html.H6("Image masking:"),
+                dbc.Col([
+                    html.I(className="fa-solid fa-circle-info",
+                           id="circ-or-square-img-mask"),
+                    dbc.Tooltip(
+                        "Select the shape of mask to be applied.",
+                        placement="bottom",
+                        target="circ-or-square-img-mask"
+                    ),
+                    dbc.RadioItems(
+                        id="circ-or-square-img-masking",
+                        className="btn-group",
+                        inputClassName="btn-check",
+                        labelClassName="btn btn-outline-primary",
+                        labelCheckedClassName="active",
+                        options=[
+                            {"label": "Circle", "value": "circle"},
+                            {"label": "Square", "value": "square"},
+                        ],
+                        value="circle",
+                    ),
+                ],
+                    width='auto'),
+                dbc.Col([
+                ],
+                )
+                ],
+                align="center")
+    )
+],
     id="instrument-settings-file-structure",
     title="Instrument Settings"
 )
@@ -171,13 +247,15 @@ instrument_settings = dbc.AccordionItem([
 ####                              Callback                          ####
 ####                                                                ####
 ########################################################################
+
+
 def hidden_multi_row_col_feature(app):
     # Appearing multi-well options
     @app.callback(
         [Output('multi-well-options-row', 'style'),
-        Output('additional-options-row', 'style')],
+         Output('additional-options-row', 'style')],
         [Input('imaging-mode', 'value'),
-        Input('file-structure', 'value')]
+         Input('file-structure', 'value')]
     )
     def update_options_visibility(imaging_mode, file_structure):
         multi_well_options_style = {'display': 'none'}

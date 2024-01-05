@@ -8,7 +8,7 @@ import dash_bootstrap_components as dbc
 from dash import dcc
 
 from app.components.configure_analysis import configure_analysis
-from app.components.meta_data_ import meta_data
+from app.components.metadata_tab import meta_data
 ########################################################################
 ####                                                                ####
 ####                             Layout                             ####

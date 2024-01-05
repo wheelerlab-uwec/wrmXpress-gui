@@ -18,7 +18,8 @@ from app.utils.callback_functions import prep_yaml
 save_page_content = dbc.ModalBody(
     [
         # Content for the Save Page Modal Body
-        dcc.Markdown("Write a YAML for running wrmXpress remotely. Include a full path and file name ending in `.yaml`."),
+        dcc.Markdown(
+            "Write a YAML for running wrmXpress remotely. Include a full path and file name ending in `.yaml`."),
         dbc.Input(id="file-path-for-saved-yaml-file",
                   placeholder="Enter the full save path...", type="text"),
     ]
@@ -41,7 +42,7 @@ save_page = dbc.Modal(
             dbc.Button("Save", id="save-page-button", className="ml-auto"),
             dbc.Button("Close", id="close-save-modal", className="ml-auto"),
         ]),
-        html.Div(id="save-page-status") 
+        html.Div(id="save-page-status")
     ],
     id="save-page-modal",
     size="l"
@@ -52,6 +53,8 @@ save_page = dbc.Modal(
 ####                             Callbacks                          ####
 ####                                                                ####
 ########################################################################
+
+
 def save_page_yaml(app):
     # Write YAML from save page
     @app.callback(
@@ -79,9 +82,10 @@ def save_page_yaml(app):
         prevent_initial_call=True
     )
     def save_page_to_yaml(
-        nclicks, imagingmode, filestructure, multiwellrows, multiwellcols, multiwelldetection, species, stages, motilityrun, conversionrun, conversionscalevideo, conversionrescalemultiplier, segmentrun, wavelength, cellprofilerrun, cellprofilerpipeline, diagnosticdx, platename, volume, wells):
+            nclicks, imagingmode, filestructure, multiwellrows, multiwellcols, multiwelldetection, species, stages, motilityrun, conversionrun, conversionscalevideo, conversionrescalemultiplier, segmentrun, wavelength, cellprofilerrun, cellprofilerpipeline, diagnosticdx, platename, volume, wells):
+
         if nclicks:
-            
+
             if wells == 'All':
                 first_well = 'A01'
             else:
@@ -113,6 +117,5 @@ def save_page_yaml(app):
             # Dump preview data to YAML file
             with open(output_file, 'w') as yaml_file:
                 yaml.dump(config, yaml_file,
-                        default_flow_style=False)
+                          default_flow_style=False)
         return ""
-

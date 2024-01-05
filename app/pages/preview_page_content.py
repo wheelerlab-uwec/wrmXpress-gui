@@ -106,6 +106,7 @@ preview_page = dbc.Modal(
 ####                                                                ####
 ########################################################################
 
+
 def load_first_img(app):
     @app.callback(
         Output('input-path-output', 'children'),
@@ -124,7 +125,8 @@ def load_first_img(app):
 
         if n_clicks >= 1:
             # assumes IX-like file structure
-            img_path = Path(volume, 'input', f'{platename}/TimePoint_1/{plate_base}_{first_well}.TIF')
+            img_path = Path(
+                volume, 'input', f'{platename}/TimePoint_1/{plate_base}_{first_well}.TIF')
             img = np.array(Image.open(img_path))
             fig = px.imshow(img, color_continuous_scale="gray")
             fig.update_layout(coloraxis_showscale=False)
@@ -133,35 +135,36 @@ def load_first_img(app):
             return f'```{img_path}```', fig
         n_clicks = 0
 
+
 def preview_analysis(app):
     @app.callback(
-            Output('analysis-preview-message', 'children'),
-            Output('analysis-preview', 'figure'),
-            Input('preview-button', 'n_clicks'),
-            State('imaging-mode', 'value'),
-            State('file-structure', 'value'),
-            State('multi-well-rows', 'value'),
-            State('multi-well-cols', 'value'),
-            State('multi-well-detection', 'value'),
-            State('species', 'value'),
-            State('stages', 'value'),
-            State('motility-run', 'value'),
-            State('conversion-run', 'value'),
-            State('conversion-scale-video', 'value'),
-            State('conversion-rescale-multiplier', 'value'),
-            State('segment-run', 'value'),
-            State('segmentation-wavelength', 'value'),
-            State('cell-profiler-run', 'value'),
-            State('cell-profiler-pipeline', 'value'),
-            State('diagnostics-dx', 'value'),
-            State('plate-name', 'value'),
-            State('mounted-volume', 'value'),
-            State('well-selection-list', 'children'),
+        Output('analysis-preview-message', 'children'),
+        Output('analysis-preview', 'figure'),
+        Input('preview-button', 'n_clicks'),
+        State('imaging-mode', 'value'),
+        State('file-structure', 'value'),
+        State('multi-well-rows', 'value'),
+        State('multi-well-cols', 'value'),
+        State('multi-well-detection', 'value'),
+        State('species', 'value'),
+        State('stages', 'value'),
+        State('motility-run', 'value'),
+        State('conversion-run', 'value'),
+        State('conversion-scale-video', 'value'),
+        State('conversion-rescale-multiplier', 'value'),
+        State('segment-run', 'value'),
+        State('segmentation-wavelength', 'value'),
+        State('cell-profiler-run', 'value'),
+        State('cell-profiler-pipeline', 'value'),
+        State('diagnostics-dx', 'value'),
+        State('plate-name', 'value'),
+        State('mounted-volume', 'value'),
+        State('well-selection-list', 'children'),
         prevent_initial_call=True
     )
     def run_analysis(nclicks, imagingmode, filestructure, multiwellrows, multiwellcols, multiwelldetection, species, stages, motilityrun, conversionrun, conversionscalevideo, conversionrescalemultiplier, segmentrun, wavelength, cellprofilerrun, cellprofilerpipeline, diagnosticdx, platename, volume, wells):
         if nclicks:
-            
+
             if wells == 'All':
                 first_well = 'A01'
             else:
@@ -187,31 +190,31 @@ def preview_analysis(app):
                 wells
             )
 
-            # Create the full filepath using os.path.join
             output_file = Path(volume, platename + '.yml')
 
             # Dump preview data to YAML file
             with open(output_file, 'w') as yaml_file:
                 yaml.dump(config, yaml_file,
-                        default_flow_style=False)
+                          default_flow_style=False)
 
             client = docker.from_env()
             print(client)
 
             command = f"python wrmXpress/wrapper.py {platename}.yml {platename}"
             command_message = f"```python wrmXpress/wrapper.py {platename}.yml {platename}```"
-            
-            container = client.containers.run('zamanianlab/wrmxpress', command=f"{command}", detach=True, 
-                                  volumes={f'{volume}/input/': {'bind': '/input/', 'mode': 'rw'},
-                                            f'{volume}/output/': {'bind': '/output/', 'mode': 'rw'},
-                                            f'{volume}/work/': {'bind': '/work/', 'mode': 'rw'},
-                                            f'{volume}/{platename}.yml': {'bind': f'/{platename}.yml', 'mode': 'rw'}
-                                            })
-            
+
+            container = client.containers.run('zamanianlab/wrmxpress', command=f"{command}", detach=True,
+                                              volumes={f'{volume}/input/': {'bind': '/input/', 'mode': 'rw'},
+                                                       f'{volume}/output/': {'bind': '/output/', 'mode': 'rw'},
+                                                       f'{volume}/work/': {'bind': '/work/', 'mode': 'rw'},
+                                                       f'{volume}/{platename}.yml': {'bind': f'/{platename}.yml', 'mode': 'rw'}
+                                                       })
+
             time.sleep(5)
-            
+
             # assumes IX-like file structure
-            img_path = Path(volume, 'work', f'{platename}/{first_well}/img/{platename}_{first_well}_motility.png')
+            img_path = Path(
+                volume, 'work', f'{platename}/{first_well}/img/{platename}_{first_well}_motility.png')
             img = np.array(Image.open(img_path))
             fig = px.imshow(img, color_continuous_scale="gray")
             fig.update_layout(coloraxis_showscale=False)
