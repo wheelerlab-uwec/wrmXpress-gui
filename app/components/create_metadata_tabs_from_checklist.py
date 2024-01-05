@@ -60,7 +60,7 @@ def create_metadata_tables_from_checklist(app):
                         editable=True,
                         style_table={'overflowX': 'auto'},
                         style_cell={'textAlign': 'center'},
-                        id=f'dynamic-table-container-{value}'
+                        id=f'{value}-tab-table'
                     )
                     )
                 ])  # Create a Tab for each checked item
