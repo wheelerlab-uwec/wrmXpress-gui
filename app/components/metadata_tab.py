@@ -91,7 +91,8 @@ meta_data = dbc.Container(
                         dbc.Button(
                             "Save metadata tables",
                             id = 'save-meta-data-to-csv', 
-                            color = 'success'
+                            color = 'success',
+                            n_clicks = 0
                         ),
                         width='auto'
                     )
