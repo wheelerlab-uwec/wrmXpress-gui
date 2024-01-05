@@ -85,6 +85,18 @@ meta_data = dbc.Container(
                 html.Br(),
                 html.Br(),
                 meta_data_from_input,
+                html.Br(),
+                dbc.Row(
+                    dbc.Col(
+                        dbc.Button(
+                            "Save metadata tables",
+                            id = 'save-meta-data-to-csv', 
+                            color = 'success',
+                            n_clicks = 0
+                        ),
+                        width='auto'
+                    )
+                )
             ]
         )
     ],
