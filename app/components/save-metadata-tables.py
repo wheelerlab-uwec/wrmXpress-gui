@@ -16,9 +16,9 @@ from dash import dash_table
 ########################################################################
 def save_metadata_tables_to_csv(app):
     @app.callback(
-        Output("save-meta-data-to-csv", "disabled"),
-        [Input("save-meta-data-to-csv", "n_clicks")],
-        [State('metadata-tabs', 'children')]
+        Output("save-meta-data-to-csv", 'color'),
+        Input("save-meta-data-to-csv", "n_clicks"),
+        State('metadata-tabs', 'children')
     )
     def save_the_metadata_tables_to_csv(n_clicks, metadata_tabs):
         if n_clicks:
@@ -48,7 +48,7 @@ def save_metadata_tables_to_csv(app):
                     df.to_csv(file_path, index=False)
 
             # Re-enable the button after saving
-            return False
+            return "alert"
 
         # Enable the button if not clicked
-        return False
+        return "success"
