@@ -52,7 +52,6 @@ app.layout = html.Div([header,
 get_callbacks(app)
 collapsing_navbar(app)
 save_page_yaml(app)
-update_metadata_tables(app)
 add_metadata_table_checklist(app)
 update_well_selection_table(app)
 hidden_multi_row_col_feature(app)
