@@ -14,6 +14,7 @@ import numpy as np
 import plotly.express as px
 from PIL import Image
 from app.utils.callback_functions import prep_yaml
+import os
 
 ########################################################################
 ####                                                                ####
@@ -210,15 +211,16 @@ def preview_analysis(app):
                                                        f'{volume}/{platename}.yml': {'bind': f'/{platename}.yml', 'mode': 'rw'}
                                                        })
 
-            time.sleep(5)
-
             # assumes IX-like file structure
             img_path = Path(
                 volume, 'work', f'{platename}/{first_well}/img/{platename}_{first_well}_motility.png')
+
+            while not os.path.exists(img_path):
+                time.sleep(1)
+
             img = np.array(Image.open(img_path))
             fig = px.imshow(img, color_continuous_scale="gray")
             fig.update_layout(coloraxis_showscale=False)
             fig.update_xaxes(showticklabels=False)
             fig.update_yaxes(showticklabels=False)
-
             return command_message, fig
