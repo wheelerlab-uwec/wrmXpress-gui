@@ -51,6 +51,9 @@ preview_page_content = dbc.ModalBody(
                                 dbc.CardBody([
                                     html.H4(
                                         "Analysis", className="text-center"),
+                                    dcc.Dropdown(
+                                        id='preview-dropdown',
+                                        placeholder='Select image to preview...'),
                                     html.Br(),
                                     html.H6(
                                         "Command:", className="card-subtitle"),
@@ -137,6 +140,27 @@ def load_first_img(app):
         n_clicks = 0
 
 
+def populate_options(app):
+    @app.callback(
+        Output('preview-dropdown', 'options'),
+        Input('open-preview-modal', 'n_clicks'),
+        State('motility-run', 'value'),
+        State('segment-run', 'value')
+    )
+    def get_options(nclicks, motility, segment):
+
+        selection_dict = {'motility': 'motility', 'segment': 'binary'}
+        option_dict = {}
+
+        if nclicks is not None:
+            for selection in selection_dict.keys():
+                if eval(selection) == 'True':
+                    option_dict[selection] = selection_dict[selection]
+
+        dict_option = {v: k for k, v in option_dict.items()}
+        return dict_option
+
+
 def preview_analysis(app):
     @app.callback(
         Output('analysis-preview-message', 'children'),
@@ -161,9 +185,10 @@ def preview_analysis(app):
         State('plate-name', 'value'),
         State('mounted-volume', 'value'),
         State('well-selection-list', 'children'),
+        State('preview-dropdown', 'value'),
         prevent_initial_call=True
     )
-    def run_analysis(nclicks, imagingmode, filestructure, multiwellrows, multiwellcols, multiwelldetection, species, stages, motilityrun, conversionrun, conversionscalevideo, conversionrescalemultiplier, segmentrun, wavelength, cellprofilerrun, cellprofilerpipeline, diagnosticdx, platename, volume, wells):
+    def run_analysis(nclicks, imagingmode, filestructure, multiwellrows, multiwellcols, multiwelldetection, species, stages, motilityrun, conversionrun, conversionscalevideo, conversionrescalemultiplier, segmentrun, wavelength, cellprofilerrun, cellprofilerpipeline, diagnosticdx, platename, volume, wells, selection):
         if nclicks:
 
             if wells == 'All':
@@ -213,7 +238,7 @@ def preview_analysis(app):
 
             # assumes IX-like file structure
             img_path = Path(
-                volume, 'work', f'{platename}/{first_well}/img/{platename}_{first_well}_motility.png')
+                volume, 'work', f'{platename}/{first_well}/img/{platename}_{first_well}_{selection}.png')
 
             while not os.path.exists(img_path):
                 time.sleep(1)

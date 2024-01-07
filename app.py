@@ -11,7 +11,7 @@ from dash import html
 from app.components.header import header, collapsing_navbar
 from app.pages.save_page_content import save_page, save_page_yaml
 from app.pages.info_page_content import info_page
-from app.pages.preview_page_content import preview_page, load_first_img, preview_analysis
+from app.pages.preview_page_content import preview_page, load_first_img, preview_analysis, populate_options
 from app.components.tabs_content import tabs_content
 from app.components.change_page_callback import get_callbacks
 from app.components.metadata_tab import open_metadata_offcanvas
@@ -62,6 +62,7 @@ preview_analysis(app)
 open_metadata_offcanvas(app)
 create_metadata_tables_from_checklist(app)
 save_metadata_tables_to_csv(app)
+populate_options(app)
 
 ########################################################################
 ####                                                                ####

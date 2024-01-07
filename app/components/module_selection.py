@@ -73,7 +73,7 @@ module_selection = dbc.AccordionItem(
                     html.Br(),
                     html.H6("Conversion Scale Video",
                             style={'display': 'inline-block'}),
-                    # Utalizing info button image
+
                     html.I(className="fa-solid fa-circle-info",
                            id='rescale-symbol',
                            style={'display': 'inline-block', 'width': '1.5%', 'height': '1.5%', 'padding-bottom': 10,  'padding-left': 5}),
