@@ -22,11 +22,11 @@ run_time_settings = dbc.AccordionItem(
         html.H4("Directories"),
         html.H6("Volume"),
         dbc.Input(
-            id="mounted-volume", placeholder="Please insert the path to the local mounted volume:", type="text"),
+            id="mounted-volume", placeholder="Path to the mounted volume", type="text"),
         html.Br(),
         html.H6("Plate/Folder"),
         dbc.Input(
-            id="plate-name", placeholder="Please insert the plate name:", type="text"),
+            id="plate-name", placeholder="Plate name", type="text"),
         html.Br(),
         html.H4("Wells"),
         html.P("Edit the following table such that well IDs are only present for wells to be analyzed.\
@@ -44,8 +44,8 @@ run_time_settings = dbc.AccordionItem(
                     )
                 )
             )],
-            style={'display':'none'})
-        
+            style={'display': 'none'})
+
     ],
     id="run-time-settings",
     title="Run-Time Settings"
@@ -56,11 +56,13 @@ run_time_settings = dbc.AccordionItem(
 ####                              Callbacks                         ####
 ####                                                                ####
 ########################################################################
+
+
 def update_well_selection_table(app):
     @app.callback(
         Output("well-selection-table", 'children'),
         [Input("total-num-rows", "value"),
-        Input("total-well-cols", "value")]
+         Input("total-well-cols", "value")]
     )
     def update_table(rows, cols):
         default_cols = 12
@@ -69,7 +71,7 @@ def update_well_selection_table(app):
             rows = default_rows
         if cols is None:
             cols = default_cols
-        
+
         df = create_df_from_inputs(rows, cols)
         well_selection = dash_table.DataTable(
             data=df.reset_index().to_dict('records'),
@@ -81,7 +83,8 @@ def update_well_selection_table(app):
             id='dynamic-table-container-well-selection-table'
         )
         return well_selection
-    
+
+
 def populate_list_of_wells(app):
     # Populate list of wells to be analyzed
     @app.callback(

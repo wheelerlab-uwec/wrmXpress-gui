@@ -24,7 +24,7 @@ meta_data = dbc.Container(
     [
         html.Div(
             [
-                dbc.Button("Metadata Selection",
+                dbc.Button("Table selection",
                            id="metadata-tab-selection-offcanvas", n_clicks=0),
                 dbc.Offcanvas(
                     [
@@ -33,7 +33,7 @@ meta_data = dbc.Container(
                         dbc.Row(
                             [
                                 # Label for Plate Format
-                                dbc.Col(html.H6("Add new metadata table:")),
+                                dbc.Col(html.H6("Add new table:")),
                             ],
                             align="center"
                         ),
@@ -42,21 +42,23 @@ meta_data = dbc.Container(
                                 # First Column: Input for Total Number of Columns
                                 dbc.Col(
                                     dbc.Button(
-                                        "Add Table",
+                                        "+",
                                         id="add-metadata-table-button",
                                         className="me-2",
                                     ),
-                                    width="auto"
+                                    width="auto",
+                                    className='pe-0'
                                 ),
                                 dbc.Col(
                                     # Add an editable input box here
                                     dbc.Input(
                                         id="uneditable-input-box",
-                                        placeholder='Table title...',
+                                        placeholder='Title',
                                         value="",
                                         disabled=False
                                     ),
-                                    width="auto"
+                                    width="auto",
+                                    className='ps-0'
                                 ),
                             ],
                             align="center"
@@ -89,10 +91,10 @@ meta_data = dbc.Container(
                 dbc.Row(
                     dbc.Col(
                         dbc.Button(
-                            "Save metadata tables",
-                            id = 'save-meta-data-to-csv', 
-                            color = 'success',
-                            n_clicks = 0
+                            "Save metadata",
+                            id='save-meta-data-to-csv',
+                            color='success',
+                            n_clicks=0
                         ),
                         width='auto'
                     )

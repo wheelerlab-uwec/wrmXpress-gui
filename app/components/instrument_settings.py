@@ -39,12 +39,11 @@ instrument_settings = dbc.AccordionItem([
                 ],
                     width="auto"),
                 dbc.Col([
-                    html.Div("Settings for multiple wells per image:"),
                     dbc.Input(id="multi-well-rows",
-                        placeholder="Number of rows per image.",
+                        placeholder="Rows per image",
                         type="number"),
                     dbc.Input(id="multi-well-cols",
-                        placeholder="Number of columns per image.",
+                        placeholder="Columns per image",
                         type="number"),
                 ],
                     width='auto',
@@ -154,7 +153,7 @@ instrument_settings = dbc.AccordionItem([
                 ],
                     width='auto',
                     id='additional-options-row',
-                    style={'display': 'flex'})  # Initially hidden
+                    style={'display': 'flex'})
                 ],
                 align="center")
     ),
@@ -186,7 +185,7 @@ instrument_settings = dbc.AccordionItem([
             dbc.Col(
                 dbc.Input(
                     id="total-well-cols",
-                    placeholder="Number of columns.",
+                    placeholder="Number of columns",
                     type="number"
                 ),
                 width="auto"
@@ -195,7 +194,7 @@ instrument_settings = dbc.AccordionItem([
             dbc.Col(
                 dbc.Input(
                     id="total-num-rows",
-                    placeholder="Number of rows.",
+                    placeholder="Number of rows",
                     type="number"
                 ),
                 width="auto",
