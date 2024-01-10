@@ -5,7 +5,7 @@
 ########################################################################
 import dash
 import dash_bootstrap_components as dbc
-from dash import html
+from dash import html, dcc
 
 # Importing Components
 from app.components.header import header, collapsing_navbar
@@ -20,9 +20,10 @@ from app.components.instrument_settings import hidden_multi_row_col_feature
 from app.components.create_metadata_tabs_from_checklist import create_metadata_tables_from_checklist
 from app.components.metadata_table_checklist import add_metadata_table_checklist
 from app.components.save_metadata_tables import save_metadata_tables_to_csv
+from app.pages.sidebar import sidebar, content, change_page_from_sidebar
 
 app = dash.Dash(__name__, external_stylesheets=[
-                dbc.themes.SPACELAB,
+                dbc.themes.FLATLY,
                 dbc.icons.FONT_AWESOME],
                 suppress_callback_exceptions=True)
 
@@ -33,16 +34,7 @@ app = dash.Dash(__name__, external_stylesheets=[
 ####                                                                ####
 ########################################################################
 
-app.layout = html.Div([header,
-                       # Adding vertical space so tabs content not hidden behind navbar
-                       html.H4("", style={'padding-top': 80,
-                               'display': 'inline-block'}),
-                       tabs_content,
-                       # Modals (popup screens)
-                       save_page,
-                       info_page,
-                       preview_page,
-                       ])
+app.layout = html.Div([dcc.Location(id="url"), sidebar, content])
 
 ########################################################################
 ####                                                                ####
@@ -63,6 +55,7 @@ open_metadata_offcanvas(app)
 create_metadata_tables_from_checklist(app)
 save_metadata_tables_to_csv(app)
 populate_options(app)
+change_page_from_sidebar(app)
 
 ########################################################################
 ####                                                                ####

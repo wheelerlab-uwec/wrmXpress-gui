@@ -11,8 +11,8 @@ from dash import dcc, html
 ####                              Layout                            ####
 ####                                                                ####
 ########################################################################
-info_page_content = dbc.ModalBody(
-    [
+info_page_content = [
+    html.H3("Information & Usage"),
         # Introduction to wrmXpress
         html.P("wrmXpress is a unified framework for the analysis of diverse phenotypic imaging data in high-throughput and high-content experiments involving free-living and parasitic nematodes and flatworms. wrmXpress is a versatile solution capable of handling large datasets and generating relevant phenotypic measurements across various worm species and experimental assays. This software, designed to analyze a spectrum of phenotypes such as motility, development/size, fecundity, and feeding, not only addresses current research needs but also establishes itself as a platform for future extensibility, enabling the development of custom phenotypic modules."),
 
@@ -86,7 +86,7 @@ info_page_content = dbc.ModalBody(
                 )
             ])
     ]
-)
+
 
 ########################################################################
 ####                                                                ####

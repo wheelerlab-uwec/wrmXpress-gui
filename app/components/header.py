@@ -12,47 +12,48 @@ from dash.dependencies import Input, Output, State
 ####                              Layout                            ####
 ####                                                                ####
 ########################################################################
-# Navbar
-header = dbc.Navbar(
-    dbc.Container(
-        [
+# Header
+header = dbc.Row(
+    [
+        dbc.Col([
             html.A(
-                html.Img(src='https://github.com/zamanianlab/wrmXpress/blob/main/img/logo/output.png?raw=true', # wrmXpress image
-                             height="100px"),
-                href="https://github.com/zamanianlab/wrmxpress", # clicked takes user to wrmXpress github 
-                style={"textDecoration": "none"},
-                className='ms-5'
-            ),
-
-                    dbc.NavbarToggler(id="navbar-toggler", n_clicks=0),
-                    dbc.Collapse(
-                        dbc.Nav(
-                            [
-                                # Buttons for the Navbar
-                                dbc.NavItem(dbc.NavLink(
-                                    "Info & Usage",
-                                    id="open-info-modal",
-                                    style={'cursor': 'pointer'})),
-                                dbc.NavItem(dbc.NavLink(
-                                    "Save YAML",
-                                    id="open-save-modal",
-                                    style={'cursor': 'pointer'})),
-                                dbc.NavItem(dbc.NavLink(
-                                    "Preview & Run",
-                                    id="open-preview-modal",
-                                    style={'cursor': 'pointer'}))
-                            ],
-                            className="w-100 justify-content-end"
-                        ),
-                        id="navbar-collapse",
-                        is_open=False, # is open
-                        navbar=True
-                    )
-        ]
-    ),
-    color='white',
-    fixed='top' # fixed to the top of the screen
+                    html.I(className="fa-solid fa-circle-info",
+                           id='information-symbol'),
+                    href ='', 
+        )],
+                    width="auto"),
+        dbc.Col([
+            html.A(
+                    html.I(className="fa-solid fa-prescription",
+                           id='rx-symbol'),
+                    href='',
+        )],
+                    width="auto"),
+        dbc.Col([
+            html.A(
+                    html.I(className="fa-brands fa-docker",
+                           id='docker-symbol'),
+                    href = "https://www.docker.com/products/docker-desktop/"
+        )],
+                    width="auto"),
+        dbc.Col([
+            html.A(
+                    html.I(className="fa-brands fa-github",
+                           id='github-symbol'),
+                    href = "https://github.com/wheelerlab-uwec/wrmXpress-gui",
+        )],
+                    width="auto"),
+        dbc.Col([
+            html.A(
+                    html.I(className="fa-brands fa-twitter",
+                           id='twitter-symbol'),
+                    href = 'https://twitter.com/wheeler_worm'
+        )],
+                    width="auto")
+    ],
+    className="w-100 justify-content-end"
 )
+
 
 ########################################################################
 ####                                                                ####
