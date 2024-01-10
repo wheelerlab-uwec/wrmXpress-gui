@@ -22,11 +22,13 @@ run_time_settings = dbc.AccordionItem(
         html.H4("Directories"),
         html.H6("Volume"),
         dbc.Input(
-            id="mounted-volume", placeholder="Path to the mounted volume", type="text"),
+            id="mounted-volume", placeholder="Path to the mounted volume", type="text", persistence=True,
+            persistence_type='session'),
         html.Br(),
         html.H6("Plate/Folder"),
         dbc.Input(
-            id="plate-name", placeholder="Plate name", type="text"),
+            id="plate-name", placeholder="Plate name", type="text", persistence=True,
+            persistence_type='session'),
         html.Br(),
         html.H4("Wells"),
         html.P("Edit the following table such that well IDs are only present for wells to be analyzed.\

@@ -35,16 +35,22 @@ instrument_settings = dbc.AccordionItem([
                             {"label": "Multi Well", "value": "multi-well"},
                         ],
                         value="single-well",
+                        persistence=True,
+                        persistence_type='session'
                     )
                 ],
                     width="auto"),
                 dbc.Col([
                     dbc.Input(id="multi-well-rows",
                         placeholder="Rows per image",
-                        type="number"),
+                        type="number",
+                        persistence=True,
+                        persistence_type='session'),
                     dbc.Input(id="multi-well-cols",
                         placeholder="Columns per image",
-                        type="number"),
+                        type="number",
+                        persistence=True,
+                        persistence_type='session'),
                 ],
                     width='auto',
                     id='multi-well-options-row',
@@ -83,7 +89,9 @@ instrument_settings = dbc.AccordionItem([
                 dbc.Input(
                     id="multi-site-well-cols",
                     placeholder="X-sites",
-                    type="number"
+                    type="number",
+                    persistence=True,
+                    persistence_type='session'
                 ),
                 width="auto"
             ),
@@ -92,7 +100,9 @@ instrument_settings = dbc.AccordionItem([
                 dbc.Input(
                     id="multi-site-num-rows",
                     placeholder="Y-sites",
-                    type="number"
+                    type="number",
+                    persistence=True,
+                    persistence_type='session'
                 ),
                 width="auto",
                 id="multi-site-foramt-options-row"
@@ -123,6 +133,8 @@ instrument_settings = dbc.AccordionItem([
                             {"label": "AVI", "value": "avi"},
                         ],
                         value="imagexpress",
+                        persistence=True,
+                        persistence_type='session'
                     )
                 ],
                     width='auto'),
@@ -149,6 +161,8 @@ instrument_settings = dbc.AccordionItem([
                             {"label": "Grid", "value": "grid"},
                         ],
                         value="auto",
+                        persistence=True,
+                        persistence_type='session'
                     ),
                 ],
                     width='auto',
@@ -186,7 +200,9 @@ instrument_settings = dbc.AccordionItem([
                 dbc.Input(
                     id="total-well-cols",
                     placeholder="Number of columns",
-                    type="number"
+                    type="number",
+                    persistence=True,
+                    persistence_type='session'
                 ),
                 width="auto"
             ),
@@ -195,7 +211,9 @@ instrument_settings = dbc.AccordionItem([
                 dbc.Input(
                     id="total-num-rows",
                     placeholder="Number of rows",
-                    type="number"
+                    type="number",
+                    persistence=True,
+                    persistence_type='session'
                 ),
                 width="auto",
                 id="plate-foramt-options-row"
@@ -227,6 +245,8 @@ instrument_settings = dbc.AccordionItem([
                             {"label": "Square", "value": "square"},
                         ],
                         value="circle",
+                        persistence=True,
+                        persistence_type='session'
                     ),
                 ],
                     width='auto'),
