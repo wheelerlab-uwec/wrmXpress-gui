@@ -6,11 +6,11 @@
 import dash
 import dash_bootstrap_components as dbc
 from dash import Input, Output, dcc, html
-from app.pages.info_page_content import info_page_content
-from app.pages.configure_analysis import configure_analysis
-from app.pages.metadata_tab import meta_data
-from app.pages.preview_page_content import preview_page_content
-from app.pages.run_page_content import run_page_content
+from app.pages.info import info_page_content
+from app.pages.configure import configure_analysis
+from app.pages.metadata import meta_data
+from app.pages.preview import preview_page_content
+from app.pages.run import run_page_content
 from app.components.header import header
 from app.utils.styling import SIDEBAR_STYLE, CONTENT_STYLE
 

@@ -7,12 +7,14 @@ import dash_bootstrap_components as dbc
 from dash import dcc, html
 import dash
 
+dash.register_page(__name__)
+
 ########################################################################
 ####                                                                ####
 ####                              Layout                            ####
 ####                                                                ####
 ########################################################################
-run_page_content = dbc.ModalBody(
+layout = dbc.ModalBody(
     [
         # Preview page contents
         html.Div([

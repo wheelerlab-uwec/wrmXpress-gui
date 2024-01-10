@@ -4,6 +4,7 @@
 ####                                                                ####
 ########################################################################
 import dash_bootstrap_components as dbc
+import dash
 from dash import dcc, html
 from dash.dependencies import Input, Output, State
 import docker
@@ -16,12 +17,14 @@ from PIL import Image
 from app.utils.callback_functions import prep_yaml
 import os
 
+dash.register_page(__name__)
+
 ########################################################################
 ####                                                                ####
 ####                              Layout                            ####
 ####                                                                ####
 ########################################################################
-preview_page_content = dbc.ModalBody(
+layout = dbc.ModalBody(
     [
         # Preview page contents
         html.Div([
@@ -89,7 +92,7 @@ preview_page = dbc.Modal(
             "Preview Page"
         ),
         # Modal page contents from defined above
-        preview_page_content,
+        layout,
 
         # Modal Footer
         dbc.ModalFooter([
