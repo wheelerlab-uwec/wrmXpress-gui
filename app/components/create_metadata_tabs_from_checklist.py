@@ -35,8 +35,8 @@ def create_metadata_tables_from_checklist(app):
     @app.callback(
         [Output('metadata-tabs', 'children'),
          Output('metadata-tabs', 'value')],  # Added Output for setting the selected tab
-        [Input('total-num-rows', 'value'),
-         Input('total-well-cols', 'value'),
+        [Input('num-well-rows', 'value'),
+         Input('num-well-cols', 'value'),
          Input("finalize-metadata-table-button", 'n_clicks')],
         [State("checklist-input", "value")]
     )

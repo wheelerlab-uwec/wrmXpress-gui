@@ -14,7 +14,6 @@ from app.pages.info_page_content import info_page
 from app.pages.preview_page_content import preview_page, load_first_img, preview_analysis, populate_options
 from app.components.tabs_content import tabs_content
 from app.components.change_page_callback import get_callbacks
-from app.components.metadata_tab import open_metadata_offcanvas
 from app.components.run_time_settings import update_well_selection_table, populate_list_of_wells
 from app.components.instrument_settings import hidden_multi_row_col_feature
 from app.components.create_metadata_tabs_from_checklist import create_metadata_tables_from_checklist
@@ -51,7 +50,6 @@ hidden_multi_row_col_feature(app)
 populate_list_of_wells(app)
 load_first_img(app)
 preview_analysis(app)
-open_metadata_offcanvas(app)
 create_metadata_tables_from_checklist(app)
 save_metadata_tables_to_csv(app)
 populate_options(app)

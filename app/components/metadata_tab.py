@@ -24,65 +24,102 @@ meta_data = dbc.Container(
     [
         html.Div(
             [
-                dbc.Button("Table selection",
-                           id="metadata-tab-selection-offcanvas", n_clicks=0),
-                dbc.Offcanvas(
+                dbc.Row(
                     [
-                        metadata_checklist,
-                        html.Br(),
-                        dbc.Row(
+                        # Label for Plate Format
+                        dbc.Col(html.H6("Plate format:")),
+                    ],
+                    align="center"
+                ),
+                dbc.Row(
+                    [
+                        # First Column: Image, Tooltip
+                        dbc.Col(
                             [
-                                # Label for Plate Format
-                                dbc.Col(html.H6("Add new table:")),
+                                html.I(className="fa-solid fa-circle-info",
+                                       id="tot-num-cols-and-rows-symbol"
+                                       ),
+                                dbc.Tooltip(
+                                    "Input the total number of rows and columns in the plate.",
+                                    placement="bottom",
+                                    target="tot-num-cols-and-rows-symbol"
+                                )
                             ],
-                            align="center"
+                            width="auto"
                         ),
-                        dbc.Row(
-                            [
-                                # First Column: Input for Total Number of Columns
-                                dbc.Col(
-                                    dbc.Button(
-                                        "+",
-                                        id="add-metadata-table-button",
-                                        className="me-2",
-                                    ),
-                                    width="auto",
-                                    className='pe-0'
-                                ),
-                                dbc.Col(
-                                    # Add an editable input box here
-                                    dbc.Input(
-                                        id="uneditable-input-box",
-                                        placeholder='Title',
-                                        value="",
-                                        disabled=False
-                                    ),
-                                    width="auto",
-                                    className='ps-0'
-                                ),
-                            ],
-                            align="center"
+                        # Second Column: Input for Total Number of Columns
+                        dbc.Col(
+                            dbc.Input(
+                                id="num-well-cols",
+                                placeholder="Number of columns",
+                                type="number"
+                            ),
+                            width="auto"
                         ),
-                        html.Hr(),
-                        dbc.Row(
-                            [
-                                # First Column: Input for Total Number of Columns
-                                dbc.Col(
-                                    dbc.Button(
-                                        "Finalize Tables",
-                                        id="finalize-metadata-table-button",
-                                        className="flex",
-                                        color='success'
-                                    ),
-                                    width="auto"
-                                ),
-                            ],
-                            justify="center"
+                        # Third Column: Input for Total Number of Rows
+                        dbc.Col(
+                            dbc.Input(
+                                id="num-well-rows",
+                                placeholder="Number of rows",
+                                type="number"
+                            ),
+                            width="auto",
+                            id="plate-foramt-options-row"
                         )
                     ],
-                    id="offcanvas",
-                    title="Select metadata tables:",
-                    is_open=True,
+                    align="center"
+                ),
+                html.Br(),
+                metadata_checklist,
+                html.Br(),
+                dbc.Row(
+                    [
+                        # Label for Plate Format
+                        dbc.Col(html.H6("Add new table:")),
+                    ],
+                    align="center"
+                ),
+                dbc.Row(
+                    [
+                        # First Column: Input for Total Number of Columns
+                        dbc.Col(
+                            dbc.Button(
+                                "+",
+                                id="add-metadata-table-button",
+                                className="me-2",
+                            ),
+                            width="auto",
+                            className='pe-0'
+                        ),
+                        dbc.Col(
+                            # Add an editable input box here
+                            dbc.Input(
+                                id="uneditable-input-box",
+                                placeholder='Title',
+                                value="",
+                                disabled=False
+                            ),
+                            width="auto",
+                            className='ps-0'
+                        ),
+                    ],
+                    align="center"
+                ),
+                html.Hr(),
+                dbc.Row(
+                    [
+                        # First Column: Input for Total Number of Columns
+                        dbc.Col(
+                            dbc.Button(
+                                "Finalize Tables",
+                                id="finalize-metadata-table-button",
+                                className="flex",
+                                color='success'
+                            ),
+                            width="auto"
+                        ),
+                    ],
+                    justify="center"
                 ),
                 html.Br(),
                 html.Br(),
@@ -106,19 +143,3 @@ meta_data = dbc.Container(
     style={"paddingTop": "80px"}
 )
 
-
-########################################################################
-####                                                                ####
-####                             Callbacks                          ####
-####                                                                ####
-########################################################################
-def open_metadata_offcanvas(app):
-    @app.callback(
-        Output("offcanvas", "is_open"),
-        Input("metadata-tab-selection-offcanvas", "n_clicks"),
-        [State("offcanvas", "is_open")],
-    )
-    def toggle_offcanvas(n1, is_open):
-        if n1:
-            return not is_open
-        return is_open
