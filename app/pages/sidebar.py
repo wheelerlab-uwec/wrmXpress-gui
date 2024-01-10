@@ -7,8 +7,8 @@ import dash
 import dash_bootstrap_components as dbc
 from dash import Input, Output, dcc, html
 from app.pages.info_page_content import info_page_content
-from app.components.configure_analysis import configure_analysis
-from app.components.metadata_tab import meta_data
+from app.pages.configure_analysis import configure_analysis
+from app.pages.metadata_tab import meta_data
 from app.pages.preview_page_content import preview_page_content
 from app.pages.run_page_content import run_page_content
 from app.components.header import header
@@ -22,20 +22,21 @@ from app.utils.styling import SIDEBAR_STYLE, CONTENT_STYLE
 sidebar = html.Div(
     [
         html.A(
-                html.Img(src='https://github.com/zamanianlab/wrmXpress/blob/main/img/logo/output.png?raw=true', # wrmXpress image
-                             height="200px"),
-                href="https://github.com/zamanianlab/wrmxpress", # clicked takes user to wrmXpress github 
-                style={"textDecoration": "none"},
-                className='ms-3'
-            ),
+            html.Img(src='https://github.com/zamanianlab/wrmXpress/blob/main/img/logo/output.png?raw=true',  # wrmXpress image
+                     height="200px"),
+            # clicked takes user to wrmXpress github
+            href="https://github.com/zamanianlab/wrmxpress",
+            style={"textDecoration": "none"},
+            className='ms-3'
+        ),
         html.Hr(),
         dbc.Nav(
             [
                 dbc.NavLink("Info", href="/", active="exact"),
                 dbc.NavLink("Configure", href="/configure", active="exact"),
                 dbc.NavLink("Metadata", href="/metadata", active="exact"),
-                dbc.NavLink('Preview', href = '/preview', active = 'exact'),
-                dbc.NavLink('Run', href = '/run', active = 'exact')
+                dbc.NavLink('Preview', href='/preview', active='exact'),
+                dbc.NavLink('Run', href='/run', active='exact')
             ],
             vertical=True,
             pills=True,
@@ -54,6 +55,8 @@ content = html.Div([
 ####                           CALLBACKS                            ####
 ####                                                                ####
 ########################################################################
+
+
 def change_page_from_sidebar(app):
     @app.callback(Output("page-content", "children"), [Input("url", "pathname")])
     def render_page_content(pathname):

@@ -4,7 +4,7 @@
 ####                                                                ####
 ########################################################################
 import dash_bootstrap_components as dbc
-from dash import html
+from dash import html, callback
 from dash.dependencies import Input, Output, State
 
 ########################################################################
@@ -267,23 +267,32 @@ instrument_settings = dbc.AccordionItem([
 ####                                                                ####
 ########################################################################
 
+# Appearing multi-well options
 
-def hidden_multi_row_col_feature(app):
-    # Appearing multi-well options
-    @app.callback(
-        [Output('multi-well-options-row', 'style'),
-         Output('additional-options-row', 'style')],
-        [Input('imaging-mode', 'value'),
-         Input('file-structure', 'value')]
-    )
-    def update_options_visibility(imaging_mode, file_structure):
-        multi_well_options_style = {'display': 'none'}
-        additional_options_style = {'display': 'none'}
 
-        if imaging_mode == 'multi-well':
-            multi_well_options_style = {'display': 'flex'}
+@callback(
+    [Output('multi-well-options-row', 'style'),
+     Output('additional-options-row', 'style')],
+    [Input('imaging-mode', 'value'),
+     Input('file-structure', 'value')]
+)
+def update_options_visibility(imaging_mode, file_structure):
+    multi_well_options_style = {'display': 'none'}
+    additional_options_style = {'display': 'none'}
 
-            if file_structure == 'avi':
-                additional_options_style = {'display': 'flex'}
+    if imaging_mode == 'multi-well':
+        multi_well_options_style = {'display': 'flex'}
 
-        return multi_well_options_style, additional_options_style
+        if file_structure == 'avi':
+            additional_options_style = {'display': 'flex'}
+
+    return multi_well_options_style, additional_options_style
+
+
+@callback(
+    Output("store", "data"),
+    Input("total-well-cols", "value"),
+    Input("total-num-rows", "value")
+)
+def rows_cols(cols, rows):
+    return {'cols': cols, 'rows': rows}
