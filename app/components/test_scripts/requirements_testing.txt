@@ -11,3 +11,4 @@ dash-html-components
 dash-table
 plotly
 pandas
+docker
