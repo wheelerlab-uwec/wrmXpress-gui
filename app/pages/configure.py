@@ -6,10 +6,19 @@
 import dash_bootstrap_components as dbc
 import dash
 from dash import callback, html
-from dash.dependencies import Input, Output
+from dash.dependencies import Input, Output, State
 from app.utils.callback_functions import create_df_from_inputs
 from dash import dash_table
 import itertools
+import docker
+import yaml
+import time
+from pathlib import Path
+import numpy as np
+import plotly.express as px
+from PIL import Image
+from app.utils.callback_functions import prep_yaml
+import os
 
 # Importing Components
 from app.components.instrument_settings import instrument_settings
@@ -139,3 +148,85 @@ def update_wells(table_contents):  # list of cells from selection table
     sorted_list = sorted(filtered_list)
 
     return sorted_list
+
+@callback(
+    Output('finalize-configure-button', 'color'),
+    Input('finalize-configure-button', 'n_clicks'),
+    State('imaging-mode', 'value'),
+    State('file-structure', 'value'),
+    State('multi-well-rows', 'value'),
+    State('multi-well-cols', 'value'),
+    State('multi-well-detection', 'value'),
+    State('species', 'value'),
+    State('stages', 'value'),
+    State('motility-run', 'value'),
+    State('conversion-run', 'value'),
+    State('conversion-scale-video', 'value'),
+    State('conversion-rescale-multiplier', 'value'),
+    State('segment-run', 'value'),
+    State('segmentation-wavelength', 'value'),
+    State('cell-profiler-run', 'value'),
+    State('cell-profiler-pipeline', 'value'),
+    State('diagnostics-dx', 'value'),
+    State('plate-name', 'value'),
+    State('mounted-volume', 'value'),
+    State('well-selection-list', 'children'),
+    prevent_initial_call=True
+)
+def run_analysis(
+    nclicks,
+    imagingmode,
+    filestructure,
+    multiwellrows,
+    multiwellcols,
+    multiwelldetection,
+    species,
+    stages,
+    motilityrun,
+    conversionrun,
+    conversionscalevideo,
+    conversionrescalemultiplier,
+    segmentrun,
+    wavelength,
+    cellprofilerrun,
+    cellprofilerpipeline,
+    diagnosticdx,
+    platename,
+    volume,
+    wells,
+):
+    if nclicks:
+
+        if wells == 'All':
+            first_well = 'A01'
+        else:
+            first_well = wells[0]
+
+        config = prep_yaml(
+            imagingmode,
+            filestructure,
+            multiwellrows,
+            multiwellcols,
+            multiwelldetection,
+            species,
+            stages,
+            motilityrun,
+            conversionrun,
+            conversionscalevideo,
+            conversionrescalemultiplier,
+            segmentrun,
+            wavelength,
+            cellprofilerrun,
+            cellprofilerpipeline,
+            diagnosticdx,
+            wells
+        )
+
+        output_file = Path(volume, platename + '.yml')
+
+        # Dump preview data to YAML file
+        with open(output_file, 'w') as yaml_file:
+            yaml.dump(config, yaml_file,
+                      default_flow_style=False)
+
+        return 'success'
