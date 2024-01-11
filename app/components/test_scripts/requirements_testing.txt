@@ -14,5 +14,3 @@ pandas
 docker
 pillow
 numpy
-pathlib
-itertools
