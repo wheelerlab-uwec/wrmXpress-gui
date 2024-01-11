@@ -16,6 +16,7 @@ from app.components.metadata_components import metadata_checklist
 # utilities
 from app.utils.callback_functions import create_empty_df_from_inputs
 
+# registering dash page
 dash.register_page(__name__)
 
 ########################################################################
@@ -120,7 +121,7 @@ layout = dbc.Container(
     [State("checklist-input", "value")],
 
 )
-def create_tabs_from_checklist(store, n_clicks, checklist_values):
+def create_tabs_from_checklist(store, n_clicks, checklist_values): # creating empty dash tables from metadata checklist with proper dimensions from rows and columns
     default_cols = 12
     default_rows = 8
     try:
@@ -164,7 +165,7 @@ def create_tabs_from_checklist(store, n_clicks, checklist_values):
     [State("uneditable-input-box", 'value'),
      State("checklist-input", "options")]
 )
-def update_metadata_checklist(n_clicks, new_table_name, existing_options):
+def update_metadata_checklist(n_clicks, new_table_name, existing_options): # creating additional checklist items from user input
     if n_clicks and new_table_name:
         # Append the new table name to the existing options
         new_option = {"label": new_table_name, "value": new_table_name}
@@ -180,7 +181,7 @@ def update_metadata_checklist(n_clicks, new_table_name, existing_options):
     State('metadata-tabs', 'children'),
     State('mounted-volume', 'value')
 )
-def save_the_metadata_tables_to_csv(n_clicks, metadata_tabs, volume):
+def save_the_metadata_tables_to_csv(n_clicks, metadata_tabs, volume): # saving metadata tables 
     if n_clicks:
 
         # Iterate over the metadata tabs

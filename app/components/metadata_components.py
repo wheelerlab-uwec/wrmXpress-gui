@@ -13,7 +13,7 @@ from dash import dcc, html
 ####                                                                ####
 ########################################################################
 
-meta_data_from_input = dbc.Container([
+meta_data_from_input = dbc.Container([ # creating empty tabs for the metadata tables which will be populated in later
     dcc.Tabs(id='metadata-tabs', value='batch-data-tab', children=[
 
     ]
@@ -24,7 +24,7 @@ meta_data_from_input = dbc.Container([
 metadata_checklist = dbc.Form([
     html.Div(
         [
-            dbc.Checklist(
+            dbc.Checklist( # Initial checklist for metadata tables 
                 options=[
                     {"label": "Batch",
                      "value": "Batch"},
@@ -51,6 +51,6 @@ metadata_checklist = dbc.Form([
     )
 ])
 
-selection_table = html.Div(
-    id='well-selection-table'
+selection_table = html.Div( 
+    id='well-selection-table' # initializing selection table id which will be populated in later
 )

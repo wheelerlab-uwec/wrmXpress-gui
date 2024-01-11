@@ -14,16 +14,16 @@ from dash import html
 instrument_settings = dbc.AccordionItem([
     html.Div([
         dbc.Row([
-                html.H6("Imaging mode:", id='imaging-mode-header'),
+                html.H6("Imaging mode:", id='imaging-mode-header'), # Title for Imaging mode
                 dbc.Col([
-                    html.I(className="fa-solid fa-circle-info",
+                    html.I(className="fa-solid fa-circle-info", # Information Symbol
                            id='imaging-mode-symbol'),
                     dbc.Tooltip(
-                        "Select Single Well if each video or image only includes a single well. Select Multi Well if each video/image contains multiple wells that need to be split.",
+                        "Select Single Well if each video or image only includes a single well. Select Multi Well if each video/image contains multiple wells that need to be split.", # Tooltip element for information symbol, displays message when cursor over the symbol
                         placement='bottom',
                         target="imaging-mode-symbol"
                     ),
-                    dbc.RadioItems(
+                    dbc.RadioItems( # Radio button selection for single well or multi well
                         id="imaging-mode",
                         className="btn-group",
                         inputClassName="btn-check",
@@ -40,12 +40,12 @@ instrument_settings = dbc.AccordionItem([
                 ],
                     width="auto"),
                 dbc.Col([
-                    dbc.Input(id="multi-well-rows",
+                    dbc.Input(id="multi-well-rows", # Input values for rows per image
                         placeholder="Rows per image",
                         type="number",
                         persistence=True,
                         persistence_type='session'),
-                    dbc.Input(id="multi-well-cols",
+                    dbc.Input(id="multi-well-cols", # Input values for columns per image
                         placeholder="Columns per image",
                         type="number",
                         persistence=True,
@@ -71,11 +71,11 @@ instrument_settings = dbc.AccordionItem([
             # First Column: Image, Tooltip
             dbc.Col(
                 [
-                    html.I(className="fa-solid fa-circle-info",
+                    html.I(className="fa-solid fa-circle-info", # Information Symbol
                            id="multi-site-imaging-mode-info-symbol"
                            ),
 
-                    dbc.Tooltip(
+                    dbc.Tooltip( # Tooltip element for information symbol, displays message when cursor over the symbol
                         "Use if each well had multiple sites imaged. Enter the number of x and y sites per well",
                         placement="bottom",
                         target="multi-site-imaging-mode-info-symbol"
@@ -112,16 +112,16 @@ instrument_settings = dbc.AccordionItem([
     html.Br(),
     html.Div(
         dbc.Row([
-                html.H6("File structure:"),
+                html.H6("File structure:"), # Title for File Structure
                 dbc.Col([
-                    html.I(className="fa-solid fa-circle-info",
+                    html.I(className="fa-solid fa-circle-info", # Information symbol
                            id='file-structure-symbol'),
-                    dbc.Tooltip(
+                    dbc.Tooltip( # Tooltip element for information symbol, displays message when cursor over the symbol
                         "Select ImageXpress if the data is saved in an IX-like structure. Select AVI if the data is a single video saved as an AVI.",
                         placement='bottom',
                         target="file-structure-symbol"
                     ),
-                    dbc.RadioItems(
+                    dbc.RadioItems( # Radio selection items for ImageXpress or AVI
                         id="file-structure",
                         className="btn-group",
                         inputClassName="btn-check",
@@ -138,18 +138,18 @@ instrument_settings = dbc.AccordionItem([
                 ],
                     width='auto'),
                 dbc.Col([
-                    html.Div(html.P("Cropping options:",
+                    html.Div(html.P("Cropping options:", # text of cropping items 
                              style={"textDecoration": "underline",
                                     "cursor": "pointer"},
                              id='crop-options')),
-                    dbc.Tooltip(
+                    dbc.Tooltip( # Tooltip element for text "cropping items", displays message when cursor over the text
                         "Select the method of cropping wells. \
                             Auto: incorporates a Hough transform in an attempt to automatically identify circular wells.\
                             Grid: Crops a grid based on the provided number of columns and rows.",
                         placement='bottom',
                         target="crop-options"
                     ),
-                    dbc.RadioItems(
+                    dbc.RadioItems( # Radio button selection of Auto or Grid
                         id="multi-well-detection",
                         className="btn-group",
                         inputClassName="btn-check",
@@ -256,6 +256,6 @@ instrument_settings = dbc.AccordionItem([
                 align="center")
     )
 ],
-    id="instrument-settings-file-structure",
-    title="Instrument Settings"
+    id="instrument-settings-file-structure", # id of accordian item 
+    title="Instrument Settings" # Title of accordian item 
 )

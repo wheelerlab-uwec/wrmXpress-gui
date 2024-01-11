@@ -8,6 +8,7 @@ import dash_bootstrap_components as dbc
 from dash import Dash, html, dcc
 
 from app.utils.styling import SIDEBAR_STYLE, CONTENT_STYLE
+from app.components.header import header
 app = Dash(__name__,
            use_pages=True,
            pages_folder='app/pages',
@@ -50,7 +51,7 @@ app.layout = html.Div([
     dcc.Store(id='store', data={}),
     sidebar,
     html.Div(id="page-content",
-             children=dash.page_container,
+             children=[header, dash.page_container],
              style=CONTENT_STYLE)])
 
 ########################################################################

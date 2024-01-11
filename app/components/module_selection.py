@@ -189,7 +189,7 @@ module_selection = dbc.AccordionItem(
                id='dx-symbol',
                style={'display': 'inline-block', 'width': '1.5%', 'height': '1.5%', 'padding-bottom': 10, 'padding-left': 5}),
 
-        dbc.Tooltip(
+        dbc.Tooltip( # Tooltip element for information symbol, displays message when cursor over the symbol
             "Generate and export diagnostic images (recommended).",
             target="dx-symbol"),
         html.H6("dx"),

@@ -17,6 +17,7 @@ from app.components.worm_information import worm_information
 from app.components.module_selection import module_selection
 from app.components.run_time_settings import run_time_settings
 
+# Registering this page
 dash.register_page(__name__)
 
 ########################################################################
@@ -51,7 +52,7 @@ layout = dbc.Container([
     [Input('imaging-mode', 'value'),
      Input('file-structure', 'value')]
 )
-def update_options_visibility(imaging_mode, file_structure):
+def update_options_visibility(imaging_mode, file_structure): # appearing selections upon meeting certain critera
     multi_well_options_style = {'display': 'none'}
     additional_options_style = {'display': 'none'}
 
@@ -64,7 +65,7 @@ def update_options_visibility(imaging_mode, file_structure):
     return multi_well_options_style, additional_options_style
 
 
-@callback(
+@callback( # Storing values of inputs to be used in different pages
     Output("store", "data"),
     Input("total-well-cols", "value"),
     Input("total-num-rows", "value")
@@ -73,12 +74,12 @@ def rows_cols(cols, rows):
     return {'cols': cols, 'rows': rows}
 
 
-@callback(
+@callback( 
     Output("well-selection-table", 'children'),
     [Input("total-num-rows", "value"),
      Input("total-well-cols", "value")]
 )
-def update_table(rows, cols):
+def update_table(rows, cols): # creating a selection table based on the dimensions of rows and columns selected
     default_cols = 12
     default_rows = 8
     if rows is None:
@@ -103,7 +104,7 @@ def update_table(rows, cols):
     Output('well-selection-list', 'children'),
     Input('dynamic-table-container-well-selection-table', 'data')
 )
-def update_wells(table_contents):
+def update_wells(table_contents): # list of cells from selection table
     values_list = [list(d.values()) for d in table_contents]
     flattened_list = list(itertools.chain.from_iterable(values_list))
     filtered_list = []

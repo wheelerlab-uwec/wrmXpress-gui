@@ -161,28 +161,29 @@ def get_options(nclicks, motility, segment):
     State('preview-dropdown', 'value'),
     prevent_initial_call=True
 )
-def run_analysis(nclicks,
-                 imagingmode,
-                 filestructure,
-                 multiwellrows,
-                 multiwellcols,
-                 multiwelldetection,
-                 species,
-                 stages,
-                 motilityrun,
-                 conversionrun,
-                 conversionscalevideo,
-                 conversionrescalemultiplier,
-                 segmentrun,
-                 wavelength,
-                 cellprofilerrun,
-                 cellprofilerpipeline,
-                 diagnosticdx,
-                 platename,
-                 volume,
-                 wells,
-                 selection
-                 ):
+def run_analysis(
+    nclicks,
+    imagingmode,
+    filestructure,
+    multiwellrows,
+    multiwellcols,
+    multiwelldetection,
+    species,
+    stages,
+    motilityrun,
+    conversionrun,
+    conversionscalevideo,
+    conversionrescalemultiplier,
+    segmentrun,
+    wavelength,
+    cellprofilerrun,
+    cellprofilerpipeline,
+    diagnosticdx,
+    platename,
+    volume,
+    wells,
+    selection
+):
     if nclicks:
 
         if wells == 'All':
