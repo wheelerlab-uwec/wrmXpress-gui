@@ -94,10 +94,21 @@ def update_options_visibility(imaging_mode, file_structure):
     Output("store", "data"),
     Input("total-well-cols", "value"),
     Input("total-num-rows", "value"),
-    Input('mounted-volume', 'value')
+    Input('mounted-volume', 'value'),
+    Input('plate-name', 'value'),
+    Input('well-selection-list', 'children'),
+    Input('motility-run', 'value'),
+    Input('segment-run', 'value')
 )
-def rows_cols(cols, rows, mounter):
-    return {'cols': cols, 'rows': rows, 'mount': mounter}
+def rows_cols(cols, rows, mounter, platename, well_selection, motility, segment):
+    return {'cols': cols, 
+            'rows': rows, 
+            'mount': mounter, 
+            'platename': platename, 
+            'wells':well_selection, 
+            'motility':motility,
+            'segment':segment
+            }
 
 
 @callback(

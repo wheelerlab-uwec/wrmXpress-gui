@@ -119,11 +119,11 @@ def update_preview_image(n_clicks, store, platename, wells):
 @callback(
     Output('preview-dropdown', 'options'),
     Input('open-preview-modal', 'n_clicks'),
-    State('motility-run', 'value'),
-    State('segment-run', 'value')
+    State('store', 'data')
 )
-def get_options(nclicks, motility, segment):
-
+def get_options(nclicks, store):
+    motility = store['motility']
+    segment = store['segment']
     selection_dict = {'motility': 'motility', 'segment': 'binary'}
     option_dict = {}
 
@@ -140,85 +140,24 @@ def get_options(nclicks, motility, segment):
     Output('analysis-preview-message', 'children'),
     Output('analysis-preview', 'figure'),
     Input('preview-button', 'n_clicks'),
-    State('imaging-mode', 'value'),
-    State('file-structure', 'value'),
-    State('multi-well-rows', 'value'),
-    State('multi-well-cols', 'value'),
-    State('multi-well-detection', 'value'),
-    State('species', 'value'),
-    State('stages', 'value'),
-    State('motility-run', 'value'),
-    State('conversion-run', 'value'),
-    State('conversion-scale-video', 'value'),
-    State('conversion-rescale-multiplier', 'value'),
-    State('segment-run', 'value'),
-    State('segmentation-wavelength', 'value'),
-    State('cell-profiler-run', 'value'),
-    State('cell-profiler-pipeline', 'value'),
-    State('diagnostics-dx', 'value'),
-    State('plate-name', 'value'),
-    State('store', 'value'),
-    State('well-selection-list', 'children'),
+    State('store', 'data'),
     State('preview-dropdown', 'value'),
     prevent_initial_call=True
 )
 def run_analysis(
     nclicks,
-    imagingmode,
-    filestructure,
-    multiwellrows,
-    multiwellcols,
-    multiwelldetection,
-    species,
-    stages,
-    motilityrun,
-    conversionrun,
-    conversionscalevideo,
-    conversionrescalemultiplier,
-    segmentrun,
-    wavelength,
-    cellprofilerrun,
-    cellprofilerpipeline,
-    diagnosticdx,
-    platename,
     store,
-    wells,
     selection
 ):
     volume = store['mount']
+    platename = store['platename']
+    wells = store["wells"]
     if nclicks:
 
         if wells == 'All':
             first_well = 'A01'
         else:
             first_well = wells[0]
-
-        config = prep_yaml(
-            imagingmode,
-            filestructure,
-            multiwellrows,
-            multiwellcols,
-            multiwelldetection,
-            species,
-            stages,
-            motilityrun,
-            conversionrun,
-            conversionscalevideo,
-            conversionrescalemultiplier,
-            segmentrun,
-            wavelength,
-            cellprofilerrun,
-            cellprofilerpipeline,
-            diagnosticdx,
-            wells
-        )
-
-        output_file = Path(volume, platename + '.yml')
-
-        # Dump preview data to YAML file
-        with open(output_file, 'w') as yaml_file:
-            yaml.dump(config, yaml_file,
-                      default_flow_style=False)
 
         client = docker.from_env()
         print(client)
