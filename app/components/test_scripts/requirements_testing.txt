@@ -3,3 +3,5 @@ selenium==4.2.0
 webdriver-manager
 pytest
 pytest-cov
+dash
+dash_bootstrap_components
