@@ -9,6 +9,7 @@ from dash import Dash, html, dcc
 
 from app.utils.styling import SIDEBAR_STYLE, CONTENT_STYLE
 from app.components.header import header
+
 app = Dash(__name__,
            use_pages=True,
            pages_folder='app/pages',
