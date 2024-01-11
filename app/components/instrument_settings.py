@@ -4,8 +4,7 @@
 ####                                                                ####
 ########################################################################
 import dash_bootstrap_components as dbc
-from dash import html, callback
-from dash.dependencies import Input, Output, State
+from dash import html
 
 ########################################################################
 ####                                                                ####
@@ -260,39 +259,3 @@ instrument_settings = dbc.AccordionItem([
     id="instrument-settings-file-structure",
     title="Instrument Settings"
 )
-
-########################################################################
-####                                                                ####
-####                              Callback                          ####
-####                                                                ####
-########################################################################
-
-# Appearing multi-well options
-
-
-@callback(
-    [Output('multi-well-options-row', 'style'),
-     Output('additional-options-row', 'style')],
-    [Input('imaging-mode', 'value'),
-     Input('file-structure', 'value')]
-)
-def update_options_visibility(imaging_mode, file_structure):
-    multi_well_options_style = {'display': 'none'}
-    additional_options_style = {'display': 'none'}
-
-    if imaging_mode == 'multi-well':
-        multi_well_options_style = {'display': 'flex'}
-
-        if file_structure == 'avi':
-            additional_options_style = {'display': 'flex'}
-
-    return multi_well_options_style, additional_options_style
-
-
-@callback(
-    Output("store", "data"),
-    Input("total-well-cols", "value"),
-    Input("total-num-rows", "value")
-)
-def rows_cols(cols, rows):
-    return {'cols': cols, 'rows': rows}

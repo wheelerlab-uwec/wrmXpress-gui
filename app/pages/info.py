@@ -89,25 +89,3 @@ layout = [
             )
         ])
 ]
-
-
-########################################################################
-####                                                                ####
-####                             Modal                              ####
-####                                                                ####
-########################################################################
-info_page = dbc.Modal(
-    [
-        dbc.ModalHeader(
-            "Information & Usage"  # Header for the modal page
-        ),
-        layout,  # Modal Page content defined above in the layout section
-        dbc.ModalFooter([
-            # Buttons for the Info Page Modal Footer
-            dbc.Button("Close", id="close-info-modal", className="ml-auto"),
-        ]),
-        html.Div(id="info-page-status")  # Placeholder for saving status
-    ],
-    id="info-page-modal",
-    size="xl"
-)

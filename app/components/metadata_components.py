@@ -4,8 +4,7 @@
 ####                                                                ####
 ########################################################################
 import dash_bootstrap_components as dbc
-from dash import html
-from dash.dependencies import Input, Output, State
+from dash import dcc, html
 
 
 ########################################################################
@@ -13,6 +12,14 @@ from dash.dependencies import Input, Output, State
 ####                              Layout                            ####
 ####                                                                ####
 ########################################################################
+
+meta_data_from_input = dbc.Container([
+    dcc.Tabs(id='metadata-tabs', value='batch-data-tab', children=[
+
+    ]
+    )
+]
+)
 
 metadata_checklist = dbc.Form([
     html.Div(
@@ -36,31 +43,14 @@ metadata_checklist = dbc.Form([
                 ],
                 value=[
                     "Batch", 'Species', 'Strains', 'Stages', 'Treatments', "Concentrations", "Other"],
+                persistence=True,
+                persistence_type='session',
                 id="checklist-input",
             ),
         ]
     )
 ])
 
-
-########################################################################
-####                                                                ####
-####                           CALLBACKS                            ####
-####                                                                ####
-########################################################################
-
-def add_metadata_table_checklist(app):
-    @app.callback(
-        Output("checklist-input", "options"),
-        [Input("add-metadata-table-button", "n_clicks")],
-        [State("uneditable-input-box", 'value'),
-         State("checklist-input", "options")]
-    )
-    def update_metadata_checklist(n_clicks, new_table_name, existing_options):
-        if n_clicks and new_table_name:
-            # Append the new table name to the existing options
-            new_option = {"label": new_table_name, "value": new_table_name}
-            updated_options = existing_options + [new_option]
-            return updated_options
-        else:
-            return existing_options
+selection_table = html.Div(
+    id='well-selection-table'
+)
