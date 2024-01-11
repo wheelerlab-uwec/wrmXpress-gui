@@ -16,7 +16,7 @@ A Dash GUI for wrmXpress
 ## Testing
 
 ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/wheelerlab-uwec/wrmxpress-gui/dash-test.yml)
-![cov](https://wheelerlab-uwec.github.io/wrmxpress-gui/badges/coverage.svg)
+![Code coverage](https://wheelerlab-uwec.github.io/wrmxpress-gui/badges/coverage.svg)
 
 ## Installation and usage
 
