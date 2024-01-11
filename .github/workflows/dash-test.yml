@@ -1,4 +1,4 @@
-name: explainerdashboard
+name: Dash testing
 
 on:
   push:
@@ -25,7 +25,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip setuptools wheel
-          pip install -r requirements_testing.txt
+          pip install -r app/components/test_scripts/requirements_testing.txt
       - name: Test with pytest
         run: |
           pytest
