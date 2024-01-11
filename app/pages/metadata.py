@@ -125,9 +125,16 @@ def create_tabs_from_checklist(store, n_clicks, checklist_values): # creating em
     default_cols = 12
     default_rows = 8
 
-    num_rows = store.get('rows', default_rows)
-    num_cols = store.get('cols', default_cols)
-    
+    try:
+        num_rows = store['rows']
+    except KeyError:
+        num_rows = default_rows
+
+    try:
+        num_cols = store['cols']
+    except KeyError:
+        num_cols = default_cols
+
     df_empty = create_empty_df_from_inputs(num_rows, num_cols)
     if n_clicks and checklist_values:
         # Create a list of dcc.Tab components from the checked items
