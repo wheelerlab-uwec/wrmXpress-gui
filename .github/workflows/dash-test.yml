@@ -2,7 +2,7 @@ name: Dash testing
 
 on:
   push:
-    branches: [ dash_test_WIP ]
+    branches: [ main ]
   pull_request:
     branches: [ main ]
 
