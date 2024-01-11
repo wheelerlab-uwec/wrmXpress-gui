@@ -119,19 +119,27 @@ layout = dbc.Container(
     [State('store', 'data'),
      Input("finalize-metadata-table-button", 'n_clicks')],
     [State("checklist-input", "value")],
+    prevent_initial_call=True
 
 )
-def create_tabs_from_checklist(store, n_clicks, checklist_values): # creating empty dash tables from metadata checklist with proper dimensions from rows and columns
+# creating empty dash tables from metadata checklist with proper dimensions from rows and columns
+def create_tabs_from_checklist(store, n_clicks, checklist_values):
     default_cols = 12
     default_rows = 8
 
     try:
-        num_rows = store['rows']
+        if store['rows'] is not None:
+            num_rows = store['rows']
+        else:
+            num_rows = default_rows
     except KeyError:
         num_rows = default_rows
 
     try:
-        num_cols = store['cols']
+        if store['cols'] is not None:
+            num_cols = store['cols']
+        else:
+            num_cols = default_cols
     except KeyError:
         num_cols = default_cols
 
@@ -167,7 +175,8 @@ def create_tabs_from_checklist(store, n_clicks, checklist_values): # creating em
     [State("uneditable-input-box", 'value'),
      State("checklist-input", "options")]
 )
-def update_metadata_checklist(n_clicks, new_table_name, existing_options): # creating additional checklist items from user input
+# creating additional checklist items from user input
+def update_metadata_checklist(n_clicks, new_table_name, existing_options):
     if n_clicks and new_table_name:
         # Append the new table name to the existing options
         new_option = {"label": new_table_name, "value": new_table_name}
@@ -183,7 +192,8 @@ def update_metadata_checklist(n_clicks, new_table_name, existing_options): # cre
     State('metadata-tabs', 'children'),
     State('store', 'data')
 )
-def save_the_metadata_tables_to_csv(n_clicks, metadata_tabs, store): # saving metadata tables 
+# saving metadata tables
+def save_the_metadata_tables_to_csv(n_clicks, metadata_tabs, store):
     if n_clicks:
 
         # Iterate over the metadata tabs

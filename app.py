@@ -23,6 +23,7 @@ app = Dash(__name__,
 ####                             LAYOUT                             ####
 ####                                                                ####
 ########################################################################
+
 sidebar = html.Div(
     [
         html.A(
@@ -36,10 +37,12 @@ sidebar = html.Div(
         html.Hr(),
         html.Div([
             dbc.Nav(
-                vertical=True,
+                children=dbc.NavLink(f"{page['name']}",
+                                     href=page["relative_path"],
+                                     active='exact'
+                                     ),
                 pills=True,
-                children=dbc.NavLink(f"{page['name']} - {page['path']}",
-                                     href=page["relative_path"], style={'color': '#00205B'})
+                vertical=True
             ) for page in dash.page_registry.values()
         ])
     ],
