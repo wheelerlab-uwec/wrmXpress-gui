@@ -39,14 +39,16 @@ layout = dbc.ModalBody(
                                         "Path:", className="card-subtitle"),
                                     html.Br(),
                                     dcc.Markdown(id='input-path-output'),
-                                    dcc.Graph(
-                                        id='input-preview',
-                                    ),
+                                    html.Div(
+                                        dcc.Graph(
+                                            id='input-preview'
+                                        )),
                                     dbc.Button('Load first input image',
                                                id='submit-val', className="d-grid gap-2 col-6 mx-auto", color="primary", n_clicks=0),
                                 ]
                                 )
-                            )
+                            ),
+                            width={'size': 6}
                         ),
 
                         dbc.Col(
@@ -70,7 +72,8 @@ layout = dbc.ModalBody(
                                         "Preview analysis", id="preview-button", className="d-grid gap-2 col-6 mx-auto", color="primary", n_clicks=0),
                                 ]
                                 )
-                            ))
+                            ),
+                            width={'size': 6})
                         ])
             ]
             )
