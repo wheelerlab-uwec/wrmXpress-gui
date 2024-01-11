@@ -28,6 +28,8 @@ worm_information = dbc.AccordionItem(
                 {"label": "Schistosoma mansoni", "value": "Sma"}
             ],
             value="Bma",
+            persistence=True,
+            persistence_type='session'
         ),
         html.H6("Stages:"),
         # Radio button items for stage information
@@ -43,6 +45,8 @@ worm_information = dbc.AccordionItem(
                 {"label": "Mixed", "value": "Mixed"},
             ],
             value="Mf",
+            persistence=True,
+            persistence_type='session'
         ),
     ],
     id="worm-information",
