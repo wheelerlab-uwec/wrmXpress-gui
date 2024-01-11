@@ -98,16 +98,18 @@ def update_options_visibility(imaging_mode, file_structure):
     Input('plate-name', 'value'),
     Input('well-selection-list', 'children'),
     Input('motility-run', 'value'),
-    Input('segment-run', 'value')
+    Input('segment-run', 'value'),
+    Input('well-selection-list', 'children')
 )
-def rows_cols(cols, rows, mounter, platename, well_selection, motility, segment):
-    return {'cols': cols, 
-            'rows': rows, 
-            'mount': mounter, 
-            'platename': platename, 
-            'wells':well_selection, 
-            'motility':motility,
-            'segment':segment
+def rows_cols(cols, rows, mounter, platename, well_selection, motility, segment, wells):
+    return {'cols': cols,
+            'rows': rows,
+            'mount': mounter,
+            'platename': platename,
+            'wells': well_selection,
+            'motility': motility,
+            'segment': segment,
+            'wells': wells
             }
 
 
@@ -159,6 +161,7 @@ def update_wells(table_contents):  # list of cells from selection table
     sorted_list = sorted(filtered_list)
 
     return sorted_list
+
 
 @callback(
     Output('finalize-configure-button', 'color'),

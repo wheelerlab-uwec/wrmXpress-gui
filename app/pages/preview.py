@@ -92,14 +92,14 @@ layout = dbc.ModalBody(
     Output('input-preview', 'figure'),
     Input('submit-val', 'n_clicks'),
     State('store', 'data'),
-    State('plate-name', 'value'),
-    State('well-selection-list', 'children'),
     prevent_initial_call=True
 )
-def update_preview_image(n_clicks, store, platename, wells):
+def update_preview_image(n_clicks, store):
 
+    wells = store['wells']
     first_well = wells[0].replace(', ', '')
 
+    platename = store['platename']
     plate_base = platename.split("_", 1)[0]
 
     volume = store['mount']

@@ -27,9 +27,8 @@ run_time_settings = dbc.AccordionItem(
             persistence_type='session'),
         html.Br(),
         html.H4("Wells"),
-        html.P("Edit the following table such that well IDs are only present for wells to be analyzed.\
-            Alternatively, edit the following field to include a list of comma-separated well IDs. \
-                This list will override the contents of the table."),
+        html.P(
+            "Edit the following table such that well IDs are only present for wells to be analyzed."),
         # Selection Table from selection_table.py acquired from imports
         selection_table,
         html.Br(),
