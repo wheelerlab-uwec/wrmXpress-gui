@@ -1,0 +1,34 @@
+name: Dash testing
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        python-version: ['3.9', '3.10', '3.11']
+
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v4
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip setuptools wheel
+          pip install -r app/components/test_scripts/requirements_testing.txt
+      - name: Test with pytest
+        run: |
+          pytest --cov --cov-report=json
+      - name: Update coverage badge
+        if: github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+        uses: we-cli/coverage-badge-action@main
