@@ -6,6 +6,7 @@
 import dash
 import dash_bootstrap_components as dbc
 from dash import html
+from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -57,7 +58,7 @@ def test_003_module_selection(dash_duo):
     # using selenium to find and click the "Video Analysis" tab
     video_analysis_option = dash_duo.driver.find_element(
         by=By.XPATH, value='//*[@id="module-tabs"]/div[1]')
-    video_analysis_option.click()
+    dash_duo.driver.execute_script("arguments[0].click()", video_analysis_option)
 
     # id_list_1 contains all known id's in the video analysis tab
     id_list_1 = [
@@ -81,7 +82,7 @@ def test_003_module_selection(dash_duo):
     # using selenium to find and click the "Image Analysis (CellProfiler)" tab
     image_analysis_option = dash_duo.driver.find_element(
         by=By.XPATH, value='//*[@id="module-tabs"]/div[2]')
-    image_analysis_option.click()
+    dash_duo.driver.execute_script("arguments[0].click()", image_analysis_option)
 
     # id_list_2 contains all known id's in the video analysis tab
     id_list_2 = [
