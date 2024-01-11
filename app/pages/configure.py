@@ -5,7 +5,7 @@
 ########################################################################
 import dash_bootstrap_components as dbc
 import dash
-from dash import callback
+from dash import callback, html
 from dash.dependencies import Input, Output
 from app.utils.callback_functions import create_df_from_inputs
 from dash import dash_table
@@ -37,6 +37,21 @@ layout = dbc.Container([
         start_collapsed=False,
         always_open=True,
     ),
+    html.Hr(),
+    dbc.Row(
+        [
+            dbc.Col(
+                dbc.Button(
+                    "Finalize Configure",
+                    id="finalize-configure-button",
+                    className="flex",
+                    color='success'
+                ),
+                width="auto"
+            ),
+        ],
+        justify="center"
+    ),
 ],
     style={"paddingTop": "80px"})  # Adjust the white space between tab and accordian elements
 
@@ -52,7 +67,8 @@ layout = dbc.Container([
     [Input('imaging-mode', 'value'),
      Input('file-structure', 'value')]
 )
-def update_options_visibility(imaging_mode, file_structure): # appearing selections upon meeting certain critera
+# appearing selections upon meeting certain critera
+def update_options_visibility(imaging_mode, file_structure):
     multi_well_options_style = {'display': 'none'}
     additional_options_style = {'display': 'none'}
 
@@ -65,22 +81,23 @@ def update_options_visibility(imaging_mode, file_structure): # appearing selecti
     return multi_well_options_style, additional_options_style
 
 
-@callback( # Storing values of inputs to be used in different pages
+@callback(  # Storing values of inputs to be used in different pages
     Output("store", "data"),
     Input("total-well-cols", "value"),
     Input("total-num-rows", "value"),
     Input('mounted-volume', 'value')
 )
 def rows_cols(cols, rows, mounter):
-    return {'cols': cols, 'rows': rows, 'mount':mounter}
+    return {'cols': cols, 'rows': rows, 'mount': mounter}
 
 
-@callback( 
+@callback(
     Output("well-selection-table", 'children'),
     [Input("total-num-rows", "value"),
      Input("total-well-cols", "value")]
 )
-def update_table(rows, cols): # creating a selection table based on the dimensions of rows and columns selected
+# creating a selection table based on the dimensions of rows and columns selected
+def update_table(rows, cols):
     default_cols = 12
     default_rows = 8
     if rows is None:
@@ -101,11 +118,13 @@ def update_table(rows, cols): # creating a selection table based on the dimensio
     return well_selection
 
 # Populate list of wells to be analyzed
+
+
 @callback(
     Output('well-selection-list', 'children'),
     Input('dynamic-table-container-well-selection-table', 'data')
 )
-def update_wells(table_contents): # list of cells from selection table
+def update_wells(table_contents):  # list of cells from selection table
     values_list = [list(d.values()) for d in table_contents]
     flattened_list = list(itertools.chain.from_iterable(values_list))
     filtered_list = []
