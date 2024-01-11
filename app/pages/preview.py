@@ -91,17 +91,18 @@ layout = dbc.ModalBody(
     Output('input-path-output', 'children'),
     Output('input-preview', 'figure'),
     Input('submit-val', 'n_clicks'),
-    State('mounted-volume', 'value'),
+    State('store', 'data'),
     State('plate-name', 'value'),
     State('well-selection-list', 'children'),
     prevent_initial_call=True
 )
-def update_preview_image(n_clicks, volume, platename, wells):
+def update_preview_image(n_clicks, store, platename, wells):
 
     first_well = wells[0].replace(', ', '')
 
     plate_base = platename.split("_", 1)[0]
 
+    volume = store['mount']
     if n_clicks >= 1:
         # assumes IX-like file structure
         img_path = Path(
@@ -156,7 +157,7 @@ def get_options(nclicks, motility, segment):
     State('cell-profiler-pipeline', 'value'),
     State('diagnostics-dx', 'value'),
     State('plate-name', 'value'),
-    State('mounted-volume', 'value'),
+    State('store', 'value'),
     State('well-selection-list', 'children'),
     State('preview-dropdown', 'value'),
     prevent_initial_call=True
@@ -180,10 +181,11 @@ def run_analysis(
     cellprofilerpipeline,
     diagnosticdx,
     platename,
-    volume,
+    store,
     wells,
     selection
 ):
+    volume = store['mount']
     if nclicks:
 
         if wells == 'All':
