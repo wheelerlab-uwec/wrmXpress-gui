@@ -39,7 +39,7 @@ sidebar = html.Div(
                 vertical=True,
                 pills=True,
                 children=dbc.NavLink(f"{page['name']} - {page['path']}",
-                                     href=page["relative_path"])
+                                     href=page["relative_path"], style={'color': '#00205B'})
             ) for page in dash.page_registry.values()
         ])
     ],

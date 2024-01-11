@@ -25,14 +25,13 @@ header = dbc.Row(
             html.A(
                 html.I(className="fa-solid fa-prescription", # Prescription Symbol
                        id='rx-symbol'),
-                href='',
             )],
             width="auto"),
         dbc.Col([
             html.A(
                 html.I(className="fa-brands fa-docker", # Docker Symbol
                        id='docker-symbol'),
-                href="https://www.docker.com/products/docker-desktop/" # Link to docker install
+                href="https://hub.docker.com/r/wheelern/wrmxpress_gui" # Link to docker install
             )],
             width="auto"),
         dbc.Col([

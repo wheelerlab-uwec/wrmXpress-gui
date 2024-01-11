@@ -124,15 +124,10 @@ layout = dbc.Container(
 def create_tabs_from_checklist(store, n_clicks, checklist_values): # creating empty dash tables from metadata checklist with proper dimensions from rows and columns
     default_cols = 12
     default_rows = 8
-    try:
-        num_rows = store['rows']
-    except:
-        num_rows = default_rows
-    try:
-        num_cols = store['cols']
-    except:
-        num_cols = default_cols
 
+    num_rows = store.get('rows', default_rows)
+    num_cols = store.get('cols', default_cols)
+    
     df_empty = create_empty_df_from_inputs(num_rows, num_cols)
     if n_clicks and checklist_values:
         # Create a list of dcc.Tab components from the checked items
@@ -179,9 +174,9 @@ def update_metadata_checklist(n_clicks, new_table_name, existing_options): # cre
     Output("save-meta-data-to-csv", 'color'),
     Input("save-meta-data-to-csv", "n_clicks"),
     State('metadata-tabs', 'children'),
-    State('mounted-volume', 'value')
+    State('store', 'data')
 )
-def save_the_metadata_tables_to_csv(n_clicks, metadata_tabs, volume): # saving metadata tables 
+def save_the_metadata_tables_to_csv(n_clicks, metadata_tabs, store): # saving metadata tables 
     if n_clicks:
 
         # Iterate over the metadata tabs
@@ -207,6 +202,7 @@ def save_the_metadata_tables_to_csv(n_clicks, metadata_tabs, volume): # saving m
             # Reorder the DataFrame columns
             df = df[sorted_columns]
 
+            volume = store['mount']
             # Save the DataFrame to a CSV file
             metadata_dir = Path(volume).joinpath('metadata')
             if not metadata_dir.exists():

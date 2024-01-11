@@ -68,10 +68,11 @@ def update_options_visibility(imaging_mode, file_structure): # appearing selecti
 @callback( # Storing values of inputs to be used in different pages
     Output("store", "data"),
     Input("total-well-cols", "value"),
-    Input("total-num-rows", "value")
+    Input("total-num-rows", "value"),
+    Input('mounted-volume', 'value')
 )
-def rows_cols(cols, rows):
-    return {'cols': cols, 'rows': rows}
+def rows_cols(cols, rows, mounter):
+    return {'cols': cols, 'rows': rows, 'mount':mounter}
 
 
 @callback( 
