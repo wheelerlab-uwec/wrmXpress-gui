@@ -12,3 +12,7 @@ dash-table
 plotly
 pandas
 docker
+pillow
+numpy
+pathlib
+itertools
