@@ -19,17 +19,16 @@ run_time_settings = dbc.AccordionItem(
         html.H6("Volume"),
         dbc.Input(
             id="mounted-volume", placeholder="Path to the mounted volume", type="text", persistence=True,
-            persistence_type='session'),
+            persistence_type='memory'),
         html.Br(),
         html.H6("Plate/Folder"),
         dbc.Input(
             id="plate-name", placeholder="Plate name", type="text", persistence=True,
-            persistence_type='session'),
+            persistence_type='memory'),
         html.Br(),
         html.H4("Wells"),
-        html.P("Edit the following table such that well IDs are only present for wells to be analyzed.\
-            Alternatively, edit the following field to include a list of comma-separated well IDs. \
-                This list will override the contents of the table."),
+        html.P(
+            "Edit the following table such that well IDs are only present for wells to be analyzed."),
         # Selection Table from selection_table.py acquired from imports
         selection_table,
         html.Br(),

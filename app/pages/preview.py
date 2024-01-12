@@ -16,6 +16,7 @@ import plotly.express as px
 from PIL import Image
 from app.utils.callback_functions import prep_yaml
 import os
+import plotly.graph_objs as go
 
 dash.register_page(__name__)
 
@@ -24,6 +25,23 @@ dash.register_page(__name__)
 ####                              Layout                            ####
 ####                                                                ####
 ########################################################################
+layout = go.Layout(
+    xaxis=dict(
+        autorange=True,
+        showgrid=False,
+        ticks='',
+        zeroline=False,
+        showticklabels=False
+    ),
+    yaxis=dict(
+        autorange=True,
+        showgrid=False,
+        ticks='',
+        zeroline=False,
+        showticklabels=False
+    )
+)
+
 layout = dbc.ModalBody(
     [
         # Preview page contents
@@ -33,20 +51,28 @@ layout = dbc.ModalBody(
                         dbc.Col(
                             dbc.Card(
                                 dbc.CardBody([
-                                    html.H4("Input", className="text-center"),
+                                    html.H4("Input",
+                                            className="text-center mb-5"),
                                     html.Br(),
                                     html.H6(
                                         "Path:", className="card-subtitle"),
                                     html.Br(),
                                     dcc.Markdown(id='input-path-output'),
-                                    dcc.Graph(
-                                        id='input-preview',
-                                    ),
+                                    html.Div(
+                                        dcc.Graph(
+                                            id='input-preview',
+                                            figure={'layout': layout},
+                                            className='h-100 w-100'
+                                        )),
                                     dbc.Button('Load first input image',
-                                               id='submit-val', className="d-grid gap-2 col-6 mx-auto", color="primary", n_clicks=0),
+                                               id='submit-val',
+                                               className="d-grid gap-2 col-6 mx-auto",
+                                               color="primary",
+                                               n_clicks=0),
                                 ]
                                 )
-                            )
+                            ),
+                            width={'size': 6}
                         ),
 
                         dbc.Col(
@@ -65,12 +91,15 @@ layout = dbc.ModalBody(
                                         id='analysis-preview-message'),
                                     dcc.Graph(
                                         id='analysis-preview',
+                                        figure={'layout': layout},
+                                        className='h-100 w-100'
                                     ),
                                     dbc.Button(
                                         "Preview analysis", id="preview-button", className="d-grid gap-2 col-6 mx-auto", color="primary", n_clicks=0),
                                 ]
                                 )
-                            ))
+                            ),
+                            width={'size': 6})
                         ])
             ]
             )
@@ -92,14 +121,14 @@ layout = dbc.ModalBody(
     Output('input-preview', 'figure'),
     Input('submit-val', 'n_clicks'),
     State('store', 'data'),
-    State('plate-name', 'value'),
-    State('well-selection-list', 'children'),
     prevent_initial_call=True
 )
-def update_preview_image(n_clicks, store, platename, wells):
+def update_preview_image(n_clicks, store):
 
+    wells = store['wells']
     first_well = wells[0].replace(', ', '')
 
+    platename = store['platename']
     plate_base = platename.split("_", 1)[0]
 
     volume = store['mount']
@@ -118,12 +147,15 @@ def update_preview_image(n_clicks, store, platename, wells):
 
 @callback(
     Output('preview-dropdown', 'options'),
-    Input('open-preview-modal', 'n_clicks'),
-    State('motility-run', 'value'),
-    State('segment-run', 'value')
+    # update the option dropdown when the previous load is clicked
+    Input('submit-val', 'n_clicks'),
+    State('store', 'data'),
+    prevent_initial_call=True
 )
-def get_options(nclicks, motility, segment):
+def get_options(nclicks, store):
 
+    motility = store['motility']
+    segment = store['segment']
     selection_dict = {'motility': 'motility', 'segment': 'binary'}
     option_dict = {}
 
@@ -140,85 +172,24 @@ def get_options(nclicks, motility, segment):
     Output('analysis-preview-message', 'children'),
     Output('analysis-preview', 'figure'),
     Input('preview-button', 'n_clicks'),
-    State('imaging-mode', 'value'),
-    State('file-structure', 'value'),
-    State('multi-well-rows', 'value'),
-    State('multi-well-cols', 'value'),
-    State('multi-well-detection', 'value'),
-    State('species', 'value'),
-    State('stages', 'value'),
-    State('motility-run', 'value'),
-    State('conversion-run', 'value'),
-    State('conversion-scale-video', 'value'),
-    State('conversion-rescale-multiplier', 'value'),
-    State('segment-run', 'value'),
-    State('segmentation-wavelength', 'value'),
-    State('cell-profiler-run', 'value'),
-    State('cell-profiler-pipeline', 'value'),
-    State('diagnostics-dx', 'value'),
-    State('plate-name', 'value'),
-    State('store', 'value'),
-    State('well-selection-list', 'children'),
+    State('store', 'data'),
     State('preview-dropdown', 'value'),
     prevent_initial_call=True
 )
 def run_analysis(
     nclicks,
-    imagingmode,
-    filestructure,
-    multiwellrows,
-    multiwellcols,
-    multiwelldetection,
-    species,
-    stages,
-    motilityrun,
-    conversionrun,
-    conversionscalevideo,
-    conversionrescalemultiplier,
-    segmentrun,
-    wavelength,
-    cellprofilerrun,
-    cellprofilerpipeline,
-    diagnosticdx,
-    platename,
     store,
-    wells,
     selection
 ):
     volume = store['mount']
-    if nclicks:
+    platename = store['platename']
+    wells = store["wells"]
 
+    if nclicks:
         if wells == 'All':
             first_well = 'A01'
         else:
             first_well = wells[0]
-
-        config = prep_yaml(
-            imagingmode,
-            filestructure,
-            multiwellrows,
-            multiwellcols,
-            multiwelldetection,
-            species,
-            stages,
-            motilityrun,
-            conversionrun,
-            conversionscalevideo,
-            conversionrescalemultiplier,
-            segmentrun,
-            wavelength,
-            cellprofilerrun,
-            cellprofilerpipeline,
-            diagnosticdx,
-            wells
-        )
-
-        output_file = Path(volume, platename + '.yml')
-
-        # Dump preview data to YAML file
-        with open(output_file, 'w') as yaml_file:
-            yaml.dump(config, yaml_file,
-                      default_flow_style=False)
 
         client = docker.from_env()
         print(client)

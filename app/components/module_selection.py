@@ -15,7 +15,7 @@ module_selection = dbc.AccordionItem(
     [
         # Create separate tabs for video/image analysis
         dcc.Tabs(id="module-tabs", value="tab-modules", persistence=True,
-                    persistence_type='session', children=[
+                    persistence_type='memory', children=[
 
                         # Video analysis tab
                         dcc.Tab(label="Video Analysis", value='video-analysis-tab',  children=[
@@ -45,7 +45,7 @@ module_selection = dbc.AccordionItem(
                                 ],
                                 value="True",
                                 persistence=True,
-                                persistence_type='session'
+                                persistence_type='memory'
                             ),
                             html.Br(),
 
@@ -74,7 +74,7 @@ module_selection = dbc.AccordionItem(
                                 ],
                                 value="False",
                                 persistence=True,
-                                persistence_type='session'
+                                persistence_type='memory'
                             ),
                             html.Br(),
                             html.H6("Conversion Scale Video",
@@ -100,7 +100,7 @@ module_selection = dbc.AccordionItem(
                                 ],
                                 value="False",
                                 persistence=True,
-                                persistence_type='session'
+                                persistence_type='memory'
                             ),
                             html.H6("Conversion Rescale Multiplier"),
                             # Input of text for rescale multiplier
@@ -125,14 +125,14 @@ module_selection = dbc.AccordionItem(
                                 ],
                                 value="True",
                                 persistence=True,
-                                persistence_type='session'
+                                persistence_type='memory'
                             ),
                             html.H6("Wavelength"),
                             # Input of text for wavelength
                             dbc.Input(id="segmentation-wavelength",
                                       placeholder="Please insert the segmentation wavelength (please seperate multiple values by a comma):", type="text",
                                       persistence=True,
-                                      persistence_type='session')
+                                      persistence_type='memory')
                         ]),
 
                         # Image analysis tab
@@ -155,7 +155,7 @@ module_selection = dbc.AccordionItem(
                                 ],
                                 value="False",
                                 persistence=True,
-                                persistence_type='session'
+                                persistence_type='memory'
                             ),
                             html.H6("Cell Profiler Pipeline"),
                             # Radio buttons for cell profiler pipeline
@@ -175,7 +175,7 @@ module_selection = dbc.AccordionItem(
                                 ],
                                 value="wormsize_intensity_cellpose",
                                 persistence=True,
-                                persistence_type='session'
+                                persistence_type='memory'
                             )
                         ])]),
 
@@ -189,7 +189,7 @@ module_selection = dbc.AccordionItem(
                id='dx-symbol',
                style={'display': 'inline-block', 'width': '1.5%', 'height': '1.5%', 'padding-bottom': 10, 'padding-left': 5}),
 
-        dbc.Tooltip( # Tooltip element for information symbol, displays message when cursor over the symbol
+        dbc.Tooltip(  # Tooltip element for information symbol, displays message when cursor over the symbol
             "Generate and export diagnostic images (recommended).",
             target="dx-symbol"),
         html.H6("dx"),
@@ -206,7 +206,7 @@ module_selection = dbc.AccordionItem(
             ],
             value="True",
             persistence=True,
-            persistence_type='session'
+            persistence_type='memory'
         )
     ],
     id="module-selection",
