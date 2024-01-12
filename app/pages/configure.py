@@ -165,6 +165,9 @@ def update_wells(table_contents):  # list of cells from selection table
 
 @callback(
     Output('finalize-configure-button', 'color'),
+    Output("error-modal", 'is_open'),
+    Output('error-modal-content', 'children'),
+    Output('resolving-error-issue', 'children'),
     Input('finalize-configure-button', 'n_clicks'),
     State('imaging-mode', 'value'),
     State('file-structure', 'value'),
@@ -210,7 +213,11 @@ def run_analysis(
     wells,
 ):
     if nclicks:
-
+        
+        if platename is None:
+            return 'success', True, 'There is no plate name', 'Please enter a plate name'
+        if volume is None:
+            return 'success', True, "There is no volume", 'please enter a volume'
         if wells == 'All':
             first_well = 'A01'
         else:
@@ -243,4 +250,4 @@ def run_analysis(
             yaml.dump(config, yaml_file,
                       default_flow_style=False)
 
-        return 'success'
+        return 'success', False, None, None
