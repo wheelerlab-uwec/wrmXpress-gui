@@ -4,8 +4,18 @@
 ####                                                                ####
 ########################################################################
 import dash_bootstrap_components as dbc
-from dash import dcc, html
-import dash
+from dash import dcc, html, callback
+from dash.dependencies import Input, Output, State
+import docker
+import yaml
+import time
+from pathlib import Path
+import numpy as np
+import plotly.express as px
+from PIL import Image
+import os
+import plotly.graph_objs as go
+import dash 
 
 dash.register_page(__name__)
 
@@ -83,3 +93,57 @@ layout = dbc.ModalBody(
         )
     ],
 )
+
+########################################################################
+####                                                                ####
+####                           Callbacks                            ####
+####                                                                ####
+########################################################################
+
+@callback(
+    Output('image-analysis-preview', 'figure'),
+    Input('submit-analysis', 'n_clicks'),
+    State('store', 'data'),
+    prevent_initial_call=True
+)
+def run_analysis(
+    nclicks,
+    store
+):
+    volume = store['mount']
+    platename = store['platename']
+    wells = store["wells"]
+
+    if nclicks:
+        if wells == 'All':
+            first_well = 'A01'
+        else:
+            first_well = wells[0]
+
+        client = docker.from_env()
+        print(client)
+
+        command = f"python wrmXpress/wrapper.py {platename}.yml {platename}"
+        command_message = f"```python wrmXpress/wrapper.py {platename}.yml {platename}```"
+
+        container = client.containers.run('zamanianlab/wrmxpress', command=f"{command}", detach=True,
+                                          volumes={f'{volume}/input/': {'bind': '/input/', 'mode': 'rw'},
+                                                   f'{volume}/output/': {'bind': '/output/', 'mode': 'rw'},
+                                                   f'{volume}/work/': {'bind': '/work/', 'mode': 'rw'},
+                                                   f'{volume}/{platename}.yml': {'bind': f'/{platename}.yml', 'mode': 'rw'}
+                                                   })
+
+        # assumes IX-like file structure
+        img_path = Path(
+            volume, 'work', f'{platename}/{first_well}/img/{platename}_{first_well}.png')
+
+        while not os.path.exists(img_path):
+            time.sleep(1)
+
+        img = np.array(Image.open(img_path))
+        fig = px.imshow(img, color_continuous_scale="gray")
+        fig.update_layout(coloraxis_showscale=False)
+        fig.update_xaxes(showticklabels=False)
+        fig.update_yaxes(showticklabels=False)
+
+        return fig

@@ -196,30 +196,25 @@ def run_analysis(
         with open(full_yaml, 'r') as file:
             data = yaml.safe_load(file)
 
-        # creating temp yaml file name
-        temp_platename = f'{platename}_temp'
-        # creating temp yaml file path
-        temp_plate_path = Path(volume, temp_platename + '.yml')
-
         # assigning first well to the well value
         data['wells'] = [first_well]
 
         # Dump preview data to temp YAML file
-        with open(temp_plate_path, 'w') as yaml_file:
+        with open(full_yaml, 'w') as yaml_file:
             yaml.dump(data, yaml_file,
                     default_flow_style=False)
-            
+        print('created temp yaml file')  
         client = docker.from_env()
         print(client)
 
-        command = f"python wrmXpress/wrapper.py {temp_platename}.yml {platename}"
-        command_message = f"```python wrmXpress/wrapper.py {temp_platename}.yml {platename}```"
+        command = f"python wrmXpress/wrapper.py {platename}.yml {platename}"
+        command_message = f"```python wrmXpress/wrapper.py {platename}.yml {platename}```"
 
         container = client.containers.run('zamanianlab/wrmxpress', command=f"{command}", detach=True,
                                           volumes={f'{volume}/input/': {'bind': '/input/', 'mode': 'rw'},
                                                    f'{volume}/output/': {'bind': '/output/', 'mode': 'rw'},
                                                    f'{volume}/work/': {'bind': '/work/', 'mode': 'rw'},
-                                                   f'{volume}/{temp_platename}.yml': {'bind': f'/{temp_platename}.yml', 'mode': 'rw'}
+                                                   f'{volume}/{platename}.yml': {'bind': f'/{platename}.yml', 'mode': 'rw'}
                                                    })
 
         # assumes IX-like file structure
@@ -235,8 +230,26 @@ def run_analysis(
         fig.update_xaxes(showticklabels=False)
         fig.update_yaxes(showticklabels=False)
 
-        # remove temporary yaml file
-        os.remove(temp_plate_path)
+        # resaving actual yaml file
 
-        print('finished')
+        # reading in full yaml file
+        with open(full_yaml, 'r') as file:
+            data = yaml.safe_load(file)
+
+        if isinstance(wells, list):
+            if len(wells) == 96:
+                wells = ['All']
+            else:
+                wells = wells
+        elif isinstance(wells, str):
+            wells = [wells]
+        # assigning well to the full well values
+        data['wells'] = wells
+
+        # Dump preview data to YAML file
+        with open(full_yaml, 'w') as yaml_file:
+            yaml.dump(data, yaml_file,
+                    default_flow_style=False)
+            
+        print('resaved yaml file')
         return command_message, fig
