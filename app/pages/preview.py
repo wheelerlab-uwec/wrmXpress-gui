@@ -191,9 +191,11 @@ def run_analysis(
         else:
             first_well = wells[0]
 
+        full_yaml = Path(volume, platename + '.yml')
         # reading in yaml file
-        with open(platename, 'r') as file:
+        with open(full_yaml, 'r') as file:
             data = yaml.safe_load(file)
+
         # creating temp yaml file name
         temp_platename = f'{platename}_temp'
         # creating temp yaml file path
@@ -201,12 +203,12 @@ def run_analysis(
 
         # assigning first well to the well value
         data['wells'] = [first_well]
-        
+
         # Dump preview data to temp YAML file
         with open(temp_plate_path, 'w') as yaml_file:
             yaml.dump(data, yaml_file,
                     default_flow_style=False)
-
+            
         client = docker.from_env()
         print(client)
 
@@ -223,9 +225,6 @@ def run_analysis(
         # assumes IX-like file structure
         img_path = Path(
             volume, 'work', f'{platename}/{first_well}/img/{platename}_{first_well}_{selection}.png')
-        
-        # remove temporary yaml file
-        os.remove(temp_plate_path)
 
         while not os.path.exists(img_path):
             time.sleep(1)
@@ -235,4 +234,9 @@ def run_analysis(
         fig.update_layout(coloraxis_showscale=False)
         fig.update_xaxes(showticklabels=False)
         fig.update_yaxes(showticklabels=False)
+
+        # remove temporary yaml file
+        os.remove(temp_plate_path)
+
+        print('finished')
         return command_message, fig
