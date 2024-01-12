@@ -61,10 +61,14 @@ layout = dbc.ModalBody(
                                     html.Div(
                                         dcc.Graph(
                                             id='input-preview',
-                                            figure={'layout': layout}
+                                            figure={'layout': layout},
+                                            className='h-100 w-100'
                                         )),
                                     dbc.Button('Load first input image',
-                                               id='submit-val', className="d-grid gap-2 col-6 mx-auto", color="primary", n_clicks=0),
+                                               id='submit-val',
+                                               className="d-grid gap-2 col-6 mx-auto",
+                                               color="primary",
+                                               n_clicks=0),
                                 ]
                                 )
                             ),
@@ -87,7 +91,8 @@ layout = dbc.ModalBody(
                                         id='analysis-preview-message'),
                                     dcc.Graph(
                                         id='analysis-preview',
-                                        figure={'layout': layout}
+                                        figure={'layout': layout},
+                                        className='h-100 w-100'
                                     ),
                                     dbc.Button(
                                         "Preview analysis", id="preview-button", className="d-grid gap-2 col-6 mx-auto", color="primary", n_clicks=0),
