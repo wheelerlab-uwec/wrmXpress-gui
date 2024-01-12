@@ -18,9 +18,7 @@ from app.components.header import header
 ####                           Testing                              ####
 ####                                                                ####
 ########################################################################
-
-
-def test_002_worm_information(dash_duo):
+def test_005_metadata_checklist(dash_duo):
     #defining the app
     app = Dash(__name__,
                use_pages=True,
@@ -63,27 +61,43 @@ def test_002_worm_information(dash_duo):
                 children=[header, dash.page_container],
                 style=CONTENT_STYLE)])
 
-    #hosting the app
+    # hosting the app
     dash_duo.start_server(app)
 
     #Wait for the presence of the configure link
-    configure_link_xpath = '//a[@class="nav-link" and @href="/configure"]'
-    WebDriverWait(dash_duo.driver, 10).until(EC.presence_of_element_located((By.XPATH, configure_link_xpath)))
+    metadata_link_xpath = '//a[@class="nav-link" and @href="/metadata"]'
+    WebDriverWait(dash_duo.driver, 10).until(EC.presence_of_element_located((By.XPATH, metadata_link_xpath)))
 
     #clicking the link 
-    dash_duo.driver.find_element(by=By.XPATH, value=configure_link_xpath).click()
+    dash_duo.driver.find_element(by=By.XPATH, value=metadata_link_xpath).click()
 
-    # testing for imaging-mode
-    # id_list contains all known id's in the code
-    id_list = ['species', 'stages', 'worm-information', '_dbcprivate_radioitems_species_input_Bma', '_dbcprivate_radioitems_species_input_Cel',
-               '_dbcprivate_radioitems_species_input_Sma', '_dbcprivate_radioitems_stages_input_Mf', '_dbcprivate_radioitems_stages_input_Adult',
-               '_dbcprivate_radioitems_stages_input_Mixed']
-
-    # tests for the existacne of specfic elements within the html
-    for i in id_list:
-        s1 = '#'
-        new_string = s1+i
+    #list containing all known id's on the initial metadata page 
+    id_list_1 = [
+        'checklist-input', '_dbcprivate_checklist_checklist-input_input_Species', '_dbcprivate_checklist_checklist-input_input_Species',
+        '_dbcprivate_checklist_checklist-input_input_Strains', '_dbcprivate_checklist_checklist-input_input_Stages',
+        '_dbcprivate_checklist_checklist-input_input_Treatments', '_dbcprivate_checklist_checklist-input_input_Concentrations',
+        '_dbcprivate_checklist_checklist-input_input_Other', 'uneditable-input-box', 'finalize-metadata-table-button'
+        ]
+    
+    #testing for id's found in id_list_1
+    for element_id_1 in id_list_1:
+        css_selector = f'#{element_id_1}'
         wait = WebDriverWait(dash_duo._driver, 10)
-        element = wait.until(EC.presence_of_element_located(
-            (By.CSS_SELECTOR, new_string)))
-        assert element is not None, f"Element with id of '{i}' not found"
+        element = wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, css_selector)))
+        assert element is not None, f"Element with id of '{element_id_1}' not found"
+
+    # using selenium to find and click the Finalize Tables button
+    finalize_tables_button = dash_duo.driver.find_element(
+        by=By.ID, value="finalize-metadata-table-button")
+    finalize_tables_button.click()
+
+    id_list_2 = [
+        'Batch-tab-table', 'metadata-tabs'
+        ]
+    
+    #testing for id's found in id_list_1
+    for element_id_2 in id_list_2:
+        css_selector = f'#{element_id_2}'
+        wait = WebDriverWait(dash_duo._driver, 10)
+        element = wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, css_selector)))
+        assert element is not None, f"Element with id of '{element_id_2}' not found"
