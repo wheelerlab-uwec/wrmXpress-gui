@@ -24,6 +24,6 @@ dependencies:
   - webdriver-manager
   - pyyaml
   - yaml
-
-- pip:
+  
+  - pip:
     - dash[testing]
