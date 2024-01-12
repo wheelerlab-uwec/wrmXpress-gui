@@ -191,22 +191,41 @@ def run_analysis(
         else:
             first_well = wells[0]
 
+        # reading in yaml file
+        with open(platename, 'r') as file:
+            data = yaml.safe_load(file)
+        # creating temp yaml file name
+        temp_platename = f'{platename}_temp'
+        # creating temp yaml file path
+        temp_plate_path = Path(volume, temp_platename + '.yml')
+
+        # assigning first well to the well value
+        data['wells'] = [first_well]
+        
+        # Dump preview data to temp YAML file
+        with open(temp_plate_path, 'w') as yaml_file:
+            yaml.dump(data, yaml_file,
+                    default_flow_style=False)
+
         client = docker.from_env()
         print(client)
 
-        command = f"python wrmXpress/wrapper.py {platename}.yml {platename}"
-        command_message = f"```python wrmXpress/wrapper.py {platename}.yml {platename}```"
+        command = f"python wrmXpress/wrapper.py {temp_platename}.yml {temp_platename}"
+        command_message = f"```python wrmXpress/wrapper.py {temp_platename}.yml {temp_platename}```"
 
         container = client.containers.run('zamanianlab/wrmxpress', command=f"{command}", detach=True,
                                           volumes={f'{volume}/input/': {'bind': '/input/', 'mode': 'rw'},
                                                    f'{volume}/output/': {'bind': '/output/', 'mode': 'rw'},
                                                    f'{volume}/work/': {'bind': '/work/', 'mode': 'rw'},
-                                                   f'{volume}/{platename}.yml': {'bind': f'/{platename}.yml', 'mode': 'rw'}
+                                                   f'{volume}/{temp_platename}.yml': {'bind': f'/{temp_platename}.yml', 'mode': 'rw'}
                                                    })
 
         # assumes IX-like file structure
         img_path = Path(
             volume, 'work', f'{platename}/{first_well}/img/{platename}_{first_well}_{selection}.png')
+        
+        # remove temporary yaml file
+        os.remove(temp_plate_path)
 
         while not os.path.exists(img_path):
             time.sleep(1)
