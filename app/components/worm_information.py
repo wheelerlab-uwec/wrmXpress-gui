@@ -29,7 +29,7 @@ worm_information = dbc.AccordionItem(
             ],
             value="Bma",
             persistence=True,
-            persistence_type='session'
+            persistence_type='memory'
         ),
         html.H6("Stages:"),
         # Radio button items for stage information
@@ -46,7 +46,7 @@ worm_information = dbc.AccordionItem(
             ],
             value="Mf",
             persistence=True,
-            persistence_type='session'
+            persistence_type='memory'
         ),
     ],
     id="worm-information",

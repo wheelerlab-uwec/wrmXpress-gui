@@ -19,12 +19,12 @@ run_time_settings = dbc.AccordionItem(
         html.H6("Volume"),
         dbc.Input(
             id="mounted-volume", placeholder="Path to the mounted volume", type="text", persistence=True,
-            persistence_type='session'),
+            persistence_type='memory'),
         html.Br(),
         html.H6("Plate/Folder"),
         dbc.Input(
             id="plate-name", placeholder="Plate name", type="text", persistence=True,
-            persistence_type='session'),
+            persistence_type='memory'),
         html.Br(),
         html.H4("Wells"),
         html.P(
