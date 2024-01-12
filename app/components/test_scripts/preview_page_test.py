@@ -18,9 +18,7 @@ from app.components.header import header
 ####                           Testing                              ####
 ####                                                                ####
 ########################################################################
-
-
-def test_002_worm_information(dash_duo):
+def test_006_preview_page(dash_duo):
     #defining the app
     app = Dash(__name__,
                use_pages=True,
@@ -67,23 +65,20 @@ def test_002_worm_information(dash_duo):
     dash_duo.start_server(app)
 
     #Wait for the presence of the configure link
-    configure_link_xpath = '//a[@class="nav-link" and @href="/configure"]'
-    WebDriverWait(dash_duo.driver, 10).until(EC.presence_of_element_located((By.XPATH, configure_link_xpath)))
+    preview_link_xpath = '//a[@class="nav-link" and @href="/preview"]'
+    WebDriverWait(dash_duo.driver, 10).until(EC.presence_of_element_located((By.XPATH, preview_link_xpath)))
 
     #clicking the link 
-    dash_duo.driver.find_element(by=By.XPATH, value=configure_link_xpath).click()
+    dash_duo.driver.find_element(by=By.XPATH, value=preview_link_xpath).click()
 
-    # testing for imaging-mode
-    # id_list contains all known id's in the code
-    id_list = ['species', 'stages', 'worm-information', '_dbcprivate_radioitems_species_input_Bma', '_dbcprivate_radioitems_species_input_Cel',
-               '_dbcprivate_radioitems_species_input_Sma', '_dbcprivate_radioitems_stages_input_Mf', '_dbcprivate_radioitems_stages_input_Adult',
-               '_dbcprivate_radioitems_stages_input_Mixed']
-
-    # tests for the existacne of specfic elements within the html
-    for i in id_list:
-        s1 = '#'
-        new_string = s1+i
+    id_list = [
+        'input-path-output', 'input-preview', 'submit-val', 'preview-dropdown', 'analysis-preview-message',
+        'analysis-preview', 'preview-button', '_pages_dummy', 
+        ]
+    
+    #testing for each id
+    for element_id in id_list:
+        css_selector = f'#{element_id}'
         wait = WebDriverWait(dash_duo._driver, 10)
-        element = wait.until(EC.presence_of_element_located(
-            (By.CSS_SELECTOR, new_string)))
-        assert element is not None, f"Element with id of '{i}' not found"
+        element = wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, css_selector)))
+        assert element is not None, f"Element with id of '{element_id}' not found"
