@@ -164,10 +164,10 @@ def update_wells(table_contents):  # list of cells from selection table
 
 
 @callback(
-    Output('finalize-configure-button', 'color'),
+    [Output('finalize-configure-button', 'color'),
     Output("error-modal", 'is_open'),
     Output('error-modal-content', 'children'),
-    Output('resolving-error-issue', 'children'),
+    Output('resolving-error-issue', 'children')],
     Input('finalize-configure-button', 'n_clicks'),
     State('imaging-mode', 'value'),
     State('file-structure', 'value'),
@@ -213,9 +213,9 @@ def run_analysis(
     wells,
 ):
     if nclicks:
-        check_cases = [None, '']
+        check_cases = [None, '', '/']
         if platename in check_cases or volume in check_cases:
-            return 'success', True, 'There is no plate name', 'Please enter a plate name'
+            return 'success', True, '', ''
         
         if wells == 'All':
             first_well = 'A01'
