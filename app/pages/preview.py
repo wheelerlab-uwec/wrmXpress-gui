@@ -210,8 +210,8 @@ def run_analysis(
         client = docker.from_env()
         print(client)
 
-        command = f"python wrmXpress/wrapper.py {temp_platename}.yml {temp_platename}"
-        command_message = f"```python wrmXpress/wrapper.py {temp_platename}.yml {temp_platename}```"
+        command = f"python wrmXpress/wrapper.py {temp_platename}.yml {platename}"
+        command_message = f"```python wrmXpress/wrapper.py {temp_platename}.yml {platename}```"
 
         container = client.containers.run('zamanianlab/wrmxpress', command=f"{command}", detach=True,
                                           volumes={f'{volume}/input/': {'bind': '/input/', 'mode': 'rw'},
