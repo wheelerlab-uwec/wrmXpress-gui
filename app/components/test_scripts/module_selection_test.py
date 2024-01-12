@@ -75,8 +75,8 @@ def test_003_module_selection(dash_duo):
 
     # using selenium to find and click the module selection dropdown
     module_selection_dropdown = dash_duo.driver.find_element(
-        by=By.ID, value="module-selection")
-    module_selection_dropdown.click()
+        by=By.XPATH, value='//*[@id="module-selection"]/h2/button')
+    dash_duo.driver.execute_script("arguments[0].click()", module_selection_dropdown)
 
     # using selenium to find and click the "Video Analysis" tab
     video_analysis_option = dash_duo.driver.find_element(
