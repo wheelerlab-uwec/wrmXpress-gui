@@ -207,7 +207,6 @@ def run_analysis(
         # assumes IX-like file structure
         img_path = Path(
             volume, 'work', f'{platename}/{first_well}/img/{platename}_{first_well}_{selection}.png')
-        print(img_path)
 
         while not os.path.exists(img_path):
             time.sleep(1)
