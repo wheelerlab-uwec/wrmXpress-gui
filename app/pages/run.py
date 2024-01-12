@@ -115,11 +115,6 @@ def run_analysis(
     wells = store["wells"]
 
     if nclicks:
-        if wells == 'All':
-            first_well = 'A01'
-        else:
-            first_well = wells[0]
-
         client = docker.from_env()
         print(client)
 
@@ -132,10 +127,9 @@ def run_analysis(
                                                    f'{volume}/work/': {'bind': '/work/', 'mode': 'rw'},
                                                    f'{volume}/{platename}.yml': {'bind': f'/{platename}.yml', 'mode': 'rw'}
                                                    })
-
         # assumes IX-like file structure
         img_path = Path(
-            volume, 'work', f'{platename}/{first_well}/img/{platename}_{first_well}.png')
+            volume, 'output', 'thumbs', f'{platename}.png')
 
         while not os.path.exists(img_path):
             time.sleep(1)
