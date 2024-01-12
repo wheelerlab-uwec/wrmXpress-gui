@@ -213,11 +213,10 @@ def run_analysis(
     wells,
 ):
     if nclicks:
-        
-        if platename is None:
+        check_cases = [None, '']
+        if platename in check_cases or volume in check_cases:
             return 'success', True, 'There is no plate name', 'Please enter a plate name'
-        if volume is None:
-            return 'success', True, "There is no volume", 'please enter a volume'
+        
         if wells == 'All':
             first_well = 'A01'
         else:
