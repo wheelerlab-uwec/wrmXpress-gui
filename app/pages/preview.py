@@ -16,6 +16,7 @@ import plotly.express as px
 from PIL import Image
 from app.utils.callback_functions import prep_yaml
 import os
+import plotly.graph_objs as go
 
 dash.register_page(__name__)
 
@@ -24,6 +25,23 @@ dash.register_page(__name__)
 ####                              Layout                            ####
 ####                                                                ####
 ########################################################################
+layout = go.Layout(
+    xaxis=dict(
+        autorange=True,
+        showgrid=False,
+        ticks='',
+        zeroline=False,
+        showticklabels=False
+    ),
+    yaxis=dict(
+        autorange=True,
+        showgrid=False,
+        ticks='',
+        zeroline=False,
+        showticklabels=False
+    )
+)
+
 layout = dbc.ModalBody(
     [
         # Preview page contents
@@ -33,7 +51,8 @@ layout = dbc.ModalBody(
                         dbc.Col(
                             dbc.Card(
                                 dbc.CardBody([
-                                    html.H4("Input", className="text-center"),
+                                    html.H4("Input",
+                                            className="text-center mb-5"),
                                     html.Br(),
                                     html.H6(
                                         "Path:", className="card-subtitle"),
@@ -41,7 +60,8 @@ layout = dbc.ModalBody(
                                     dcc.Markdown(id='input-path-output'),
                                     html.Div(
                                         dcc.Graph(
-                                            id='input-preview'
+                                            id='input-preview',
+                                            figure={'layout': layout}
                                         )),
                                     dbc.Button('Load first input image',
                                                id='submit-val', className="d-grid gap-2 col-6 mx-auto", color="primary", n_clicks=0),
@@ -67,6 +87,7 @@ layout = dbc.ModalBody(
                                         id='analysis-preview-message'),
                                     dcc.Graph(
                                         id='analysis-preview',
+                                        figure={'layout': layout}
                                     ),
                                     dbc.Button(
                                         "Preview analysis", id="preview-button", className="d-grid gap-2 col-6 mx-auto", color="primary", n_clicks=0),
@@ -121,10 +142,13 @@ def update_preview_image(n_clicks, store):
 
 @callback(
     Output('preview-dropdown', 'options'),
-    Input('open-preview-modal', 'n_clicks'),
-    State('store', 'data')
+    # update the option dropdown when the previous load is clicked
+    Input('submit-val', 'n_clicks'),
+    State('store', 'data'),
+    prevent_initial_call=True
 )
 def get_options(nclicks, store):
+
     motility = store['motility']
     segment = store['segment']
     selection_dict = {'motility': 'motility', 'segment': 'binary'}
@@ -155,8 +179,8 @@ def run_analysis(
     volume = store['mount']
     platename = store['platename']
     wells = store["wells"]
-    if nclicks:
 
+    if nclicks:
         if wells == 'All':
             first_well = 'A01'
         else:
@@ -178,6 +202,7 @@ def run_analysis(
         # assumes IX-like file structure
         img_path = Path(
             volume, 'work', f'{platename}/{first_well}/img/{platename}_{first_well}_{selection}.png')
+        print(img_path)
 
         while not os.path.exists(img_path):
             time.sleep(1)
