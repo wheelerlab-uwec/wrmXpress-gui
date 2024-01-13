@@ -183,7 +183,8 @@ def update_wells(table_contents):  # list of cells from selection table
     State('plate-name', 'value'),
     State('mounted-volume', 'value'),
     State('well-selection-list', 'children'),
-    prevent_initial_call=True
+    prevent_initial_call=True,
+    allow_duplicate=True
 )
 def run_analysis(
     nclicks,
@@ -215,30 +216,35 @@ def run_analysis(
             Checking volume and plate names to ensure they are adequately named
             """
             check_cases = [None, '', '/']
-            if platename in check_cases or volume in check_cases:
-                return 'success', True, 'Please adequately name the Volume and Plate name'
+            if platename in check_cases: 
+                return 'success', True, "Platename is missing; please add a Platename."
+            if volume in check_cases:
+                return 'success', True, "Volume is missing; please add a Volume path."
 
             platename_parts = list(platename)
             if len(platename_parts) > 0:
                 platename_parts_start = platename_parts[0]
                 platename_parts_end = platename_parts[-1]
                 if platename_parts_start in check_cases or platename_parts_end in check_cases:
-                    return 'success', True,  'Please adequately name the plate'
+                    return 'success', True,  'Platename is inadequatly named; please add an adequate Platename'
             
             volume_parts=list(volume)
             if len(volume_parts)>0:
                 volume_parts = volume_parts[-1]
                 if volume_parts in check_cases:
-                    return "success", True, 'Please adequately name the volume'
+                    return "success", True, 'Volume is inadequatly named; please add an adequate Volume'
                 
             """
-            Checking to see if volume and plate names exist
+            Checking to see if volume, plate, and input directories exist
             """
+            input_path = Path(volume, 'input')
             platename_path = Path(volume, "input", platename)
             if not os.path.exists(volume):
-                return 'success', True, 'Please choose the accurate volume'
+                return 'success', True, 'Volume is invalid; please choose a valid Volume'
             if not os.path.exists(platename_path):
-                return 'success', True, 'Please choose the accurate platename'
+                return 'success', True, 'Platename is invalid; please choose a valid Platename'
+            if not os.path.exists(input_path):
+                return 'success', True, "No 'input' in the Volume directory; please ensure Volume contains 'input'"
             
             '''
             Checking to see if the wells selected exist
@@ -256,7 +262,7 @@ def run_analysis(
                 for i in range(2,3):
                     timept = Path(volume, 'input', f'{platename}/TimePoint_{i}')
                     if not os.path.exists(timept):
-                        return 'success', True, 'please ensure accurate selections'
+                        return 'success', True, 'Please ensure accurate selections of the configuration page'
 
             """
             Checking for conflicting modules
@@ -272,11 +278,6 @@ def run_analysis(
             return 'success', True, 'A ValueError occurred'
         except Exception as e:
             return 'success', True, f'An unexpected error occurred: {str(e)}'
-        
-        if wells == 'All':
-            first_well = 'A01'
-        else:
-            first_well = wells[0]
 
         config = prep_yaml(
             imagingmode,
