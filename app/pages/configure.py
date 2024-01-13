@@ -10,13 +10,8 @@ from dash.dependencies import Input, Output, State
 from app.utils.callback_functions import create_df_from_inputs
 from dash import dash_table
 import itertools
-import docker
 import yaml
-import time
 from pathlib import Path
-import numpy as np
-import plotly.express as px
-from PIL import Image
 from app.utils.callback_functions import prep_yaml
 import os
 
