@@ -25,6 +25,7 @@ from app.components.instrument_settings import instrument_settings
 from app.components.worm_information import worm_information
 from app.components.module_selection import module_selection
 from app.components.run_time_settings import run_time_settings
+from app.utils.callback_functions import eval_bool
 
 # Registering this page
 dash.register_page(__name__)
@@ -165,9 +166,9 @@ def update_wells(table_contents):  # list of cells from selection table
 
 @callback(
     [Output('finalize-configure-button', 'color'),
-    Output("error-modal", 'is_open'),
-    Output('error-modal-content', 'children'),
-    Output('resolving-error-issue', 'children')],
+     Output("error-modal", 'is_open'),
+     Output('error-modal-content', 'children'),
+     Output('resolving-error-issue', 'children')],
     Input('finalize-configure-button', 'n_clicks'),
     State('imaging-mode', 'value'),
     State('file-structure', 'value'),
@@ -213,9 +214,62 @@ def run_analysis(
     wells,
 ):
     if nclicks:
-        check_cases = [None, '', '/']
-        if platename in check_cases or volume in check_cases:
-            return 'success', True, '', ''
+
+        try:
+
+            """
+            Checking volume and plate names to ensure they are adequately named
+            """
+            check_cases = [None, '', '/']
+            if platename in check_cases or volume in check_cases:
+                return 'success', True, 'There is an inadequate Volume or Plate name', 'Please adequately name the Volume and Plate name'
+
+            platename_parts = list(platename)
+            if len(platename_parts) > 0:
+                platename_parts_start = platename_parts[0]
+                platename_parts_end = platename_parts[-1]
+                if platename_parts_start in check_cases or platename_parts_end in check_cases:
+                    return 'success', True, f'{platename} is an inadequate plate name', 'Please adequately name the plate'
+            
+            volume_parts=list(volume)
+            if len(volume_parts)>0:
+                volume_parts = volume_parts[-1]
+                if volume_parts in check_cases:
+                    return "success", True, f'{volume} is an inadequate volume name', 'Please adequately name the volume'
+                
+            """
+            Checking to see if volume and plate names exist
+            """
+            platename_path = Path(volume, "input", platename)
+            if not os.path.exists(volume):
+                return 'success', True, f'The directory {volume} does not exist', 'Please choose the accurate volume'
+            if not os.path.exists(platename_path):
+                return 'success', True, f'The directory {platename} does not exist', 'Please choose the accurate platename'
+            
+            '''
+            Checking to see if the wells selected exist
+            '''
+            plate_base = platename.split("_", 1)[0]
+            for well in wells:
+                img_path = Path(volume, 'input', f'{platename}/TimePoint_1/{plate_base}_{well}.TIF')
+                if not os.path.exists(img_path):
+                    return 'success', True, f'the selected well {well} does not exist', 'Please ensure you select onley the wells which you wish to analyze'
+
+            """
+            checking if video module is selected with only one time point
+            """
+            if eval_bool(cellprofilerrun)==True:
+                for i in range(2,3):
+                    timept = Path(volume, 'input', f'{platename}/TimePoint_{i}')
+                    if os.path.exists(timept):
+                        return 'success', True, "you cannot select cell prolfiler with more than one time point", 'please ensure accurate selections'
+
+
+
+        except ValueError:
+            return 'success', True, 'A ValueError occurred', ''
+        except Exception as e:
+            return 'success', True, f'An unexpected error occurred: {str(e)}', ''
         
         if wells == 'All':
             first_well = 'A01'

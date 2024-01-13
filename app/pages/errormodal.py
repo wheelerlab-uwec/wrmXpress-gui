@@ -16,9 +16,9 @@ from dash.dependencies import Input, Output, State
 
 error_content = dbc.ModalBody(
     [
-    dbc.Alert(id='error-modal-content', color = 'danger'),
-    dbc.Alert(id='resolving-error-issue', color = 'success'),
-]
+        dbc.Alert(id='error-modal-content', color='danger'),
+        dbc.Alert(id='resolving-error-issue', color='success'),
+    ]
 )
 
 
