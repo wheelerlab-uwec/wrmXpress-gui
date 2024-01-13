@@ -251,5 +251,4 @@ def run_analysis(
             yaml.dump(data, yaml_file,
                     default_flow_style=False)
             
-        print('resaved yaml file')
         return command_message, fig

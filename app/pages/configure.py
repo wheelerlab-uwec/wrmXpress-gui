@@ -261,15 +261,19 @@ def run_analysis(
             if eval_bool(cellprofilerrun)==True:
                 for i in range(2,3):
                     timept = Path(volume, 'input', f'{platename}/TimePoint_{i}')
-                    if os.path.exists(timept):
-                        return 'success', True, "you cannot select cell prolfiler with more than one time point", 'please ensure accurate selections'
+                    if not os.path.exists(timept):
+                        return 'success', True, "cannot select cell prolfiler with one time point", 'please ensure accurate selections'
 
             """
             Checking for conflicting modules
             """
-            if eval_bool(cellprofilerrun) ==True and eval_bool(motilityrun) == True:
-                return 'success', True, f'Conflicting selections of {cellprofilerrun} and {motilityrun}', 'please ensure accurate selections'
-            
+            if eval_bool(cellprofilerrun) ==True and eval_bool(segmentrun):
+                return 'success', True, f'Conflicting selections of Cell Profile Run: {cellprofilerrun} and Segment Run: {segmentrun}', 'please ensure accurate selections'
+  
+            if eval_bool(cellprofilerrun) ==True and eval_bool(motilityrun):
+                return 'success', True, f'Conflicting selections of Cell Profile Run: {cellprofilerrun} and Segment Run: {motilityrun}', 'please ensure accurate selections'
+  
+
         except ValueError:
             return 'success', True, 'A ValueError occurred', ''
         except Exception as e:
