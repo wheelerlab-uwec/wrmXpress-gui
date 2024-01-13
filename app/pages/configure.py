@@ -14,6 +14,7 @@ import yaml
 from pathlib import Path
 from app.utils.callback_functions import prep_yaml
 import os
+import time
 
 # Importing Components
 from app.components.instrument_settings import instrument_settings
@@ -161,8 +162,8 @@ def update_wells(table_contents):  # list of cells from selection table
 
 @callback(
     [Output('finalize-configure-button', 'color'),
-     Output("error-modal", 'is_open'),
-     Output('resolving-error-issue', 'children')],
+     Output("error-modal-configure", 'is_open'),
+     Output('resolving-error-issue-configure', 'children')],
     Input('finalize-configure-button', 'n_clicks'),
     State('imaging-mode', 'value'),
     State('file-structure', 'value'),
@@ -307,3 +308,4 @@ def run_analysis(
                       default_flow_style=False)
 
         return 'success', False, None
+    

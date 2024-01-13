@@ -171,6 +171,8 @@ def get_options(nclicks, store):
 @callback(
     Output('analysis-preview-message', 'children'),
     Output('analysis-preview', 'figure'),
+    Output('error-modal-preview', 'is_open'),
+    Output('resolving-error-issue-preview','children'),
     Input('preview-button', 'n_clicks'),
     State('store', 'data'),
     State('preview-dropdown', 'value'),
@@ -186,6 +188,25 @@ def run_analysis(
     wells = store["wells"]
 
     if nclicks:
+        """
+        Checking if wrmXpress container exists
+        """
+        try:
+            good_to_go = False
+            container_name = 'zamanianlab/wrmxpress'
+            client = docker.from_env()
+            images_in_docker = client.images.list()
+            for img in images_in_docker:
+                img = f"{img}"
+                image_info = img.strip()[8:-1].strip("'").split("', '")  # Remove angle brackets, quotes, and split
+                image_tag = image_info[-1]
+                if container_name in image_tag:
+                    good_to_go = True
+
+            if good_to_go == False:
+                return None, None, True, f'Please ensure that you have the container {container_name}'
+        except ValueError as ve:
+            return None, None, True, 'An error occured somewhere'
         if wells == 'All':
             first_well = 'A01'
         else:
@@ -203,8 +224,7 @@ def run_analysis(
         with open(full_yaml, 'w') as yaml_file:
             yaml.dump(data, yaml_file,
                     default_flow_style=False)
-        print('created temp yaml file')  
-        client = docker.from_env()
+
         print(client)
 
         command = f"python wrmXpress/wrapper.py {platename}.yml {platename}"
@@ -230,12 +250,6 @@ def run_analysis(
         fig.update_xaxes(showticklabels=False)
         fig.update_yaxes(showticklabels=False)
 
-        # resaving actual yaml file
-
-        # reading in full yaml file
-        with open(full_yaml, 'r') as file:
-            data = yaml.safe_load(file)
-
         if isinstance(wells, list):
             if len(wells) == 96:
                 wells = ['All']
@@ -251,4 +265,4 @@ def run_analysis(
             yaml.dump(data, yaml_file,
                     default_flow_style=False)
             
-        return command_message, fig
+        return command_message, fig, False, f''
