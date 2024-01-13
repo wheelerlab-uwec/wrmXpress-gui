@@ -13,7 +13,7 @@ from pathlib import Path
 # components
 from app.components.metadata_components import metadata_checklist
 
-# utilities
+# functions
 from app.utils.callback_functions import create_empty_df_from_inputs
 
 # registering dash page

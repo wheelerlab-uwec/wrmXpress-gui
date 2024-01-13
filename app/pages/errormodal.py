@@ -4,13 +4,10 @@
 ####                                                                ####
 ########################################################################
 import dash_bootstrap_components as dbc
-import dash
-from dash import dcc, html, callback
-from dash.dependencies import Input, Output, State
 
 ########################################################################
 ####                                                                ####
-####                              Layout                            ####
+####                              Content                           ####
 ####                                                                ####
 ########################################################################
 
@@ -20,7 +17,6 @@ error_content = dbc.ModalBody(
         dbc.Alert(id='resolving-error-issue', color='success'),
     ]
 )
-
 
 ########################################################################
 ####                                                                ####

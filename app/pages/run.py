@@ -7,14 +7,12 @@ import dash_bootstrap_components as dbc
 from dash import dcc, html, callback
 from dash.dependencies import Input, Output, State
 import docker
-import yaml
 import time
 from pathlib import Path
 import numpy as np
 import plotly.express as px
 from PIL import Image
 import os
-import plotly.graph_objs as go
 import dash 
 
 dash.register_page(__name__)
@@ -24,6 +22,7 @@ dash.register_page(__name__)
 ####                              Layout                            ####
 ####                                                                ####
 ########################################################################
+
 layout = dbc.ModalBody(
     [
         # Preview page contents
