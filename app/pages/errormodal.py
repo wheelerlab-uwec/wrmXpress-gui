@@ -13,7 +13,6 @@ import dash_bootstrap_components as dbc
 
 error_content = dbc.ModalBody(
     [
-        dbc.Alert(id='error-modal-content', color='danger'),
         dbc.Alert(id='resolving-error-issue', color='success'),
     ]
 )
