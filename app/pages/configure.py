@@ -256,7 +256,7 @@ def run_analysis(
                     return 'success', True, f'the selected well {well} does not exist', 'Please ensure you select onley the wells which you wish to analyze'
 
             """
-            checking if video module is selected with only one time point
+            Checking if video module is selected with only one time point
             """
             if eval_bool(cellprofilerrun)==True:
                 for i in range(2,3):
@@ -264,8 +264,12 @@ def run_analysis(
                     if os.path.exists(timept):
                         return 'success', True, "you cannot select cell prolfiler with more than one time point", 'please ensure accurate selections'
 
-
-
+            """
+            Checking for conflicting modules
+            """
+            if eval_bool(cellprofilerrun) ==True and eval_bool(motilityrun) == True:
+                return 'success', True, f'Conflicting selections of {cellprofilerrun} and {motilityrun}', 'please ensure accurate selections'
+            
         except ValueError:
             return 'success', True, 'A ValueError occurred', ''
         except Exception as e:
