@@ -113,6 +113,8 @@ layout = dbc.ModalBody(
 
 @callback(
     Output('image-analysis-preview', 'figure'),
+    Output('analysis-postview', 'figure'),
+    Output('analysis-postview-another', 'figure'),
     Input('submit-analysis', 'n_clicks'),
     State('store', 'data'),
     prevent_initial_call=True
@@ -124,7 +126,7 @@ def run_analysis(
     volume = store['mount']
     platename = store['platename']
     wells = store["wells"]
-
+    
     if nclicks:
         client = docker.from_env()
         print(client)
@@ -141,14 +143,37 @@ def run_analysis(
         # assumes IX-like file structure
         img_path = Path(
             volume, 'output', 'thumbs', f'{platename}.png')
+        
+        # directory path to the thumbs
+        file_path = Path(
+            volume, 'output', 'thumbs'
+        )
 
+        # ensures that the images have been processed 
         while not os.path.exists(img_path):
             time.sleep(1)
 
-        img = np.array(Image.open(img_path))
-        fig = px.imshow(img, color_continuous_scale="gray")
-        fig.update_layout(coloraxis_showscale=False)
-        fig.update_xaxes(showticklabels=False)
-        fig.update_yaxes(showticklabels=False)
+        # empty list of filepaths which will be added to later
+        files_with_png = []
 
-        return fig
+        # Iterate through all files and subdirectories
+        for root, dirs, files in os.walk(file_path):
+            for file in files:
+                if file.lower().endswith('.png'):  # Check if the file is a PNG file
+                    file_path = os.path.join(root, file)  # Get the full file path
+                    files_with_png.append(file_path)  # append the file path to the list
+
+        # empty list for the figures to be added to once they have been processed
+        figs = []
+
+        # iterating through each file path and getting the subsequent image
+        for i, file_path in enumerate(files_with_png):
+            img = np.array(Image.open(file_path))  # Open the image using PIL
+            fig = px.imshow(img, color_continuous_scale="gray")
+            fig.update_layout(coloraxis_showscale=False)
+            fig.update_xaxes(showticklabels=False)
+            fig.update_yaxes(showticklabels=False)
+            figs.append(fig) # appending this image to the list
+
+        # Return the figures as a tuple
+        return tuple(figs)
