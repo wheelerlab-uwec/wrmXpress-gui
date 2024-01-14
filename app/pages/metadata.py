@@ -3,6 +3,7 @@
 ####                             Imports                            ####
 ####                                                                ####
 ########################################################################
+
 import dash_bootstrap_components as dbc
 import dash
 from dash.dependencies import Input, Output, State
@@ -111,7 +112,6 @@ layout = dbc.Container(
 ####                             Callbacks                          ####
 ####                                                                ####
 ########################################################################
-
 
 @callback(
     [Output('metadata-tabs', 'children'),

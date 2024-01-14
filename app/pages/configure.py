@@ -3,6 +3,7 @@
 ####                             Imports                            ####
 ####                                                                ####
 ########################################################################
+
 import dash_bootstrap_components as dbc
 import dash
 from dash import callback, html
@@ -31,6 +32,7 @@ dash.register_page(__name__)
 ####                             Layout                             ####
 ####                                                                ####
 ########################################################################
+
 layout = dbc.Container([
     dbc.Accordion(
         [
@@ -44,6 +46,8 @@ layout = dbc.Container([
         always_open=True,
     ),
     html.Hr(),
+    dbc.Alert(id='resolving-error-issue-configure',is_open=False, color='success', duration = 6000),
+    html.Br(),
     dbc.Row(
         [
             dbc.Col(
@@ -61,12 +65,12 @@ layout = dbc.Container([
 ],
     style={"paddingTop": "80px"})  # Adjust the white space between tab and accordian elements
 
-
 ########################################################################
 ####                                                                ####
 ####                              Callback                          ####
 ####                                                                ####
 ########################################################################
+
 @callback(
     [Output('multi-well-options-row', 'style'),
      Output('additional-options-row', 'style')],
@@ -162,7 +166,7 @@ def update_wells(table_contents):  # list of cells from selection table
 
 @callback(
     [Output('finalize-configure-button', 'color'),
-     Output("error-modal-configure", 'is_open'),
+     Output("resolving-error-issue-configure", 'is_open'),
      Output('resolving-error-issue-configure', 'children')],
     Input('finalize-configure-button', 'n_clicks'),
     State('imaging-mode', 'value'),

@@ -3,13 +3,14 @@
 ####                             Imports                            ####
 ####                                                                ####
 ########################################################################
+
 import dash
 import dash_bootstrap_components as dbc
 from dash import Dash, html, dcc
 
 from app.utils.styling import SIDEBAR_STYLE, CONTENT_STYLE
 from app.components.header import header
-from app.pages.errormodal import error_modal_configure, error_modal_preview
+
 app = Dash(__name__,
            use_pages=True,
            pages_folder='app/pages',
@@ -17,7 +18,6 @@ app = Dash(__name__,
                dbc.themes.FLATLY,
                dbc.icons.FONT_AWESOME],
            suppress_callback_exceptions=True)
-
 
 ########################################################################
 ####                                                                ####
@@ -55,7 +55,7 @@ app.layout = html.Div([
     dcc.Store(id='store', data={}),
     sidebar,
     html.Div(id="page-content",
-             children=[header, dash.page_container, error_modal_configure, error_modal_preview],
+             children=[header, dash.page_container],
              style=CONTENT_STYLE)])
 
 ########################################################################

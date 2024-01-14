@@ -3,6 +3,7 @@
 ####                             Imports                            ####
 ####                                                                ####
 ########################################################################
+
 import dash_bootstrap_components as dbc
 from dash import html
 
@@ -11,6 +12,7 @@ from dash import html
 ####                              Layout                            ####
 ####                                                                ####
 ########################################################################
+
 # Worm Information accordian items
 worm_information = dbc.AccordionItem(
     [

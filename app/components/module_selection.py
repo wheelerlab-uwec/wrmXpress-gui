@@ -3,6 +3,7 @@
 ####                             Imports                            ####
 ####                                                                ####
 ########################################################################
+
 import dash_bootstrap_components as dbc
 from dash import dcc, html
 
@@ -11,6 +12,7 @@ from dash import dcc, html
 ####                              Layout                            ####
 ####                                                                ####
 ########################################################################
+
 module_selection = dbc.AccordionItem(
     [
         # Create separate tabs for video/image analysis

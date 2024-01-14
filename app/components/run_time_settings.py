@@ -3,6 +3,7 @@
 ####                             Imports                            ####
 ####                                                                ####
 ########################################################################
+
 from app.components.metadata_components import selection_table
 import dash_bootstrap_components as dbc
 from dash import html
@@ -12,6 +13,7 @@ from dash import html
 ####                              Layout                            ####
 ####                                                                ####
 ########################################################################
+
 # Run time accordian items for main page layout
 run_time_settings = dbc.AccordionItem(
     [

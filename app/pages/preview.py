@@ -3,6 +3,7 @@
 ####                             Imports                            ####
 ####                                                                ####
 ########################################################################
+
 import dash_bootstrap_components as dbc
 import dash
 from dash import dcc, html, callback
@@ -25,6 +26,7 @@ dash.register_page(__name__)
 ####                              Layout                            ####
 ####                                                                ####
 ########################################################################
+
 layout = go.Layout(
     xaxis=dict(
         autorange=True,
@@ -94,6 +96,7 @@ layout = dbc.ModalBody(
                                         figure={'layout': layout},
                                         className='h-100 w-100'
                                     ),
+                                    dbc.Alert(id='resolving-error-issue-preview',is_open=False, color='success', duration=6000),
                                     dbc.Button(
                                         "Preview analysis", id="preview-button", className="d-grid gap-2 col-6 mx-auto", color="primary", n_clicks=0),
                                 ]
@@ -114,7 +117,6 @@ layout = dbc.ModalBody(
 ####                           Callbacks                            ####
 ####                                                                ####
 ########################################################################
-
 
 @callback(
     Output('input-path-output', 'children'),
@@ -171,7 +173,7 @@ def get_options(nclicks, store):
 @callback(
     Output('analysis-preview-message', 'children'),
     Output('analysis-preview', 'figure'),
-    Output('error-modal-preview', 'is_open'),
+    Output('resolving-error-issue-preview', 'is_open'),
     Output('resolving-error-issue-preview','children'),
     Input('preview-button', 'n_clicks'),
     State('store', 'data'),
