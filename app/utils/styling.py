@@ -1,5 +1,13 @@
 ########################################################################
 ####                                                                ####
+####                             Imports                            ####
+####                                                                ####
+########################################################################
+
+import plotly.graph_objs as go
+
+########################################################################
+####                                                                ####
 ####                             Styling                            ####
 ####                                                                ####
 ########################################################################
@@ -23,3 +31,20 @@ CONTENT_STYLE = {
     "text-color": "#00205B", 
     'color':'#000000',
 }
+
+layout = go.Layout(
+    xaxis=dict(
+        autorange=True,
+        showgrid=False,
+        ticks='',
+        zeroline=False,
+        showticklabels=False
+    ),
+    yaxis=dict(
+        autorange=True,
+        showgrid=False,
+        ticks='',
+        zeroline=False,
+        showticklabels=False
+    )
+)

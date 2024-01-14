@@ -14,7 +14,11 @@ import numpy as np
 import plotly.express as px
 from PIL import Image
 import os
-import dash 
+import dash
+import plotly.graph_objs as go
+
+# importing utils
+from app.utils.styling import layout
 
 dash.register_page(__name__)
 
@@ -64,6 +68,8 @@ layout = dbc.ModalBody(
                                                id='submit-analysis', className="d-grid gap-2 col-6 mx-auto", color="primary", n_clicks=0),
                                     dcc.Graph(
                                         id='image-analysis-preview',
+                                        figure={'layout': layout},
+                                        className='h-100 w-100'
                                     ),
 
                                 ]
@@ -78,10 +84,14 @@ layout = dbc.ModalBody(
                                         "Run Diagnosis", className="text-center"),
                                     dcc.Graph(
                                         id='analysis-postview',
+                                        figure={'layout': layout},
+                                        className='h-100 w-100'
                                     ),
                                     html.Br(),
                                     dcc.Graph(
                                         id='analysis-postview-another',
+                                        figure={'layout': layout},
+                                        className='h-100 w-100'
                                     ),
                                 ]
                                 )
@@ -99,6 +109,7 @@ layout = dbc.ModalBody(
 ####                           Callbacks                            ####
 ####                                                                ####
 ########################################################################
+
 
 @callback(
     Output('image-analysis-preview', 'figure'),

@@ -19,6 +19,9 @@ from app.utils.callback_functions import prep_yaml
 import os
 import plotly.graph_objs as go
 
+# importing utils
+from app.utils.styling import layout
+
 dash.register_page(__name__)
 
 ########################################################################
@@ -26,23 +29,6 @@ dash.register_page(__name__)
 ####                              Layout                            ####
 ####                                                                ####
 ########################################################################
-
-layout = go.Layout(
-    xaxis=dict(
-        autorange=True,
-        showgrid=False,
-        ticks='',
-        zeroline=False,
-        showticklabels=False
-    ),
-    yaxis=dict(
-        autorange=True,
-        showgrid=False,
-        ticks='',
-        zeroline=False,
-        showticklabels=False
-    )
-)
 
 layout = dbc.ModalBody(
     [
