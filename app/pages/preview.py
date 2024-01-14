@@ -195,18 +195,20 @@ def run_analysis(
         """
         try:
             good_to_go = False
-            container_name = 'zamanianlab/wrmxpress'
+            check_for_names = ['zamanianlab/wrmxpress', 'latest']
             client = docker.from_env()
             images_in_docker = client.images.list()
             for img in images_in_docker:
                 img = f"{img}"
                 image_info = img.strip()[8:-1].strip("'").split("', '")  # Remove angle brackets, quotes, and split
                 image_tag = image_info[-1]
-                if container_name in image_tag:
+                if check_for_names[0] in image_tag:
+                    good_to_go = True
+                if check_for_names[1] in image_tag:
                     good_to_go = True
 
             if good_to_go == False:
-                return None, None, True, f'Please ensure that you have the container {container_name}'
+                return None, None, True, f'Please ensure that you have the Image "{check_for_names[0]}" and is the "{check_for_names[1]}" image.'
         except ValueError as ve:
             return None, None, True, 'An error occured somewhere'
         
