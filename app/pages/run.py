@@ -213,6 +213,5 @@ def run_analysis(
             fig.update_xaxes(showticklabels=False)
             fig.update_yaxes(showticklabels=False)
             figs.append(fig) # appending this image to the list
-        print('obtained figures')
         # Return the figures as a tuple
         return tuple(figs)
