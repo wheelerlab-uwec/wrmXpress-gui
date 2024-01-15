@@ -236,7 +236,13 @@ def run_analysis(
 
         # Run the docker logs command
         result = subprocess.run(['docker', 'logs', '-f', container_name], capture_output=True, text=True).stdout
-        
+
+        # Assuming `output` is the string containing the docker logs output
+        output_lines = result.splitlines()  # Split the output into lines
+
+        # Convert each line into an HTML paragraph element
+        result = [html.P(line, className="mb-0") for line in output_lines]
+
         # assumes IX-like file structure
         img_path = Path(
             volume, 'work', f'{platename}/{first_well}/img/{platename}_{first_well}_{selection}.png')
