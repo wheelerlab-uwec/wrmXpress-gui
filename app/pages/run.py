@@ -39,33 +39,35 @@ layout = dbc.ModalBody(
                                 dbc.CardBody([
                                     html.H4("Configure Summary",
                                             className="text-center"),
-                                    html.Br(),
-                                    html.H6(
-                                        "Imaging Mode:", className="card-subtitle"),
-                                    html.Br(),
-                                    html.H6(
-                                        'File Structure:', className='card-subtitle'),
-                                    html.Br(),
-                                    html.H6('Plate Format:',
+                                    dcc.Markdown(
+                                        id = 'img-mode-output', 
+                                        className="card-subtitle"),
+                                    dcc.Markdown( 
+                                        id = 'file-structure-output', 
+                                        className='card-subtitle'),
+                                    dcc.Markdown(
+                                            id = 'plate-format-output', 
                                             className='card-subtitle'),
-                                    html.Br(),
-                                    html.H6('Image Masking:',
+                                    dcc.Markdown(
+                                            id = 'img-masking-output', 
                                             className='card-subtitle'),
-                                    html.Br(),
-                                    html.H6('Module Selection:',
+                                    dcc.Markdown(
+                                            id = 'mod-selection-output', 
                                             className='card-subtitle'),
-                                    html.Br(),
-                                    html.H6(
-                                        'Volume:', className='card-subtitle'),
-                                    html.Br(),
-                                    html.H6('Plate Name:',
+                                    dcc.Markdown(
+                                        id = 'volume-name-output', 
+                                        className='card-subtitle'),
+                                    dcc.Markdown(
+                                            id = 'plate-name-output', 
                                             className='card-subtitle'),
-                                    html.Br(),
-                                    html.H6(
-                                        'Wells:', className='card-subtitle'),
-                                    html.Br(),
+                                    dcc.Markdown(
+                                        id = 'wells-content-output',  
+                                        className='card-subtitle'),
                                     dbc.Button('Begin Analysis',
-                                               id='submit-analysis', className="d-grid gap-2 col-6 mx-auto", color="primary", n_clicks=0),
+                                               id='submit-analysis', 
+                                               className="d-grid gap-2 col-6 mx-auto", 
+                                               color="primary", 
+                                               n_clicks=0),
                                     dcc.Graph(
                                         id='image-analysis-preview',
                                         figure={'layout': layout},
@@ -87,7 +89,6 @@ layout = dbc.ModalBody(
                                         figure={'layout': layout},
                                         className='h-100 w-100'
                                     ),
-                                    html.Br(),
                                     dcc.Graph(
                                         id='analysis-postview-another',
                                         figure={'layout': layout},
@@ -110,6 +111,44 @@ layout = dbc.ModalBody(
 ####                                                                ####
 ########################################################################
 
+@callback(
+    Output("img-mode-output" , 'children'),
+    Output('file-structure-output', 'children'),
+    Output('plate-format-output', 'children'),
+    Output('img-masking-output',  'children'),
+    Output('mod-selection-output', 'children'),
+    Output('volume-name-output', 'children'),
+    Output('plate-name-output',  'children'),
+    Output('wells-content-output',  'children'),
+    Input('submit-analysis', 'n_clicks'),
+    State('store', 'data'),
+    prevent_initial_call=True,
+    allow_duplicate = True
+)
+def update_results_message_for_run_page(
+    nclicks, 
+    store
+):
+    img_mode =f'Imaging Mode: True'
+    file_structure = f'File Structure: True'
+    plate_format = f'Plate Format: True'
+    img_masking = f'Image Masking: True'
+    mod_selection = f'Module Selection: True'
+    volume = f'Volume: {store["mount"]}'
+    platename = f'Platenmae: {store["platename"]}'
+    wells = f'Wells: {store["wells"]}'
+    results = [
+        img_mode, 
+        file_structure, 
+        plate_format, 
+        img_masking,
+        mod_selection,
+        volume,
+        platename,
+        wells
+    ]
+    if nclicks:
+        return results
 
 @callback(
     Output('image-analysis-preview', 'figure'),
@@ -174,6 +213,6 @@ def run_analysis(
             fig.update_xaxes(showticklabels=False)
             fig.update_yaxes(showticklabels=False)
             figs.append(fig) # appending this image to the list
-
+        print('obtained figures')
         # Return the figures as a tuple
         return tuple(figs)
