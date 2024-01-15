@@ -55,7 +55,7 @@ layout = dbc.Container([
                     "Finalize Configure",
                     id="finalize-configure-button",
                     className="flex",
-                    color='success'
+                    color='info'
                 ),
                 width="auto"
             ),
@@ -295,16 +295,19 @@ def run_analysis(
                 Checking to see if the wells selected exist
                 '''
                 
-                # obtaining the plate base name
                 plate_base = platename.split("_", 1)[0]
-                well_fail = False #iterating through until well does not exist, then loop will be exited
-                for well in list(wells):
-                    while well_fail == False:
-                        img_path = Path(volume, 'input', f'{platename}/TimePoint_1/{plate_base}_{well}.TIF')
-                        if not os.path.exists(img_path):
-                            error_occured = True
-                            error_messages.append('You have selected more wells than you have images. Please ensure you select onley the wells which you wish to analyze. ')
-                            well_fail = True
+                well_fail = False  # Initializing the flag
+                index = 0  # Initializing the index for iteration
+
+                while not well_fail and index < len(wells):
+                    well = wells[index]
+                    img_path = Path(volume, 'input', f'{platename}/TimePoint_1/{plate_base}_{well}.TIF')
+                    if not os.path.exists(img_path):
+                        error_occured = True
+                        error_messages.append('You have selected more wells than you have images. Please ensure you select only the wells which you wish to analyze.')
+                        well_fail = True  # Set the flag to True to exit the loop
+                    index += 1  # Increment the index for the next iteration
+
 
                 """
                 Checking if video module is selected with only one time point
@@ -344,7 +347,6 @@ def run_analysis(
             return 'danger', True, 'A ValueError occurred'
         except Exception as e:
             return 'danger', True, f'An unexpected error occurred: {str(e)}'
-
         config = prep_yaml(
             imagingmode,
             filestructure,
@@ -371,6 +373,5 @@ def run_analysis(
         with open(output_file, 'w') as yaml_file:
             yaml.dump(config, yaml_file,
                       default_flow_style=False)
-
         return 'success', False, ''
     
