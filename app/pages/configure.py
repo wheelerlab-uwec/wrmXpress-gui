@@ -100,9 +100,23 @@ def update_options_visibility(imaging_mode, file_structure):
     Input('well-selection-list', 'children'),
     Input('motility-run', 'value'),
     Input('segment-run', 'value'),
-    Input('well-selection-list', 'children')
+    Input('well-selection-list', 'children'),
+    Input('imaging-mode', 'value'),
+    Input("file-structure", 'value'),
+    Input("circ-or-square-img-masking", 'value')
 )
-def rows_cols(cols, rows, mounter, platename, well_selection, motility, segment, wells):
+def rows_cols(cols, 
+              rows, 
+              mounter, 
+              platename, 
+              well_selection, 
+              motility, 
+              segment, 
+              wells,
+              imgaging_mode,
+              file_sturcture,
+              img_masking
+              ):
     return {'cols': cols,
             'rows': rows,
             'mount': mounter,
@@ -110,7 +124,10 @@ def rows_cols(cols, rows, mounter, platename, well_selection, motility, segment,
             'wells': well_selection,
             'motility': motility,
             'segment': segment,
-            'wells': wells
+            'wells': wells,
+            'img_mode': imgaging_mode,
+            'file_structure': file_sturcture,
+            'img_masking': img_masking
             }
 
 

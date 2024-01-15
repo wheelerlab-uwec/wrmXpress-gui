@@ -129,11 +129,11 @@ def update_results_message_for_run_page(
     nclicks, 
     store
 ):
-    img_mode =f'Imaging Mode: True'
-    file_structure = f'File Structure: True'
-    plate_format = f'Plate Format: True'
-    img_masking = f'Image Masking: True'
-    mod_selection = f'Module Selection: True'
+    img_mode =f'Imaging Mode: {store["img_mode"]}'
+    file_structure = f'File Structure: {store["file_structure"]}'
+    plate_format = f'Plate Format: Rows = {store["rows"]}, Cols = {store["cols"]}'
+    img_masking = f'Image Masking: {store["img_masking"]}'
+    mod_selection = f'Module Selection: {store["motility"]}'
     volume = f'Volume: {store["mount"]}'
     platename = f'Platenmae: {store["platename"]}'
     wells = f'Wells: {store["wells"]}'
