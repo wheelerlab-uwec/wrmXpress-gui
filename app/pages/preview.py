@@ -18,6 +18,7 @@ from PIL import Image
 from app.utils.callback_functions import prep_yaml
 import os
 import plotly.graph_objs as go
+import subprocess
 
 # importing utils
 from app.utils.styling import layout
@@ -85,6 +86,7 @@ layout = dbc.ModalBody(
                                     dbc.Alert(id='resolving-error-issue-preview',is_open=False, color='success', duration=6000),
                                     dbc.Button(
                                         "Preview analysis", id="preview-button", className="d-grid gap-2 col-6 mx-auto", color="primary", n_clicks=0),
+                                    dbc.Alert(id='view-docker-logs',is_open=False, color='success', duration=30000),
                                 ]
                                 )
                             ),
@@ -161,6 +163,8 @@ def get_options(nclicks, store):
     Output('analysis-preview', 'figure'),
     Output('resolving-error-issue-preview', 'is_open'),
     Output('resolving-error-issue-preview','children'),
+    Output("view-docker-logs", 'is_open'),
+    Output("view-docker-logs", 'children'),
     Input('preview-button', 'n_clicks'),
     State('store', 'data'),
     State('preview-dropdown', 'value'),
@@ -194,9 +198,9 @@ def run_analysis(
                     good_to_go = True
 
             if good_to_go == False:
-                return None, None, True, f'Please ensure that you have the Image "{check_for_names[0]}" and is the "{check_for_names[1]}" image.'
+                return None, None, True, f'Please ensure that you have the Image "{check_for_names[0]}" and is the "{check_for_names[1]}" image.', False, ''
         except ValueError as ve:
-            return None, None, True, 'An error occured somewhere'
+            return None, None, True, 'An error occured somewhere', False, ''
         
         if wells == 'All':
             first_well = 'A01'
@@ -227,7 +231,12 @@ def run_analysis(
                                                    f'{volume}/work/': {'bind': '/work/', 'mode': 'rw'},
                                                    f'{volume}/{platename}.yml': {'bind': f'/{platename}.yml', 'mode': 'rw'}
                                                    })
+        # Get the name of the most recent container
+        container_name = container.name
 
+        # Run the docker logs command
+        result = subprocess.run(['docker', 'logs', '-f', container_name], capture_output=True, text=True).stdout
+        
         # assumes IX-like file structure
         img_path = Path(
             volume, 'work', f'{platename}/{first_well}/img/{platename}_{first_well}_{selection}.png')
@@ -256,4 +265,4 @@ def run_analysis(
             yaml.dump(data, yaml_file,
                     default_flow_style=False)
             
-        return command_message, fig, False, f''
+        return command_message, fig, False, f'', True, result
