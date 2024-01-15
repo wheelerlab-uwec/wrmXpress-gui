@@ -16,7 +16,7 @@ from dash import dcc, html
 module_selection = dbc.AccordionItem(
     [
         # Create separate tabs for video/image analysis
-        dcc.Tabs(id="module-tabs", value="tab-modules", persistence=True,
+        dcc.Tabs(id="module-tabs", value="video-analysis-tab", persistence=True,
                     persistence_type='memory', children=[
 
                         # Video analysis tab

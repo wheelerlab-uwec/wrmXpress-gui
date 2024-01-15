@@ -80,7 +80,7 @@ instrument_settings = dbc.AccordionItem([
                            ),
 
                     dbc.Tooltip(  # Tooltip element for information symbol, displays message when cursor over the symbol
-                        "Use if each well had multiple sites imaged. Enter the number of x and y sites per well",
+                        "Use if each well had multiple sites imaged. Enter the number of x and y sites per well. If none provided, defaults to 1.",
                         placement="bottom",
                         target="multi-site-imaging-mode-info-symbol"
                     )
@@ -91,7 +91,7 @@ instrument_settings = dbc.AccordionItem([
             dbc.Col(
                 dbc.Input(
                     id="multi-site-well-cols",
-                    placeholder="X-sites",
+                    placeholder="X-sites = 1",
                     type="number",
                     persistence=True,
                     persistence_type='memory'
@@ -102,7 +102,7 @@ instrument_settings = dbc.AccordionItem([
             dbc.Col(
                 dbc.Input(
                     id="multi-site-num-rows",
-                    placeholder="Y-sites",
+                    placeholder="Y-sites = 1",
                     type="number",
                     persistence=True,
                     persistence_type='memory'
@@ -191,7 +191,7 @@ instrument_settings = dbc.AccordionItem([
                            id="tot-num-cols-and-rows-symbol"
                            ),
                     dbc.Tooltip(
-                        "Input the total number of rows and columns in the plate.",
+                        "Input the total number of rows and columns in the plate. If none provided, defaults to 12 columns and 8 rows",
                         placement="bottom",
                         target="tot-num-cols-and-rows-symbol"
                     )
@@ -202,7 +202,7 @@ instrument_settings = dbc.AccordionItem([
             dbc.Col(
                 dbc.Input(
                     id="total-well-cols",
-                    placeholder="Number of columns",
+                    placeholder="Columns = 12",
                     type="number",
                     persistence=True,
                     persistence_type='memory'
@@ -213,7 +213,7 @@ instrument_settings = dbc.AccordionItem([
             dbc.Col(
                 dbc.Input(
                     id="total-num-rows",
-                    placeholder="Number of rows",
+                    placeholder="Rows = 8",
                     type="number",
                     persistence=True,
                     persistence_type='memory'

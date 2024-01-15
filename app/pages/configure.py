@@ -46,7 +46,8 @@ layout = dbc.Container([
         always_open=True,
     ),
     html.Hr(),
-    dbc.Alert(id='resolving-error-issue-configure',is_open=False, color='danger', duration = 6000),
+    dbc.Alert(id='resolving-error-issue-configure',
+              is_open=False, color='danger', duration=6000),
     html.Br(),
     dbc.Row(
         [
@@ -70,6 +71,7 @@ layout = dbc.Container([
 ####                              Callback                          ####
 ####                                                                ####
 ########################################################################
+
 
 @callback(
     [Output('multi-well-options-row', 'style'),
@@ -216,86 +218,92 @@ def run_analysis(
     if nclicks:
 
         try:
-            error_messages = ["While finalizing the configuration, the following errors were found:"]
+            error_messages = [
+                "While finalizing the configuration, the following errors were found:"]
             error_occured = False
-            """
-            Checking volume and plate names to ensure they are adequately named
-            """
+
+            # Check volume and plate/folder names
             check_cases = [None, '', '/']
-            if platename in check_cases: 
+            if platename in check_cases:
                 error_occured = True
-                error_messages.append("Platename is missing; please add a Platename. ")
+                error_messages.append("Plate/Folder name is missing.")
             if volume in check_cases:
                 error_occured = True
-                error_messages.append("Volume is missing; please add a Volume path. ")
-            
-            if volume not in check_cases and platename not in check_cases: # ensuring that platename and volume contains characters
+                error_messages.append("Volume path is missing. ")
+
+            # Ensure that platename and volume contains characters
+            if volume not in check_cases and platename not in check_cases:
                 platename_parts = list(platename)
                 if len(platename_parts) > 0:
                     platename_parts_start = platename_parts[0]
                     platename_parts_end = platename_parts[-1]
                     if platename_parts_start in check_cases or platename_parts_end in check_cases:
                         error_occured = True
-                        error_messages.append('Platename is inadequatly named; please add an adequate Platename. ')
-                
-                volume_parts=list(volume)
-                if len(volume_parts)>0:
+                        error_messages.append(
+                            'Platename is inadequatly named; please add an adequate Platename. ')
+
+                volume_parts = list(volume)
+                if len(volume_parts) > 0:
                     volume_parts = volume_parts[-1]
                     if volume_parts in check_cases:
                         error_occured = True
-                        error_messages.append('Volume is inadequatly named; please add an adequate Volume. ')
-                
-                """
-                Checking to see if volume, plate, and input directories exist
-                """
+                        error_messages.append(
+                            'Volume is inadequatly named; please add an adequate Volume. ')
+
+                # Check to see if volume, plate, and input directories exist
                 input_path = Path(volume, 'input')
                 platename_path = Path(volume, "input", platename)
                 if not os.path.exists(volume):
                     error_occured = True
-                    error_messages.append('Volume is invalid; please choose a valid Volume. ')
+                    error_messages.append(
+                        'Volume is invalid; please choose a valid Volume. ')
                 if not os.path.exists(platename_path):
                     error_occured = True
-                    error_messages.append('Platename is invalid; please choose a valid Platename. ')
+                    error_messages.append(
+                        'Platename is invalid; please choose a valid Platename. ')
                 if not os.path.exists(input_path):
                     error_occured = True
-                    error_messages("No 'input' in the Volume directory; please ensure Volume contains 'input'. ")
-            
-                '''
-                Checking to see if the wells selected exist
-                '''
+                    error_messages(
+                        "No 'input' in the Volume directory; please ensure Volume contains 'input'.")
+
+                # Check to see if the wells selected exist
                 plate_base = platename.split("_", 1)[0]
                 for well in wells:
-                    img_path = Path(volume, 'input', f'{platename}/TimePoint_1/{plate_base}_{well}.TIF')
+                    img_path = Path(
+                        volume, 'input', f'{platename}/TimePoint_1/{plate_base}_{well}.TIF')
                     if not os.path.exists(img_path):
                         error_occured = True
-                        error_messages.append('You have selected more wells than you have images. Please ensure you select onley the wells which you wish to analyze. ')
+                        error_messages.append(
+                            f'The path {img_path} to well {well} does not exist.')
 
-                """
-                Checking if video module is selected with only one time point
-                """
-                if eval_bool(cellprofilerrun)==True:
-                    for i in range(2,3):
-                        timept = Path(volume, 'input', f'{platename}/TimePoint_{i}')
+                # Check if video module is selected with only one time point
+                if eval_bool(cellprofilerrun) == True:
+                    for i in range(2, 3):
+                        timept = Path(volume, 'input',
+                                      f'{platename}/TimePoint_{i}')
                         if not os.path.exists(timept):
                             error_occured = True
-                            error_messages.append('You have selected cell profiler while having multiple time points, please ensure accurate selections. ')
+                            error_messages.append(
+                                'You have selected cell profiler while having multiple time points, please ensure accurate selections. ')
 
-            """
-            Checking for conflicting modules
-            """
-            if eval_bool(cellprofilerrun) ==True and eval_bool(segmentrun):
+            # Check for conflicting modules
+            if eval_bool(cellprofilerrun) == True and eval_bool(segmentrun):
                 error_occured = True
-                error_messages.append('Cannot run Cellprofiler and Segment together.')
-  
-            if eval_bool(cellprofilerrun) ==True and eval_bool(motilityrun):
+                error_messages.append(
+                    'Cannot run Cellprofiler and Segment together.')
+
+            if eval_bool(cellprofilerrun) == True and eval_bool(motilityrun):
                 error_occured = True
-                error_messages.append('Cannot run Cellprofiler and Motility together.')
+                error_messages.append(
+                    'Cannot run Cellprofiler and Motility together.')
 
             if error_occured == True:
-                error_messages[0] = html.H4(f'{error_messages[0]}', className='alert-heading')
+                error_messages[0] = html.H4(
+                    f'{error_messages[0]}', className='alert-heading')
                 # Format the error messages
-                for i in range(1,len(error_messages)):
-                    error_messages[i] = html.P(f'{i}. {error_messages[i]}', className="mb-0")
+                for i in range(1, len(error_messages)):
+                    error_messages[i] = html.P(
+                        f'{i}. {error_messages[i]}', className="mb-0")
 
                 return 'success', True, error_messages
 
@@ -332,4 +340,3 @@ def run_analysis(
                       default_flow_style=False)
 
         return 'success', False, None
-    
