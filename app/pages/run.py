@@ -165,8 +165,31 @@ def run_analysis(
     volume = store['mount']
     platename = store['platename']
     wells = store["wells"]
-    
+
     if nclicks:
+
+        """
+        Checking if input folder exists, and if not, create it, 
+        then subsequently copy the images into this folder
+        """
+        # input and platename input folder paths
+        input_folder = Path(volume, 'input')
+        platename_input_folder = Path(input_folder, platename)
+
+        # if the input folder does not exist, create it
+        if not os.path.exists(input_folder):
+            os.makedirs(input_folder)
+            os.system(f'cp -r {Path(volume, platename)} {input_folder}')
+
+        # if the input folder exists, but the platename folder does not exist, create it    
+        if os.path.exists(input_folder):
+            if not os.path.exists(platename_input_folder):
+                os.system(f'cp -r {Path(volume, platename)} {input_folder}')
+
+            # if the input folder exists, and the platename folder exists, replace the platename folder with the input folder
+            if os.path.exists(platename_input_folder):
+                os.system(f'cp -rf {Path(volume, platename)} {input_folder}')
+
         client = docker.from_env()
         print(client)
 
