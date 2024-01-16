@@ -215,66 +215,104 @@ def run_analysis(
         # input and platename input folder paths
         input_folder = Path(volume, 'input')
         platename_input_folder = Path(input_folder, platename)
-        time_pt_1_folder = Path(platename_input_folder, 'TimePoint_1')
-        # if the input folder does not exist, create it
+        
+        # collecting the time point folders
+        folder_containing_img = Path(volume, platename)
+        timept_list_dirs = os.listdir(folder_containing_img)
+        folders = [item for item in timept_list_dirs if os.path.isdir(os.path.join(folder_containing_img, item))]
+        print(folders)
+
+        # if input folder does not exists
         if not os.path.exists(input_folder):
-            os.makedirs(input_folder)
-            os.makedirs(platename_input_folder)
-            os.makedirs(time_pt_1_folder)
-            # first well img path 
-            first_well_img_path = Path(
-                volume, f'{platename}/TimePoint_1/{plate_base}_{first_well}.TIF')
-            # platename htd file path
-            platename_htd_file = Path(
-                volume, platename, plate_base + '.HTD')
-            os.system(f'cp {first_well_img_path} {platename_input_folder}')
-            os.system(f'cp {platename_htd_file} {platename_input_folder}')
 
-        # if the input folder exists, but the platename folder does not exist, create it    
+            # create input folder and platename input folder
+            os.mkdir(input_folder)
+            os.mkdir(platename_input_folder)
+
+            # HTD file path
+            htd_file_path = f'{Path(folder_containing_img)}/{plate_base}.HTD'
+            
+            #copying the .htd file into the platename folder
+            os.system(f'cp {htd_file_path} {platename_input_folder}')
+
+            # iterating through each of the time points
+            for folder in folders:
+
+                # creating the time point folder
+                os.mkdir(Path(platename_input_folder, folder))
+
+                # first well file path
+                first_well_path = f'{Path(folder_containing_img, folder, plate_base)}_{first_well}.TIF'
+
+                # coping the images into the newly created time point folder
+                os.system(f'cp {first_well_path} {Path(platename_input_folder, folder)}')
+
+        # if the input folder exists
         if os.path.exists(input_folder):
+
+            # if the platename input folder does not exist
             if not os.path.exists(platename_input_folder):
-                os.makedirs(platename_input_folder)
-                os.makedirs(time_pt_1_folder)
-                # assumes IX-like file structure
-                first_well_img_path = Path(
-                    volume, f'{platename}/TimePoint_1/{plate_base}_{first_well}.TIF')
-                # platename htd file path
-                platename_htd_file = Path(
-                    volume, platename, plate_base + '.HTD')
-                os.system(f'cp {first_well_img_path} {platename_input_folder}')
-                os.system(f'cp {platename_htd_file} {platename_input_folder}')
 
-            # if the input folder exists, and the platename folder exists, but the first well image does not exist, copy it
+                # create platename input folder
+                os.mkdir(platename_input_folder)
+
+                # HTD file path
+                htd_file_path = f'{Path(folder_containing_img)}/{plate_base}.HTD'
+
+                #copying the .htd file into the platename folder
+                os.system(f'cp {htd_file_path} {platename_input_folder}')
+
+                # iterating through each of the time points
+                for folder in folders:
+
+                    # creating the time point folder
+                    os.mkdir(Path(platename_input_folder, folder))
+
+                    # first well file path
+                    first_well_path = f'{Path(folder_containing_img, folder, plate_base)}_{first_well}.TIF'
+                    
+                    # coping the images into the newly created time point folder
+                    os.system(f'cp {first_well_path} {Path(platename_input_folder, folder)}')
+
+            # if the platename input folder exists
             if os.path.exists(platename_input_folder):
-                if not os.path.exists(time_pt_1_folder):
-                    os.makedirs(time_pt_1_folder)
-                    first_well_img_path = Path(
-                        volume, f'{platename}/TimePoint_1/{plate_base}_{first_well}.TIF')
-                    # platename htd file path
-                    platename_htd_file = Path(
-                        volume, platename, plate_base + '.HTD')
-                    
-                    # if the first well image does not exist, copy it
-                    if not os.path.exists(first_well_img_path):
-                        os.system(f'cp {first_well_img_path} {platename_input_folder}')
 
-                    # if the platename htd file does not exist, copy it
-                    if not os.path.exists(platename_htd_file):
-                        os.system(f'cp {platename_htd_file} {platename_input_folder}')
-                if os.path.exists(time_pt_1_folder):
-                    first_well_img_path = Path(
-                        volume, f'{platename}/TimePoint_1/{plate_base}_{first_well}.TIF')
-                    # platename htd file path
-                    platename_htd_file = Path(
-                        volume, platename, plate_base + '.HTD')
-                    
-                    # if the first well image does not exist, copy it
-                    if not os.path.exists(first_well_img_path):
-                        os.system(f'cp {first_well_img_path} {platename_input_folder}')
+                # HTD file path
+                htd_file_path = f'{Path(folder_containing_img)}/{plate_base}.HTD'
 
-                    # if the platename htd file does not exist, copy it
-                    if not os.path.exists(platename_htd_file):
-                        os.system(f'cp {platename_htd_file} {platename_input_folder}')
+                # if the .htd file does not exist
+                if not os.path.exists(htd_file_path):
+
+                    # copy the .htd file into the platename folder
+                    os.system(f'cp {htd_file_path} {platename_input_folder}')
+
+                # iterating through each of the time points
+                for folder in folders:
+
+                    # if the time point folder does not exist
+                    if not os.path.exists(Path(platename_input_folder, folder)):
+    
+                        # create the time point folder
+                        os.mkdir(Path(platename_input_folder, folder))
+    
+                        # first well file path
+                        first_well_path = f'{Path(folder_containing_img, folder, plate_base)}_{first_well}.TIF'
+                        
+                        # coping the images into the newly created time point folder
+                        os.system(f'cp {first_well_path} {Path(platename_input_folder, folder)}')
+    
+                    # if the time point folder exists
+                    if os.path.exists(Path(platename_input_folder, folder)):
+                        
+                        # first well file path
+                        first_well_path = f'{Path(folder_containing_img, folder, plate_base)}_{first_well}.TIF'
+               
+                        # if the images do not exist
+                        if not os.path.exists(first_well_path):
+    
+                            # coping the images into the newly created time point folder
+                            os.system(f'cp {first_well_path} {Path(platename_input_folder, folder)}')
+
 
         # defining the yaml file path (same as the filepath from configure.py)
         full_yaml = Path(volume, platename + '.yml')
