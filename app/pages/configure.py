@@ -186,7 +186,8 @@ def update_wells(table_contents):  # list of cells from selection table
 @callback(
     [Output('finalize-configure-button', 'color'),
      Output("resolving-error-issue-configure", 'is_open'),
-     Output('resolving-error-issue-configure', 'children')],
+     Output('resolving-error-issue-configure', 'children'),
+     Output("resolving-error-issue-configure", 'color'),],
     Input('finalize-configure-button', 'n_clicks'),
     State('imaging-mode', 'value'),
     State('file-structure', 'value'),
@@ -362,13 +363,13 @@ def run_analysis(
                     error_messages[i] = html.P(
                         f'{i}. {error_messages[i]}', className="mb-0")
 
-                return 'danger', True, error_messages
+                return 'danger', True, error_messages, 'danger'
 
         # additional error messages that we have not accounted for
         except ValueError:
-            return 'danger', True, 'A ValueError occurred'
+            return 'danger', True, 'A ValueError occurred', 'danger'
         except Exception as e:
-            return 'danger', True, f'An unexpected error occurred: {str(e)}'
+            return 'danger', True, f'An unexpected error occurred: {str(e)}', 'danger'
         config = prep_yaml(
             imagingmode,
             filestructure,
@@ -395,4 +396,4 @@ def run_analysis(
         with open(output_file, 'w') as yaml_file:
             yaml.dump(config, yaml_file,
                       default_flow_style=False)
-        return 'success', False, ''
+        return 'success', True, f'Configuration written to {output_file}', 'success'
