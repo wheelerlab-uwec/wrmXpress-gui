@@ -125,7 +125,7 @@ def update_preview_image(n_clicks, store):
     if n_clicks >= 1:
         # assumes IX-like file structure
         img_path = Path(
-            volume, 'input', f'{platename}/TimePoint_1/{plate_base}_{first_well}.TIF')
+            volume, f'{platename}/TimePoint_1/{plate_base}_{first_well}.TIF')
         img = np.array(Image.open(img_path))
         fig = px.imshow(img, color_continuous_scale="gray")
         fig.update_layout(coloraxis_showscale=False)
@@ -201,13 +201,66 @@ def run_analysis(
                 return None, None, True, f'Please ensure that you have the Image "{check_for_names[0]}" and is the "{check_for_names[1]}" image.', False, ''
         except ValueError as ve:
             return None, None, True, 'An error occured somewhere', False, ''
-        
+
         if wells == 'All':
             first_well = 'A01'
         else:
             first_well = wells[0]
+        plate_base = platename.split("_", 1)[0]
 
+        """
+        Checking if input folder exists, and if not, create it, 
+        then subsequently copy the images into this folder
+        """
+        # input and platename input folder paths
+        input_folder = Path(volume, 'input')
+        platename_input_folder = Path(input_folder, platename)
+
+        # if the input folder does not exist, create it
+        if not os.path.exists(input_folder):
+            os.makedirs(input_folder)
+            os.makedirs(platename_input_folder)
+            # first well img path 
+            first_well_img_path = Path(
+                volume, f'{platename}/TimePoint_1/{plate_base}_{first_well}.TIF')
+            # platename htd file path
+            platename_htd_file = Path(
+                volume, platename, plate_base + '.HTD')
+            os.system(f'cp {first_well_img_path} {platename_input_folder}')
+            os.system(f'cp {platename_htd_file} {platename_input_folder}')
+
+        # if the input folder exists, but the platename folder does not exist, create it    
+        if os.path.exists(input_folder):
+            if not os.path.exists(platename_input_folder):
+                os.makedirs(platename_input_folder)
+                # assumes IX-like file structure
+                first_well_img_path = Path(
+                    volume, f'{platename}/TimePoint_1/{plate_base}_{first_well}.TIF')
+                # platename htd file path
+                platename_htd_file = Path(
+                    volume, platename, plate_base + '.HTD')
+                os.system(f'cp {first_well_img_path} {platename_input_folder}')
+                os.system(f'cp {platename_htd_file} {platename_input_folder}')
+
+            # if the input folder exists, and the platename folder exists, but the first well image does not exist, copy it
+            if os.path.exists(platename_input_folder):
+                first_well_img_path = Path(
+                    volume, f'{platename}/TimePoint_1/{plate_base}_{first_well}.TIF')
+                # platename htd file path
+                platename_htd_file = Path(
+                    volume, platename, plate_base + '.HTD')
+                
+                # if the first well image does not exist, copy it
+                if not os.path.exists(first_well_img_path):
+                    os.system(f'cp {first_well_img_path} {platename_input_folder}')
+
+                # if the platename htd file does not exist, copy it
+                if not os.path.exists(platename_htd_file):
+                    os.system(f'cp {platename_htd_file} {platename_input_folder}')
+
+        # defining the yaml file path (same as the filepath from configure.py)
         full_yaml = Path(volume, platename + '.yml')
+
         # reading in yaml file
         with open(full_yaml, 'r') as file:
             data = yaml.safe_load(file)
