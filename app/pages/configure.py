@@ -265,12 +265,6 @@ def run_analysis(
                     platename_parts_end = platename_parts[-1]
                     plate_name_end_checks = [None, '', ' ', '/']
 
-                    # ensures first and last character of plate name are not invalid characters
-                    if platename_parts_start in plate_name_end_checks or platename_parts_end in plate_name_end_checks:
-                        error_occured = True
-                        error_messages.append(
-                            'Plate/Folder name contains invalid characters. A valid plate name only contains letters, numbers, underscores ( _ ), and dashes ( - ).')
-
                     # ensures plate name does not contain spaces or slashes
                     has_invalid_chars = any(
                         letter == ' ' or letter == '/' for letter in platename_parts)
@@ -338,13 +332,12 @@ def run_analysis(
 
                 # check if video module is selected with only one time point
                 if eval_bool(cellprofilerrun) == True:
-                    for i in range(2, 3):
-                        timept = Path(volume, 'input',
-                                      f'{platename}/TimePoint_{i}')
-                        if not os.path.exists(timept):
-                            error_occured = True
-                            error_messages.append(
-                                'You have selected a Cell Profiler pipeline while having multiple time points.')
+                    timept = Path(volume, 'input',
+                                  f'{platename}/TimePoint_2')
+                    if os.path.exists(timept):
+                        error_occured = True
+                        error_messages.append(
+                            'You have selected a Cell Profiler pipeline while having multiple time points.')
 
             # check for conflicting modules
             if eval_bool(cellprofilerrun) == True and eval_bool(segmentrun):
