@@ -3,6 +3,7 @@
 ####                             Imports                            ####
 ####                                                                ####
 ########################################################################
+
 import dash
 import dash_bootstrap_components as dbc
 from dash import Dash, html, dcc
@@ -17,7 +18,6 @@ app = Dash(__name__,
                dbc.themes.FLATLY,
                dbc.icons.FONT_AWESOME],
            suppress_callback_exceptions=True)
-
 
 ########################################################################
 ####                                                                ####

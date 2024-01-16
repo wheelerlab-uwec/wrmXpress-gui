@@ -1,4 +1,17 @@
-# the style arguments for the sidebar. We use position:fixed and a fixed width
+########################################################################
+####                                                                ####
+####                             Imports                            ####
+####                                                                ####
+########################################################################
+
+import plotly.graph_objs as go
+
+########################################################################
+####                                                                ####
+####                             Styling                            ####
+####                                                                ####
+########################################################################
+
 SIDEBAR_STYLE = {
     "position": "fixed",
     "top": 0,
@@ -7,16 +20,31 @@ SIDEBAR_STYLE = {
     "width": "16rem",
     "padding": "2rem 1rem",
     "background-color": "#f8f9fa",
-    "text-color": "#00205B",  # Change text color to black
+    "text-color": "#00205B",  
     'color':'#000000',
 }
 
-# the styles for the main content position it to the right of the sidebar and
-# add some padding.
 CONTENT_STYLE = {
     "margin-left": "18rem",
     "margin-right": "2rem",
     "padding": "2rem 1rem",
-    "text-color": "#00205B",  # Change text color to black
+    "text-color": "#00205B", 
     'color':'#000000',
 }
+
+layout = go.Layout(
+    xaxis=dict(
+        autorange=True,
+        showgrid=False,
+        ticks='',
+        zeroline=False,
+        showticklabels=False
+    ),
+    yaxis=dict(
+        autorange=True,
+        showgrid=False,
+        ticks='',
+        zeroline=False,
+        showticklabels=False
+    )
+)

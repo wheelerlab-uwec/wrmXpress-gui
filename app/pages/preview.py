@@ -3,6 +3,7 @@
 ####                             Imports                            ####
 ####                                                                ####
 ########################################################################
+
 import dash_bootstrap_components as dbc
 import dash
 from dash import dcc, html, callback
@@ -17,6 +18,10 @@ from PIL import Image
 from app.utils.callback_functions import prep_yaml
 import os
 import plotly.graph_objs as go
+import subprocess
+
+# importing utils
+from app.utils.styling import layout
 
 dash.register_page(__name__)
 
@@ -25,22 +30,6 @@ dash.register_page(__name__)
 ####                              Layout                            ####
 ####                                                                ####
 ########################################################################
-layout = go.Layout(
-    xaxis=dict(
-        autorange=True,
-        showgrid=False,
-        ticks='',
-        zeroline=False,
-        showticklabels=False
-    ),
-    yaxis=dict(
-        autorange=True,
-        showgrid=False,
-        ticks='',
-        zeroline=False,
-        showticklabels=False
-    )
-)
 
 layout = dbc.ModalBody(
     [
@@ -94,8 +83,10 @@ layout = dbc.ModalBody(
                                         figure={'layout': layout},
                                         className='h-100 w-100'
                                     ),
+                                    dbc.Alert(id='resolving-error-issue-preview',is_open=False, color='success', duration=6000),
                                     dbc.Button(
                                         "Preview analysis", id="preview-button", className="d-grid gap-2 col-6 mx-auto", color="primary", n_clicks=0),
+                                    dbc.Alert(id='view-docker-logs',is_open=False, color='success', duration=30000),
                                 ]
                                 )
                             ),
@@ -114,7 +105,6 @@ layout = dbc.ModalBody(
 ####                           Callbacks                            ####
 ####                                                                ####
 ########################################################################
-
 
 @callback(
     Output('input-path-output', 'children'),
@@ -171,6 +161,10 @@ def get_options(nclicks, store):
 @callback(
     Output('analysis-preview-message', 'children'),
     Output('analysis-preview', 'figure'),
+    Output('resolving-error-issue-preview', 'is_open'),
+    Output('resolving-error-issue-preview','children'),
+    Output("view-docker-logs", 'is_open'),
+    Output("view-docker-logs", 'children'),
     Input('preview-button', 'n_clicks'),
     State('store', 'data'),
     State('preview-dropdown', 'value'),
@@ -186,12 +180,46 @@ def run_analysis(
     wells = store["wells"]
 
     if nclicks:
+        """
+        Checking if wrmXpress container exists
+        """
+        try:
+            good_to_go = False
+            check_for_names = ['zamanianlab/wrmxpress', 'latest']
+            client = docker.from_env()
+            images_in_docker = client.images.list()
+            for img in images_in_docker:
+                img = f"{img}"
+                image_info = img.strip()[8:-1].strip("'").split("', '")  # Remove angle brackets, quotes, and split
+                image_tag = image_info[-1]
+                if check_for_names[0] in image_tag:
+                    good_to_go = True
+                if check_for_names[1] in image_tag:
+                    good_to_go = True
+
+            if good_to_go == False:
+                return None, None, True, f'Please ensure that you have the Image "{check_for_names[0]}" and is the "{check_for_names[1]}" image.', False, ''
+        except ValueError as ve:
+            return None, None, True, 'An error occured somewhere', False, ''
+        
         if wells == 'All':
             first_well = 'A01'
         else:
             first_well = wells[0]
 
-        client = docker.from_env()
+        full_yaml = Path(volume, platename + '.yml')
+        # reading in yaml file
+        with open(full_yaml, 'r') as file:
+            data = yaml.safe_load(file)
+
+        # assigning first well to the well value
+        data['wells'] = [first_well]
+
+        # Dump preview data to temp YAML file
+        with open(full_yaml, 'w') as yaml_file:
+            yaml.dump(data, yaml_file,
+                    default_flow_style=False)
+
         print(client)
 
         command = f"python wrmXpress/wrapper.py {platename}.yml {platename}"
@@ -203,6 +231,17 @@ def run_analysis(
                                                    f'{volume}/work/': {'bind': '/work/', 'mode': 'rw'},
                                                    f'{volume}/{platename}.yml': {'bind': f'/{platename}.yml', 'mode': 'rw'}
                                                    })
+        # Get the name of the most recent container
+        container_name = container.name
+
+        # Run the docker logs command
+        result = subprocess.run(['docker', 'logs', '-f', container_name], capture_output=True, text=True).stdout
+
+        # Assuming `output` is the string containing the docker logs output
+        output_lines = result.splitlines()  # Split the output into lines
+
+        # Convert each line into an HTML paragraph element
+        result = [html.P(line, className="mb-0") for line in output_lines]
 
         # assumes IX-like file structure
         img_path = Path(
@@ -216,4 +255,20 @@ def run_analysis(
         fig.update_layout(coloraxis_showscale=False)
         fig.update_xaxes(showticklabels=False)
         fig.update_yaxes(showticklabels=False)
-        return command_message, fig
+
+        if isinstance(wells, list):
+            if len(wells) == 96:
+                wells = ['All']
+            else:
+                wells = wells
+        elif isinstance(wells, str):
+            wells = [wells]
+        # assigning well to the full well values
+        data['wells'] = wells
+
+        # Dump preview data to YAML file
+        with open(full_yaml, 'w') as yaml_file:
+            yaml.dump(data, yaml_file,
+                    default_flow_style=False)
+            
+        return command_message, fig, False, f'', True, result

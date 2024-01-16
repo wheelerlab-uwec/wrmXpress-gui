@@ -10,6 +10,7 @@ import pandas as pd
 ####                             LAYOUT                             ####
 ####                                                                ####
 ########################################################################
+
 def create_df_from_inputs(_rows, _cols):
     rows_total = list("ABCDEFGHIJKLMNOP")
     rows = rows_total[:int(_rows)]

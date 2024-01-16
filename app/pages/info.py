@@ -3,6 +3,7 @@
 ####                             Imports                            ####
 ####                                                                ####
 ########################################################################
+
 import dash_bootstrap_components as dbc
 from dash import dcc, html
 import dash
@@ -14,6 +15,7 @@ dash.register_page(__name__, order=0, path = '/')
 ####                              Layout                            ####
 ####                                                                ####
 ########################################################################
+
 layout = [
     html.H3("Information & Usage"),
     # Introduction to wrmXpress

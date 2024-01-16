@@ -3,6 +3,7 @@
 ####                             Imports                            ####
 ####                                                                ####
 ########################################################################
+
 from app.components.metadata_components import selection_table
 import dash_bootstrap_components as dbc
 from dash import html
@@ -12,18 +13,19 @@ from dash import html
 ####                              Layout                            ####
 ####                                                                ####
 ########################################################################
+
 # Run time accordian items for main page layout
 run_time_settings = dbc.AccordionItem(
     [
         html.H4("Directories"),
-        html.H6("Volume"),
+        html.H6("Volume path:"),
         dbc.Input(
-            id="mounted-volume", placeholder="Path to the mounted volume", type="text", persistence=True,
+            id="mounted-volume", placeholder="Path", type="text", persistence=True,
             persistence_type='memory'),
         html.Br(),
-        html.H6("Plate/Folder"),
+        html.H6("Plate/Folder name:"),
         dbc.Input(
-            id="plate-name", placeholder="Plate name", type="text", persistence=True,
+            id="plate-name", placeholder="Name", type="text", persistence=True,
             persistence_type='memory'),
         html.Br(),
         html.H4("Wells"),

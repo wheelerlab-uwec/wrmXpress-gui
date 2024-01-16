@@ -3,6 +3,7 @@
 ####                             Imports                            ####
 ####                                                                ####
 ########################################################################
+
 import dash_bootstrap_components as dbc
 from dash import html
 
@@ -11,6 +12,7 @@ from dash import html
 ####                              Layout                            ####
 ####                                                                ####
 ########################################################################
+
 # Header
 header = dbc.Row(
     [
@@ -18,7 +20,7 @@ header = dbc.Row(
             html.A(
                 html.I(className="fa-solid fa-circle-info", # Information Symbol
                        id='information-symbol'),
-                href='',
+                href='https://www.youtube.com/watch?v=dQw4w9WgXcQ',
             )],
             width="auto"),
         dbc.Col([

@@ -3,6 +3,7 @@
 ####                             Imports                            ####
 ####                                                                ####
 ########################################################################
+
 import dash_bootstrap_components as dbc
 import dash
 from dash.dependencies import Input, Output, State
@@ -13,7 +14,7 @@ from pathlib import Path
 # components
 from app.components.metadata_components import metadata_checklist
 
-# utilities
+# functions
 from app.utils.callback_functions import create_empty_df_from_inputs
 
 # registering dash page
@@ -111,7 +112,6 @@ layout = dbc.Container(
 ####                             Callbacks                          ####
 ####                                                                ####
 ########################################################################
-
 
 @callback(
     [Output('metadata-tabs', 'children'),
