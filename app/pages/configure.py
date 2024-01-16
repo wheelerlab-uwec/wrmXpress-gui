@@ -46,7 +46,8 @@ layout = dbc.Container([
         always_open=True,
     ),
     html.Hr(),
-    dbc.Alert(id='resolving-error-issue-configure',is_open=False, color='danger', duration = 6000),
+    dbc.Alert(id='resolving-error-issue-configure',
+              is_open=False, color='danger', duration=10000),
     html.Br(),
     dbc.Row(
         [
@@ -70,6 +71,7 @@ layout = dbc.Container([
 ####                              Callback                          ####
 ####                                                                ####
 ########################################################################
+
 
 @callback(
     [Output('multi-well-options-row', 'style'),
@@ -105,13 +107,13 @@ def update_options_visibility(imaging_mode, file_structure):
     Input("file-structure", 'value'),
     Input("circ-or-square-img-masking", 'value')
 )
-def rows_cols(cols, 
-              rows, 
-              mounter, 
-              platename, 
-              well_selection, 
-              motility, 
-              segment, 
+def rows_cols(cols,
+              rows,
+              mounter,
+              platename,
+              well_selection,
+              motility,
+              segment,
               wells,
               imgaging_mode,
               file_sturcture,
@@ -234,7 +236,8 @@ def run_analysis(
 
         try:
             # initializing the first error message
-            error_messages = ["While finalizing the configuration, the following errors were found:"]
+            error_messages = [
+                "While finalizing the configuration, the following errors were found:"]
             error_occured = False
             """
             Checking volume and plate names to ensure they are adequately named
@@ -242,15 +245,18 @@ def run_analysis(
             check_cases = [None, '', ' ']
 
             # checks to ensure that platename and volume contains characters
-            if platename in check_cases: 
+            if platename in check_cases:
                 error_occured = True
-                error_messages.append("Platename is missing; please add a Platename. ")
+                error_messages.append(
+                    "Platename is missing; please add a Platename. ")
             if volume in check_cases:
                 error_occured = True
-                error_messages.append("Volume is missing; please add a Volume path. ")
-            
-            if volume not in check_cases and platename not in check_cases: # ensuring that platename and volume contains characters
-                
+                error_messages.append(
+                    "Volume is missing; please add a Volume path. ")
+
+            # ensuring that platename and volume contains characters
+            if volume not in check_cases and platename not in check_cases:
+
                 # splits platename into a list of characters
                 platename_parts = list(platename)
                 if len(platename_parts) > 0:
@@ -263,17 +269,20 @@ def run_analysis(
                     # ensures first and last character of plate name are not forbidden characters
                     if platename_parts_start in plate_name_end_checks or platename_parts_end in plate_name_end_checks:
                         error_occured = True
-                        error_messages.append('Platename is inadequatly named; please add an adequate Platename. A valid platename only contains letters, numbers, underscores ( _ ), and dashs ( - ). ')
-                    
+                        error_messages.append(
+                            'Platename is inadequatly named; please add an adequate Platename. A valid platename only contains letters, numbers, underscores ( _ ), and dashs ( - ). ')
+
                     # ensures plate name does not contain spaces or slashs
-                    has_invalid_chars = any(letter == ' ' or letter == '/' for letter in platename_parts)
+                    has_invalid_chars = any(
+                        letter == ' ' or letter == '/' for letter in platename_parts)
                     if has_invalid_chars == True:
                         error_occured = True
-                        error_messages.append('Platename is inadequatly named; please add an adequate Platename. A valid platename only contains letters, numbers, underscores ( _ ), and dashs ( - ). ')
-                
+                        error_messages.append(
+                            'Platename is inadequatly named; please add an adequate Platename. A valid platename only contains letters, numbers, underscores ( _ ), and dashs ( - ). ')
+
                 # splits volume into a list of characters
-                volume_parts=list(volume)
-                if len(volume_parts)>0:
+                volume_parts = list(volume)
+                if len(volume_parts) > 0:
 
                     # obtaining last character of volume
                     volume_parts_end = volume_parts[-1]
@@ -281,81 +290,93 @@ def run_analysis(
                     # ensures last character of volume is a forbidden character
                     if volume_parts_end in check_cases:
                         error_occured = True
-                        error_messages.append('Volume is inadequatly named; please add an adequate Volume. A valid volume only contains letters, numbers, underscores( _ ), dashs ( - ), and slashs (/). ')
-                    
+                        error_messages.append(
+                            'Volume is inadequatly named; please add an adequate Volume. A valid volume only contains letters, numbers, underscores( _ ), dashs ( - ), and slashs (/). ')
+
                     # ensures volume does not contain spaces
-                    has_invalid_characters = any(letter == ' ' for letter in volume_parts)
+                    has_invalid_characters = any(
+                        letter == ' ' for letter in volume_parts)
                     if has_invalid_characters == True:
                         error_occured = True
-                        error_messages.append('Volume is inadequatly named; please add an adequate Volume. A valid volume only contains letters, numbers, underscores( _ ), dashs ( - ), and slashs (/). ') 
+                        error_messages.append(
+                            'Volume is inadequatly named; please add an adequate Volume. A valid volume only contains letters, numbers, underscores( _ ), dashs ( - ), and slashs (/). ')
                 """
                 Checking to see if volume, plate, and input directories exist
                 """
 
-                #obtaining input path, and full platename path 
+                # obtaining input path, and full platename path
                 input_path = Path(volume, 'input')
                 platename_path = Path(volume, "input", platename)
 
                 # ensuring all of these file paths exist (volume, input path, and platename path)
                 if not os.path.exists(volume):
                     error_occured = True
-                    error_messages.append('Volume is invalid; please choose a valid Volume. ')
+                    error_messages.append(
+                        'Volume is invalid; please choose a valid Volume. ')
                 if not os.path.exists(input_path):
                     error_occured = True
-                    error_messages.append("No 'input' in the Volume directory; please ensure Volume contains 'input'. ")
+                    error_messages.append(
+                        "No 'input' in the Volume directory; please ensure Volume contains 'input'. ")
                 if not os.path.exists(platename_path):
                     error_occured = True
-                    error_messages.append('Platename filepath is invalid; please choose a valid Platename and Volume. ')
-                
-                
+                    error_messages.append(
+                        'Platename filepath is invalid; please choose a valid Platename and Volume. ')
+
                 '''
                 Checking to see if the wells selected exist
                 '''
-                
+
                 plate_base = platename.split("_", 1)[0]
                 well_fail = False  # Initializing the flag
                 index = 0  # Initializing the index for iteration
 
                 while not well_fail and index < len(wells):
                     well = wells[index]
-                    img_path = Path(volume, 'input', f'{platename}/TimePoint_1/{plate_base}_{well}.TIF')
+                    img_path = Path(
+                        volume, 'input', f'{platename}/TimePoint_1/{plate_base}_{well}.TIF')
                     if not os.path.exists(img_path):
                         error_occured = True
-                        error_messages.append('You have selected more wells than you have images. Please ensure you select only the wells which you wish to analyze.')
+                        error_messages.append(
+                            'You have selected more wells than you have images. Please ensure you select only the wells which you wish to analyze.')
                         well_fail = True  # Set the flag to True to exit the loop
                     index += 1  # Increment the index for the next iteration
-
 
                 """
                 Checking if video module is selected with only one time point
                 """
-                if eval_bool(cellprofilerrun)==True:
-                    for i in range(2,3):
-                        timept = Path(volume, 'input', f'{platename}/TimePoint_{i}')
+                if eval_bool(cellprofilerrun) == True:
+                    for i in range(2, 3):
+                        timept = Path(volume, 'input',
+                                      f'{platename}/TimePoint_{i}')
                         if not os.path.exists(timept):
                             error_occured = True
-                            error_messages.append('You have selected cell profiler while having multiple time points, please ensure accurate selections. ')
+                            error_messages.append(
+                                'You have selected cell profiler while having multiple time points, please ensure accurate selections. ')
 
             """
             Checking for conflicting modules
             """
-            if eval_bool(cellprofilerrun) ==True and eval_bool(segmentrun):
+            if eval_bool(cellprofilerrun) == True and eval_bool(segmentrun):
                 error_occured = True
-                error_messages.append('Cannot run Cellprofiler and Segment together.')
-  
-            if eval_bool(cellprofilerrun) ==True and eval_bool(motilityrun):
+                error_messages.append(
+                    'Cannot run Cellprofiler and Segment together.')
+
+            if eval_bool(cellprofilerrun) == True and eval_bool(motilityrun):
                 error_occured = True
-                error_messages.append('Cannot run Cellprofiler and Motility together.')
+                error_messages.append(
+                    'Cannot run Cellprofiler and Motility together.')
 
             # checks to see if there was an error message
             if error_occured == True:
 
                 # formats the first line of the error message
-                error_messages[0] = html.H4(f'{error_messages[0]}', className='alert-heading')
-                
+                error_messages[0] = html.H4(
+                    f'{error_messages[0]}', className='alert-heading')
+
                 # Format the content of the error messages
-                for i in range(1,len(error_messages)):
-                    error_messages[i] = html.P(f'{i}. {error_messages[i]}', className="mb-0")
+                for i in range(1, len(error_messages)):
+                    error_messages[i] = html.P(
+                        f'{i}. {error_messages[i]}', className="mb-0")
 
                 return 'danger', True, error_messages
 
@@ -391,4 +412,3 @@ def run_analysis(
             yaml.dump(config, yaml_file,
                       default_flow_style=False)
         return 'success', False, ''
-    
