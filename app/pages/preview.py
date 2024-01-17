@@ -163,8 +163,6 @@ def get_options(nclicks, store):
     Output('analysis-preview', 'figure'),
     Output('resolving-error-issue-preview', 'is_open'),
     Output('resolving-error-issue-preview','children'),
-    Output("view-docker-logs", 'is_open'),
-    Output("view-docker-logs", 'children'),
     Input('preview-button', 'n_clicks'),
     State('store', 'data'),
     State('preview-dropdown', 'value'),
@@ -198,9 +196,9 @@ def run_analysis(
                     good_to_go = True
 
             if good_to_go == False:
-                return None, None, True, f'Please ensure that you have the Image "{check_for_names[0]}" and is the "{check_for_names[1]}" image.', False, ''
+                return None, None, True, f'Please ensure that you have the Image "{check_for_names[0]}" and is the "{check_for_names[1]}" image.'
         except ValueError as ve:
-            return None, None, True, 'An error occured somewhere', False, ''
+            return None, None, True, 'An error occured somewhere'
 
         if wells == 'All':
             first_well = 'A01'
@@ -220,7 +218,6 @@ def run_analysis(
         folder_containing_img = Path(volume, platename)
         timept_list_dirs = os.listdir(folder_containing_img)
         folders = [item for item in timept_list_dirs if os.path.isdir(os.path.join(folder_containing_img, item))]
-        print(folders)
 
         # if input folder does not exists
         if not os.path.exists(input_folder):
@@ -313,8 +310,9 @@ def run_analysis(
                             # coping the images into the newly created time point folder
                             os.system(f'cp {first_well_path} {Path(platename_input_folder, folder)}')
 
-
         # defining the yaml file path (same as the filepath from configure.py)
+        preview_yaml_platename = Path('.' + platename + '.yml')
+        preview_yaml_platenmaefull_yaml = Path(volume, preview_yaml_platename)
         full_yaml = Path(volume, platename + '.yml')
 
         # reading in yaml file
@@ -325,32 +323,33 @@ def run_analysis(
         data['wells'] = [first_well]
 
         # Dump preview data to temp YAML file
-        with open(full_yaml, 'w') as yaml_file:
+        with open(preview_yaml_platenmaefull_yaml, 'w') as yaml_file:
             yaml.dump(data, yaml_file,
                     default_flow_style=False)
 
         print(client)
 
-        command = f"python wrmXpress/wrapper.py {platename}.yml {platename}"
-        command_message = f"```python wrmXpress/wrapper.py {platename}.yml {platename}```"
+        command = f"python wrmXpress/wrapper.py {preview_yaml_platenmaefull_yaml}.yml {platename_input_folder}"
+        command_message = f"```python wrmXpress/wrapper.py {platename}.yml {platename_input_folder}```"
 
         container = client.containers.run('zamanianlab/wrmxpress', command=f"{command}", detach=True,
                                           volumes={f'{volume}/input/': {'bind': '/input/', 'mode': 'rw'},
                                                    f'{volume}/output/': {'bind': '/output/', 'mode': 'rw'},
                                                    f'{volume}/work/': {'bind': '/work/', 'mode': 'rw'},
-                                                   f'{volume}/{platename}.yml': {'bind': f'/{platename}.yml', 'mode': 'rw'}
+                                                   f'{volume}/{preview_yaml_platename}.yml': {'bind': f'/{preview_yaml_platename}.yml', 'mode': 'rw'}
                                                    })
         # Get the name of the most recent container
         container_name = container.name
 
-        # Run the docker logs command
-        result = subprocess.run(['docker', 'logs', '-f', container_name], capture_output=True, text=True).stdout
+        # Wait for the container to finish running (adjust timeout as needed)
+        container.wait(timeout=300)
 
-        # Assuming `output` is the string containing the docker logs output
-        output_lines = result.splitlines()  # Split the output into lines
+        # Retrieve and process the logs after the container has finished
+        result = subprocess.run(['docker', 'logs', container_name], capture_output=True, text=True)
+        output_lines = result.stdout.splitlines()
 
         # Convert each line into an HTML paragraph element
-        result = [html.P(line, className="mb-0") for line in output_lines]
+        result = [dcc.Markdown(f"```{line}```", className="mb-0") for line in output_lines]
 
         # assumes IX-like file structure
         img_path = Path(
@@ -364,20 +363,5 @@ def run_analysis(
         fig.update_layout(coloraxis_showscale=False)
         fig.update_xaxes(showticklabels=False)
         fig.update_yaxes(showticklabels=False)
-
-        if isinstance(wells, list):
-            if len(wells) == 96:
-                wells = ['All']
-            else:
-                wells = wells
-        elif isinstance(wells, str):
-            wells = [wells]
-        # assigning well to the full well values
-        data['wells'] = wells
-
-        # Dump preview data to YAML file
-        with open(full_yaml, 'w') as yaml_file:
-            yaml.dump(data, yaml_file,
-                    default_flow_style=False)
             
-        return command_message, fig, False, f'', True, result
+        return command_message, fig, False, f''
