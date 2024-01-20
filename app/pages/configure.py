@@ -53,7 +53,7 @@ layout = dbc.Container([
         [
             dbc.Col(
                 dbc.Button(
-                    "Finalize Configure",
+                    "Finalize configuration",
                     id="finalize-configure-button",
                     className="flex",
                     color='info'

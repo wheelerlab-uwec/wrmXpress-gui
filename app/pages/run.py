@@ -145,7 +145,7 @@ def update_results_message_for_run_page(
     img_masking = f'Image Masking: {store["img_masking"]}'
     mod_selection = f'Module Selection: {store["motility"]}'
     volume = f'Volume: {store["mount"]}'
-    platename = f'Platenmae: {store["platename"]}'
+    platename = f'Platename: {store["platename"]}'
     wells = f'Wells: {store["wells"]}'
     results = [
         img_mode,
@@ -188,30 +188,36 @@ def run_analysis(
         # check to see how many wells we are analyzing
         remove_wells_later = False
         if len(wells) == 1:
-                remove_wells_later = True
-                # check to see if a second well exists
+            remove_wells_later = True
+            # check to see if a second well exists
 
-                # Assuming wells[0] is a string like "A01"
-                first_well = wells[0]
-                last_char = first_well[-1]  # Get the last character of the well identifier
-                next_char = chr(ord(last_char) + 1)  # Increment the last character by 1
-                second_well = first_well[:-1] + next_char  # Concatenate the first part with the incremented character
-                wells.append(second_well)
-                first_well = wells
+            # Assuming wells[0] is a string like "A01"
+            first_well = wells[0]
+            # Get the last character of the well identifier
+            last_char = first_well[-1]
+            # Increment the last character by 1
+            next_char = chr(ord(last_char) + 1)
+            # Concatenate the first part with the incremented character
+            second_well = first_well[:-1] + next_char
+            wells.append(second_well)
+            first_well = wells
 
-                # create a new img in the volume with the new well for analysis
-                plate_base = platename.split("_", 1)[0]
-                # Collecting the time point folders
-                folder_containing_img = Path(volume, platename)
-                folders = [item for item in os.listdir(folder_containing_img) if os.path.isdir(os.path.join(folder_containing_img, item))]
-                # Iterate through each time point
-                for folder in folders:
-                    # Copy first and second well image into time point folder
-                    first_well_path = folder_containing_img / folder / f'{plate_base}_{first_well[0]}.TIF'
-                    second_well_path = folder_containing_img / folder / f'{plate_base}_{first_well[1]}.TIF'
-                    # rename first well path with second well name
-                    shutil.copy(first_well_path, second_well_path)
- 
+            # create a new img in the volume with the new well for analysis
+            plate_base = platename.split("_", 1)[0]
+            # Collecting the time point folders
+            folder_containing_img = Path(volume, platename)
+            folders = [item for item in os.listdir(folder_containing_img) if os.path.isdir(
+                os.path.join(folder_containing_img, item))]
+            # Iterate through each time point
+            for folder in folders:
+                # Copy first and second well image into time point folder
+                first_well_path = folder_containing_img / \
+                    folder / f'{plate_base}_{first_well[0]}.TIF'
+                second_well_path = folder_containing_img / \
+                    folder / f'{plate_base}_{first_well[1]}.TIF'
+                # rename first well path with second well name
+                shutil.copy(first_well_path, second_well_path)
+
         # input and platename input folder paths
         input_folder = Path(volume, 'input')
         platename_input_folder = Path(input_folder, platename)
@@ -249,7 +255,8 @@ def run_analysis(
         container.wait(timeout=300)
 
         # Retrieve and process the logs after the container has finished
-        result = subprocess.run(['docker', 'logs', container_name], capture_output=True, text=True)
+        result = subprocess.run(
+            ['docker', 'logs', container_name], capture_output=True, text=True)
         output_lines = result.stdout.splitlines()
 
         # ensure that these rows of the output are not indented
@@ -261,8 +268,9 @@ def run_analysis(
             "HTD metadata:",
         ]
         # Convert each line into an HTML paragraph element
-        markdown_lines = [dcc.Markdown(f"```{line}```", className = 'mb-0') if line in non_indented else dcc.Markdown(f"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;```{line}```", className = 'mb-0') for line in output_lines]
-        
+        markdown_lines = [dcc.Markdown(f"```{line}```", className='mb-0') if line in non_indented else dcc.Markdown(
+            f"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;```{line}```", className='mb-0') for line in output_lines]
+
         # assumes IX-like file structure
         img_path = Path(
             volume, 'output', 'thumbs', f'{platename}.png')
@@ -301,17 +309,19 @@ def run_analysis(
             figs.append(fig)  # appending this image to the list
         # Return the figures as a tuple
 
-        # remove all the created files 
+        # remove all the created files
         if remove_wells_later == True:
             # create a new img in the volume with the new well for analysis
             plate_base = platename.split("_", 1)[0]
             # Collecting the time point folders
             folder_containing_img = Path(volume, platename)
-            folders = [item for item in os.listdir(folder_containing_img) if os.path.isdir(os.path.join(folder_containing_img, item))]
+            folders = [item for item in os.listdir(folder_containing_img) if os.path.isdir(
+                os.path.join(folder_containing_img, item))]
             # Iterate through each time point
             for folder in folders:
                 # obtain the second well image path
-                second_well_path = folder_containing_img / folder / f'{plate_base}_{first_well[1]}.TIF'
+                second_well_path = folder_containing_img / \
+                    folder / f'{plate_base}_{first_well[1]}.TIF'
                 # remove the second well image
                 os.remove(second_well_path)
         return figs[0], figs[1], figs[2], True, markdown_lines
