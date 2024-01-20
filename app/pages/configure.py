@@ -53,7 +53,7 @@ layout = dbc.Container([
         [
             dbc.Col(
                 dbc.Button(
-                    "Finalize Configure",
+                    "Finalize configuration",
                     id="finalize-configure-button",
                     className="flex",
                     color='info'
@@ -261,11 +261,6 @@ def run_analysis(
                 platename_parts = list(platename)
                 if len(platename_parts) > 0:
 
-                    # obtains the first and last character of plate name
-                    platename_parts_start = platename_parts[0]
-                    platename_parts_end = platename_parts[-1]
-                    plate_name_end_checks = [None, '', ' ', '/']
-
                     # ensures plate name does not contain spaces or slashes
                     has_invalid_chars = any(
                         letter == ' ' or letter == '/' for letter in platename_parts)
@@ -297,23 +292,18 @@ def run_analysis(
 
                 # check to see if volume, plate, and input directories exist
 
-                # obtain input path and full plate name path
-                input_path = Path(volume, 'input')
-                platename_path = Path(volume, "input", platename)
+                # obtain and full plate name path
+                platename_path = Path(volume, platename)
 
                 # ensure all of these file paths exist (volume, input path, and plate name path)
                 if not os.path.exists(volume):
                     error_occured = True
                     error_messages.append(
                         'The volume path does not exist.')
-                if not os.path.exists(input_path):
-                    error_occured = True
-                    error_messages.append(
-                        "No 'input/' directory in the volume.")
                 if not os.path.exists(platename_path):
                     error_occured = True
                     error_messages.append(
-                        "No Plate/Folder in the 'input/' of the volume.")
+                        "No Plate/Folder in the volume.")
 
                 # check to see if the wells selected exist
                 plate_base = platename.split("_", 1)[0]
@@ -323,7 +313,7 @@ def run_analysis(
                 while not well_fail and index < len(wells):
                     well = wells[index]
                     img_path = Path(
-                        volume, 'input', f'{platename}/TimePoint_1/{plate_base}_{well}.TIF')
+                        volume, f'{platename}/TimePoint_1/{plate_base}_{well}.TIF')
                     if not os.path.exists(img_path):
                         error_occured = True
                         error_messages.append(
@@ -333,7 +323,7 @@ def run_analysis(
 
                 # check if video module is selected with only one time point
                 if eval_bool(cellprofilerrun) == True:
-                    timept = Path(volume, 'input',
+                    timept = Path(volume,
                                   f'{platename}/TimePoint_2')
                     if os.path.exists(timept):
                         error_occured = True

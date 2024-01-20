@@ -19,6 +19,7 @@ from app.utils.callback_functions import prep_yaml
 import os
 import plotly.graph_objs as go
 import subprocess
+import shutil
 
 # importing utils
 from app.utils.styling import layout
@@ -83,10 +84,12 @@ layout = dbc.ModalBody(
                                         figure={'layout': layout},
                                         className='h-100 w-100'
                                     ),
-                                    dbc.Alert(id='resolving-error-issue-preview',is_open=False, color='success', duration=6000),
+                                    dbc.Alert(id='resolving-error-issue-preview',
+                                              is_open=False, color='success', duration=6000),
                                     dbc.Button(
                                         "Preview analysis", id="preview-button", className="d-grid gap-2 col-6 mx-auto", color="primary", n_clicks=0),
-                                    dbc.Alert(id='view-docker-logs',is_open=False, color='success', duration=30000),
+                                    dbc.Alert(
+                                        id='view-docker-logs', is_open=False, color='success', duration=30000),
                                 ]
                                 )
                             ),
@@ -125,7 +128,7 @@ def update_preview_image(n_clicks, store):
     if n_clicks >= 1:
         # assumes IX-like file structure
         img_path = Path(
-            volume, 'input', f'{platename}/TimePoint_1/{plate_base}_{first_well}.TIF')
+            volume, f'{platename}/TimePoint_1/{plate_base}_{first_well}.TIF')
         img = np.array(Image.open(img_path))
         fig = px.imshow(img, color_continuous_scale="gray")
         fig.update_layout(coloraxis_showscale=False)
@@ -162,9 +165,7 @@ def get_options(nclicks, store):
     Output('analysis-preview-message', 'children'),
     Output('analysis-preview', 'figure'),
     Output('resolving-error-issue-preview', 'is_open'),
-    Output('resolving-error-issue-preview','children'),
-    Output("view-docker-logs", 'is_open'),
-    Output("view-docker-logs", 'children'),
+    Output('resolving-error-issue-preview', 'children'),
     Input('preview-button', 'n_clicks'),
     State('store', 'data'),
     State('preview-dropdown', 'value'),
@@ -190,7 +191,8 @@ def run_analysis(
             images_in_docker = client.images.list()
             for img in images_in_docker:
                 img = f"{img}"
-                image_info = img.strip()[8:-1].strip("'").split("', '")  # Remove angle brackets, quotes, and split
+                # Remove angle brackets, quotes, and split
+                image_info = img.strip()[8:-1].strip("'").split("', '")
                 image_tag = image_info[-1]
                 if check_for_names[0] in image_tag:
                     good_to_go = True
@@ -198,54 +200,113 @@ def run_analysis(
                     good_to_go = True
 
             if good_to_go == False:
-                return None, None, True, f'Please ensure that you have the Image "{check_for_names[0]}" and is the "{check_for_names[1]}" image.', False, ''
+                return None, None, True, f'Please ensure that you have the Image "{check_for_names[0]}" and is the "{check_for_names[1]}" image.'
         except ValueError as ve:
-            return None, None, True, 'An error occured somewhere', False, ''
-        
-        if wells == 'All':
-            first_well = 'A01'
-        else:
-            first_well = wells[0]
+            return None, None, True, 'An error occured somewhere'
 
+        if wells == 'All':
+            first_well = ['A01', "A02"]
+        else:
+            if len(wells) == 1:
+                # Assuming wells[0] is a string like "A01"
+                first_well = wells[0]
+                # Get the last character of the well identifier
+                last_char = first_well[-1]
+                # Increment the last character by 1
+                next_char = chr(ord(last_char) + 1)
+                # Concatenate the first part with the incremented character
+                second_well = first_well[:-1] + next_char
+                wells.append(second_well)
+                first_well = wells
+            else:
+                first_well = wells[:2]
+        plate_base = platename.split("_", 1)[0]
+
+        """
+        Checking if input folder exists, and if not, create it, 
+        then subsequently copy the images into this folder
+        """
+
+        # Input and platename input folder paths
+        folder_containing_img = Path(volume, platename)
+        input_folder = Path(volume, 'input')
+        platename_input_folder = Path(input_folder, platename)
+        os.makedirs(platename_input_folder, exist_ok=True)
+
+        # Copy .HTD file into platename input folder
+        htd_file_path = folder_containing_img / f'{plate_base}.HTD'
+        shutil.copy(htd_file_path, platename_input_folder)
+
+        # Collecting the time point folders
+        folders = [item for item in os.listdir(folder_containing_img) if os.path.isdir(
+            Path(folder_containing_img, item))]
+
+        # Iterate through each time point
+        for folder in folders:
+            time_point_folder = Path(platename_input_folder, folder)
+            os.makedirs(time_point_folder, exist_ok=True)
+
+            # Copy first and second well image into time point folder
+            first_well_path = Path(folder_containing_img,
+                                   folder, f'{plate_base}_{first_well[0]}.TIF')
+            second_well_path = Path(folder_containing_img,
+                                    folder, f'{plate_base}_{first_well[1]}.TIF')
+            shutil.copy(first_well_path, time_point_folder)
+            if os.path.exists(second_well_path):
+                shutil.copy(second_well_path, time_point_folder)
+            # if there isn't a second well
+            else:
+                # rename first well path with second well name
+                shutil.copy(first_well_path, second_well_path)
+                # save second well path with second well name to the time point folder
+                shutil.copy(second_well_path, time_point_folder)
+
+        # defining the yaml file path (same as the filepath from configure.py)
+        preview_yaml_platename = '.' + platename + '.yml'
+        preview_yaml_platenmaefull_yaml = Path(volume, preview_yaml_platename)
         full_yaml = Path(volume, platename + '.yml')
+
         # reading in yaml file
         with open(full_yaml, 'r') as file:
             data = yaml.safe_load(file)
 
         # assigning first well to the well value
-        data['wells'] = [first_well]
+        data['wells'] = first_well
 
         # Dump preview data to temp YAML file
-        with open(full_yaml, 'w') as yaml_file:
+        with open(preview_yaml_platenmaefull_yaml, 'w') as yaml_file:
             yaml.dump(data, yaml_file,
-                    default_flow_style=False)
+                      default_flow_style=False)
 
         print(client)
 
-        command = f"python wrmXpress/wrapper.py {platename}.yml {platename}"
+        command = f"python wrmXpress/wrapper.py {preview_yaml_platename} {platename}"
         command_message = f"```python wrmXpress/wrapper.py {platename}.yml {platename}```"
 
         container = client.containers.run('zamanianlab/wrmxpress', command=f"{command}", detach=True,
                                           volumes={f'{volume}/input/': {'bind': '/input/', 'mode': 'rw'},
                                                    f'{volume}/output/': {'bind': '/output/', 'mode': 'rw'},
                                                    f'{volume}/work/': {'bind': '/work/', 'mode': 'rw'},
-                                                   f'{volume}/{platename}.yml': {'bind': f'/{platename}.yml', 'mode': 'rw'}
+                                                   f'{volume}/{preview_yaml_platename}': {'bind': f'/{preview_yaml_platename}', 'mode': 'rw'}
                                                    })
         # Get the name of the most recent container
         container_name = container.name
 
-        # Run the docker logs command
-        result = subprocess.run(['docker', 'logs', '-f', container_name], capture_output=True, text=True).stdout
+        # Wait for the container to finish running (adjust timeout as needed)
+        container.wait(timeout=300)
 
-        # Assuming `output` is the string containing the docker logs output
-        output_lines = result.splitlines()  # Split the output into lines
+        # Retrieve and process the logs after the container has finished
+        result = subprocess.run(
+            ['docker', 'logs', container_name], capture_output=True, text=True)
+        output_lines = result.stdout.splitlines()
 
         # Convert each line into an HTML paragraph element
-        result = [html.P(line, className="mb-0") for line in output_lines]
+        result = [dcc.Markdown(f"```{line}```", className="mb-0")
+                  for line in output_lines]
 
         # assumes IX-like file structure
         img_path = Path(
-            volume, 'work', f'{platename}/{first_well}/img/{platename}_{first_well}_{selection}.png')
+            volume, 'work', f'{platename}/{first_well[0]}/img/{platename}_{first_well[0]}_{selection}.png')
 
         while not os.path.exists(img_path):
             time.sleep(1)
@@ -256,19 +317,4 @@ def run_analysis(
         fig.update_xaxes(showticklabels=False)
         fig.update_yaxes(showticklabels=False)
 
-        if isinstance(wells, list):
-            if len(wells) == 96:
-                wells = ['All']
-            else:
-                wells = wells
-        elif isinstance(wells, str):
-            wells = [wells]
-        # assigning well to the full well values
-        data['wells'] = wells
-
-        # Dump preview data to YAML file
-        with open(full_yaml, 'w') as yaml_file:
-            yaml.dump(data, yaml_file,
-                    default_flow_style=False)
-            
-        return command_message, fig, False, f'', True, result
+        return command_message, fig, False, f''
