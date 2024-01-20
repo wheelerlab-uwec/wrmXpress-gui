@@ -202,9 +202,19 @@ def run_analysis(
             return None, None, True, 'An error occured somewhere'
 
         if wells == 'All':
-            first_well = 'A01'
+            first_well = ['A01',"A02"]
         else:
-            first_well = wells[0]
+            print(len(wells))
+            if len(wells) == 1:
+                # Assuming wells[0] is a string like "A01"
+                first_well = wells[0]
+                last_char = first_well[-1]  # Get the last character of the well identifier
+                next_char = chr(ord(last_char) + 1)  # Increment the last character by 1
+                second_well = first_well[:-1] + next_char  # Concatenate the first part with the incremented character
+                wells.append(second_well)
+                first_well = wells
+            else:
+                first_well = wells[:1]
         plate_base = platename.split("_", 1)[0]
 
         """
@@ -232,10 +242,18 @@ def run_analysis(
             time_point_folder = platename_input_folder / folder
             os.makedirs(time_point_folder, exist_ok=True)
 
-            # Copy first well image into time point folder
-            first_well_path = folder_containing_img / folder / f'{plate_base}_{first_well}.TIF'
+            # Copy first and second well image into time point folder
+            first_well_path = folder_containing_img / folder / f'{plate_base}_{first_well[0]}.TIF'
+            second_well_path = folder_containing_img / folder / f'{plate_base}_{first_well[1]}.TIF'
             if os.path.exists(first_well_path):
                 shutil.copy(first_well_path, time_point_folder)
+            if os.path.exists(second_well_path):
+                shutil.copy(second_well_path, time_point_folder)
+            if not os.path.exists(second_well_path):
+                # rename first well path with second well name
+                shutil.copy(first_well_path, second_well_path)
+                # save second well path with second well name to the time point folder
+                shutil.copy(second_well_path, time_point_folder)
 
         # defining the yaml file path (same as the filepath from configure.py)
         preview_yaml_platename = Path('.' + platename + '.yml')
@@ -280,7 +298,7 @@ def run_analysis(
 
         # assumes IX-like file structure
         img_path = Path(
-            volume, 'work', f'{platename}/{first_well}/img/{platename}_{first_well}_{selection}.png')
+            volume, 'work', f'{platename}/{first_well[0]}/img/{platename}_{first_well[0]}_{selection}.png')
 
         while not os.path.exists(img_path):
             time.sleep(1)
