@@ -186,8 +186,11 @@ def run_analysis(
         then subsequently copy the images into this folder
         """
         # check to see how many wells we are analyzing
-        
+        remove_wells_later = False
         if len(wells) == 1:
+                remove_wells_later = True
+                # check to see if a second well exists
+
                 # Assuming wells[0] is a string like "A01"
                 first_well = wells[0]
                 last_char = first_well[-1]  # Get the last character of the well identifier
@@ -297,4 +300,18 @@ def run_analysis(
             fig.update_yaxes(showticklabels=False)
             figs.append(fig)  # appending this image to the list
         # Return the figures as a tuple
+
+        # remove all the created files 
+        if remove_wells_later == True:
+            # create a new img in the volume with the new well for analysis
+            plate_base = platename.split("_", 1)[0]
+            # Collecting the time point folders
+            folder_containing_img = Path(volume, platename)
+            folders = [item for item in os.listdir(folder_containing_img) if os.path.isdir(os.path.join(folder_containing_img, item))]
+            # Iterate through each time point
+            for folder in folders:
+                # obtain the second well image path
+                second_well_path = folder_containing_img / folder / f'{plate_base}_{first_well[1]}.TIF'
+                # remove the second well image
+                os.remove(second_well_path)
         return figs[0], figs[1], figs[2], True, markdown_lines
