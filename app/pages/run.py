@@ -17,6 +17,7 @@ import os
 import dash
 import plotly.graph_objs as go
 import subprocess
+import shutil
 
 # importing utils
 from app.utils.styling import layout
@@ -184,6 +185,30 @@ def run_analysis(
         Checking if input folder exists, and if not, create it, 
         then subsequently copy the images into this folder
         """
+        # check to see how many wells we are analyzing
+        
+        if len(wells) == 1:
+                # Assuming wells[0] is a string like "A01"
+                first_well = wells[0]
+                last_char = first_well[-1]  # Get the last character of the well identifier
+                next_char = chr(ord(last_char) + 1)  # Increment the last character by 1
+                second_well = first_well[:-1] + next_char  # Concatenate the first part with the incremented character
+                wells.append(second_well)
+                first_well = wells
+
+                # create a new img in the volume with the new well for analysis
+                plate_base = platename.split("_", 1)[0]
+                # Collecting the time point folders
+                folder_containing_img = Path(volume, platename)
+                folders = [item for item in os.listdir(folder_containing_img) if os.path.isdir(os.path.join(folder_containing_img, item))]
+                # Iterate through each time point
+                for folder in folders:
+                    # Copy first and second well image into time point folder
+                    first_well_path = folder_containing_img / folder / f'{plate_base}_{first_well[0]}.TIF'
+                    second_well_path = folder_containing_img / folder / f'{plate_base}_{first_well[1]}.TIF'
+                    # rename first well path with second well name
+                    shutil.copy(first_well_path, second_well_path)
+ 
         # input and platename input folder paths
         input_folder = Path(volume, 'input')
         platename_input_folder = Path(input_folder, platename)
