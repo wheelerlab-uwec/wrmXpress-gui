@@ -250,7 +250,6 @@ def run_analysis(
         with open(preview_yaml_platenmaefull_yaml, 'w') as yaml_file:
             yaml.dump(data, yaml_file,
                       default_flow_style=False)
-        print(preview_yaml_platenmaefull_yaml)
         if wells == 'All':
             first_well = "A01"
         else:
