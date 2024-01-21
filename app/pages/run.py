@@ -187,7 +187,7 @@ def run_analysis(
         """
         # check to see how many wells we are analyzing
         remove_wells_later = False
-        if len(wells) == 1:
+        if len(wells) == 1 and wells[0] != 'All':
             remove_wells_later = True
             # check to see if a second well exists
 
