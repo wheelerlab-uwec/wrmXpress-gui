@@ -70,12 +70,20 @@ layout = dbc.ModalBody(
                                            className="d-grid gap-2 col-6 mx-auto",
                                            color="primary",
                                            n_clicks=0),
-                                dcc.Graph(
-                                    id='image-analysis-preview',
-                                    # Empty layout for now
-                                    figure={'layout': {}},
-                                    className='h-100 w-100'
+                                dcc.Loading(
+                                    id="loading-2",
+                                    children=[
+                                        html.Div([
+                                            dcc.Graph(
+                                                id='image-analysis-preview',
+                                                # Empty layout for now
+                                                figure={'layout': {}},
+                                                className='h-100 w-100'
+                                            ),
+                                        ])],
+                                    type="cube",
                                 ),
+
                             ])
                         )
                     ),
@@ -85,18 +93,34 @@ layout = dbc.ModalBody(
                             dbc.CardBody([
                                 html.H4(
                                     "Run Diagnosis", className="text-center"),
-                                dcc.Graph(
-                                    id='analysis-postview',
-                                    # Empty layout for now
-                                    figure={'layout': {}},
-                                    className='h-100 w-100'
+                                dcc.Loading(
+                                    id="loading-2",
+                                    children=[
+                                        html.Div([
+                                            dcc.Graph(
+                                                id='analysis-postview',
+                                                # Empty layout for now
+                                                figure={'layout': {}},
+                                                className='h-100 w-100'
+                                            ),
+                                        ])],
+                                    type="cube",
                                 ),
-                                dcc.Graph(
-                                    id='analysis-postview-another',
-                                    # Empty layout for now
-                                    figure={'layout': {}},
-                                    className='h-100 w-100'
+
+                                dcc.Loading(
+                                    id="loading-2",
+                                    children=[
+                                        html.Div([
+                                            dcc.Graph(
+                                                id='analysis-postview-another',
+                                                # Empty layout for now
+                                                figure={'layout': {}},
+                                                className='h-100 w-100'
+                                            ),
+                                        ])],
+                                    type="cube",
                                 ),
+
                             ])
                         )
                     ),

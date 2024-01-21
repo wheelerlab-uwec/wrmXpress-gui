@@ -49,11 +49,22 @@ layout = dbc.ModalBody(
                                     html.Br(),
                                     dcc.Markdown(id='input-path-output'),
                                     html.Div(
-                                        dcc.Graph(
-                                            id='input-preview',
-                                            figure={'layout': layout},
-                                            className='h-100 w-100'
-                                        )),
+                                        dcc.Loading(
+                                            id='loading-1',
+                                            children=[
+                                                html.Div([
+                                                    dcc.Graph(
+                                                        id='input-preview',
+                                                        figure={
+                                                            'layout': layout},
+                                                        className='h-100 w-100'
+                                                    )
+                                                ]),
+                                            ],
+                                            type='cube',
+                                        ),
+
+                                    ),
                                     dbc.Button('Load first input image',
                                                id='submit-val',
                                                className="d-grid gap-2 col-6 mx-auto",
@@ -79,11 +90,19 @@ layout = dbc.ModalBody(
                                     html.Br(),
                                     dcc.Markdown(
                                         id='analysis-preview-message'),
-                                    dcc.Graph(
-                                        id='analysis-preview',
-                                        figure={'layout': layout},
-                                        className='h-100 w-100'
+                                    dcc.Loading(
+                                        id="loading-2",
+                                        children=[
+                                            html.Div([
+                                                dcc.Graph(
+                                                    id='analysis-preview',
+                                                    figure={'layout': layout},
+                                                    className='h-100 w-100'
+                                                ),
+                                            ])],
+                                        type="cube",
                                     ),
+
                                     dbc.Alert(id='resolving-error-issue-preview',
                                               is_open=False, color='success', duration=6000),
                                     dbc.Button(
@@ -318,3 +337,9 @@ def run_analysis(
         fig.update_yaxes(showticklabels=False)
 
         return command_message, fig, False, f''
+
+
+@callback(Output("loading-output-2", "children"), Input("loading-input-2", "value"))
+def input_triggers_nested(value):
+    time.sleep(1)
+    return value
