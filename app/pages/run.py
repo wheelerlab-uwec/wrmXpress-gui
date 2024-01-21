@@ -18,6 +18,7 @@ import dash
 import plotly.graph_objs as go
 import subprocess
 import shutil
+import yaml
 
 # importing utils
 from app.utils.styling import layout
@@ -70,6 +71,17 @@ layout = dbc.ModalBody(
                                            className="d-grid gap-2 col-6 mx-auto",
                                            color="primary",
                                            n_clicks=0),
+                                html.Br(),
+                                dbc.Alert(children=[
+                                    dbc.Progress(
+                                        id = 'progress-bar-run-page',
+                                        striped = True,
+                                        color = "primary",
+                                        value = 50,
+                                        animated=True,
+                                    ),
+                                ], is_open = True, color = 'success', id = 'alert-progress-bar-run-page', 
+                                ),
                                 dcc.Loading(
                                     id="loading-2",
                                     children=[
@@ -209,38 +221,36 @@ def run_analysis(
         Checking if input folder exists, and if not, create it, 
         then subsequently copy the images into this folder
         """
-        # check to see how many wells we are analyzing
-        remove_wells_later = False
-        if len(wells) == 1 and wells[0] != 'All':
-            remove_wells_later = True
-            # check to see if a second well exists
 
-            # Assuming wells[0] is a string like "A01"
-            first_well = wells[0]
-            # Get the last character of the well identifier
-            last_char = first_well[-1]
-            # Increment the last character by 1
-            next_char = chr(ord(last_char) + 1)
-            # Concatenate the first part with the incremented character
-            second_well = first_well[:-1] + next_char
-            wells.append(second_well)
-            first_well = wells
+        ########################################################
+        ####                                                ####
+        ####        Bypassing the wrmxpress bug             ####
+        ####                                                ####
+        ########################################################
+        """
+        remove this section following the fix in the wrmxpress bug
+        """
+        # check to see if we are analyzing one well
+        if wells != 'All' and len(wells) == 1:
+            # redo yaml file to include "All" wells -- bypass wrmxpress bug for now
 
-            # create a new img in the volume with the new well for analysis
-            plate_base = platename.split("_", 1)[0]
-            # Collecting the time point folders
-            folder_containing_img = Path(volume, platename)
-            folders = [item for item in os.listdir(folder_containing_img) if os.path.isdir(
-                os.path.join(folder_containing_img, item))]
-            # Iterate through each time point
-            for folder in folders:
-                # Copy first and second well image into time point folder
-                first_well_path = folder_containing_img / \
-                    folder / f'{plate_base}_{first_well[0]}.TIF'
-                second_well_path = folder_containing_img / \
-                    folder / f'{plate_base}_{first_well[1]}.TIF'
-                # rename first well path with second well name
-                shutil.copy(first_well_path, second_well_path)
+            # defining the yaml file path (same as the filepath from configure.py)
+            full_yaml = Path(volume, platename + '.yml')
+
+            # reading in yaml file
+            with open(full_yaml, 'r') as file:
+                data = yaml.safe_load(file)
+
+            # assigning first well to the well value
+            data['wells'] = "All"
+
+            # Dump preview data to temp YAML file
+            with open(full_yaml, 'w') as yaml_file:
+                yaml.dump(data, yaml_file,
+                        default_flow_style=False)
+        """
+        end of remove section following wrmxpress bug fix
+        """
 
         # input and platename input folder paths
         input_folder = Path(volume, 'input')
@@ -333,19 +343,4 @@ def run_analysis(
             figs.append(fig)  # appending this image to the list
         # Return the figures as a tuple
 
-        # remove all the created files
-        if remove_wells_later == True:
-            # create a new img in the volume with the new well for analysis
-            plate_base = platename.split("_", 1)[0]
-            # Collecting the time point folders
-            folder_containing_img = Path(volume, platename)
-            folders = [item for item in os.listdir(folder_containing_img) if os.path.isdir(
-                os.path.join(folder_containing_img, item))]
-            # Iterate through each time point
-            for folder in folders:
-                # obtain the second well image path
-                second_well_path = folder_containing_img / \
-                    folder / f'{plate_base}_{first_well[1]}.TIF'
-                # remove the second well image
-                os.remove(second_well_path)
         return figs[0], figs[1], figs[2], True, markdown_lines
