@@ -222,23 +222,43 @@ def run_analysis(
                 return None, None, True, f'Please ensure that you have the Image "{check_for_names[0]}" and is the "{check_for_names[1]}" image.'
         except ValueError as ve:
             return None, None, True, 'An error occured somewhere'
+        
+        ########################################################################
+        ####                                                                ####
+        ####                  Preview YAML Creation                         ####  
+        ####                                                                ####
+        ########################################################################
+        """
+        Remove this section following the fix in the wrmXpress bug
+        """
+        if wells != 'All':
+            first_well = 'All'
 
+        # defining the yaml file path (same as the filepath from configure.py)
+        preview_yaml_platename = '.' + platename + '.yml'
+        preview_yaml_platenmaefull_yaml = Path(volume, preview_yaml_platename)
+        full_yaml = Path(volume, platename + '.yml')
+
+        # reading in yaml file
+        with open(full_yaml, 'r') as file:
+            data = yaml.safe_load(file)
+
+        # assigning first well to the well value
+        data['wells'] = first_well
+
+        # Dump preview data to temp YAML file
+        with open(preview_yaml_platenmaefull_yaml, 'w') as yaml_file:
+            yaml.dump(data, yaml_file,
+                      default_flow_style=False)
+        print(preview_yaml_platenmaefull_yaml)
         if wells == 'All':
-            first_well = ['A01', "A02"]
+            first_well = "A01"
         else:
-            if len(wells) == 1:
-                # Assuming wells[0] is a string like "A01"
-                first_well = wells[0]
-                # Get the last character of the well identifier
-                last_char = first_well[-1]
-                # Increment the last character by 1
-                next_char = chr(ord(last_char) + 1)
-                # Concatenate the first part with the incremented character
-                second_well = first_well[:-1] + next_char
-                wells.append(second_well)
-                first_well = wells
-            else:
-                first_well = wells[:2]
+            first_well = wells[0]
+        """
+        End of section to remove following the fix in the wrmXpress bug
+        """
+
         plate_base = platename.split("_", 1)[0]
 
         """
@@ -267,35 +287,10 @@ def run_analysis(
 
             # Copy first and second well image into time point folder
             first_well_path = Path(folder_containing_img,
-                                   folder, f'{plate_base}_{first_well[0]}.TIF')
-            second_well_path = Path(folder_containing_img,
-                                    folder, f'{plate_base}_{first_well[1]}.TIF')
+                                   folder, f'{plate_base}_{first_well}.TIF')
             shutil.copy(first_well_path, time_point_folder)
-            if os.path.exists(second_well_path):
-                shutil.copy(second_well_path, time_point_folder)
-            # if there isn't a second well
-            else:
-                # rename first well path with second well name
-                shutil.copy(first_well_path, second_well_path)
-                # save second well path with second well name to the time point folder
-                shutil.copy(second_well_path, time_point_folder)
 
-        # defining the yaml file path (same as the filepath from configure.py)
-        preview_yaml_platename = '.' + platename + '.yml'
-        preview_yaml_platenmaefull_yaml = Path(volume, preview_yaml_platename)
-        full_yaml = Path(volume, platename + '.yml')
-
-        # reading in yaml file
-        with open(full_yaml, 'r') as file:
-            data = yaml.safe_load(file)
-
-        # assigning first well to the well value
-        data['wells'] = first_well
-
-        # Dump preview data to temp YAML file
-        with open(preview_yaml_platenmaefull_yaml, 'w') as yaml_file:
-            yaml.dump(data, yaml_file,
-                      default_flow_style=False)
+        yaml_file = Path(platename + '.yml')
 
         print(client)
 
@@ -325,7 +320,7 @@ def run_analysis(
 
         # assumes IX-like file structure
         img_path = Path(
-            volume, 'work', f'{platename}/{first_well[0]}/img/{platename}_{first_well[0]}_{selection}.png')
+            volume, 'work', f'{platename}/{first_well}/img/{platename}_{first_well}_{selection}.png')
 
         while not os.path.exists(img_path):
             time.sleep(1)
@@ -338,8 +333,3 @@ def run_analysis(
 
         return command_message, fig, False, f''
 
-
-@callback(Output("loading-output-2", "children"), Input("loading-input-2", "value"))
-def input_triggers_nested(value):
-    time.sleep(1)
-    return value
