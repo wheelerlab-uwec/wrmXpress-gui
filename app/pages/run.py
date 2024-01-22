@@ -80,7 +80,7 @@ layout = dbc.ModalBody(
                                         value = 50,
                                         animated=True,
                                     ),
-                                ], is_open = True, color = 'success', id = 'alert-progress-bar-run-page', 
+                                ], is_open = False, color = 'success', id = 'alert-progress-bar-run-page', 
                                 ),
                                 dcc.Loading(
                                     id="loading-2",
@@ -273,6 +273,12 @@ def run_analysis(
         client = docker.from_env()
         print(client)
 
+        # create a .txt file for the logs of docker which we will use in the progress bar callback
+        docker_logs_file = Path(volume, 'work', platename, f'{platename}_docker_logs.txt')
+        # remove the docker logs file if it exists
+        if docker_logs_file.exists():
+            docker_logs_file.unlink()
+
         command = f"python wrmXpress/wrapper.py {platename}.yml {platename}"
         command_message = f"```python wrmXpress/wrapper.py {platename}.yml {platename}```"
 
@@ -282,17 +288,17 @@ def run_analysis(
                                                    f'{volume}/work/': {'bind': '/work/', 'mode': 'rw'},
                                                    f'{volume}/{platename}.yml': {'bind': f'/{platename}.yml', 'mode': 'rw'}
                                                    })
+        for line in container.logs(stream=True):
+            # add log to end of .txt file
+            with open(docker_logs_file, 'a') as f:
+                f.write(line.decode('utf-8'))
         # Get the name of the most recent container
         container_name = container.name
-
-        # Wait for the container to finish running (adjust timeout as needed)
-        container.wait(timeout=300)
 
         # Retrieve and process the logs after the container has finished
         result = subprocess.run(
             ['docker', 'logs', container_name], capture_output=True, text=True)
         output_lines = result.stdout.splitlines()
-
         # ensure that these rows of the output are not indented
         non_indented = [
             'instrument settings:',
@@ -343,4 +349,38 @@ def run_analysis(
             figs.append(fig)  # appending this image to the list
         # Return the figures as a tuple
 
+        # remove docker logs folder
+        
         return figs[0], figs[1], figs[2], True, markdown_lines
+
+@callback(
+    Output("alert-progress-bar-run-page", 'is_open'),
+    Output("progress-bar-run-page", 'value'),
+    Input('submit-analysis', 'n_clicks'),
+    State('store', 'data'),
+)
+def update_progress_bar(nclicks, store):
+    if nclicks == 0:
+        return False, 0  # Initial state when the button hasn't been clicked
+
+    volume = store['mount']
+    platename = store['platename']
+    wells = store["wells"]
+    docker_logs_file = Path(volume, 'work', platename, f'{platename}_docker_logs.txt')
+
+    # Check if the Docker logs file exists
+    if not docker_logs_file.exists():
+        return True, 0  # Return 0% if the file doesn't exist
+
+    # Read the Docker logs file
+    with open(docker_logs_file, 'r') as f:
+        lines = f.readlines()
+
+    # Extract the analyzed wells from the logs
+    analyzed_wells = [line.split(' ')[-1] for line in lines if 'Running' in line]
+
+    # Calculate the percentage of analyzed wells
+    num_wells = 96 if wells == 'All' else len(wells)
+    percentage_analyzed = len(analyzed_wells) / num_wells * 100
+
+    return True, percentage_analyzed
