@@ -7,11 +7,32 @@
 import dash
 import dash_bootstrap_components as dbc
 from dash import Dash, html, dcc
+from dash.dependencies import Input, Output, State
+import docker
+import time
+from pathlib import Path
+import numpy as np
+import plotly.express as px
+from PIL import Image
+import os
+import subprocess
+import yaml
+from dash.long_callback import DiskcacheLongCallbackManager
+import pandas as pd
 
 from app.utils.styling import SIDEBAR_STYLE, CONTENT_STYLE
 from app.components.header import header
 
+# importing utils
+from app.utils.styling import layout
+
+# Diskcache
+import diskcache
+cache = diskcache.Cache("./cache")
+long_callback_manager = DiskcacheLongCallbackManager(cache)
+
 app = Dash(__name__,
+           long_callback_manager=long_callback_manager,
            use_pages=True,
            pages_folder='app/pages',
            external_stylesheets=[
@@ -60,9 +81,50 @@ app.layout = html.Div([
 
 ########################################################################
 ####                                                                ####
+####                           Callbacks                            ####
+####                                                                ####
+########################################################################
+
+@app.long_callback(
+    output=Output("paragraph_id", "children"),
+    inputs=Input("button_id", "n_clicks"),
+    running=[
+        (
+            Output("button_id", "disabled"), True, False
+        ),
+        (
+            Output("cancel_button_id", "disabled"), False, True
+        ),
+        (
+            Output("paragraph_id", "style"),
+            {"visibility": "hidden"},
+            {"visibility": "visible"}
+        ),
+        (
+            Output("progress_bar", "style"),
+            {"visibility": "visible"},
+            {"visibility": "hidden"}
+        ),
+    ],
+
+    cancel=[Input("cancel_button_id", "n_clicks")],
+    progress=[Output("progress_bar", "value"), Output("progress_bar", "max")],
+)
+def callback(set_progress, n_clicks):
+    if n_clicks:
+        df = pd.read_csv("NYC_Pool_Inspections_20240124.csv")
+        for i in range(df.shape[0]):
+            text = str(df.iloc[i])
+            time.sleep(0.1)
+            set_progress((str(i + 1), str(df.shape[0]), text))
+        return [f"Clicked {n_clicks} times"]
+
+########################################################################
+####                                                                ####
 ####                        RUNNING SERVER                          ####
 ####                                                                ####
 ########################################################################
+
 
 if __name__ == '__main__':
     app.run_server(debug=True, host='0.0.0.0', port=9000)
