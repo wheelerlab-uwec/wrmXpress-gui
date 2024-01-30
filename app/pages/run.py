@@ -95,7 +95,7 @@ layout = dbc.ModalBody(
                                         value=50,
                                         animated=True,
                                     ),
-                                ], is_open=False, color='success', id='alert-progress-bar-run-page',
+                                ], is_open=True, color='success', id='alert-progress-bar-run-page',
                                 ),
                                 dcc.Loading(
                                     id="loading-2",
@@ -211,37 +211,3 @@ def update_results_message_for_run_page(
     if nclicks:
         return results
 
-
-@callback(
-    Output("alert-progress-bar-run-page", 'is_open'),
-    Output("progress-bar-run-page", 'value'),
-    Input('submit-analysis', 'n_clicks'),
-    State('store', 'data'),
-)
-def update_progress_bar(nclicks, store):
-    if nclicks == 0:
-        return False, 0  # Initial state when the button hasn't been clicked
-
-    volume = store['mount']
-    platename = store['platename']
-    wells = store["wells"]
-    docker_logs_file = Path(volume, 'work', platename,
-                            f'{platename}_docker_logs.txt')
-
-    # Check if the Docker logs file exists
-    if not docker_logs_file.exists():
-        return True, 0  # Return 0% if the file doesn't exist
-
-    # Read the Docker logs file
-    with open(docker_logs_file, 'r') as f:
-        lines = f.readlines()
-
-    # Extract the analyzed wells from the logs
-    analyzed_wells = [line.split(' ')[-1]
-                      for line in lines if 'Running' in line]
-
-    # Calculate the percentage of analyzed wells
-    num_wells = 96 if wells == 'All' else len(wells)
-    percentage_analyzed = len(analyzed_wells) / num_wells * 100
-
-    return True, percentage_analyzed

@@ -85,30 +85,34 @@ app.layout = html.Div([
 ####                                                                ####
 ########################################################################
 
+
 @app.long_callback(
-    output=Output("paragraph_id", "children"),
-    inputs=Input("button_id", "n_clicks"),
+    output=Output("image-analysis-preview", "children"),
+    inputs=Input("submit-analysis", "n_clicks"),
     running=[
         (
-            Output("button_id", "disabled"), True, False
+            Output("submit-analysis", "disabled"), True, False
         ),
         (
-            Output("cancel_button_id", "disabled"), False, True
+            Output("cancel-analysis", "disabled"), False, True
         ),
         (
-            Output("paragraph_id", "style"),
+            Output("image-analysis-preview", "style"),
             {"visibility": "hidden"},
             {"visibility": "visible"}
         ),
         (
-            Output("progress_bar", "style"),
+            Output("progress-bar-run-page", "style"),
             {"visibility": "visible"},
             {"visibility": "hidden"}
         ),
     ],
 
-    cancel=[Input("cancel_button_id", "n_clicks")],
-    progress=[Output("progress_bar", "value"), Output("progress_bar", "max")],
+    cancel=[Input("cancel-analysis", "n_clicks")],
+    progress=[
+        Output("progress-bar-run-page", "value"),
+        Output("progress-bar-run-page", "max")
+    ],
 )
 def callback(set_progress, n_clicks):
     if n_clicks:
