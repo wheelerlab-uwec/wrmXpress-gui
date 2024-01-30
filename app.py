@@ -87,7 +87,7 @@ app.layout = html.Div([
 
 
 @app.long_callback(
-    output=Output("image-analysis-preview", "children"),
+    output=Output("image-analysis-preview", "figure"),
     inputs=Input("submit-analysis", "n_clicks"),
     running=[
         (
@@ -116,12 +116,19 @@ app.layout = html.Div([
 )
 def callback(set_progress, n_clicks):
     if n_clicks:
-        df = pd.read_csv("NYC_Pool_Inspections_20240124.csv")
-        for i in range(df.shape[0]):
-            text = str(df.iloc[i])
+        for i in range(1,100):
+            text = str(i)
             time.sleep(0.1)
-            set_progress((str(i + 1), str(df.shape[0]), text))
-        return [f"Clicked {n_clicks} times"]
+            set_progress((str(i + 1), str(100), text))
+
+        img_path = "/Users/zach/Downloads/seal_cu_boulder.png"
+        img = np.array(Image.open(img_path))
+        fig = px.imshow(img, color_continuous_scale="gray")
+        fig.update_layout(coloraxis_showscale=False)
+        fig.update_xaxes(showticklabels=False)
+        fig.update_yaxes(showticklabels=False)
+
+        return [fig]
 
 ########################################################################
 ####                                                                ####

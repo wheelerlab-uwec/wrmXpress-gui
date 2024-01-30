@@ -73,29 +73,26 @@ layout = dbc.ModalBody(
                                 dbc.Row([
                                     dbc.Col(
                                         dbc.Button('Begin Analysis',
-                                           id='submit-analysis',
-                                           className="d-grid gap-2 col-6 mx-auto",
-                                           color="primary",
-                                           n_clicks=0),
+                                                   id='submit-analysis',
+                                                   className="d-grid gap-2 col-6 mx-auto",
+                                                   color="primary",
+                                                   n_clicks=0),
                                     ),
                                     dbc.Col(
                                         dbc.Button('Cancel Analysis',
-                                                   id = 'cancel-analysis',
-                                                    className="d-grid gap-2 col-6 mx-auto",
-                                                    color="danger",
-                                                    n_clicks=0),
+                                                   id='cancel-analysis',
+                                                   className="d-grid gap-2 col-6 mx-auto",
+                                                   color="danger",
+                                                   n_clicks=0),
                                     ),
                                 ]),
                                 html.Br(),
-                                dbc.Alert(children=[
-                                    dbc.Progress(
-                                        id='progress-bar-run-page',
-                                        striped=True,
-                                        color="primary",
-                                        value=50,
-                                        animated=True,
-                                    ),
-                                ], is_open=True, color='success', id='alert-progress-bar-run-page',
+                                dbc.Progress(
+                                    id='progress-bar-run-page',
+                                    striped=True,
+                                    color="primary",
+                                    value=50,
+                                    animated=True,
                                 ),
                                 dcc.Loading(
                                     id="loading-2",
@@ -210,4 +207,3 @@ def update_results_message_for_run_page(
     ]
     if nclicks:
         return results
-
