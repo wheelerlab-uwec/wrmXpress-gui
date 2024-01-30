@@ -18,7 +18,7 @@ import os
 import subprocess
 import yaml
 from dash.long_callback import DiskcacheLongCallbackManager
-import pandas as pd
+import shutil
 
 from app.utils.styling import SIDEBAR_STYLE, CONTENT_STYLE
 from app.components.header import header
@@ -120,14 +120,100 @@ app.layout = html.Div([
         Output("progress-bar-run-page", "value"),
         Output("progress-bar-run-page", "max")
     ],
+    prevent_initial_call=True,
 )
 def callback(set_progress, n_clicks, store):
     volume = store['mount']
     platename = store['platename']
     wells = store["wells"]
-    print(volume, platename, wells)
 
     if n_clicks:
+        """
+        Checking if wrmXpress container exists
+        """
+        try:
+            good_to_go = False
+            check_for_names = ['zamanianlab/wrmxpress', 'latest']
+            print('error 0')
+            os.environ['OBJC_DISABLE_INITIALIZE_FORK_SAFETY'] = 'YES'
+            client = docker.from_env()
+            print('error 0.5')
+            images_in_docker = client.images.list()
+            for img in images_in_docker:
+                img = f"{img}"
+                # Remove angle brackets, quotes, and split
+                image_info = img.strip()[8:-1].strip("'").split("', '")
+                image_tag = image_info[-1]
+                if check_for_names[0] in image_tag:
+                    good_to_go = True
+                if check_for_names[1] in image_tag:
+                    good_to_go = True
+
+            if good_to_go == False:
+                return None, None, None
+        except ValueError as ve:
+            return None, None, None
+        
+        """
+        Remove this section following the fix in the wrmXpress bug
+        """
+        if wells != 'All' and len(wells)==1:
+            yaml_well = "All"
+        else:
+            yaml_well = wells
+        full_yaml = Path(volume, platename + '.yml')
+
+        # reading in yaml file
+        with open(full_yaml, 'r') as file:
+            data = yaml.safe_load(file)
+
+        # assigning first well to the well value
+        data['wells'] = yaml_well
+
+        # Dump preview data to temp YAML file
+        with open(full_yaml, 'w') as yaml_file:
+            yaml.dump(data, yaml_file,
+                      default_flow_style=False)
+        """
+        End of section to remove
+        """
+
+        """
+        need to ensure input folder exists and contains the platename folder 
+        also copy the whole platename folder into the input folder
+        """
+        # Input and platename input folder paths
+        folder_containing_img = Path(volume, platename)
+        input_folder = Path(volume, 'input')
+        platename_input_folder = Path(input_folder, platename)
+        os.makedirs(platename_input_folder, exist_ok=True)
+        shutil.copytree(folder_containing_img, platename_input_folder, dirs_exist_ok=True) # overwrite if exists
+        yaml_file = Path(platename + '.yml')
+
+        print(client)
+
+        command = f"python wrmXpress/wrapper.py {yaml_file} {platename}"
+        command_message = f"```python wrmXpress/wrapper.py {platename}.yml {platename}```"
+
+        container = client.containers.run('zamanianlab/wrmxpress', command=f"{command}", detach=True,
+                                          volumes={f'{volume}/input/': {'bind': '/input/', 'mode': 'rw'},
+                                                   f'{volume}/output/': {'bind': '/output/', 'mode': 'rw'},
+                                                   f'{volume}/work/': {'bind': '/work/', 'mode': 'rw'},
+                                                   f'{volume}/{yaml_file}': {'bind': f'/{yaml_file}', 'mode': 'rw'}
+                                                   })
+        # Get the name of the most recent container
+        container_name = container.name
+
+        # Wait for the container to finish running (adjust timeout as needed)
+        container.wait(timeout=300)
+
+        # Retrieve and process the logs after the container has finished
+        result = subprocess.run(
+            ['docker', 'logs', container_name], capture_output=True, text=True)
+        output_lines = result.stdout.splitlines()
+
+        print(output_lines)
+
         for i in range(1,100):
             text = str(i)
             time.sleep(0.1)
