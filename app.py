@@ -87,8 +87,15 @@ app.layout = html.Div([
 
 
 @app.long_callback(
-    output=Output("image-analysis-preview", "figure"),
-    inputs=Input("submit-analysis", "n_clicks"),
+    output=[
+        Output("image-analysis-preview", "figure"),
+        Output('analysis-postview', 'figure'),
+        Output('analysis-postview-another', 'figure'),
+    ],
+    inputs=[
+        Input("submit-analysis", "n_clicks"),
+        State("store", "data"),
+    ],
     running=[
         (
             Output("submit-analysis", "disabled"), True, False
@@ -114,21 +121,25 @@ app.layout = html.Div([
         Output("progress-bar-run-page", "max")
     ],
 )
-def callback(set_progress, n_clicks):
+def callback(set_progress, n_clicks, store):
+    volume = store['mount']
+    platename = store['platename']
+    wells = store["wells"]
+    print(volume, platename, wells)
+
     if n_clicks:
         for i in range(1,100):
             text = str(i)
             time.sleep(0.1)
             set_progress((str(i + 1), str(100), text))
 
-        img_path = "/Users/zach/Downloads/seal_cu_boulder.png"
-        img = np.array(Image.open(img_path))
+        file_path = "/Users/zach/Downloads/seal_cu_boulder.png"
+        img = np.array(Image.open(file_path))
         fig = px.imshow(img, color_continuous_scale="gray")
         fig.update_layout(coloraxis_showscale=False)
         fig.update_xaxes(showticklabels=False)
         fig.update_yaxes(showticklabels=False)
-
-        return [fig]
+        return fig, fig, fig
 
 ########################################################################
 ####                                                                ####
