@@ -222,17 +222,17 @@ def run_analysis(
                 return None, None, True, f'Please ensure that you have the Image "{check_for_names[0]}" and is the "{check_for_names[1]}" image.'
         except ValueError as ve:
             return None, None, True, 'An error occured somewhere'
-        
+
         ########################################################################
         ####                                                                ####
-        ####                  Preview YAML Creation                         ####  
+        ####                  Preview YAML Creation                         ####
         ####                                                                ####
         ########################################################################
         """
         Remove this section following the fix in the wrmXpress bug
         """
         if wells != 'All':
-            first_well = 'All'
+            first_well = ['All']
 
         # defining the yaml file path (same as the filepath from configure.py)
         preview_yaml_platename = '.' + platename + '.yml'
@@ -331,4 +331,3 @@ def run_analysis(
         fig.update_yaxes(showticklabels=False)
 
         return command_message, fig, False, f''
-
