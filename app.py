@@ -201,7 +201,6 @@ def callback(set_progress, n_clicks, store):
                 time_point_folder = Path(platename_input_folder, folder)
                 os.makedirs(time_point_folder, exist_ok=True)
                 for well in store["wells"]:
-                    print(well)
                     # Copy necessary wells image into time point folder
                     well_path = Path(folder_containing_img,
                                         folder, f'{plate_base}_{well}.TIF')
@@ -242,17 +241,6 @@ def callback(set_progress, n_clicks, store):
                             well_path = Path(folder_containing_img,
                                             folder, f'{plate_base}_{well}.TIF')
                             shutil.copy(well_path, time_point_folder)        
-
-        """    
-        # Input and platename input folder paths
-        folder_containing_img = Path(volume, platename)
-        input_folder = Path(volume, 'input')
-        platename_input_folder = Path(input_folder, platename)
-        os.makedirs(platename_input_folder, exist_ok=True)
-        shutil.copytree(folder_containing_img, platename_input_folder, dirs_exist_ok=True) # overwrite if exists
-        yaml_file = Path(platename + '.yml')
-        full_yaml = Path(volume, platename + '.yml')
-        """
         """
         End of section to replace
         """
@@ -271,30 +259,32 @@ def callback(set_progress, n_clicks, store):
         
         # Get the name of the most recent container
         container_name = container.name
-        print(container_name)
-        img_path = Path(volume, 'output', 'thumbs', platename + '.png')
-
-        while not os.path.exists(img_path):
+        container_status = container.status
+        wells_to_be_analyzed = len(store["wells"])
+        wells_analyzed = []
+        while container_status in ['created', 'running']:
+            container.reload()
+            container_status = container.status
             time.sleep(1)
             # Retrieve and process the logs after the container has finished
             result = subprocess.run(
                 ['docker', 'logs', container_name], capture_output=True, text=True)
+            output_lines = result.stdout.splitlines()
+            for line in output_lines:
+                if "Running" in line:
+                    well_running = line.split(" ")[-1]
+                    if well_running not in wells_analyzed:
+                        wells_analyzed.append(well_running)
+                    set_progress((str(len(wells_analyzed)), str(wells_to_be_analyzed), line))
+                    
+        img_path = Path(volume, 'output', 'thumbs', platename + '.png')
 
-            output_line = (result.stdout.splitlines())
-            
-            print(output_line)
-
-        for i in range(1,100):
-            text = str(i)
-            time.sleep(0.1)
-            set_progress((str(i + 1), str(100), text))
-
-        file_path = "/Users/zach/Downloads/cu_boulder.png"
-        img = np.array(Image.open(file_path))
+        img = np.array(Image.open(img_path))
         fig = px.imshow(img, color_continuous_scale="gray")
         fig.update_layout(coloraxis_showscale=False)
         fig.update_xaxes(showticklabels=False)
         fig.update_yaxes(showticklabels=False)
+
         return fig, fig, fig
 
 ########################################################################
