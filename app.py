@@ -134,10 +134,7 @@ def callback(set_progress, n_clicks, store):
         try:
             good_to_go = False
             check_for_names = ['zamanianlab/wrmxpress', 'latest']
-            print('error 0')
-            os.environ['OBJC_DISABLE_INITIALIZE_FORK_SAFETY'] = 'YES'
             client = docker.from_env()
-            print('error 0.5')
             images_in_docker = client.images.list()
             for img in images_in_docker:
                 img = f"{img}"
@@ -155,12 +152,25 @@ def callback(set_progress, n_clicks, store):
             return None, None, None
         
         """
-        Remove this section following the fix in the wrmXpress bug
+        Replace this section following the fix in the wrmXpress bug
+
+        Replace with 
+        '''
+
+        '''
+
         """
+        folder_containing_img = Path(volume, platename)
+        input_folder = Path(volume, 'input')
+        platename_input_folder = Path(input_folder, platename)
+        plate_base = platename.split("_", 1)[0]
+        htd_file_path = folder_containing_img / f'{plate_base}.HTD'
+
+
         if wells != 'All' and len(wells)==1:
-            yaml_well = "All"
+            yaml_well = ["All"]
         else:
-            yaml_well = wells
+            yaml_well = [wells]
         full_yaml = Path(volume, platename + '.yml')
 
         # reading in yaml file
@@ -174,14 +184,66 @@ def callback(set_progress, n_clicks, store):
         with open(full_yaml, 'w') as yaml_file:
             yaml.dump(data, yaml_file,
                       default_flow_style=False)
-        """
-        End of section to remove
-        """
+            
+        # check to see if input folder exists, if not create it
+        # then copy necessay files into input folder
+        if not os.path.exists(Path(volume, 'input')):
+            os.makedirs(Path(volume, 'input'))
+            os.makedirs(Path(volume, 'input', platename))
 
-        """
-        need to ensure input folder exists and contains the platename folder 
-        also copy the whole platename folder into the input folder
-        """
+            # Copy .HTD file into platename input folder
+            shutil.copy(htd_file_path, platename_input_folder)
+            # Collecting the time point folders
+            folders = [item for item in os.listdir(folder_containing_img) if os.path.isdir(
+                Path(folder_containing_img, item))]
+            # Iterate through each time point
+            for folder in folders:
+                time_point_folder = Path(platename_input_folder, folder)
+                os.makedirs(time_point_folder, exist_ok=True)
+                for well in store["wells"]:
+                    print(well)
+                    # Copy necessary wells image into time point folder
+                    well_path = Path(folder_containing_img,
+                                        folder, f'{plate_base}_{well}.TIF')
+                    shutil.copy(well_path, time_point_folder)
+        # if input folder exists, check to see if platename folder exists, if not create it
+        # then copy necessay files into platename folder
+        elif os.path.exists(Path(volume, 'input')):
+            if not os.path.exists(htd_file_path):
+                shutil.copy(htd_file_path, platename_input_folder)
+
+            if not os.path.exists(platename_input_folder):
+                os.makedirs(platename_input_folder)
+                # Collecting the time point folders
+                folders = [item for item in os.listdir(folder_containing_img) if os.path.isdir(
+                    Path(folder_containing_img, item))]
+                # Iterate through each time point
+                for folder in folders:
+                    time_point_folder = Path(platename_input_folder, folder)
+                    os.makedirs(time_point_folder, exist_ok=True)
+                    for well in store["wells"]:
+                        # Copy necessary wells image into time point folder
+                        well_path = Path(folder_containing_img,
+                                        folder, f'{plate_base}_{well}.TIF')
+                        shutil.copy(well_path, time_point_folder)
+
+            # if input folder & platname folder exist, check to see if necessary files are in platename folder
+            elif os.path.exists(platename_input_folder):
+                # Collecting the time point folders
+                folders = [item for item in os.listdir(folder_containing_img) if os.path.isdir(
+                    Path(folder_containing_img, item))]
+                # Iterate through each time point
+                for folder in folders:
+                    time_point_folder = Path(platename_input_folder, folder)
+                    if not os.path.exists(time_point_folder):
+                        os.makedirs(time_point_folder, exist_ok=True)
+                        for well in store["wells"]:
+                            # Copy necessary wells image into time point folder
+                            well_path = Path(folder_containing_img,
+                                            folder, f'{plate_base}_{well}.TIF')
+                            shutil.copy(well_path, time_point_folder)        
+
+        """    
         # Input and platename input folder paths
         folder_containing_img = Path(volume, platename)
         input_folder = Path(volume, 'input')
@@ -189,37 +251,45 @@ def callback(set_progress, n_clicks, store):
         os.makedirs(platename_input_folder, exist_ok=True)
         shutil.copytree(folder_containing_img, platename_input_folder, dirs_exist_ok=True) # overwrite if exists
         yaml_file = Path(platename + '.yml')
-
+        full_yaml = Path(volume, platename + '.yml')
+        """
+        """
+        End of section to replace
+        """
+          
         print(client)
 
-        command = f"python wrmXpress/wrapper.py {yaml_file} {platename}"
+        command = f"python wrmXpress/wrapper.py {platename}.yml {platename}"
         command_message = f"```python wrmXpress/wrapper.py {platename}.yml {platename}```"
 
         container = client.containers.run('zamanianlab/wrmxpress', command=f"{command}", detach=True,
                                           volumes={f'{volume}/input/': {'bind': '/input/', 'mode': 'rw'},
                                                    f'{volume}/output/': {'bind': '/output/', 'mode': 'rw'},
                                                    f'{volume}/work/': {'bind': '/work/', 'mode': 'rw'},
-                                                   f'{volume}/{yaml_file}': {'bind': f'/{yaml_file}', 'mode': 'rw'}
+                                                   f'{volume}/{platename}.yml': {'bind': f'/{platename}.yml', 'mode': 'rw'}
                                                    })
+        
         # Get the name of the most recent container
         container_name = container.name
+        print(container_name)
+        img_path = Path(volume, 'output', 'thumbs', platename + '.png')
 
-        # Wait for the container to finish running (adjust timeout as needed)
-        container.wait(timeout=300)
+        while not os.path.exists(img_path):
+            time.sleep(1)
+            # Retrieve and process the logs after the container has finished
+            result = subprocess.run(
+                ['docker', 'logs', container_name], capture_output=True, text=True)
 
-        # Retrieve and process the logs after the container has finished
-        result = subprocess.run(
-            ['docker', 'logs', container_name], capture_output=True, text=True)
-        output_lines = result.stdout.splitlines()
-
-        print(output_lines)
+            output_line = (result.stdout.splitlines())
+            
+            print(output_line)
 
         for i in range(1,100):
             text = str(i)
             time.sleep(0.1)
             set_progress((str(i + 1), str(100), text))
 
-        file_path = "/Users/zach/Downloads/seal_cu_boulder.png"
+        file_path = "/Users/zach/Downloads/cu_boulder.png"
         img = np.array(Image.open(file_path))
         fig = px.imshow(img, color_continuous_scale="gray")
         fig.update_layout(coloraxis_showscale=False)

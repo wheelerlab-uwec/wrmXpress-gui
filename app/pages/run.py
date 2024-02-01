@@ -91,7 +91,7 @@ layout = dbc.ModalBody(
                                     id='progress-bar-run-page',
                                     striped=True,
                                     color="primary",
-                                    value=50,
+                                    value=0,
                                     animated=True,
                                 ),
                                 dcc.Loading(
