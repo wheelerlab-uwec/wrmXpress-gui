@@ -149,7 +149,7 @@ def callback(set_progress, n_clicks, store):
                 return None, None, None
         except ValueError as ve:
             return None, None, None
-        
+
         """
         Replace this section following the fix in the wrmXpress bug
 
@@ -178,7 +178,7 @@ def callback(set_progress, n_clicks, store):
         with open(full_yaml, 'w') as yaml_file:
             yaml.dump(data, yaml_file,
                       default_flow_style=False)
-            
+
         # check to see if input folder exists, if not create it
         # then copy necessay files into input folder
         if not os.path.exists(Path(volume, 'input')):
@@ -197,7 +197,7 @@ def callback(set_progress, n_clicks, store):
                 for well in store["wells"]:
                     # Copy necessary wells image into time point folder
                     well_path = Path(folder_containing_img,
-                                        folder, f'{plate_base}_{well}.TIF')
+                                     folder, f'{plate_base}_{well}.TIF')
                     shutil.copy(well_path, time_point_folder)
         # if input folder exists, check to see if platename folder exists, if not create it
         # then copy necessay files into platename folder
@@ -217,7 +217,7 @@ def callback(set_progress, n_clicks, store):
                     for well in store["wells"]:
                         # Copy necessary wells image into time point folder
                         well_path = Path(folder_containing_img,
-                                        folder, f'{plate_base}_{well}.TIF')
+                                         folder, f'{plate_base}_{well}.TIF')
                         shutil.copy(well_path, time_point_folder)
 
             # if input folder & platname folder exist, clear platename folder and copy necessary files into it
@@ -236,16 +236,32 @@ def callback(set_progress, n_clicks, store):
                         for well in store["wells"]:
                             # Copy necessary wells image into time point folder
                             well_path = Path(folder_containing_img,
-                                            folder, f'{plate_base}_{well}.TIF')
-                            shutil.copy(well_path, time_point_folder)  
+                                             folder, f'{plate_base}_{well}.TIF')
+                            shutil.copy(well_path, time_point_folder)
 
-        ## check to see if work folder exists, if it does delete it
+        # check to see if work folder exists, if it does delete it
         if os.path.exists(Path(volume, 'work')):
-            os.system(f'rm -rf {Path(volume, "work")}')
+            for filename in os.listdir(Path(volume, 'work')):
+                file_path = os.path.join(Path(volume, 'work'), filename)
+                try:
+                    if os.path.isfile(file_path) or os.path.islink(file_path):
+                        os.unlink(file_path)
+                    elif os.path.isdir(file_path):
+                        shutil.rmtree(file_path)
+                except Exception as e:
+                    print('Failed to delete %s because %s' % (file_path, e))
 
         # check to see if output folder exists, if it does delete it
         if os.path.exists(Path(volume, 'output')):
-            os.remove(Path(volume, 'output'))   
+            for filename in os.listdir(Path(volume, 'output')):
+                file_path = os.path.join(Path(volume, 'output'), filename)
+                try:
+                    if os.path.isfile(file_path) or os.path.islink(file_path):
+                        os.unlink(file_path)
+                    elif os.path.isdir(file_path):
+                        shutil.rmtree(file_path)
+                except Exception as e:
+                    print('Failed to delete %s because %s' % (file_path, e))
         """
         End of section to replace 
         """
@@ -261,7 +277,7 @@ def callback(set_progress, n_clicks, store):
                                                    f'{volume}/work/': {'bind': '/work/', 'mode': 'rw'},
                                                    f'{volume}/{platename}.yml': {'bind': f'/{platename}.yml', 'mode': 'rw'}
                                                    })
-        
+
         # Get the name of the most recent container
         container_name = container.name
         container_status = container.status
@@ -281,8 +297,9 @@ def callback(set_progress, n_clicks, store):
                     well_running = line.split(" ")[-1]
                     if well_running not in wells_analyzed:
                         wells_analyzed.append(well_running)
-                    set_progress((str(len(wells_analyzed)), str(wells_to_be_analyzed), line))
-                 
+                    set_progress((str(len(wells_analyzed)),
+                                 str(wells_to_be_analyzed), line))
+
         img_path = Path(volume, 'output', 'thumbs', platename + '.png')
 
         img = np.array(Image.open(img_path))
