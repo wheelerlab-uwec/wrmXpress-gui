@@ -126,7 +126,6 @@ def callback(set_progress, n_clicks, store):
     volume = store['mount']
     platename = store['platename']
     wells = store["wells"]
-
     if n_clicks:
         """
         Checking if wrmXpress container exists
@@ -166,11 +165,6 @@ def callback(set_progress, n_clicks, store):
         plate_base = platename.split("_", 1)[0]
         htd_file_path = folder_containing_img / f'{plate_base}.HTD'
 
-
-        if wells != 'All' and len(wells)==1:
-            yaml_well = ["All"]
-        else:
-            yaml_well = [wells]
         full_yaml = Path(volume, platename + '.yml')
 
         # reading in yaml file
@@ -178,7 +172,7 @@ def callback(set_progress, n_clicks, store):
             data = yaml.safe_load(file)
 
         # assigning first well to the well value
-        data['wells'] = yaml_well
+        data['wells'] = ['All']
 
         # Dump preview data to temp YAML file
         with open(full_yaml, 'w') as yaml_file:
@@ -242,9 +236,8 @@ def callback(set_progress, n_clicks, store):
                                             folder, f'{plate_base}_{well}.TIF')
                             shutil.copy(well_path, time_point_folder)        
         """
-        End of section to replace
+        End of section to replace 
         """
-          
         print(client)
 
         command = f"python wrmXpress/wrapper.py {platename}.yml {platename}"
