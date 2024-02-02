@@ -220,8 +220,11 @@ def callback(set_progress, n_clicks, store):
                                         folder, f'{plate_base}_{well}.TIF')
                         shutil.copy(well_path, time_point_folder)
 
-            # if input folder & platname folder exist, check to see if necessary files are in platename folder
+            # if input folder & platname folder exist, clear platename folder and copy necessary files into it
             elif os.path.exists(platename_input_folder):
+                os.system(f'rm -rf {platename_input_folder}')
+                os.makedirs(platename_input_folder)
+                shutil.copy(htd_file_path, platename_input_folder)
                 # Collecting the time point folders
                 folders = [item for item in os.listdir(folder_containing_img) if os.path.isdir(
                     Path(folder_containing_img, item))]
@@ -238,9 +241,10 @@ def callback(set_progress, n_clicks, store):
         """
         End of section to replace 
         """
+
         print(client)
 
-        command = f"python wrmXpress/wrapper.py {platename}.yml {platename}"
+        command = f"python -u wrmXpress/wrapper.py {platename}.yml {platename}"
         command_message = f"```python wrmXpress/wrapper.py {platename}.yml {platename}```"
 
         container = client.containers.run('zamanianlab/wrmxpress', command=f"{command}", detach=True,
@@ -255,6 +259,7 @@ def callback(set_progress, n_clicks, store):
         container_status = container.status
         wells_to_be_analyzed = len(store["wells"])
         wells_analyzed = []
+
         while container_status in ['created', 'running']:
             container.reload()
             container_status = container.status
@@ -269,7 +274,7 @@ def callback(set_progress, n_clicks, store):
                     if well_running not in wells_analyzed:
                         wells_analyzed.append(well_running)
                     set_progress((str(len(wells_analyzed)), str(wells_to_be_analyzed), line))
-                    
+                 
         img_path = Path(volume, 'output', 'thumbs', platename + '.png')
 
         img = np.array(Image.open(img_path))
@@ -289,3 +294,14 @@ def callback(set_progress, n_clicks, store):
 
 if __name__ == '__main__':
     app.run_server(debug=True, host='0.0.0.0', port=9000)
+
+"""
+        ## Loop through work folders to get the all of the file paths of the work folders
+        work_folder = Path(volume, 'work')
+        platename_work_folder = Path(work_folder, platename)
+        list_of_folders = []
+
+        for well in store['wells']:
+            well_path = Path(platename_work_folder, well, 'img')
+            list_of_folders.append(well_path)
+"""
