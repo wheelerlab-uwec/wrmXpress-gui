@@ -239,20 +239,13 @@ def callback(set_progress, n_clicks, store):
                                             folder, f'{plate_base}_{well}.TIF')
                             shutil.copy(well_path, time_point_folder)  
 
-        ## check to see if work folder exists, if it does, check to see if platename folder exists, if it does delete it
+        ## check to see if work folder exists, if it does delete it
         if os.path.exists(Path(volume, 'work')):
-            if os.path.exists(Path(volume, 'work', platename)):
-                os.system(f'rm -rf {Path(volume, "work", platename)}')
+            os.system(f'rm -rf {Path(volume, "work")}')
 
-        # check to see if output folder exists, if it does, check to see if thumbs folder exists, remove any of the files that have the platename base in the name
+        # check to see if output folder exists, if it does delete it
         if os.path.exists(Path(volume, 'output')):
-            if os.path.exists(Path(volume, 'output', 'thumbs')):
-                thumbs_folder = Path(volume, 'output', 'thumbs')
-                thumbs_files = [item for item in os.listdir(thumbs_folder) if os.path.isfile(
-                    Path(thumbs_folder, item))]
-                for file in thumbs_files:
-                    if plate_base in file:
-                        os.remove(Path(thumbs_folder, file))   
+            os.remove(Path(volume, 'output'))   
         """
         End of section to replace 
         """
