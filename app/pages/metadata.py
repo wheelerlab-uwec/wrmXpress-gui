@@ -73,7 +73,7 @@ layout = dbc.Container(
                                 "Finalize Tables",
                                 id="finalize-metadata-table-button",
                                 className="flex",
-                                color='success'
+                                color='primary'
                             ),
                             width="auto"
                         ),
@@ -94,7 +94,7 @@ layout = dbc.Container(
                         dbc.Button(
                             "Save metadata",
                             id='save-meta-data-to-csv',
-                            color='success',
+                            color='primary',
                             n_clicks=0
                         ),
                         width='auto'
@@ -123,7 +123,8 @@ layout = dbc.Container(
 
 @callback(
     [Output('metadata-tabs', 'children'),
-     Output('metadata-tabs', 'value')],
+     Output('metadata-tabs', 'value'),
+     Output("finalize-metadata-table-button", "color")],
     [State('store', 'data'),
      Input("finalize-metadata-table-button", 'n_clicks')],
     [State("checklist-input", "value")],
@@ -171,10 +172,10 @@ def create_tabs_from_checklist(store, n_clicks, checklist_values):
         ]
         # Set the value of the first tab as the selected tab
         selected_tab = f'{checklist_values[0]}-tab'
-        return tabs, selected_tab
+        return tabs, selected_tab, 'success'
     else:
         # If no checklist values are available, return an empty list and set 'batch-data-tab' as the selected tab
-        return [], 'batch-data-tab'
+        return [], 'batch-data-tab','primary'
 
 
 @callback(
@@ -239,4 +240,4 @@ def save_the_metadata_tables_to_csv(n_clicks, metadata_tabs, store):
         # Enable the button if not clicked
         return "success", True
     else: 
-        return "success", False
+        return "primary", False
