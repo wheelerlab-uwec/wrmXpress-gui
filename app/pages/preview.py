@@ -198,6 +198,7 @@ def run_analysis(
     volume = store['mount']
     platename = store['platename']
     wells = store["wells"]
+    plate_base = platename.split("_", 1)[0]
 
     if nclicks:
         """
@@ -222,19 +223,20 @@ def run_analysis(
                 return None, None, True, f'Please ensure that you have the Image "{check_for_names[0]}" and is the "{check_for_names[1]}" image.'
         except ValueError as ve:
             return None, None, True, 'An error occured somewhere'
-
-        ### Check to see if first well already exists, if it does insert the img
-        ### rather than running wrmXpress again
-        first_well_path = Path(
-            volume, f'{platename}/TimePoint_1/{platename}_{wells[0]}.png')
-        if os.path.exists(first_well_path):
-            img = np.array(Image.open(first_well_path))
-            fig = px.imshow(img, color_continuous_scale="gray")
-            fig.update_layout(coloraxis_showscale=False)
-            fig.update_xaxes(showticklabels=False)
-            fig.update_yaxes(showticklabels=False)
-            return None, fig, False, f''
-
+        try:
+            ### Check to see if first well already exists, if it does insert the img
+            ### rather than running wrmXpress again
+            first_well_path = Path(
+                volume, 'work', f'{platename}/{wells[0]}/img/{platename}_{wells[0]}_{selection}.png')
+            if os.path.exists(first_well_path):
+                img = np.array(Image.open(first_well_path))
+                fig = px.imshow(img, color_continuous_scale="gray")
+                fig.update_layout(coloraxis_showscale=False)
+                fig.update_xaxes(showticklabels=False)
+                fig.update_yaxes(showticklabels=False)
+                return f"```{first_well_path}```", fig, False, f''
+        except ValueError as ve:
+            return None, None, True, 'An error occured somewhere'
         ########################################################################
         ####                                                                ####
         ####                  Preview YAML Creation                         ####
@@ -269,8 +271,6 @@ def run_analysis(
         """
         End of section to remove following the fix in the wrmXpress bug
         """
-
-        plate_base = platename.split("_", 1)[0]
 
         """
         Checking if input folder exists, and if not, create it, 
