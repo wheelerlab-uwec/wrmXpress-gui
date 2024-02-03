@@ -99,6 +99,14 @@ layout = dbc.Container(
                         ),
                         width='auto'
                     )
+                ),
+                html.Br(),
+                dbc.Alert(
+                    children= ["Metadata tables saved!"],
+                    id="metadata-saved-alert",
+                    is_open=False,
+                    color="success",
+                    style={"textAlign": "center"}
                 )
             ]
         )
@@ -187,7 +195,8 @@ def update_metadata_checklist(n_clicks, new_table_name, existing_options):
 
 
 @callback(
-    Output("save-meta-data-to-csv", 'color'),
+    [Output("save-meta-data-to-csv", 'color'),
+     Output("metadata-saved-alert", "is_open")],
     Input("save-meta-data-to-csv", "n_clicks"),
     State('metadata-tabs', 'children'),
     State('store', 'data')
@@ -227,5 +236,7 @@ def save_the_metadata_tables_to_csv(n_clicks, metadata_tabs, store):
             file_path = metadata_dir.joinpath(f"{tab_id}.csv")
             df.to_csv(file_path, index=False, header=False)
 
-    # Enable the button if not clicked
-    return "success"
+        # Enable the button if not clicked
+        return "success", True
+    else: 
+        return "success", False
