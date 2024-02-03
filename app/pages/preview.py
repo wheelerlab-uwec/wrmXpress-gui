@@ -223,20 +223,17 @@ def run_analysis(
                 return None, None, True, f'Please ensure that you have the Image "{check_for_names[0]}" and is the "{check_for_names[1]}" image.'
         except ValueError as ve:
             return None, None, True, 'An error occured somewhere'
-        try:
-            ### Check to see if first well already exists, if it does insert the img
-            ### rather than running wrmXpress again
-            first_well_path = Path(
+        ### Check to see if first well already exists, if it does insert the img
+        ### rather than running wrmXpress again
+        first_well_path = Path(
                 volume, 'work', f'{platename}/{wells[0]}/img/{platename}_{wells[0]}_{selection}.png')
-            if os.path.exists(first_well_path):
+        if os.path.exists(first_well_path):
                 img = np.array(Image.open(first_well_path))
                 fig = px.imshow(img, color_continuous_scale="gray")
                 fig.update_layout(coloraxis_showscale=False)
                 fig.update_xaxes(showticklabels=False)
                 fig.update_yaxes(showticklabels=False)
                 return f"```{first_well_path}```", fig, False, f''
-        except ValueError as ve:
-            return None, None, True, 'An error occured somewhere'
         ########################################################################
         ####                                                                ####
         ####                  Preview YAML Creation                         ####
