@@ -71,7 +71,6 @@ sidebar = html.Div(
     style=SIDEBAR_STYLE
 )
 
-
 app.layout = html.Div([
     dcc.Store(id='store', data={}),
     sidebar,
@@ -84,7 +83,6 @@ app.layout = html.Div([
 ####                           Callbacks                            ####
 ####                                                                ####
 ########################################################################
-
 
 @app.long_callback(
     output=[
@@ -330,14 +328,3 @@ def callback(set_progress, n_clicks, store):
 
 if __name__ == '__main__':
     app.run_server(debug=True, host='0.0.0.0', port=9000)
-
-"""
-        ## Loop through work folders to get the all of the file paths of the work folders
-        work_folder = Path(volume, 'work')
-        platename_work_folder = Path(work_folder, platename)
-        list_of_folders = []
-
-        for well in store['wells']:
-            well_path = Path(platename_work_folder, well, 'img')
-            list_of_folders.append(well_path)
-"""
