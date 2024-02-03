@@ -223,6 +223,18 @@ def run_analysis(
         except ValueError as ve:
             return None, None, True, 'An error occured somewhere'
 
+        ### Check to see if first well already exists, if it does insert the img
+        ### rather than running wrmXpress again
+        first_well_path = Path(
+            volume, f'{platename}/TimePoint_1/{platename}_{wells[0]}.png')
+        if os.path.exists(first_well_path):
+            img = np.array(Image.open(first_well_path))
+            fig = px.imshow(img, color_continuous_scale="gray")
+            fig.update_layout(coloraxis_showscale=False)
+            fig.update_xaxes(showticklabels=False)
+            fig.update_yaxes(showticklabels=False)
+            return None, fig, False, f''
+
         ########################################################################
         ####                                                                ####
         ####                  Preview YAML Creation                         ####
