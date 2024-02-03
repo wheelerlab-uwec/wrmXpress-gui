@@ -84,6 +84,7 @@ app.layout = html.Div([
 ####                                                                ####
 ########################################################################
 
+
 @app.long_callback(
     output=[
         Output("image-analysis-preview", "figure"),
@@ -297,7 +298,7 @@ def callback(set_progress, n_clicks, store):
                         wells_analyzed.append(well_running)
                     set_progress((str(len(wells_analyzed)),
                                  str(wells_to_be_analyzed), line))
-                    
+
         # get output files, and have them appear in the images
         output_files = []
         output_figures = []
@@ -307,9 +308,7 @@ def callback(set_progress, n_clicks, store):
             if file.endswith(".png"):
                 # get full filepath of file
                 img_path = Path(output_path, file)
-                print(img_path)
                 output_files.append(img_path)
-        print(output_files)
         for img in output_files:
             img = np.array(Image.open(img))
             fig = px.imshow(img, color_continuous_scale="gray")
