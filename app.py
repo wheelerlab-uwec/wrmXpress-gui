@@ -299,16 +299,27 @@ def callback(set_progress, n_clicks, store):
                         wells_analyzed.append(well_running)
                     set_progress((str(len(wells_analyzed)),
                                  str(wells_to_be_analyzed), line))
-
-        img_path = Path(volume, 'output', 'thumbs', platename + '.png')
-
-        img = np.array(Image.open(img_path))
-        fig = px.imshow(img, color_continuous_scale="gray")
-        fig.update_layout(coloraxis_showscale=False)
-        fig.update_xaxes(showticklabels=False)
-        fig.update_yaxes(showticklabels=False)
-
-        return fig, fig, fig
+                    
+        # get output files, and have them appear in the images
+        output_files = []
+        output_figures = []
+        # get all files in output folder that have .png extension
+        output_path = Path(volume, 'output', 'thumbs')
+        for file in os.listdir(output_path):
+            if file.endswith(".png"):
+                # get full filepath of file
+                img_path = Path(output_path, file)
+                print(img_path)
+                output_files.append(img_path)
+        print(output_files)
+        for img in output_files:
+            img = np.array(Image.open(img))
+            fig = px.imshow(img, color_continuous_scale="gray")
+            fig.update_layout(coloraxis_showscale=False)
+            fig.update_xaxes(showticklabels=False)
+            fig.update_yaxes(showticklabels=False)
+            output_figures.append(fig)
+        return output_figures[0], output_figures[1], output_figures[2]
 
 ########################################################################
 ####                                                                ####
