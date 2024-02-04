@@ -41,7 +41,7 @@ layout = dbc.ModalBody(
                         dbc.Col(
                             dbc.Card(
                                 dbc.CardBody([
-                                    html.H4("Input",
+                                    html.H4("Input preview",
                                             className="text-center mb-5"),
                                     html.Br(),
                                     html.H6(
@@ -62,7 +62,7 @@ layout = dbc.ModalBody(
                                                 ]),
                                             ],
                                             type='cube',
-                                            color = '#3b4d61'
+                                            color='#3b4d61'
                                         ),
 
                                     ),
@@ -81,7 +81,7 @@ layout = dbc.ModalBody(
                             dbc.Card(
                                 dbc.CardBody([
                                     html.H4(
-                                        "Analysis", className="text-center"),
+                                        "Analysis preview", className="text-center"),
                                     dcc.Dropdown(
                                         id='preview-dropdown',
                                         placeholder='Select image to preview...'),
@@ -102,7 +102,7 @@ layout = dbc.ModalBody(
                                                 ),
                                             ])],
                                         type="cube",
-                                        color = '#3b4d61'
+                                        color='#3b4d61'
                                     ),
 
                                     dbc.Alert(id='resolving-error-issue-preview',

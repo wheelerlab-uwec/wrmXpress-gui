@@ -44,8 +44,9 @@ layout = dbc.ModalBody(
                     dbc.Col(
                         dbc.Card(
                             dbc.CardBody([
-                                html.H4("Configure Summary",
+                                html.H4("Configuration summary",
                                         className="text-center"),
+                                html.Br(),
                                 dcc.Markdown(
                                     id='img-mode-output',
                                     className="card-subtitle"),
@@ -74,14 +75,14 @@ layout = dbc.ModalBody(
                                     dbc.Col(
                                         dbc.Button('Begin Analysis',
                                                    id='submit-analysis',
-                                                   className="d-grid gap-2 col-6 mx-auto",
+                                                      className="d-grid gap-2 col-8 mx-auto",
                                                    color="primary",
                                                    n_clicks=0),
                                     ),
                                     dbc.Col(
                                         dbc.Button('Cancel Analysis',
                                                    id='cancel-analysis',
-                                                   className="d-grid gap-2 col-6 mx-auto",
+                                                      className="d-grid gap-2 col-8 mx-auto",
                                                    color="danger",
                                                    n_clicks=0),
                                     ),
@@ -100,8 +101,7 @@ layout = dbc.ModalBody(
                                         html.Div([
                                             dcc.Graph(
                                                 id='image-analysis-preview',
-                                                # Empty layout for now
-                                                figure={'layout': {}},
+                                                figure={'layout': layout},
                                                 className='h-100 w-100'
                                             ),
                                         ])],
@@ -116,13 +116,13 @@ layout = dbc.ModalBody(
                         dbc.Card(
                             dbc.CardBody([
                                 html.H4(
-                                    "Run Diagnosis", className="text-center"),
+                                    "Run diagnosis", className="text-center"),
                                 dbc.Row(
                                     [
                                         dbc.Col(
                                             dcc.Dropdown(
                                                 id='analysis-dropdown',
-                                                placeholder='Select image to preview...'
+                                                placeholder='Select diagnostic image to view...'
                                             ),
                                             width=8
                                         ),
@@ -138,7 +138,7 @@ layout = dbc.ModalBody(
                                 ),
                                 html.Br(),
                                 html.H6(
-                                    "Command:", className="card-subtitle"),
+                                    "File:", className="card-subtitle"),
                                 html.Br(),
                                 dcc.Markdown(
                                     id='analysis-postview-message'),
@@ -148,8 +148,7 @@ layout = dbc.ModalBody(
                                         html.Div([
                                             dcc.Graph(
                                                 id='analysis-postview',
-                                                # Empty layout for now
-                                                figure={'layout': {}},
+                                                figure={'layout': layout},
                                                 className='h-100 w-100'
                                             ),
                                         ])],
@@ -179,9 +178,10 @@ layout = dbc.ModalBody(
 ####                                                                ####
 ########################################################################
 
+
 @callback(
     [Output('analysis-postview', 'figure'),
-    Output('analysis-postview-message', 'children')],
+     Output('analysis-postview-message', 'children')],
     State('analysis-dropdown', 'value'),
     Input('load-analysis-img', 'n_clicks'),
     State('store', 'data'),
@@ -208,6 +208,7 @@ def load_analysis_img(selection, n_clicks, store):
     else:
         return None, None
 
+
 @callback(
     Output('analysis-dropdown', 'options'),
     # update the option dropdown when the run analysis is clicked
@@ -230,6 +231,7 @@ def get_options_analysis(nclicks, store):
 
     dict_option = {v: k for k, v in option_dict.items()}
     return dict_option
+
 
 @callback(
     Output("img-mode-output", 'children'),
