@@ -74,7 +74,7 @@ layout = dbc.ModalBody(
                                 ]
                                 ),
                                 style={'height': '100%',
-                                   'width': '99%'},
+                                       'width': '99%'},
                             ),
                             width={'size': 6},
                         ),
@@ -92,20 +92,27 @@ layout = dbc.ModalBody(
                                     html.Br(),
                                     dcc.Markdown(
                                         id='analysis-preview-message'),
-                                    dcc.Loading(
-                                        id="loading-2",
+                                    dbc.Alert(
+                                        id='preview-img-view-alert',
+                                        color='light',
+                                        is_open=True,
                                         children=[
-                                            html.Div([
-                                                dcc.Graph(
-                                                    id='analysis-preview',
-                                                    figure={'layout': layout},
-                                                    className='h-100 w-100'
-                                                ),
-                                            ])],
-                                        type="cube",
-                                        color='#3b4d61'
+                                            dcc.Loading(
+                                                id="loading-2",
+                                                children=[
+                                                    html.Div([
+                                                        dcc.Graph(
+                                                            id='analysis-preview',
+                                                            figure={
+                                                                'layout': layout},
+                                                            className='h-100 w-100'
+                                                        ),
+                                                    ])],
+                                                type="cube",
+                                                color='#3b4d61'
+                                            ),
+                                        ],
                                     ),
-
                                     dbc.Alert(id='resolving-error-issue-preview',
                                               is_open=False, color='success', duration=6000),
                                     dbc.Button(
@@ -115,10 +122,10 @@ layout = dbc.ModalBody(
                                 ]
                                 ),
                                 style={'height': '100%',
-                                   'width': '99%'},
+                                       'width': '99%'},
                             ),
                             width={'size': 6}
-                            )
+                        )
                         ])
             ]
             )
