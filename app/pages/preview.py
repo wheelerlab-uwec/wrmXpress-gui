@@ -72,11 +72,12 @@ layout = dbc.ModalBody(
                                                color="primary",
                                                n_clicks=0),
                                 ]
-                                )
+                                ),
+                                style={'height': '100%',
+                                   'width': '99%'},
                             ),
-                            width={'size': 6}
+                            width={'size': 6},
                         ),
-
                         dbc.Col(
                             dbc.Card(
                                 dbc.CardBody([
@@ -112,9 +113,12 @@ layout = dbc.ModalBody(
                                     dbc.Alert(
                                         id='view-docker-logs', is_open=False, color='success', duration=30000),
                                 ]
-                                )
+                                ),
+                                style={'height': '100%',
+                                   'width': '99%'},
                             ),
-                            width={'size': 6})
+                            width={'size': 6}
+                            )
                         ])
             ]
             )
