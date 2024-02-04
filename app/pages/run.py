@@ -95,21 +95,9 @@ layout = dbc.ModalBody(
                                     value=0,
                                     animated=True,
                                 ),
-                                dcc.Loading(
-                                    id="loading-2",
-                                    children=[
-                                        html.Div([
-                                            dcc.Graph(
-                                                id='image-analysis-preview',
-                                                figure={'layout': layout},
-                                                className='h-100 w-100'
-                                            ),
-                                        ])],
-                                    type="cube",
-                                    color='#3b4d61'
-                                ),
-
-                            ])
+                            ]),
+                            style={'height': '100%',
+                                   'width': '99%'},
                         )
                     ),
                     dbc.Col(
@@ -142,20 +130,51 @@ layout = dbc.ModalBody(
                                 html.Br(),
                                 dcc.Markdown(
                                     id='analysis-postview-message'),
-                                dcc.Loading(
-                                    id="loading-2",
+                                dbc.Alert(
+                                    id='first-view-of-analysis-alert',
+                                    color='light',
+                                    is_open=True,
                                     children=[
-                                        html.Div([
-                                            dcc.Graph(
-                                                id='analysis-postview',
-                                                figure={'layout': layout},
-                                                className='h-100 w-100'
-                                            ),
-                                        ])],
-                                    type="cube",
-                                    color='#3b4d61'
+                                        dcc.Loading(
+                                            id="loading-2",
+                                            children=[
+                                                html.Div([
+                                                    dcc.Graph(
+                                                        id='image-analysis-preview',
+                                                        figure={
+                                                            'layout': layout},
+                                                        className='h-100 w-100'
+                                                    ),
+                                                ])],
+                                            type="cube",
+                                            color='#3b4d61'
+                                        ),
+                                    ]
                                 ),
-                            ])
+                                dbc.Alert(
+                                    id='additional-view-of-analysis-alert',
+                                    color='light',
+                                    is_open=False,
+                                    children=[
+                                        dcc.Loading(
+                                            id="loading-2",
+                                            children=[
+                                                html.Div([
+                                                    dcc.Graph(
+                                                        id='analysis-postview',
+                                                        figure={
+                                                            'layout': layout},
+                                                        className='h-100 w-100'
+                                                    ),
+                                                ])],
+                                            type="cube",
+                                            color='#3b4d61'
+                                        ),
+                                    ]
+                                ),
+                            ]),
+                            style={'height': '100%',
+                                   'width': '99%'},
                         )
                     ),
                 ]),
@@ -181,7 +200,9 @@ layout = dbc.ModalBody(
 
 @callback(
     [Output('analysis-postview', 'figure'),
-     Output('analysis-postview-message', 'children')],
+     Output('analysis-postview-message', 'children'),
+     Output('first-view-of-analysis-alert', 'is_open'),
+     Output('additional-view-of-analysis-alert', 'is_open')],
     State('analysis-dropdown', 'value'),
     Input('load-analysis-img', 'n_clicks'),
     State('store', 'data'),
@@ -193,20 +214,27 @@ def load_analysis_img(selection, n_clicks, store):
     platename = store['platename']
 
     if n_clicks:
+        if selection == 'plate':
+            output_plate_path = Path(volume, f'output/thumbs/{platename}.png')
+            img = np.array(Image.open(output_plate_path))
+            fig = px.imshow(img, color_continuous_scale="gray")
+            fig.update_layout(coloraxis_showscale=False)
+            fig.update_xaxes(showticklabels=False)
+            fig.update_yaxes(showticklabels=False)
+            return fig, f'```{output_plate_path}```', False, True
         # check to see if selection option exists in output thumbs folder
         output_thumbs_path = Path(
             volume, f'output/thumbs/{platename}_{selection}.png'
         )
-        print(output_thumbs_path)
         if os.path.exists(output_thumbs_path):
             img = np.array(Image.open(output_thumbs_path))
             fig = px.imshow(img, color_continuous_scale="gray")
             fig.update_layout(coloraxis_showscale=False)
             fig.update_xaxes(showticklabels=False)
             fig.update_yaxes(showticklabels=False)
-            return fig, f'```{output_thumbs_path}```'
+            return fig, f'```{output_thumbs_path}```', False, True
     else:
-        return None, None
+        return None, None, True, False
 
 
 @callback(
@@ -221,6 +249,7 @@ def get_options_analysis(nclicks, store):
 
     motility = store['motility']
     segment = store['segment']
+    platename = store['platename']
     selection_dict = {'motility': 'motility', 'segment': 'binary'}
     option_dict = {}
 
@@ -228,8 +257,8 @@ def get_options_analysis(nclicks, store):
         for selection in selection_dict.keys():
             if eval(selection) == 'True':
                 option_dict[selection] = selection_dict[selection]
-
     dict_option = {v: k for k, v in option_dict.items()}
+    dict_option['plate'] = 'plate'
     return dict_option
 
 
