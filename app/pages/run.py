@@ -106,17 +106,42 @@ layout = dbc.ModalBody(
                                             ),
                                         ])],
                                     type="cube",
+                                    color='#3b4d61'
                                 ),
 
                             ])
                         )
                     ),
-
                     dbc.Col(
                         dbc.Card(
                             dbc.CardBody([
                                 html.H4(
                                     "Run Diagnosis", className="text-center"),
+                                dbc.Row(
+                                    [
+                                        dbc.Col(
+                                            dcc.Dropdown(
+                                                id='analysis-dropdown',
+                                                placeholder='Select image to preview...'
+                                            ),
+                                            width=8
+                                        ),
+                                        dbc.Col(
+                                            dbc.Button(
+                                                id='load-analysis-img',
+                                                children='Load Image',
+                                                disabled=True
+                                            ),
+                                            width=4
+                                        )
+                                    ]
+                                ),
+                                html.Br(),
+                                html.H6(
+                                    "Command:", className="card-subtitle"),
+                                html.Br(),
+                                dcc.Markdown(
+                                    id='analysis-postview-message'),
                                 dcc.Loading(
                                     id="loading-2",
                                     children=[
@@ -129,22 +154,8 @@ layout = dbc.ModalBody(
                                             ),
                                         ])],
                                     type="cube",
+                                    color='#3b4d61'
                                 ),
-
-                                dcc.Loading(
-                                    id="loading-2",
-                                    children=[
-                                        html.Div([
-                                            dcc.Graph(
-                                                id='analysis-postview-another',
-                                                # Empty layout for now
-                                                figure={'layout': {}},
-                                                className='h-100 w-100'
-                                            ),
-                                        ])],
-                                    type="cube",
-                                ),
-
                             ])
                         )
                     ),
@@ -168,6 +179,57 @@ layout = dbc.ModalBody(
 ####                                                                ####
 ########################################################################
 
+@callback(
+    [Output('analysis-postview', 'figure'),
+    Output('analysis-postview-message', 'children')],
+    State('analysis-dropdown', 'value'),
+    Input('load-analysis-img', 'n_clicks'),
+    State('store', 'data'),
+    allow_duplicate=True,
+    prevent_initial_call=True,
+)
+def load_analysis_img(selection, n_clicks, store):
+    volume = store['mount']
+    platename = store['platename']
+
+    if n_clicks:
+        # check to see if selection option exists in output thumbs folder
+        output_thumbs_path = Path(
+            volume, f'output/thumbs/{platename}_{selection}.png'
+        )
+        print(output_thumbs_path)
+        if os.path.exists(output_thumbs_path):
+            img = np.array(Image.open(output_thumbs_path))
+            fig = px.imshow(img, color_continuous_scale="gray")
+            fig.update_layout(coloraxis_showscale=False)
+            fig.update_xaxes(showticklabels=False)
+            fig.update_yaxes(showticklabels=False)
+            return fig, f'```{output_thumbs_path}```'
+    else:
+        return None, None
+
+@callback(
+    Output('analysis-dropdown', 'options'),
+    # update the option dropdown when the run analysis is clicked
+    Input('submit-analysis', 'n_clicks'),
+    State('store', 'data'),
+    prevent_initial_call=True,
+    allow_duplicate=True
+)
+def get_options_analysis(nclicks, store):
+
+    motility = store['motility']
+    segment = store['segment']
+    selection_dict = {'motility': 'motility', 'segment': 'binary'}
+    option_dict = {}
+
+    if nclicks is not None:
+        for selection in selection_dict.keys():
+            if eval(selection) == 'True':
+                option_dict[selection] = selection_dict[selection]
+
+    dict_option = {v: k for k, v in option_dict.items()}
+    return dict_option
 
 @callback(
     Output("img-mode-output", 'children'),

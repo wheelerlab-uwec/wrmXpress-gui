@@ -10,6 +10,7 @@ from dash.dependencies import Input, Output, State
 from dash import dcc, html, callback, dash_table
 import pandas as pd
 from pathlib import Path
+import os
 
 # components
 from app.components.metadata_components import metadata_checklist
@@ -197,7 +198,8 @@ def update_metadata_checklist(n_clicks, new_table_name, existing_options):
 
 @callback(
     [Output("save-meta-data-to-csv", 'color'),
-     Output("metadata-saved-alert", "is_open")],
+     Output("metadata-saved-alert", "is_open"),
+     Output("metadata-saved-alert", "children")],
     Input("save-meta-data-to-csv", "n_clicks"),
     State('metadata-tabs', 'children'),
     State('store', 'data')
@@ -236,8 +238,8 @@ def save_the_metadata_tables_to_csv(n_clicks, metadata_tabs, store):
                 metadata_dir.mkdir(parents=True, exist_ok=True)
             file_path = metadata_dir.joinpath(f"{tab_id}.csv")
             df.to_csv(file_path, index=False, header=False)
-
+        directory_path = os.path.dirname(file_path)
         # Enable the button if not clicked
-        return "success", True
+        return "success", True, f"Metadata tables saved to destination: {directory_path}"
     else: 
-        return "primary", False
+        return "primary", False, ''

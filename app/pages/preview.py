@@ -62,6 +62,7 @@ layout = dbc.ModalBody(
                                                 ]),
                                             ],
                                             type='cube',
+                                            color = '#3b4d61'
                                         ),
 
                                     ),
@@ -101,6 +102,7 @@ layout = dbc.ModalBody(
                                                 ),
                                             ])],
                                         type="cube",
+                                        color = '#3b4d61'
                                     ),
 
                                     dbc.Alert(id='resolving-error-issue-preview',
