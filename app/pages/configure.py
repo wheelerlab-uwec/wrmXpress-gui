@@ -56,7 +56,7 @@ layout = dbc.Container([
                     "Finalize configuration",
                     id="finalize-configure-button",
                     className="flex",
-                    color='info'
+                    color='primary'
                 ),
                 width="auto"
             ),
