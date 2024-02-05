@@ -147,7 +147,7 @@ def callback(set_progress, n_clicks, store):
             if good_to_go == False:
                 return None, True
         except ValueError as ve:
-            return None, True 
+            return None, True
 
         """
         Replace this section following the fix in the wrmXpress bug

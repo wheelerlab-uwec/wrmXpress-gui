@@ -43,34 +43,42 @@ layout = dbc.ModalBody(
                                 dbc.CardBody([
                                     html.H4("Input preview",
                                             className="text-center mb-5"),
+                                    dbc.Row([
+                                        dbc.Button('Preview Analysis',
+                                               id='submit-val',
+                                               className="d-grid gap-2 col-6 mx-auto",
+                                               color="primary",
+                                               n_clicks=0),
+                                    ]),
                                     html.Br(),
                                     html.H6(
                                         "Path:", className="card-subtitle"),
                                     html.Br(),
                                     dcc.Markdown(id='input-path-output'),
                                     html.Div(
-                                        dcc.Loading(
-                                            id='loading-1',
+                                        dbc.Alert(
+                                            id='input-img-view-alert',
+                                            color='light',
+                                            is_open=True,
                                             children=[
-                                                html.Div([
-                                                    dcc.Graph(
-                                                        id='input-preview',
-                                                        figure={
-                                                            'layout': layout},
-                                                        className='h-100 w-100'
-                                                    )
-                                                ]),
-                                            ],
-                                            type='cube',
-                                            color='#3b4d61'
+                                                dcc.Loading(
+                                                    id='loading-1',
+                                                    children=[
+                                                        html.Div([
+                                                            dcc.Graph(
+                                                                id='input-preview',
+                                                                figure={
+                                                                    'layout': layout},
+                                                                className='h-100 w-100'
+                                                            )
+                                                        ]),
+                                                    ],
+                                                    type='cube',
+                                                    color='#3b4d61'
+                                                ),
+                                            ]
                                         ),
-
                                     ),
-                                    dbc.Button('Load first input image',
-                                               id='submit-val',
-                                               className="d-grid gap-2 col-6 mx-auto",
-                                               color="primary",
-                                               n_clicks=0),
                                 ]
                                 ),
                                 style={'height': '100%',
@@ -83,9 +91,27 @@ layout = dbc.ModalBody(
                                 dbc.CardBody([
                                     html.H4(
                                         "Analysis preview", className="text-center"),
-                                    dcc.Dropdown(
-                                        id='preview-dropdown',
-                                        placeholder='Select image to preview...'),
+                                    html.Br(),
+                                    dbc.Row(
+                                        [
+                                            dbc.Col(
+                                                dcc.Dropdown(
+                                                    id='preview-dropdown',
+                                                    placeholder='Select image to preview...'
+                                                ),
+                                            ),
+                                            dbc.Col(
+                                                dbc.Button(
+                                                    "Load Image",
+                                                    id="preview-change-img-button",
+                                                    className="d-grid gap-2 col-6 mx-auto",
+                                                    color="primary",
+                                                    disabled=True,
+                                                    n_clicks=0
+                                                ),
+                                            )
+                                        ]
+                                    ),
                                     html.Br(),
                                     html.H6(
                                         "Command:", className="card-subtitle"),
@@ -113,10 +139,29 @@ layout = dbc.ModalBody(
                                             ),
                                         ],
                                     ),
+                                    dbc.Alert(
+                                        id='post-analysis-first-well-img-view-alert',
+                                        color='light',
+                                        is_open=False,
+                                        children=[
+                                            dcc.Loading(
+                                                id="loading-2",
+                                                children=[
+                                                    html.Div([
+                                                        dcc.Graph(
+                                                            id='analysis-preview-other-img',
+                                                            figure={
+                                                                'layout': layout},
+                                                            className='h-100 w-100'
+                                                        ),
+                                                    ])],
+                                                type="cube",
+                                                color='#3b4d61'
+                                            ),
+                                        ],
+                                    ),
                                     dbc.Alert(id='resolving-error-issue-preview',
                                               is_open=False, color='success', duration=6000),
-                                    dbc.Button(
-                                        "Preview analysis", id="preview-button", className="d-grid gap-2 col-6 mx-auto", color="primary", n_clicks=0),
                                     dbc.Alert(
                                         id='view-docker-logs', is_open=False, color='success', duration=30000),
                                 ]
@@ -140,6 +185,38 @@ layout = dbc.ModalBody(
 ####                           Callbacks                            ####
 ####                                                                ####
 ########################################################################
+
+@callback(
+    Output("analysis-preview-other-img", "figure"),
+    Output("preview-img-view-alert", "is_open"),
+    Output("post-analysis-first-well-img-view-alert", "is_open"),
+    State("preview-dropdown", 'value'),
+    Input("preview-change-img-button", 'n_clicks'),
+    State('store', 'data'),
+)
+def update_analysis_preview_imgage(selection, nclicks, store):
+    if nclicks:
+        volume = store['mount']
+        platename = store['platename']
+        wells = store["wells"]
+
+        # assumes IX-like file structure
+        img_path = Path(
+            f'{volume}/work/{platename}/{wells[0]}/img/{platename}_{wells[0]}_{selection}.png')
+        if os.path.exists(img_path):
+            if selection == 'motility':
+                scale = 'inferno'
+            else:
+                scale = 'gray'
+            img = np.array(Image.open(img_path))
+            fig = px.imshow(img, color_continuous_scale=scale)
+            fig.update_layout(coloraxis_showscale=False)
+            fig.update_xaxes(showticklabels=False)
+            fig.update_yaxes(showticklabels=False)
+            return fig, False, True
+        else:
+            return None,True, False
+    return None, True, False
 
 @callback(
     Output('input-path-output', 'children'),
@@ -198,15 +275,14 @@ def get_options(nclicks, store):
     Output('analysis-preview', 'figure'),
     Output('resolving-error-issue-preview', 'is_open'),
     Output('resolving-error-issue-preview', 'children'),
-    Input('preview-button', 'n_clicks'),
+    Output("preview-change-img-button", "disabled"),
+    Input('submit-val', 'n_clicks'),
     State('store', 'data'),
-    State('preview-dropdown', 'value'),
     prevent_initial_call=True
 )
 def run_analysis(
     nclicks,
     store,
-    selection
 ):
     volume = store['mount']
     platename = store['platename']
@@ -233,24 +309,24 @@ def run_analysis(
                     good_to_go = True
 
             if good_to_go == False:
-                return None, None, True, f'Please ensure that you have the Image "{check_for_names[0]}" and is the "{check_for_names[1]}" image.'
+                return None, None, True, f'Please ensure that you have the Image "{check_for_names[0]}" and is the "{check_for_names[1]}" image.', True
         except ValueError as ve:
-            return None, None, True, 'An error occured somewhere'
+            return None, None, True, 'An error occured somewhere', True
         # Check to see if first well already exists, if it does insert the img
         # rather than running wrmXpress again
         first_well_path = Path(
-            volume, 'work', f'{platename}/{wells[0]}/img/{platename}_{wells[0]}_{selection}.png')
+            volume, 'work', f'{platename}/{wells[0]}/img/{platename}_{wells[0]}.png')
         if os.path.exists(first_well_path):
-            if selection == 'motility':
-                scale = 'inferno'
-            else:
-                scale = 'gray'
+            #if selection == 'motility':
+            #    scale = 'inferno'
+            #else:
+            #    scale = 'gray'
             img = np.array(Image.open(first_well_path))
-            fig = px.imshow(img, color_continuous_scale=scale)
+            fig = px.imshow(img, color_continuous_scale='gray')
             fig.update_layout(coloraxis_showscale=False)
             fig.update_xaxes(showticklabels=False)
             fig.update_yaxes(showticklabels=False)
-            return f"```{first_well_path}```", fig, False, f''
+            return f"```{first_well_path}```", fig, False, f'', False
         ########################################################################
         ####                                                                ####
         ####                  Preview YAML Creation                         ####
@@ -345,19 +421,19 @@ def run_analysis(
 
         # assumes IX-like file structure
         img_path = Path(
-            volume, 'work', f'{platename}/{first_well}/img/{platename}_{first_well}_{selection}.png')
+            volume, 'work', f'{platename}/{first_well}/img/{platename}_{first_well}.png')
 
         while not os.path.exists(img_path):
             time.sleep(1)
 
         img = np.array(Image.open(img_path))
-        if selection == 'motility':
-            scale = 'inferno'
-        else:
-            scale = 'gray'
-        fig = px.imshow(img, color_continuous_scale=scale)
+        #if selection == 'motility':
+        #    scale = 'inferno'
+        #else:
+        #    scale = 'gray'
+        fig = px.imshow(img, color_continuous_scale='gray')
         fig.update_layout(coloraxis_showscale=False)
         fig.update_xaxes(showticklabels=False)
         fig.update_yaxes(showticklabels=False)
 
-        return command_message, fig, False, f''
+        return command_message, fig, False, f'', False
