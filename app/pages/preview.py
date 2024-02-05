@@ -292,11 +292,13 @@ def run_analysis(
     segment_selection = store['segment']
 
     if motility_selection == 'True':
-        selection = '_motility'
+        selection1 = '_motility'
+        selection = 'motility'
     elif segment_selection == 'True':
-        selection = '_segment'
+        selection1 = '_segment'
+        selection = 'segment'
     else:
-        selection = ''
+        selection1 = ''
     if nclicks:
         """
         Checking if wrmXpress container exists
@@ -323,7 +325,7 @@ def run_analysis(
         # Check to see if first well already exists, if it does insert the img
         # rather than running wrmXpress again
         first_well_path = Path(
-            volume, 'work', f'{platename}/{wells[0]}/img/{platename}_{wells[0]}{selection}.png')
+            volume, 'work', f'{platename}/{wells[0]}/img/{platename}_{wells[0]}{selection1}.png')
         if os.path.exists(first_well_path):
             if selection == 'motility':
                 scale = 'inferno'
@@ -429,7 +431,7 @@ def run_analysis(
 
         # assumes IX-like file structure
         img_path = Path(
-            volume, 'work', f'{platename}/{first_well}/img/{platename}_{first_well}{selection}.png')
+            volume, 'work', f'{platename}/{first_well}/img/{platename}_{first_well}{selection1}.png')
 
         while not os.path.exists(img_path):
             time.sleep(1)
