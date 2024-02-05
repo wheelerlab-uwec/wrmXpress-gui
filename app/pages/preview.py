@@ -288,7 +288,15 @@ def run_analysis(
     platename = store['platename']
     wells = store["wells"]
     plate_base = platename.split("_", 1)[0]
+    motility_selection = store['motility']
+    segment_selection = store['segment']
 
+    if motility_selection == 'True':
+        selection = 'motility'
+    elif segment_selection == 'True':
+        selection = 'segment'
+    else:
+        selection = 'binary'
     if nclicks:
         """
         Checking if wrmXpress container exists
@@ -315,14 +323,14 @@ def run_analysis(
         # Check to see if first well already exists, if it does insert the img
         # rather than running wrmXpress again
         first_well_path = Path(
-            volume, 'work', f'{platename}/{wells[0]}/img/{platename}_{wells[0]}.png')
+            volume, 'work', f'{platename}/{wells[0]}/img/{platename}_{wells[0]}_{selection}.png')
         if os.path.exists(first_well_path):
-            #if selection == 'motility':
-            #    scale = 'inferno'
-            #else:
-            #    scale = 'gray'
+            if selection == 'motility':
+                scale = 'inferno'
+            else:
+                scale = 'gray'
             img = np.array(Image.open(first_well_path))
-            fig = px.imshow(img, color_continuous_scale='gray')
+            fig = px.imshow(img, color_continuous_scale=scale)
             fig.update_layout(coloraxis_showscale=False)
             fig.update_xaxes(showticklabels=False)
             fig.update_yaxes(showticklabels=False)
@@ -421,17 +429,17 @@ def run_analysis(
 
         # assumes IX-like file structure
         img_path = Path(
-            volume, 'work', f'{platename}/{first_well}/img/{platename}_{first_well}.png')
+            volume, 'work', f'{platename}/{first_well}/img/{platename}_{first_well}_{selection}.png')
 
         while not os.path.exists(img_path):
             time.sleep(1)
 
         img = np.array(Image.open(img_path))
-        #if selection == 'motility':
-        #    scale = 'inferno'
-        #else:
-        #    scale = 'gray'
-        fig = px.imshow(img, color_continuous_scale='gray')
+        if selection == 'motility':
+            scale = 'inferno'
+        else:
+            scale = 'gray'
+        fig = px.imshow(img, color_continuous_scale=scale)
         fig.update_layout(coloraxis_showscale=False)
         fig.update_xaxes(showticklabels=False)
         fig.update_yaxes(showticklabels=False)
