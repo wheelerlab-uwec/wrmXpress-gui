@@ -105,8 +105,8 @@ app.layout = html.Div([
         ),
         (
             Output("image-analysis-preview", "style"),
-            {"visibility": "hidden"},
-            {"visibility": "visible"}
+            {"visibility": "visible"},
+            {"visibility": "hidden"}
         ),
         (
             Output("progress-bar-run-page", "style"),
@@ -118,7 +118,9 @@ app.layout = html.Div([
     cancel=[Input("cancel-analysis", "n_clicks")],
     progress=[
         Output("progress-bar-run-page", "value"),
-        Output("progress-bar-run-page", "max")
+        Output("progress-bar-run-page", "max"),
+        Output("image-analysis-preview", "figure"),
+        Output('progress-message-run-page-for-analysis', 'children')
     ],
     prevent_initial_call=True,
     allow_duplicate=True
@@ -294,8 +296,23 @@ def callback(set_progress, n_clicks, store):
                     well_running = line.split(" ")[-1]
                     if well_running not in wells_analyzed:
                         wells_analyzed.append(well_running)
-                    set_progress((str(len(wells_analyzed)),
-                                 str(wells_to_be_analyzed), line))
+                        current_well = wells_analyzed[-1]
+                        # Optain filepath for the well being analyzed
+                        img_path = Path(
+                            volume, f'{platename}/TimePoint_1/{plate_base}_{wells_analyzed[-1]}.TIF')
+                        print(img_path)
+                        img = np.array(Image.open(img_path))
+                        fig = px.imshow(img, color_continuous_scale="gray")
+                        fig.update_layout(coloraxis_showscale=False)
+                        fig.update_xaxes(showticklabels=False)
+                        fig.update_yaxes(showticklabels=False)
+
+                        set_progress((
+                            str(len(wells_analyzed)),
+                            str(wells_to_be_analyzed),
+                            fig,
+                            f'```{img_path}```'
+                        ))
 
         
         # get all files in output folder that have .png extension
