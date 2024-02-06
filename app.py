@@ -120,7 +120,8 @@ app.layout = html.Div([
         Output("progress-bar-run-page", "value"),
         Output("progress-bar-run-page", "max"),
         Output("image-analysis-preview", "figure"),
-        Output('progress-message-run-page-for-analysis', 'children')
+        Output('progress-message-run-page-for-analysis', 'children'),
+        Output("loading-2-1", 'loading_state')
     ],
     prevent_initial_call=True,
     allow_duplicate=True
@@ -311,7 +312,8 @@ def callback(set_progress, n_clicks, store):
                             str(len(wells_analyzed)),
                             str(wells_to_be_analyzed),
                             fig,
-                            f'```{img_path}```'
+                            f'```{img_path}```',
+                            {"is_loading": False}
                         ))
 
         

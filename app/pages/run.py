@@ -90,7 +90,7 @@ layout = dbc.ModalBody(
                                     ),
                                 ]),
                                 dbc.Alert(
-                                    id='run-page-no-store-alert',
+                                    id = 'run-page-no-store-alert',
                                     color='danger',
                                     is_open=False,
                                     children=[
@@ -146,8 +146,7 @@ layout = dbc.ModalBody(
                                 html.Br(),
                                 html.H6(
                                     "File:", className="card-subtitle"),
-                                dcc.Markdown(
-                                    id='progress-message-run-page-for-analysis'),
+                                dcc.Markdown(id = 'progress-message-run-page-for-analysis'),
                                 html.Br(),
                                 dcc.Markdown(
                                     id='analysis-postview-message'),
@@ -156,14 +155,21 @@ layout = dbc.ModalBody(
                                     color='light',
                                     is_open=True,
                                     children=[
-                                        html.Div([
-                                            dcc.Graph(
-                                                id='image-analysis-preview',
-                                                figure={
-                                                    'layout': layout},
-                                                className='h-100 w-100'
-                                            ),
-                                        ]),
+                                        dcc.Loading(
+                                            id="loading-2-1",
+                                            children=[
+                                                html.Div([
+                                                    dcc.Graph(
+                                                        id='image-analysis-preview',
+                                                        figure={
+                                                            'layout': layout},
+                                                        className='h-100 w-100'
+                                                    ),
+                                                ])],
+                                            type="cube",
+                                            color='#3b4d61',
+                                            loading_state={'is_loading': True} 
+                                        ),
                                     ]
                                 ),
                                 dbc.Alert(
@@ -203,7 +209,6 @@ layout = dbc.ModalBody(
 ####                           Callbacks                            ####
 ####                                                                ####
 ########################################################################
-
 
 @callback(
     [Output('analysis-postview', 'figure'),
