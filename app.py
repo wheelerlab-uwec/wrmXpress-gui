@@ -89,6 +89,8 @@ app.layout = html.Div([
     output=[
         Output("image-analysis-preview", "figure"),
         Output('load-analysis-img', 'disabled'),
+        Output("run-page-alert", 'is_open'),
+        Output("run-page-alert", 'children'),
     ],
     inputs=[
         Input("submit-analysis", "n_clicks"),
@@ -122,6 +124,8 @@ app.layout = html.Div([
     allow_duplicate=True
 )
 def callback(set_progress, n_clicks, store):
+    if not store:
+        return None, True, True, "No configuration found. Please go to the configuration page to set up the analysis."
     volume = store['mount']
     platename = store['platename']
     wells = store["wells"]
@@ -145,18 +149,12 @@ def callback(set_progress, n_clicks, store):
                     good_to_go = True
 
             if good_to_go == False:
-                return None, True
+                return None, True, True, "wrmXpress container not found. Please install the container and try again."
         except ValueError as ve:
-            return None, True
+            return None, True, True, f"Error: {ve}"
 
         """
         Replace this section following the fix in the wrmXpress bug
-
-        Replace with 
-        '''
-
-        '''
-
         """
         folder_containing_img = Path(volume, platename)
         input_folder = Path(volume, 'input')
@@ -308,7 +306,7 @@ def callback(set_progress, n_clicks, store):
         fig.update_layout(coloraxis_showscale=False)
         fig.update_xaxes(showticklabels=False)
         fig.update_yaxes(showticklabels=False)
-        return fig, False
+        return fig, False, False, ''
 
 ########################################################################
 ####                                                                ####

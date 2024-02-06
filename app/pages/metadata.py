@@ -199,13 +199,17 @@ def update_metadata_checklist(n_clicks, new_table_name, existing_options):
 @callback(
     [Output("save-meta-data-to-csv", 'color'),
      Output("metadata-saved-alert", "is_open"),
-     Output("metadata-saved-alert", "children")],
+     Output("metadata-saved-alert", "children"),
+     Output("metadata-saved-alert", "color"),
+     Output('save-meta-data-to-csv', 'disabled')],
     Input("save-meta-data-to-csv", "n_clicks"),
     State('metadata-tabs', 'children'),
     State('store', 'data')
 )
 # saving metadata tables
 def save_the_metadata_tables_to_csv(n_clicks, metadata_tabs, store):
+    if not store:
+        return 'primary', True, "No configuration found. Please go to the configuration page to set up the analysis.", "danger", True
     if n_clicks:
 
         # Iterate over the metadata tabs
@@ -240,6 +244,6 @@ def save_the_metadata_tables_to_csv(n_clicks, metadata_tabs, store):
             df.to_csv(file_path, index=False, header=False)
         directory_path = os.path.dirname(file_path)
         # Enable the button if not clicked
-        return "success", True, f"Metadata tables saved to destination: {directory_path}"
+        return "success", True, f"Metadata tables saved to destination: {directory_path}", "success", False
     else: 
-        return "primary", False, ''
+        return "primary", False, '', "success", False

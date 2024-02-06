@@ -77,14 +77,33 @@ layout = dbc.ModalBody(
                                                    id='submit-analysis',
                                                       className="d-grid gap-2 col-8 mx-auto",
                                                    color="primary",
-                                                   n_clicks=0),
+                                                   n_clicks=0,
+                                                   disabled=False),
                                     ),
                                     dbc.Col(
                                         dbc.Button('Cancel Analysis',
                                                    id='cancel-analysis',
                                                       className="d-grid gap-2 col-8 mx-auto",
                                                    color="danger",
-                                                   n_clicks=0),
+                                                   n_clicks=0,
+                                                   disabled=False),
+                                    ),
+                                ]),
+                                dbc.Alert(
+                                    id = 'run-page-no-store-alert',
+                                    color='danger',
+                                    is_open=False,
+                                    children=[
+                                        'No configuration found. Please go to the configuration page to set up the analysis.'
+                                    ]
+                                ),
+                                html.Br(),
+                                dbc.Row([
+                                    dbc.Alert(
+                                        id='run-page-alert',
+                                        color='danger',
+                                        is_open=False,
+                                        duration=30000,
                                     ),
                                 ]),
                                 html.Br(),
@@ -178,14 +197,6 @@ layout = dbc.ModalBody(
                         )
                     ),
                 ]),
-                dbc.Row([
-                    dbc.Alert(
-                        id='run-page-alert',
-                        color='success',
-                        is_open=False,
-                        duration=30000,
-                    ),
-                ])
             ])
         ])
     ]
@@ -196,7 +207,6 @@ layout = dbc.ModalBody(
 ####                           Callbacks                            ####
 ####                                                                ####
 ########################################################################
-
 
 @callback(
     [Output('analysis-postview', 'figure'),
@@ -210,6 +220,8 @@ layout = dbc.ModalBody(
     prevent_initial_call=True,
 )
 def load_analysis_img(selection, n_clicks, store):
+    if not store:
+        return None, None, False, False
     volume = store['mount']
     platename = store['platename']
 
@@ -246,7 +258,8 @@ def load_analysis_img(selection, n_clicks, store):
     allow_duplicate=True
 )
 def get_options_analysis(nclicks, store):
-
+    if not store:
+        return []
     motility = store['motility']
     segment = store['segment']
     platename = store['platename']
@@ -280,6 +293,8 @@ def update_results_message_for_run_page(
     nclicks,
     store
 ):
+    if not store:
+        return None, None, None, None, None, None, None, None
     img_mode = f'Imaging Mode: {store["img_mode"]}'
     file_structure = f'File Structure: {store["file_structure"]}'
     plate_format = f'Plate Format: Rows = {store["rows"]}, Cols = {store["cols"]}'

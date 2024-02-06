@@ -51,6 +51,14 @@ layout = dbc.ModalBody(
                                                n_clicks=0),
                                     ]),
                                     html.Br(),
+                                    dbc.Alert(
+                                        id = 'no-store-data-alert',
+                                        color = 'danger',
+                                        is_open = False,
+                                        children = [
+                                            "No configuration found. Please go to the configuration page to set up the analysis."
+                                        ]
+                                    ),
                                     html.H6(
                                         "Path:", className="card-subtitle"),
                                     html.Br(),
@@ -190,11 +198,15 @@ layout = dbc.ModalBody(
     Output("analysis-preview-other-img", "figure"),
     Output("preview-img-view-alert", "is_open"),
     Output("post-analysis-first-well-img-view-alert", "is_open"),
+    Output("no-store-data-alert", 'is_open'),
+    Output("submit-val", "disabled"),
     State("preview-dropdown", 'value'),
     Input("preview-change-img-button", 'n_clicks'),
     State('store', 'data'),
 )
 def update_analysis_preview_imgage(selection, nclicks, store):
+    if not store:
+        return None, True, False, True, True
     if nclicks:
         volume = store['mount']
         platename = store['platename']
@@ -213,10 +225,10 @@ def update_analysis_preview_imgage(selection, nclicks, store):
             fig.update_layout(coloraxis_showscale=False)
             fig.update_xaxes(showticklabels=False)
             fig.update_yaxes(showticklabels=False)
-            return fig, False, True
+            return fig, False, True, False, '', False
         else:
-            return None,True, False
-    return None, True, False
+            return None,True, False, False, False
+    return None, True, False,  False, False
 
 @callback(
     Output('input-path-output', 'children'),
