@@ -106,12 +106,17 @@ app.layout = html.Div([
         (
             Output("image-analysis-preview", "style"),
             {"visibility": "visible"},
-            {"visibility": "hidden"}
+            {"visibility": "visible"}
         ),
         (
             Output("progress-bar-run-page", "style"),
             {"visibility": "visible"},
             {"visibility": "hidden"}
+        ), 
+        (
+            Output("progress-message-run-page-for-analysis", "style"),
+            {'visibility': 'visible'},
+            {'visibility': 'hidden'}
         ),
     ],
 
@@ -120,8 +125,7 @@ app.layout = html.Div([
         Output("progress-bar-run-page", "value"),
         Output("progress-bar-run-page", "max"),
         Output("image-analysis-preview", "figure"),
-        Output('progress-message-run-page-for-analysis', 'children'),
-        Output("loading-2-1", 'loading_state')
+        Output("progress-message-run-page-for-analysis", "children"),
     ],
     prevent_initial_call=True,
     allow_duplicate=True
@@ -301,7 +305,6 @@ def callback(set_progress, n_clicks, store):
                         # Optain filepath for the well being analyzed
                         img_path = Path(
                             volume, f'{platename}/TimePoint_1/{plate_base}_{wells_analyzed[-1]}.TIF')
-                        print(img_path)
                         img = np.array(Image.open(img_path))
                         fig = px.imshow(img, color_continuous_scale="gray")
                         fig.update_layout(coloraxis_showscale=False)
@@ -312,20 +315,17 @@ def callback(set_progress, n_clicks, store):
                             str(len(wells_analyzed)),
                             str(wells_to_be_analyzed),
                             fig,
-                            f'```{img_path}```',
-                            {"is_loading": False}
+                            f'```{img_path}```'
                         ))
 
-        
         # get all files in output folder that have .png extension
         output_path = Path(volume, 'output', 'thumbs', platename + '.png')
-    
-        img = np.array(Image.open(output_path))
-        fig = px.imshow(img, color_continuous_scale="gray")
-        fig.update_layout(coloraxis_showscale=False)
-        fig.update_xaxes(showticklabels=False)
-        fig.update_yaxes(showticklabels=False)
-        return fig, False, False, ''
+        img1 = np.array(Image.open(output_path))
+        fig_1 = px.imshow(img1, color_continuous_scale="gray")
+        fig_1.update_layout(coloraxis_showscale=False)
+        fig_1.update_xaxes(showticklabels=False)
+        fig_1.update_yaxes(showticklabels=False)
+        return fig_1, False, False, ''
 
 ########################################################################
 ####                                                                ####
