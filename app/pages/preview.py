@@ -211,10 +211,10 @@ def update_analysis_preview_imgage(selection, nclicks, store):
         volume = store['mount']
         platename = store['platename']
         wells = store["wells"]
-
         # assumes IX-like file structure
         img_path = Path(
             f'{volume}/work/{platename}/{wells[0]}/img/{platename}_{wells[0]}_{selection}.png')
+        print(img_path)
         if os.path.exists(img_path):
             if selection == 'motility':
                 scale = 'inferno'
@@ -225,7 +225,7 @@ def update_analysis_preview_imgage(selection, nclicks, store):
             fig.update_layout(coloraxis_showscale=False)
             fig.update_xaxes(showticklabels=False)
             fig.update_yaxes(showticklabels=False)
-            return fig, False, True, False, '', False
+            return fig, False, True, False, ''
         else:
             return None,True, False, False, False
     return None, True, False,  False, False
