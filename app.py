@@ -225,116 +225,41 @@ def callback(set_progress, n_clicks, store):
         except ValueError as ve:
             return None, True, True, f"Error: {ve}"
 
-        """
-        Replace this section following the fix in the wrmXpress bug
-        """
+
         # necessary file paths
-        folder_containing_img = Path(volume, platename)
-        input_folder = Path(volume, 'input')
-        platename_input_folder = Path(input_folder, platename)
+        img_dir = Path(volume, platename)
+        input_dir = Path(volume, 'input')
+        platename_input_dir = Path(input_dir, platename)
         plate_base = platename.split("_", 1)[0]
-        htd_file_path = folder_containing_img / f'{plate_base}.HTD'
-
-        if os.path.exists(Path(volume, 'work')):
-            os.remove(Path(volume, 'work'))
-
+        htd_file = Path(img_dir, f'{plate_base}.HTD')
         full_yaml = Path(volume, platename + '.yml')
 
         # reading in yaml file
         with open(full_yaml, 'r') as file:
             data = yaml.safe_load(file)
 
-        # assigning first well to the well value
+        # replace the YAML config option with ['All'] as a workaround for wrmXpress bug
+        # instead, we'll copy the selected files to input and analyze all of them
         data['wells'] = ['All']
 
-        # Dump preview data to temp YAML file
         with open(full_yaml, 'w') as yaml_file:
             yaml.dump(data, yaml_file,
                       default_flow_style=False)
+            
+        # wipe previous runs
+        if os.path.exists(Path(volume, 'work', platename)):
+            shutil.rmtree(Path(volume, 'work', platename))
+            Path(volume, 'work', platename).mkdir(parents=True, exist_ok=True)
+        else:
+            Path(volume, 'work', platename).mkdir(parents=True, exist_ok=True)
 
-        # check to see if input folder exists, if not create it
-        # then copy necessay files into input folder
-        if not os.path.exists(Path(volume, 'input')):
+        if os.path.exists(Path(volume, 'input', platename)):
+            shutil.rmtree(Path(volume, 'input', platename))
+            Path(volume, 'input', platename).mkdir(parents=True, exist_ok=True)
+        else:
+            Path(volume, 'input', platename).mkdir(parents=True, exist_ok=True)
 
-            # Copy .HTD file into platename input folder
-            shutil.copy(htd_file_path, platename_input_folder)
-
-            # Collecting the time point folders
-            folders = [item for item in os.listdir(folder_containing_img) if os.path.isdir(
-                Path(folder_containing_img, item))]
-
-            # Iterate through each time point
-            for folder in folders:
-                time_point_folder = Path(platename_input_folder, folder)
-                os.makedirs(time_point_folder, exist_ok=True)
-                for well in store["wells"]:
-
-                    # Copy necessary wells image into time point folder
-                    well_path = Path(folder_containing_img,
-                                     folder, f'{plate_base}_{well}.TIF')
-                    shutil.copy(well_path, time_point_folder)
-
-        # if input folder exists, check to see if platename folder exists, if not create it
-        # then copy necessay files into platename folder
-        elif os.path.exists(Path(volume, 'input')):
-            os.remove(input_folder)
-            os.makedirs(input_folder)
-            if not os.path.exists(htd_file_path):
-                shutil.copy(htd_file_path, platename_input_folder)
-
-            if not os.path.exists(platename_input_folder):
-                os.makedirs(platename_input_folder)
-
-                # Collecting the time point folders
-                folders = [item for item in os.listdir(folder_containing_img) if os.path.isdir(
-                    Path(folder_containing_img, item))]
-
-                # Iterate through each time point
-                for folder in folders:
-                    time_point_folder = Path(platename_input_folder, folder)
-                    os.makedirs(time_point_folder, exist_ok=True)
-                    for well in store["wells"]:
-
-                        # Copy necessary wells image into time point folder
-                        well_path = Path(folder_containing_img,
-                                         folder, f'{plate_base}_{well}.TIF')
-                        shutil.copy(well_path, time_point_folder)
-
-            # if input folder & platname folder exist, clear platename folder and copy necessary files into it
-            elif os.path.exists(platename_input_folder):
-                os.system(f'rm -rf {platename_input_folder}')
-                os.makedirs(platename_input_folder)
-                shutil.copy(htd_file_path, platename_input_folder)
-
-                # Collecting the time point folders
-                folders = [item for item in os.listdir(folder_containing_img) if os.path.isdir(
-                    Path(folder_containing_img, item))]
-
-                # Iterate through each time point
-                for folder in folders:
-                    time_point_folder = Path(platename_input_folder, folder)
-                    if not os.path.exists(time_point_folder):
-                        os.makedirs(time_point_folder, exist_ok=True)
-                        for well in store["wells"]:
-
-                            # Copy necessary wells image into time point folder
-                            well_path = Path(folder_containing_img,
-                                             folder, f'{plate_base}_{well}.TIF')
-                            shutil.copy(well_path, time_point_folder)
-
-        # check to see if work folder exists, if it does delete it
-        if os.path.exists(Path(volume, 'work')):
-            for filename in os.listdir(Path(volume, 'work')):
-                file_path = os.path.join(Path(volume, 'work'), filename)
-                try:
-                    if os.path.isfile(file_path) or os.path.islink(file_path):
-                        os.unlink(file_path)
-                    elif os.path.isdir(file_path):
-                        shutil.rmtree(file_path)
-                except Exception as e:
-                    print('Failed to delete %s because %s' % (file_path, e))
-
-        # check to see if output folder exists, if it does delete it
+        # wipe contents of output (different logic because backend doesn't put all output in a platename dir)
         if os.path.exists(Path(volume, 'output')):
             for filename in os.listdir(Path(volume, 'output')):
                 file_path = os.path.join(Path(volume, 'output'), filename)
@@ -345,6 +270,22 @@ def callback(set_progress, n_clicks, store):
                         shutil.rmtree(file_path)
                 except Exception as e:
                     print('Failed to delete %s because %s' % (file_path, e))
+
+        # Copy .HTD file into platename input dir
+        shutil.copy(htd_file, platename_input_dir)
+
+        # Iterate through each time point and copy images into new dirs
+        time_points = [item for item in os.listdir(img_dir) if os.path.isdir(
+            Path(img_dir, item))]
+
+        for time_point in time_points:
+            time_point_dir = Path(platename_input_dir, time_point)
+            time_point_dir.mkdir(parents=True, exist_ok=True)
+            
+            for well in store["wells"]:
+                well_path = Path(img_dir,
+                                 time_point, f'{plate_base}_{well}.TIF')
+                shutil.copy(well_path, time_point_dir)
         """
         End of section to replace 
         """
@@ -414,7 +355,7 @@ def callback(set_progress, n_clicks, store):
                             f'```{img_path}```'
                         ))
 
-        # get the platename (default) file in output folder that have .png extension
+        # get the platename (default) file in output dir that have .png extension
         output_path = Path(volume, 'output', 'thumbs', platename + '.png')
 
         # create a figure for the output

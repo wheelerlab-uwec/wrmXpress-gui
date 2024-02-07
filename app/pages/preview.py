@@ -487,9 +487,9 @@ def run_analysis(
             # Return the path and the figure and the open status of the alerts
             return f"```{first_well_path}```", fig, False, f'', False
 
-        """
-        Remove this section following the fix in the wrmXpress bug
-        """
+
+        # replace the YAML config option with ['All'] as a workaround for wrmXpress bug
+        # instead, we'll copy the selected files to input and analyze all of them
         if wells != 'All':
             first_well = ['All']
 
@@ -520,28 +520,42 @@ def run_analysis(
         # Checking if input folder exists, and if not, create it,
         # then subsequently copy the images into this folder
         # Input and platename input folder paths
-        folder_containing_img = Path(volume, platename)
-        input_folder = Path(volume, 'input')
-        platename_input_folder = Path(input_folder, platename)
-        os.makedirs(platename_input_folder, exist_ok=True)
+        # necessary file paths
+        img_dir = Path(volume, platename)
+        input_dir = Path(volume, 'input')
+        platename_input_dir = Path(input_dir, platename)
+        plate_base = platename.split("_", 1)[0]
+        htd_file = Path(img_dir, f'{plate_base}.HTD')
 
-        # Copy .HTD file into platename input folder
-        htd_file_path = folder_containing_img / f'{plate_base}.HTD'
-        shutil.copy(htd_file_path, platename_input_folder)
+        # wipe previous runs
+        if os.path.exists(Path(volume, 'work', platename)):
+            shutil.rmtree(Path(volume, 'work', platename))
+            Path(volume, 'work', platename).mkdir(parents=True, exist_ok=True)
+        else:
+            Path(volume, 'work', platename).mkdir(parents=True, exist_ok=True)
+
+        if os.path.exists(Path(volume, 'input', platename)):
+            shutil.rmtree(Path(volume, 'input', platename))
+            Path(volume, 'input', platename).mkdir(parents=True, exist_ok=True)
+        else:
+            Path(volume, 'input', platename).mkdir(parents=True, exist_ok=True)
+
+        # Copy .HTD file into platename input dir
+        shutil.copy(htd_file, platename_input_dir)
 
         # Collecting the time point folders
-        folders = [item for item in os.listdir(folder_containing_img) if os.path.isdir(
-            Path(folder_containing_img, item))]
+        time_points = [item for item in os.listdir(img_dir) if os.path.isdir(
+            Path(img_dir, item))]
 
         # Iterate through each time point
-        for folder in folders:
-            time_point_folder = Path(platename_input_folder, folder)
-            os.makedirs(time_point_folder, exist_ok=True)
+        for time_point in time_points:
+            time_point_dir = Path(platename_input_dir, time_point)
+            time_point_dir.mkdir(parents=True, exist_ok=True)
 
             # Copy first and second well image into time point folder
-            first_well_path = Path(folder_containing_img,
-                                   folder, f'{plate_base}_{first_well}.TIF')
-            shutil.copy(first_well_path, time_point_folder)
+            first_well_path = Path(img_dir,
+                                   time_point, f'{plate_base}_{first_well}.TIF')
+            shutil.copy(first_well_path, time_point_dir)
 
         # filepath of the yaml file
         yaml_file = Path(platename + '.yml')
