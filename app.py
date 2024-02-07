@@ -152,8 +152,8 @@ def callback(set_progress, n_clicks, store):
                 image_tag = image_info[-1]
                 if check_for_names[0] in image_tag:
                     good_to_go = True
-                if check_for_names[1] in image_tag:
-                    good_to_go = True
+                    if check_for_names[1] not in image_tag:
+                        good_to_go = False
 
             if good_to_go == False:
                 return None, True, True, "wrmXpress container not found. Please install the container and try again."
