@@ -12,26 +12,29 @@ import plotly.graph_objs as go
 ####                                                                ####
 ########################################################################
 
+# Sidebar style
 SIDEBAR_STYLE = {
-    "position": "fixed",
-    "top": 0,
-    "left": 0,
-    "bottom": 0,
-    "width": "16rem",
-    "padding": "2rem 1rem",
-    "background-color": "#f8f9fa",
-    "text-color": "#00205B",  
-    'color':'#000000',
+    "position": "fixed", # Fixed position
+    "top": 0, # Top of the page
+    "left": 0, # Left of the page
+    "bottom": 0, # Bottom of the page
+    "width": "16rem", # Width of the sidebar
+    "padding": "2rem 1rem", # Padding of the sidebar
+    "background-color": "#f8f9fa", # Background color of the sidebar
+    "text-color": "#00205B",  # Text color of the sidebar
+    'color':'#000000', # Color of the sidebar
 }
 
+# Content style
 CONTENT_STYLE = {
-    "margin-left": "18rem",
-    "margin-right": "2rem",
-    "padding": "2rem 1rem",
-    "text-color": "#00205B", 
-    'color':'#000000',
+    "margin-left": "18rem", # Margin left of the content
+    "margin-right": "2rem", # Margin right of the content
+    "padding": "2rem 1rem", # Padding of the content
+    "text-color": "#00205B",  # Text color of the content
+    'color':'#000000', # Color of the content
 }
 
+# Graph style
 layout = go.Layout(
     xaxis=dict(
         autorange=True,

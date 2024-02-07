@@ -36,10 +36,10 @@ layout = dbc.Container([
     dbc.Accordion(
         [
             # Order of the Accordian item in which they appear in the app
-            instrument_settings,
-            worm_information,
-            module_selection,
-            run_time_settings,
+            instrument_settings,  # Instrument settings, see instrument_settings.py
+            worm_information,  # Worm information, see worm_information.py
+            module_selection,  # Module selection, see module_selection.py
+            run_time_settings,  # Run time settings, see run_time_settings.py
         ],
         start_collapsed=False,  # Start with the accordian open
         always_open=True,  # Always open the accordian
@@ -52,14 +52,15 @@ layout = dbc.Container([
         duration=10000  # Alert will close after 10 seconds
     ),
     html.Br(),
+    # Button to finalize configuration
     dbc.Row(
         [
             dbc.Col(
                 dbc.Button(
                     "Finalize configuration",  # Button text
                     id="finalize-configure-button",
-                    className="flex",
-                    color='primary'  # Button color is wrmXpress blue
+                    className="flex",  # Button class is flex
+                    color='primary'  # Default button color is (wrmXpress) blue
                 ),
                 width="auto"  # Button width is auto
             ),
@@ -90,16 +91,29 @@ layout = dbc.Container([
 )
 # appearing selections upon meeting certain critera
 def update_options_visibility(imaging_mode, file_structure):
+    """
+    This function will display the multi-well options and additional options based on the imaging mode and file structure selected.
+    =======================================================================================================
+    Arguments:
+        - imaging_mode : str : The imaging mode selected
+        - file_structure : str : The file structure selected
+    =======================================================================================================
+    Returns:
+        - multi_well_options_style : dict : The style for the multi-well options
+        - additional_options_style : dict : The style for the additional options
+    """
     multi_well_options_style = {'display': 'none'}
     additional_options_style = {'display': 'none'}
 
-    if imaging_mode == 'multi-well':
+    if imaging_mode == 'multi-well':  # if multi-well is selected
+        # display the multi-well options
         multi_well_options_style = {'display': 'flex'}
 
-        if file_structure == 'avi':
+        if file_structure == 'avi':  # if avi is selected
+            # display the additional options
             additional_options_style = {'display': 'flex'}
 
-    return multi_well_options_style, additional_options_style
+    return multi_well_options_style, additional_options_style  # return the styles
 
 
 @callback(
@@ -130,6 +144,26 @@ def rows_cols(
     file_sturcture,
     img_masking
 ):
+    """
+    This function will store the values of the inputs to be used in different pages.
+    =======================================================================================================
+    Arguments:
+        - cols : int : The number of columns
+        - rows : int : The number of rows
+        - mounter : str : The mounted volume
+        - platename : str : The plate name
+        - well_selection : list : The list of wells selected
+        - motility : str : The motility run
+        - segment : str : The segment run
+        - wells : list : The list of wells
+        - imgaging_mode : str : The imaging mode
+        - file_sturcture : str : The file structure
+        - img_masking : str : The image masking
+    =======================================================================================================
+    Returns:
+        - dict : The values of the inputs to be used in different pages
+    """
+    # storing and returning the values of the inputs to be used in different pages
     return {
         'cols': cols,
         'rows': rows,
@@ -144,6 +178,7 @@ def rows_cols(
         'img_masking': img_masking
     }
 
+
 @callback(
     Output("well-selection-table", 'children'),
     [
@@ -153,44 +188,70 @@ def rows_cols(
 )
 # creating a selection table based on the dimensions of rows and columns selected
 def update_table(rows, cols):
+    """
+    This function will create a selection table based on the dimensions of rows and columns selected.
+    =======================================================================================================
+    Arguments:
+        - rows : int : The number of rows
+        - cols : int : The number of columns
+    =======================================================================================================
+    Returns:
+        - well_selection : dash_table.DataTable : The selection table
+    """
+    # default values for rows and columns
     default_cols = 12
     default_rows = 8
-    if rows is None:
+    if rows is None:  # if rows is not selected
         rows = default_rows
-    if cols is None:
+    if cols is None:  # if cols is not selected
         cols = default_cols
 
+    # create a dataframe from the inputs, see callback_functions.py
     df = create_df_from_inputs(rows, cols)
+
+    # create a table from the dataframe
     well_selection = dash_table.DataTable(
         data=df.reset_index().to_dict('records'),
         columns=[{'name': 'Row', 'id': 'index', 'editable': False}] +
         [{'name': col, 'id': col} for col in df.columns],
-        editable=True,
-        style_table={'overflowX': 'auto'},
-        style_cell={'textAlign': 'center'},
+        editable=True,  # table is editable
+        style_table={'overflowX': 'auto'},  # table style
+        style_cell={'textAlign': 'center'},  # cell style
         id='dynamic-table-container-well-selection-table'
     )
-    return well_selection
+    return well_selection  # return the table
 
 # Populate list of wells to be analyzed
+
+
 @callback(
     Output('well-selection-list', 'children'),
     Input('dynamic-table-container-well-selection-table', 'data')
 )
 def update_wells(table_contents):  # list of cells from selection table
+    """
+    This function will populate the list of wells to be analyzed.
+    =======================================================================================================
+    Arguments:
+        - table_contents : list : The list of cells from the selection table
+    =======================================================================================================
+    Returns:
+        - list : The sorted list of wells to be analyzed
+    """
     values_list = [list(d.values()) for d in table_contents]
     flattened_list = list(itertools.chain.from_iterable(values_list))
     filtered_list = []
-    for item in flattened_list:
+    for item in flattened_list:  # remove empty cells
         if item is None:
             continue
-        elif len(item) == 1:
+        elif len(item) == 1:  # remove single character cells
             continue
         else:
-            filtered_list.append(item)
-    # filtered_list = [item for item in flattened_list if item is None or len(item) > 1]
-    sorted_list = sorted(filtered_list)
-    return sorted_list
+            filtered_list.append(item)  # append the item to the filtered list
+
+    sorted_list = sorted(filtered_list)  # sort the list
+    return sorted_list  # return the sorted list
+
 
 @callback(
     [
@@ -222,7 +283,7 @@ def update_wells(table_contents):  # list of cells from selection table
     prevent_initial_call=True,
     allow_duplicate=True
 )
-def run_analysis(
+def run_analysis(  # function to save the yaml file from the sections in the configuration page
     nclicks,
     imagingmode,
     filestructure,
@@ -244,13 +305,56 @@ def run_analysis(
     volume,
     wells,
 ):
+    """
+    This function will save the yaml file from the sections in the configuration page.
+    =======================================================================================================
+    Arguments:
+        - nclicks : int : The number of clicks
+        - imagingmode : str : The imaging mode
+        - filestructure : str : The file structure
+        - multiwellrows : int : The number of multi-well rows
+        - multiwellcols : int : The number of multi-well columns
+        - multiwelldetection : str : The multi-well detection
+        - species : str : The species
+        - stages : str : The stages
+        - motilityrun : str : The motility run
+        - conversionrun : str : The conversion run
+        - conversionscalevideo : str : The conversion scale video
+        - conversionrescalemultiplier : str : The conversion rescale multiplier
+        - segmentrun : str : The segment run
+        - wavelength : str : The wavelength
+        - cellprofilerrun : str : The cell profiler run
+        - cellprofilerpipeline : str : The cell profiler pipeline
+        - diagnosticdx : str : The diagnostics dx
+        - platename : str : The plate name
+        - volume : str : The volume
+        - wells : list : The list of wells
+    =======================================================================================================
+    Returns:
+        - str : The color of the finalize configuration button
+            +- 'primary' : The color of the initial configuration button
+            +- 'danger' : The color of the configuration button upon encountering an error
+            +- 'success' : The color of the finalize configuration button upon successful configuration
+        - bool : The open state of the alert 
+            +- False : The alert is not open
+            +- True : The alert is open
+        - str : The children of the alert
+            +- str : The error message
+            +- str : The success message
+        - str : The color of the alert
+            +- 'danger' : The color of the alert upon encountering an error
+            +- 'success' : The color of the alert upon successful configuration
+
+    """
     if nclicks:
 
+        # try to catch any errors that may occur
+        # return an error message if an error occurs
         try:
             # initializing the first error message
             error_messages = [
                 "While finalizing the configuration, the following errors were found:"]
-            error_occured = False
+            error_occured = False  # initializing the error flag
 
             # checks volume and plate names to ensure they are adequately named
             check_cases = [None, '', ' ']
@@ -259,11 +363,13 @@ def run_analysis(
             if platename in check_cases:
                 error_occured = True
                 error_messages.append(
-                    "Plate/Folder name is missing.")
+                    "Plate/Folder name is missing."  # error message
+                )
             if volume in check_cases:
                 error_occured = True
                 error_messages.append(
-                    "Volume path is missing.")
+                    "Volume path is missing."  # error message
+                )
 
             # ensures that plate name and volume contains characters
             if volume not in check_cases and platename not in check_cases:
@@ -278,7 +384,8 @@ def run_analysis(
                     if has_invalid_chars == True:
                         error_occured = True
                         error_messages.append(
-                            'Plate/Folder name contains invalid characters. A valid platename only contains letters, numbers, underscores ( _ ), and dashs ( - ).')
+                            'Plate/Folder name contains invalid characters. A valid platename only contains letters, numbers, underscores ( _ ), and dashs ( - ).'
+                        )
 
                 # splits volume into a list of characters
                 volume_parts = list(volume)
@@ -309,60 +416,81 @@ def run_analysis(
                 if not os.path.exists(volume):
                     error_occured = True
                     error_messages.append(
-                        'The volume path does not exist.')
-                    
+                        'The volume path does not exist.'
+                    )
+
+                # check to see if the plate name path exists
                 if not os.path.exists(platename_path):
                     error_occured = True
                     error_messages.append(
-                        "No Plate/Folder in the volume.")
+                        "No Plate/Folder in the volume."
+                    )
 
                 # check to see if the wells selected exist
                 plate_base = platename.split("_", 1)[0]
                 well_fail = False
                 index = 0
+                # iterate through the wells that have been selected
                 while not well_fail and index < len(wells):
-                    well = wells[index]
+                    well = wells[index]  # obtain the well
                     img_path = Path(
-                        volume, f'{platename}/TimePoint_1/{plate_base}_{well}.TIF')
+                        volume, f'{platename}/TimePoint_1/{plate_base}_{well}.TIF'
+                    )
+
+                    # check to see if the image path exists
                     if not os.path.exists(img_path):
                         error_occured = True
                         error_messages.append(
-                            'You have selected more wells than you have images. This may result in unexpected errors or results.')
-                        well_fail = True
-                    index += 1
+                            'You have selected more wells than you have images. This may result in unexpected errors or results.'
+                        )
+                        well_fail = True  # set well fail to true if the image path does not exist
+                    index += 1  # increment the index
 
                 # check if video module is selected with only one time point
                 if eval_bool(cellprofilerrun) == True:
-                    timept = Path(volume,
-                                  f'{platename}/TimePoint_2')
+
+                    # obtain the time point path
+                    timept = Path(
+                        volume,
+                        f'{platename}/TimePoint_2'
+                    )
+
+                    # check to see if the time point exists
                     if os.path.exists(timept):
                         error_occured = True
                         error_messages.append(
-                            'You have selected a Cell Profiler pipeline while having multiple time points.')
+                            'You have selected a Cell Profiler pipeline while having multiple time points.'
+                        )
 
             # check for conflicting modules
             if eval_bool(cellprofilerrun) == True and eval_bool(segmentrun):
                 error_occured = True
                 error_messages.append(
-                    'Cannot run Cellprofiler and Segment together.')
+                    'Cannot run Cellprofiler and Segment together.'
+                )
 
             if eval_bool(cellprofilerrun) == True and eval_bool(motilityrun):
                 error_occured = True
                 error_messages.append(
-                    'Cannot run Cellprofiler and Motility together.')
+                    'Cannot run Cellprofiler and Motility together.'
+                )
 
             # check to see if there was an error message
             if error_occured == True:
 
                 # formats the first line of the error message
                 error_messages[0] = html.H4(
-                    f'{error_messages[0]}', className='alert-heading')
+                    f'{error_messages[0]}',
+                    className='alert-heading'
+                )
 
                 # format the content of the error messages
                 for i in range(1, len(error_messages)):
                     error_messages[i] = html.P(
-                        f'{i}. {error_messages[i]}', className="mb-0")
-                    
+                        f'{i}. {error_messages[i]}',
+                        className="mb-0"
+                    )
+
                 # return the error messages
                 return 'danger', True, error_messages, 'danger'
 
@@ -371,7 +499,7 @@ def run_analysis(
             return 'danger', True, 'A ValueError occurred', 'danger'
         except Exception as e:
             return 'danger', True, f'An unexpected error occurred: {str(e)}', 'danger'
-        
+
         # if no error messages are found, write the configuration to a YAML file
         config = prep_yaml(
             imagingmode,
@@ -399,6 +527,6 @@ def run_analysis(
         with open(output_file, 'w') as yaml_file:
             yaml.dump(config, yaml_file,
                       default_flow_style=False)
-            
+
         # return success message
         return 'success', True, f'Configuration written to {output_file}', 'success'

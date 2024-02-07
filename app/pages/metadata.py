@@ -31,59 +31,60 @@ layout = dbc.Container(
     [
         html.Div(
             [
-                metadata_checklist,
+                metadata_checklist,  # Metadata checklist, see metadata_components.py
                 html.Br(),
                 dbc.Row(
                     [
                         # Label for Plate Format
                         dbc.Col(
                             html.H6(
-                                "Add new table:"
+                                "Add new table:"  # Label for adding new table
                             )
                         ),
                     ],
-                    align="center"
+                    align="center"  # Align the label to the center
                 ),
                 dbc.Row(
                     [
                         # First Column: Input for Total Number of Columns
                         dbc.Col(
                             dbc.Button(
-                                "+",
+                                "+",  # Add button
                                 id="add-metadata-table-button",
                                 className="me-2",
                             ),
-                            width="auto",
+                            width="auto",  # Width of the column
                             className='pe-0'
                         ),
                         dbc.Col(
                             # Add an editable input box here
                             dbc.Input(
-                                id="uneditable-input-box",
+                                id="uneditable-input-box",  # ID for the input box, indeed it is editable
                                 placeholder='Title',
                                 value="",
-                                disabled=False
+                                disabled=False  # Enable the input box
                             ),
                             width="auto",
                             className='ps-0'
                         ),
                     ],
-                    align="center"
+                    align="center"  # Align the input box to the center
                 ),
                 html.Hr(),
                 dbc.Row(
                     [
                         dbc.Col(
                             dbc.Button(
-                                "Finalize Tables",
+                                "Finalize Tables",  # Finalize Tables button
                                 id="finalize-metadata-table-button",
                                 className="flex",
+                                # Color of the button (wrmXpress) blue
                                 color='primary'
                             ),
-                            width="auto"
+                            width="auto"  # Width of the column
                         ),
                     ],
-                    justify="center"
+                    justify="center"  # Justify the button to the center
                 ),
                 html.Br(),
                 html.Br(),
@@ -91,7 +92,7 @@ layout = dbc.Container(
                     dcc.Tabs(
                         id='metadata-tabs',
                         value='batch-data-tab',
-                        children=[]
+                        children=[]  # Empty children for the tabs to be filled in by the user, see function below
                     )
                 ]
                 ),
@@ -99,10 +100,11 @@ layout = dbc.Container(
                 dbc.Row(
                     dbc.Col(
                         dbc.Button(
-                            "Save metadata",
+                            "Save metadata",  # Save metadata button
                             id='save-meta-data-to-csv',
+                            # Color of the button (wrmXpress) blue
                             color='primary',
-                            n_clicks=0
+                            n_clicks=0  # Number of clicks
                         ),
                         width='auto'
                     )
@@ -110,11 +112,11 @@ layout = dbc.Container(
                 html.Br(),
                 dbc.Alert(
                     children=[
-                        "Metadata tables saved!"
+                        "Metadata tables saved!"  # Metadata tables saved alert
                     ],
                     id="metadata-saved-alert",
-                    is_open=False,
-                    color="success",
+                    is_open=False,  # Alert is not open
+                    color="success",  # Color of the alert (green)
                     style={"textAlign": "center"}
                 )
             ]
@@ -150,9 +152,26 @@ layout = dbc.Container(
 )
 # creating empty dash tables from metadata checklist with proper dimensions from rows and columns
 def create_tabs_from_checklist(store, n_clicks, checklist_values):
+    """
+    This function creates a list of dcc.Tab components from the checklist values
+    =================================================================================================
+    Arguments:
+        - store : dict : the store dictionary
+        - n_clicks : int : the number of times the (finalize metatadata table)button has been clicked
+        - checklist_values : list : the values of the checklist
+    =================================================================================================
+    Returns:
+        - tabs : list : a list of dcc.Tab components
+        - selected_tab : str : the value of the selected tab (the first tab)
+        - color : str : the color of the finalize-metadata-table-button
+            +- 'success' : if the checklist values are available
+            +- 'primary' : if the checklist values are not available
+    """
     default_cols = 12
     default_rows = 8
 
+    # attempting to catch any errors that may occur
+    # if the rows are not available, set them to the default values
     try:
         if store['rows'] is not None:
             num_rows = store['rows']
@@ -161,6 +180,7 @@ def create_tabs_from_checklist(store, n_clicks, checklist_values):
     except KeyError:
         num_rows = default_rows
 
+    # if the columns are not available, set them to the default values
     try:
         if store['cols'] is not None:
             num_cols = store['cols']
@@ -169,24 +189,33 @@ def create_tabs_from_checklist(store, n_clicks, checklist_values):
     except KeyError:
         num_cols = default_cols
 
+    # Create an empty DataFrame with the specified dimensions, see callback_functions.py
     df_empty = create_empty_df_from_inputs(num_rows, num_cols)
-    if n_clicks and checklist_values:
+
+    if n_clicks and checklist_values: # If the checklist values are available and the button has been clicked
+
         # Create a list of dcc.Tab components from the checked items
         tabs = [
-            dcc.Tab(label=value, value=f"{value}-tab", children=[
-                html.Div(dash_table.DataTable(
-                    data=df_empty.reset_index().to_dict('records'),
-                    columns=[{'name': 'Row', 'id': 'index', 'editable': False}] +
-                    [{'name': col, 'id': col} for col in df_empty.columns],
-                    editable=True,
-                    style_table={'overflowX': 'auto'},
-                    style_cell={'textAlign': 'center'},
-                    id=f'{value}-tab-table'
-                )
-                )
-            ])  # Create a Tab for each checked item
-            for value in checklist_values
+            dcc.Tab(label=value,
+                    value=f"{value}-tab",
+                    children=[
+                        html.Div(
+                            dash_table.DataTable(
+                                data=df_empty.reset_index().to_dict('records'),
+                                columns=[{'name': 'Row', 'id': 'index', 'editable': False}] +
+                                [{'name': col, 'id': col}
+                                    for col in df_empty.columns],
+                                editable=True,
+                                style_table={'overflowX': 'auto'},
+                                style_cell={'textAlign': 'center'},
+                                id=f'{value}-tab-table'
+                            )
+                        )
+                    ])  # Create a Tab for each checked item
+
+            for value in checklist_values # Iterate over the checklist values
         ]
+
         # Set the value of the first tab as the selected tab
         selected_tab = f'{checklist_values[0]}-tab'
         return tabs, selected_tab, 'success'
@@ -207,13 +236,25 @@ def create_tabs_from_checklist(store, n_clicks, checklist_values):
 )
 # creating additional checklist items from user input
 def update_metadata_checklist(n_clicks, new_table_name, existing_options):
-    if n_clicks and new_table_name:
+    """
+    This function updates the checklist options with the new table name
+    =================================================================================================
+    Arguments:
+        - n_clicks : int : the number of times the (add-metadata-table-button) button has been clicked
+        - new_table_name : str : the value of the uneditable input box
+        - existing_options : list : the existing options of the checklist
+    =================================================================================================
+    Returns:
+        - updated_options : list : the updated options of the checklist
+    """
+    if n_clicks and new_table_name: # If the button has been clicked and the new table name is available
+
         # Append the new table name to the existing options
         new_option = {"label": new_table_name, "value": new_table_name}
-        updated_options = existing_options + [new_option]
-        return updated_options
+        updated_options = existing_options + [new_option] # Append the new table name to the existing options
+        return updated_options # Return the updated options
     else:
-        return existing_options
+        return existing_options # Return the existing options
 
 
 @callback(
@@ -230,41 +271,75 @@ def update_metadata_checklist(n_clicks, new_table_name, existing_options):
 )
 # saving metadata tables
 def save_the_metadata_tables_to_csv(n_clicks, metadata_tabs, store):
+    """
+    This function saves the metadata tables to a CSV file
+    =================================================================================================
+    Arguments:
+        - n_clicks : int : the number of times the (save-meta-data-to-csv) button has been clicked
+        - metadata_tabs : list : the metadata tabs
+        - store : dict : the store dictionary
+    =================================================================================================
+    Returns:
+        - color : str : the color of the save-meta-data-to-csv button
+            +- 'success' : if the metadata tables are saved
+            +- 'primary' : if the metadata tables are not saved
+        - is_open : bool : whether the metadata-saved-alert is open
+            +- True : if the metadata tables are saved
+            +- False : if the metadata tables are not saved
+        - children : str : the message to display in the metadata-saved-alert
+        - color : str : the color of the metadata-saved-alert
+            +- 'success' : if the metadata tables are saved
+            +- 'danger' : if the metadata tables are not saved, or unable to save due to insufficient configuration
+        - disabled : bool : whether the save-meta-data-to-csv button is disabled
+            +- True : if the metadata tables are saved
+            +- False : if the metadata tables are not saved, or unable to save due to insufficient configuration
+    """
+    # If no store is available, return an error message and disable the button
     if not store:
         return 'primary', True, "No configuration found. Please go to the configuration page to set up the analysis.", "danger", True
-    if n_clicks:
+    
+    if n_clicks: # If the button has been clicked and store values from the configuration page are available
 
         # Iterate over the metadata tabs
         for tab in metadata_tabs:
-            tab_data = tab['props']['children'][0]['props']['children']['props']['data']
-            tab_id = tab['props']['label']
-            tab_id = tab_id.lower()
+            tab_data = tab['props']['children'][0]['props']['children']['props']['data'] # Get the data from the tab
+            tab_id = tab['props']['label'] # Get the label of the tab
+            tab_id = tab_id.lower() # Convert the label to lowercase
 
             df = pd.DataFrame(tab_data)
-            current_columns_order = df.columns.tolist()
+            current_columns_order = df.columns.tolist() # Get the current columns order
+
             # Define a mapping of column names to integer values (except for 'index')
             column_order_mapping = {'index': -1}
-            for i, col in enumerate(current_columns_order):
-                if col != 'index':
-                    column_order_mapping[col] = int(col)
+            for i, col in enumerate(current_columns_order): # Iterate over the current columns order
+                if col != 'index': # All of the columns that are not 'index'
+                    column_order_mapping[col] = int(col) # Add the column to the column order mapping
 
             # Sort the columns based on their values in the mapping
             sorted_columns = sorted(
                 current_columns_order, key=lambda col: column_order_mapping[col])
-            sorted_columns = list(sorted_columns)
-            sorted_columns = sorted_columns[1:]
+            sorted_columns = list(sorted_columns) # Convert the sorted columns to a list
+            sorted_columns = sorted_columns[1:] 
 
             # Reorder the DataFrame columns
             df = df[sorted_columns]
 
-            volume = store['mount']
+            volume = store['mount'] # Get the volume from the store
+
             # Save the DataFrame to a CSV file
-            metadata_dir = Path(volume).joinpath('metadata')
+            metadata_dir = Path(volume).joinpath('metadata') # Join the volume and the metadata directory
+
+            # If the metadata directory does not exist, create it
             if not metadata_dir.exists():
                 metadata_dir.mkdir(parents=True, exist_ok=True)
+
+            # Save the DataFrame to a CSV file    
             file_path = metadata_dir.joinpath(f"{tab_id}.csv")
             df.to_csv(file_path, index=False, header=False)
+
+        # Get the directory path    
         directory_path = os.path.dirname(file_path)
+        
         # Enable the button if not clicked
         return "success", True, f"Metadata tables saved to destination: {directory_path}", "success", False
     else:
