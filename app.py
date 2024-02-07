@@ -51,6 +51,7 @@ sidebar = html.Div(
         html.A(
             html.Img(src='https://github.com/zamanianlab/wrmXpress/blob/main/img/logo/output.png?raw=true',  # wrmXpress image
                      height="200px"),
+
             # clicked takes user to wrmXpress github
             href="https://github.com/zamanianlab/wrmxpress",
             style={"textDecoration": "none"},
@@ -112,7 +113,7 @@ app.layout = html.Div([
             Output("progress-bar-run-page", "style"),
             {"visibility": "visible"},
             {"visibility": "hidden"}
-        ), 
+        ),
         (
             Output("progress-message-run-page-for-analysis", "style"),
             {'visibility': 'visible'},
@@ -120,7 +121,9 @@ app.layout = html.Div([
         ),
     ],
 
-    cancel=[Input("cancel-analysis", "n_clicks")],
+    cancel=[
+        Input("cancel-analysis", "n_clicks")
+    ],
     progress=[
         Output("progress-bar-run-page", "value"),
         Output("progress-bar-run-page", "max"),
@@ -147,6 +150,7 @@ def callback(set_progress, n_clicks, store):
             images_in_docker = client.images.list()
             for img in images_in_docker:
                 img = f"{img}"
+
                 # Remove angle brackets, quotes, and split
                 image_info = img.strip()[8:-1].strip("'").split("', '")
                 image_tag = image_info[-1]
@@ -189,23 +193,25 @@ def callback(set_progress, n_clicks, store):
         # check to see if input folder exists, if not create it
         # then copy necessay files into input folder
         if not os.path.exists(Path(volume, 'input')):
-            os.makedirs(Path(volume, 'input'))
-            os.makedirs(Path(volume, 'input', platename))
 
             # Copy .HTD file into platename input folder
             shutil.copy(htd_file_path, platename_input_folder)
+
             # Collecting the time point folders
             folders = [item for item in os.listdir(folder_containing_img) if os.path.isdir(
                 Path(folder_containing_img, item))]
+
             # Iterate through each time point
             for folder in folders:
                 time_point_folder = Path(platename_input_folder, folder)
                 os.makedirs(time_point_folder, exist_ok=True)
                 for well in store["wells"]:
+
                     # Copy necessary wells image into time point folder
                     well_path = Path(folder_containing_img,
                                      folder, f'{plate_base}_{well}.TIF')
                     shutil.copy(well_path, time_point_folder)
+
         # if input folder exists, check to see if platename folder exists, if not create it
         # then copy necessay files into platename folder
         elif os.path.exists(Path(volume, 'input')):
@@ -216,14 +222,17 @@ def callback(set_progress, n_clicks, store):
 
             if not os.path.exists(platename_input_folder):
                 os.makedirs(platename_input_folder)
+
                 # Collecting the time point folders
                 folders = [item for item in os.listdir(folder_containing_img) if os.path.isdir(
                     Path(folder_containing_img, item))]
+
                 # Iterate through each time point
                 for folder in folders:
                     time_point_folder = Path(platename_input_folder, folder)
                     os.makedirs(time_point_folder, exist_ok=True)
                     for well in store["wells"]:
+
                         # Copy necessary wells image into time point folder
                         well_path = Path(folder_containing_img,
                                          folder, f'{plate_base}_{well}.TIF')
@@ -234,15 +243,18 @@ def callback(set_progress, n_clicks, store):
                 os.system(f'rm -rf {platename_input_folder}')
                 os.makedirs(platename_input_folder)
                 shutil.copy(htd_file_path, platename_input_folder)
+
                 # Collecting the time point folders
                 folders = [item for item in os.listdir(folder_containing_img) if os.path.isdir(
                     Path(folder_containing_img, item))]
+
                 # Iterate through each time point
                 for folder in folders:
                     time_point_folder = Path(platename_input_folder, folder)
                     if not os.path.exists(time_point_folder):
                         os.makedirs(time_point_folder, exist_ok=True)
                         for well in store["wells"]:
+
                             # Copy necessary wells image into time point folder
                             well_path = Path(folder_containing_img,
                                              folder, f'{plate_base}_{well}.TIF')
@@ -297,6 +309,7 @@ def callback(set_progress, n_clicks, store):
             container.reload()
             container_status = container.status
             time.sleep(1)
+
             # Retrieve and process the logs after the container has finished
             result = subprocess.run(
                 ['docker', 'logs', container_name], capture_output=True, text=True)
@@ -307,6 +320,7 @@ def callback(set_progress, n_clicks, store):
                     if well_running not in wells_analyzed:
                         wells_analyzed.append(well_running)
                         current_well = wells_analyzed[-1]
+
                         # Optain filepath for the well being analyzed
                         img_path = Path(
                             volume, f'{platename}/TimePoint_1/{plate_base}_{wells_analyzed[-1]}.TIF')
@@ -330,7 +344,7 @@ def callback(set_progress, n_clicks, store):
         fig_1.update_layout(coloraxis_showscale=False)
         fig_1.update_xaxes(showticklabels=False)
         fig_1.update_yaxes(showticklabels=False)
-        
+
         return fig_1, False, False, ''
 
 ########################################################################

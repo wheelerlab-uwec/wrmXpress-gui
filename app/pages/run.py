@@ -44,49 +44,63 @@ layout = dbc.ModalBody(
                     dbc.Col(
                         dbc.Card(
                             dbc.CardBody([
-                                html.H4("Configuration summary",
-                                        className="text-center"),
+                                html.H4(
+                                    "Configuration summary",
+                                    className="text-center"
+                                ),
                                 html.Br(),
                                 dcc.Markdown(
                                     id='img-mode-output',
-                                    className="card-subtitle"),
+                                    className="card-subtitle"
+                                ),
                                 dcc.Markdown(
                                     id='file-structure-output',
-                                    className='card-subtitle'),
+                                    className='card-subtitle'
+                                ),
                                 dcc.Markdown(
                                     id='plate-format-output',
-                                    className='card-subtitle'),
+                                    className='card-subtitle'
+                                ),
                                 dcc.Markdown(
                                     id='img-masking-output',
-                                    className='card-subtitle'),
+                                    className='card-subtitle'
+                                ),
                                 dcc.Markdown(
                                     id='mod-selection-output',
-                                    className='card-subtitle'),
+                                    className='card-subtitle'
+                                ),
                                 dcc.Markdown(
                                     id='volume-name-output',
-                                    className='card-subtitle'),
+                                    className='card-subtitle'
+                                ),
                                 dcc.Markdown(
                                     id='plate-name-output',
-                                    className='card-subtitle'),
+                                    className='card-subtitle'
+                                ),
                                 dcc.Markdown(
                                     id='wells-content-output',
-                                    className='card-subtitle'),
+                                    className='card-subtitle'
+                                ),
                                 dbc.Row([
                                     dbc.Col(
-                                        dbc.Button('Begin Analysis',
-                                                   id='submit-analysis',
-                                                      className="d-grid gap-2 col-8 mx-auto",
-                                                   color="primary",
-                                                   n_clicks=0,
-                                                   disabled=False),
+                                        dbc.Button(
+                                            'Begin Analysis',
+                                            id='submit-analysis',
+                                            className="d-grid gap-2 col-8 mx-auto",
+                                            color="primary",
+                                            n_clicks=0,
+                                            disabled=False
+                                        ),
                                     ),
                                     dbc.Col(
-                                        dbc.Button('Cancel Analysis',
-                                                   id='cancel-analysis',
-                                                      className="d-grid gap-2 col-8 mx-auto",
-                                                   color="danger",
-                                                   n_clicks=0,
-                                                   disabled=False),
+                                        dbc.Button(
+                                            'Cancel Analysis',
+                                            id='cancel-analysis',
+                                            className="d-grid gap-2 col-8 mx-auto",
+                                            color="danger",
+                                            n_clicks=0,
+                                            disabled=False
+                                        ),
                                     ),
                                 ]),
                                 dbc.Alert(
@@ -123,7 +137,9 @@ layout = dbc.ModalBody(
                         dbc.Card(
                             dbc.CardBody([
                                 html.H4(
-                                    "Run diagnosis", className="text-center"),
+                                    "Run diagnosis",
+                                    className="text-center"
+                                ),
                                 dbc.Row(
                                     [
                                         dbc.Col(
@@ -145,12 +161,15 @@ layout = dbc.ModalBody(
                                 ),
                                 html.Br(),
                                 html.H6(
-                                    "File:", className="card-subtitle"),
+                                    "File:", className="card-subtitle"
+                                ),
                                 dcc.Markdown(
-                                    id='progress-message-run-page-for-analysis'),
+                                    id='progress-message-run-page-for-analysis'
+                                ),
                                 html.Br(),
                                 dcc.Markdown(
-                                    id='analysis-postview-message'),
+                                    id='analysis-postview-message'
+                                ),
                                 dbc.Alert(
                                     id='first-view-of-analysis-alert',
                                     color='light',
@@ -159,7 +178,8 @@ layout = dbc.ModalBody(
                                         dcc.Graph(
                                             id='image-analysis-preview',
                                             figure={
-                                                'layout': layout},
+                                                'layout': layout
+                                            },
                                             className='h-100 w-100'
                                         ),
                                     ]
@@ -176,7 +196,8 @@ layout = dbc.ModalBody(
                                                     dcc.Graph(
                                                         id='analysis-postview',
                                                         figure={
-                                                            'layout': layout},
+                                                            'layout': layout
+                                                        },
                                                         className='h-100 w-100'
                                                     ),
                                                 ])],
@@ -202,9 +223,10 @@ layout = dbc.ModalBody(
 ####                                                                ####
 ########################################################################
 
+
 @callback(
-        Output("cancel-analysis", 'n_clicks'),
-        Input("cancel-analysis", 'n_clicks')
+    Output("cancel-analysis", 'n_clicks'),
+    Input("cancel-analysis", 'n_clicks')
 )
 def cancel_analysis(n_clicks):
     if n_clicks:
@@ -215,19 +237,22 @@ def cancel_analysis(n_clicks):
         containers = client.containers.list()
 
         # Find the most recent container based on creation timestamp
-        most_recent_container = max(containers, key=lambda c: c.attrs['Created'])
+        most_recent_container = max(
+            containers, key=lambda c: c.attrs['Created'])
 
         # Kill the most recent container
         most_recent_container.kill()
 
-        print(f"Killed container {most_recent_container.id}")
     return n_clicks
 
+
 @callback(
-    [Output('analysis-postview', 'figure'),
-     Output('analysis-postview-message', 'children'),
-     Output('first-view-of-analysis-alert', 'is_open'),
-     Output('additional-view-of-analysis-alert', 'is_open')],
+    [
+        Output('analysis-postview', 'figure'),
+        Output('analysis-postview-message', 'children'),
+        Output('first-view-of-analysis-alert', 'is_open'),
+        Output('additional-view-of-analysis-alert', 'is_open')
+    ],
     State('analysis-dropdown', 'value'),
     Input('load-analysis-img', 'n_clicks'),
     State('store', 'data'),
@@ -249,6 +274,7 @@ def load_analysis_img(selection, n_clicks, store):
             fig.update_xaxes(showticklabels=False)
             fig.update_yaxes(showticklabels=False)
             return fig, f'```{output_plate_path}```', False, True
+
         # check to see if selection option exists in output thumbs folder
         output_thumbs_path = Path(
             volume, f'output/thumbs/{platename}_{selection}.png'
@@ -266,6 +292,7 @@ def load_analysis_img(selection, n_clicks, store):
 
 @callback(
     Output('analysis-dropdown', 'options'),
+
     # update the option dropdown when the run analysis is clicked
     Input('submit-analysis', 'n_clicks'),
     State('store', 'data'),
@@ -310,9 +337,15 @@ def update_results_message_for_run_page(
 ):
     if not store:
         return None, None, None, None, None, None, None, None
+
+    if store['rows'] == None:
+        rows = 8
+    if store['cols'] == None:
+        cols = 12
+
     img_mode = f'Imaging Mode: {store["img_mode"]}'
     file_structure = f'File Structure: {store["file_structure"]}'
-    plate_format = f'Plate Format: Rows = {store["rows"]}, Cols = {store["cols"]}'
+    plate_format = f'Plate Format: Rows = {rows}, Cols = {cols}'
     img_masking = f'Image Masking: {store["img_masking"]}'
     mod_selection = f'Module Selection: {store["motility"]}'
     volume = f'Volume: {store["mount"]}'

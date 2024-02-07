@@ -42,7 +42,14 @@ metadata_checklist = dbc.Form([
                      'value': 'Other'},
                 ],
                 value=[
-                    "Batch", 'Species', 'Strains', 'Stages', 'Treatments', "Concentrations", "Other"],
+                    "Batch",
+                    'Species',
+                    'Strains',
+                    'Stages',
+                    'Treatments',
+                    "Concentrations",
+                    "Other"
+                ],
                 persistence=True,
                 persistence_type='memory',
                 id="checklist-input",

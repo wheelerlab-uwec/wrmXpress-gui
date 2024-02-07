@@ -17,25 +17,44 @@ from dash import html
 # Run time accordian items for main page layout
 run_time_settings = dbc.AccordionItem(
     [
-        html.H4("Directories"),
-        html.H6("Volume path:"),
+        html.H4(
+            "Directories"
+        ),
+        html.H6(
+            "Volume path:"
+        ),
         dbc.Input(
-            id="mounted-volume", placeholder="Path", type="text", persistence=True,
-            persistence_type='memory'),
+            id="mounted-volume",
+            placeholder="Path",
+            type="text",
+            persistence=True,
+            persistence_type='memory'
+        ),
         html.Br(),
-        html.H6("Plate/Folder name:"),
+        html.H6(
+            "Plate/Folder name:"
+        ),
         dbc.Input(
-            id="plate-name", placeholder="Name", type="text", persistence=True,
-            persistence_type='memory'),
+            id="plate-name",
+            placeholder="Name",
+            type="text",
+            persistence=True,
+            persistence_type='memory'
+        ),
         html.Br(),
-        html.H4("Wells"),
+        html.H4(
+            "Wells"
+        ),
         html.P(
-            "Edit the following table such that well IDs are only present for wells to be analyzed."),
+            "Edit the following table such that well IDs are only present for wells to be analyzed."
+        ),
         # Selection Table from selection_table.py acquired from imports
         selection_table,
         html.Br(),
         html.Div([
-            html.P("List of wells to be analyzed:"),
+            html.P(
+                "List of wells to be analyzed:"
+            ),
             dbc.Card(
                 dbc.CardBody(
                     html.P(
@@ -43,7 +62,8 @@ run_time_settings = dbc.AccordionItem(
                     )
                 )
             )],
-            style={'display': 'none'})
+            style={'display': 'none'}
+        )
 
     ],
     id="run-time-settings",

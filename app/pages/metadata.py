@@ -36,7 +36,11 @@ layout = dbc.Container(
                 dbc.Row(
                     [
                         # Label for Plate Format
-                        dbc.Col(html.H6("Add new table:")),
+                        dbc.Col(
+                            html.H6(
+                                "Add new table:"
+                            )
+                        ),
                     ],
                     align="center"
                 ),
@@ -84,8 +88,10 @@ layout = dbc.Container(
                 html.Br(),
                 html.Br(),
                 dbc.Container([
-                    dcc.Tabs(id='metadata-tabs', value='batch-data-tab', children=[
-                    ]
+                    dcc.Tabs(
+                        id='metadata-tabs',
+                        value='batch-data-tab',
+                        children=[]
                     )
                 ]
                 ),
@@ -103,7 +109,9 @@ layout = dbc.Container(
                 ),
                 html.Br(),
                 dbc.Alert(
-                    children= ["Metadata tables saved!"],
+                    children=[
+                        "Metadata tables saved!"
+                    ],
                     id="metadata-saved-alert",
                     is_open=False,
                     color="success",
@@ -112,6 +120,7 @@ layout = dbc.Container(
             ]
         )
     ],
+
     # adjust white space between metadata tab and tabs of metadata content
     style={"paddingTop": "80px"}
 )
@@ -122,13 +131,20 @@ layout = dbc.Container(
 ####                                                                ####
 ########################################################################
 
+
 @callback(
-    [Output('metadata-tabs', 'children'),
-     Output('metadata-tabs', 'value'),
-     Output("finalize-metadata-table-button", "color")],
-    [State('store', 'data'),
-     Input("finalize-metadata-table-button", 'n_clicks')],
-    [State("checklist-input", "value")],
+    [
+        Output('metadata-tabs', 'children'),
+        Output('metadata-tabs', 'value'),
+        Output("finalize-metadata-table-button", "color")
+    ],
+    [
+        State('store', 'data'),
+        Input("finalize-metadata-table-button", 'n_clicks')
+    ],
+    [
+        State("checklist-input", "value")
+    ],
     prevent_initial_call=True
 
 )
@@ -176,14 +192,18 @@ def create_tabs_from_checklist(store, n_clicks, checklist_values):
         return tabs, selected_tab, 'success'
     else:
         # If no checklist values are available, return an empty list and set 'batch-data-tab' as the selected tab
-        return [], 'batch-data-tab','primary'
+        return [], 'batch-data-tab', 'primary'
 
 
 @callback(
     Output("checklist-input", "options"),
-    [Input("add-metadata-table-button", "n_clicks")],
-    [State("uneditable-input-box", 'value'),
-     State("checklist-input", "options")]
+    [
+        Input("add-metadata-table-button", "n_clicks")
+    ],
+    [
+        State("uneditable-input-box", 'value'),
+        State("checklist-input", "options")
+    ]
 )
 # creating additional checklist items from user input
 def update_metadata_checklist(n_clicks, new_table_name, existing_options):
@@ -197,11 +217,13 @@ def update_metadata_checklist(n_clicks, new_table_name, existing_options):
 
 
 @callback(
-    [Output("save-meta-data-to-csv", 'color'),
-     Output("metadata-saved-alert", "is_open"),
-     Output("metadata-saved-alert", "children"),
-     Output("metadata-saved-alert", "color"),
-     Output('save-meta-data-to-csv', 'disabled')],
+    [
+        Output("save-meta-data-to-csv", 'color'),
+        Output("metadata-saved-alert", "is_open"),
+        Output("metadata-saved-alert", "children"),
+        Output("metadata-saved-alert", "color"),
+        Output('save-meta-data-to-csv', 'disabled')
+    ],
     Input("save-meta-data-to-csv", "n_clicks"),
     State('metadata-tabs', 'children'),
     State('store', 'data')
@@ -245,5 +267,5 @@ def save_the_metadata_tables_to_csv(n_clicks, metadata_tabs, store):
         directory_path = os.path.dirname(file_path)
         # Enable the button if not clicked
         return "success", True, f"Metadata tables saved to destination: {directory_path}", "success", False
-    else: 
+    else:
         return "primary", False, '', "success", False

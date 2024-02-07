@@ -15,9 +15,8 @@ import yaml
 from pathlib import Path
 from app.utils.callback_functions import prep_yaml
 import os
-import time
 
-# Importing Components
+# Importing Components and functions
 from app.components.instrument_settings import instrument_settings
 from app.components.worm_information import worm_information
 from app.components.module_selection import module_selection
@@ -42,29 +41,35 @@ layout = dbc.Container([
             module_selection,
             run_time_settings,
         ],
-        start_collapsed=False,
-        always_open=True,
+        start_collapsed=False,  # Start with the accordian open
+        always_open=True,  # Always open the accordian
     ),
     html.Hr(),
-    dbc.Alert(id='resolving-error-issue-configure',
-              is_open=False, color='danger', duration=10000),
+    dbc.Alert(
+        id='resolving-error-issue-configure',
+        is_open=False,  # Alert is not open by default
+        color='danger',  # Alert color is red
+        duration=10000  # Alert will close after 10 seconds
+    ),
     html.Br(),
     dbc.Row(
         [
             dbc.Col(
                 dbc.Button(
-                    "Finalize configuration",
+                    "Finalize configuration",  # Button text
                     id="finalize-configure-button",
                     className="flex",
-                    color='primary'
+                    color='primary'  # Button color is wrmXpress blue
                 ),
-                width="auto"
+                width="auto"  # Button width is auto
             ),
         ],
-        justify="center"
+        justify="center"  # Center the button
     ),
 ],
-    style={"paddingTop": "80px"})  # Adjust the white space between tab and accordian elements
+    # Adjust the white space between tab and accordian elements
+    style={"paddingTop": "80px"}
+)
 
 ########################################################################
 ####                                                                ####
@@ -74,10 +79,14 @@ layout = dbc.Container([
 
 
 @callback(
-    [Output('multi-well-options-row', 'style'),
-     Output('additional-options-row', 'style')],
-    [Input('imaging-mode', 'value'),
-     Input('file-structure', 'value')]
+    [
+        Output('multi-well-options-row', 'style'),
+        Output('additional-options-row', 'style')
+    ],
+    [
+        Input('imaging-mode', 'value'),
+        Input('file-structure', 'value')
+    ]
 )
 # appearing selections upon meeting certain critera
 def update_options_visibility(imaging_mode, file_structure):
@@ -93,7 +102,8 @@ def update_options_visibility(imaging_mode, file_structure):
     return multi_well_options_style, additional_options_style
 
 
-@callback(  # Storing values of inputs to be used in different pages
+@callback(
+    # Storing values of inputs to be used in different pages
     Output("store", "data"),
     Input("total-well-cols", "value"),
     Input("total-num-rows", "value"),
@@ -107,36 +117,39 @@ def update_options_visibility(imaging_mode, file_structure):
     Input("file-structure", 'value'),
     Input("circ-or-square-img-masking", 'value')
 )
-def rows_cols(cols,
-              rows,
-              mounter,
-              platename,
-              well_selection,
-              motility,
-              segment,
-              wells,
-              imgaging_mode,
-              file_sturcture,
-              img_masking
-              ):
-    return {'cols': cols,
-            'rows': rows,
-            'mount': mounter,
-            'platename': platename,
-            'wells': well_selection,
-            'motility': motility,
-            'segment': segment,
-            'wells': wells,
-            'img_mode': imgaging_mode,
-            'file_structure': file_sturcture,
-            'img_masking': img_masking
-            }
-
+def rows_cols(
+    cols,
+    rows,
+    mounter,
+    platename,
+    well_selection,
+    motility,
+    segment,
+    wells,
+    imgaging_mode,
+    file_sturcture,
+    img_masking
+):
+    return {
+        'cols': cols,
+        'rows': rows,
+        'mount': mounter,
+        'platename': platename,
+        'wells': well_selection,
+        'motility': motility,
+        'segment': segment,
+        'wells': wells,
+        'img_mode': imgaging_mode,
+        'file_structure': file_sturcture,
+        'img_masking': img_masking
+    }
 
 @callback(
     Output("well-selection-table", 'children'),
-    [Input("total-num-rows", "value"),
-     Input("total-well-cols", "value")]
+    [
+        Input("total-num-rows", "value"),
+        Input("total-well-cols", "value")
+    ]
 )
 # creating a selection table based on the dimensions of rows and columns selected
 def update_table(rows, cols):
@@ -160,8 +173,6 @@ def update_table(rows, cols):
     return well_selection
 
 # Populate list of wells to be analyzed
-
-
 @callback(
     Output('well-selection-list', 'children'),
     Input('dynamic-table-container-well-selection-table', 'data')
@@ -179,15 +190,15 @@ def update_wells(table_contents):  # list of cells from selection table
             filtered_list.append(item)
     # filtered_list = [item for item in flattened_list if item is None or len(item) > 1]
     sorted_list = sorted(filtered_list)
-
     return sorted_list
 
-
 @callback(
-    [Output('finalize-configure-button', 'color'),
-     Output("resolving-error-issue-configure", 'is_open'),
-     Output('resolving-error-issue-configure', 'children'),
-     Output("resolving-error-issue-configure", 'color'),],
+    [
+        Output('finalize-configure-button', 'color'),
+        Output("resolving-error-issue-configure", 'is_open'),
+        Output('resolving-error-issue-configure', 'children'),
+        Output("resolving-error-issue-configure", 'color'),
+    ],
     Input('finalize-configure-button', 'n_clicks'),
     State('imaging-mode', 'value'),
     State('file-structure', 'value'),
@@ -291,7 +302,6 @@ def run_analysis(
                             'Volume path contains invalid characters. A valid path only contains letters, numbers, underscores ( _ ), dashes ( - ), and slashes ( / ).')
 
                 # check to see if volume, plate, and input directories exist
-
                 # obtain and full plate name path
                 platename_path = Path(volume, platename)
 
@@ -300,6 +310,7 @@ def run_analysis(
                     error_occured = True
                     error_messages.append(
                         'The volume path does not exist.')
+                    
                 if not os.path.exists(platename_path):
                     error_occured = True
                     error_messages.append(
@@ -309,7 +320,6 @@ def run_analysis(
                 plate_base = platename.split("_", 1)[0]
                 well_fail = False
                 index = 0
-
                 while not well_fail and index < len(wells):
                     well = wells[index]
                     img_path = Path(
@@ -352,7 +362,8 @@ def run_analysis(
                 for i in range(1, len(error_messages)):
                     error_messages[i] = html.P(
                         f'{i}. {error_messages[i]}', className="mb-0")
-
+                    
+                # return the error messages
                 return 'danger', True, error_messages, 'danger'
 
         # additional error messages that we have not accounted for
@@ -360,6 +371,8 @@ def run_analysis(
             return 'danger', True, 'A ValueError occurred', 'danger'
         except Exception as e:
             return 'danger', True, f'An unexpected error occurred: {str(e)}', 'danger'
+        
+        # if no error messages are found, write the configuration to a YAML file
         config = prep_yaml(
             imagingmode,
             filestructure,
@@ -386,4 +399,6 @@ def run_analysis(
         with open(output_file, 'w') as yaml_file:
             yaml.dump(config, yaml_file,
                       default_flow_style=False)
+            
+        # return success message
         return 'success', True, f'Configuration written to {output_file}', 'success'

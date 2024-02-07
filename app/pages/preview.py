@@ -41,28 +41,36 @@ layout = dbc.ModalBody(
                         dbc.Col(
                             dbc.Card(
                                 dbc.CardBody([
-                                    html.H4("Input preview",
-                                            className="text-center mb-5"),
+                                    html.H4(
+                                        "Input preview",
+                                        className="text-center mb-5"
+                                    ),
                                     dbc.Row([
-                                        dbc.Button('Preview Analysis',
-                                               id='submit-val',
-                                               className="d-grid gap-2 col-6 mx-auto",
-                                               color="primary",
-                                               n_clicks=0),
+                                        dbc.Button(
+                                            'Preview Analysis',
+                                            id='submit-val',
+                                            className="d-grid gap-2 col-6 mx-auto",
+                                            color="primary",
+                                            n_clicks=0
+                                        ),
                                     ]),
                                     html.Br(),
                                     dbc.Alert(
-                                        id = 'no-store-data-alert',
-                                        color = 'danger',
-                                        is_open = False,
-                                        children = [
+                                        id='no-store-data-alert',
+                                        color='danger',
+                                        is_open=False,
+                                        children=[
                                             "No configuration found. Please go to the configuration page to set up the analysis."
                                         ]
                                     ),
                                     html.H6(
-                                        "Path:", className="card-subtitle"),
+                                        "Path:",
+                                        className="card-subtitle"
+                                    ),
                                     html.Br(),
-                                    dcc.Markdown(id='input-path-output'),
+                                    dcc.Markdown(
+                                        id='input-path-output'
+                                    ),
                                     html.Div(
                                         dbc.Alert(
                                             id='input-img-view-alert',
@@ -76,7 +84,8 @@ layout = dbc.ModalBody(
                                                             dcc.Graph(
                                                                 id='input-preview',
                                                                 figure={
-                                                                    'layout': layout},
+                                                                    'layout': layout
+                                                                },
                                                                 className='h-100 w-100'
                                                             )
                                                         ]),
@@ -98,7 +107,8 @@ layout = dbc.ModalBody(
                             dbc.Card(
                                 dbc.CardBody([
                                     html.H4(
-                                        "Analysis preview", className="text-center"),
+                                        "Analysis preview", className="text-center"
+                                    ),
                                     html.Br(),
                                     dbc.Row(
                                         [
@@ -122,10 +132,13 @@ layout = dbc.ModalBody(
                                     ),
                                     html.Br(),
                                     html.H6(
-                                        "Command:", className="card-subtitle"),
+                                        "Command:",
+                                        className="card-subtitle"
+                                    ),
                                     html.Br(),
                                     dcc.Markdown(
-                                        id='analysis-preview-message'),
+                                        id='analysis-preview-message'
+                                    ),
                                     dbc.Alert(
                                         id='preview-img-view-alert',
                                         color='light',
@@ -138,7 +151,8 @@ layout = dbc.ModalBody(
                                                         dcc.Graph(
                                                             id='analysis-preview',
                                                             figure={
-                                                                'layout': layout},
+                                                                'layout': layout
+                                                            },
                                                             className='h-100 w-100'
                                                         ),
                                                     ])],
@@ -159,7 +173,8 @@ layout = dbc.ModalBody(
                                                         dcc.Graph(
                                                             id='analysis-preview-other-img',
                                                             figure={
-                                                                'layout': layout},
+                                                                'layout': layout
+                                                            },
                                                             className='h-100 w-100'
                                                         ),
                                                     ])],
@@ -168,10 +183,18 @@ layout = dbc.ModalBody(
                                             ),
                                         ],
                                     ),
-                                    dbc.Alert(id='resolving-error-issue-preview',
-                                              is_open=False, color='success', duration=6000),
                                     dbc.Alert(
-                                        id='view-docker-logs', is_open=False, color='success', duration=30000),
+                                        id='resolving-error-issue-preview',
+                                        is_open=False,
+                                        color='success',
+                                        duration=6000
+                                    ),
+                                    dbc.Alert(
+                                        id='view-docker-logs',
+                                        is_open=False,
+                                        color='success',
+                                        duration=30000
+                                    ),
                                 ]
                                 ),
                                 style={'height': '100%',
@@ -211,6 +234,7 @@ def update_analysis_preview_imgage(selection, nclicks, store):
         volume = store['mount']
         platename = store['platename']
         wells = store["wells"]
+
         # assumes IX-like file structure
         img_path = Path(
             f'{volume}/work/{platename}/{wells[0]}/img/{platename}_{wells[0]}_{selection}.png')
@@ -227,8 +251,9 @@ def update_analysis_preview_imgage(selection, nclicks, store):
             fig.update_yaxes(showticklabels=False)
             return fig, False, True, False, ''
         else:
-            return None,True, False, False, False
+            return None, True, False, False, False
     return None, True, False,  False, False
+
 
 @callback(
     Output('input-path-output', 'children'),
@@ -247,6 +272,7 @@ def update_preview_image(n_clicks, store):
 
     volume = store['mount']
     if n_clicks >= 1:
+
         # assumes IX-like file structure
         img_path = Path(
             volume, f'{platename}/TimePoint_1/{plate_base}_{first_well}.TIF')
@@ -261,6 +287,7 @@ def update_preview_image(n_clicks, store):
 
 @callback(
     Output('preview-dropdown', 'options'),
+
     # update the option dropdown when the previous load is clicked
     Input('submit-val', 'n_clicks'),
     State('store', 'data'),
@@ -322,18 +349,20 @@ def run_analysis(
             images_in_docker = client.images.list()
             for img in images_in_docker:
                 img = f"{img}"
+
                 # Remove angle brackets, quotes, and split
                 image_info = img.strip()[8:-1].strip("'").split("', '")
                 image_tag = image_info[-1]
                 if check_for_names[0] in image_tag:
                     good_to_go = True
-                if check_for_names[1] in image_tag:
-                    good_to_go = True
+                    if check_for_names[1] in image_tag:
+                        good_to_go = True
 
             if good_to_go == False:
                 return None, None, True, f'Please ensure that you have the Image "{check_for_names[0]}" and is the "{check_for_names[1]}" image.', True
         except ValueError as ve:
             return None, None, True, 'An error occured somewhere', True
+
         # Check to see if first well already exists, if it does insert the img
         # rather than running wrmXpress again
         first_well_path = Path(
@@ -349,6 +378,7 @@ def run_analysis(
             fig.update_xaxes(showticklabels=False)
             fig.update_yaxes(showticklabels=False)
             return f"```{first_well_path}```", fig, False, f'', False
+
         ########################################################################
         ####                                                                ####
         ####                  Preview YAML Creation                         ####
@@ -426,6 +456,7 @@ def run_analysis(
                                                    f'{volume}/work/': {'bind': '/work/', 'mode': 'rw'},
                                                    f'{volume}/{preview_yaml_platename}': {'bind': f'/{preview_yaml_platename}', 'mode': 'rw'}
                                                    })
+
         # Get the name of the most recent container
         container_name = container.name
 
