@@ -325,6 +325,7 @@ def callback(set_progress, n_clicks, store):
         fig_1.update_layout(coloraxis_showscale=False)
         fig_1.update_xaxes(showticklabels=False)
         fig_1.update_yaxes(showticklabels=False)
+        
         return fig_1, False, False, ''
 
 ########################################################################

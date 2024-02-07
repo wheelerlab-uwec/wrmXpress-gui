@@ -202,6 +202,26 @@ layout = dbc.ModalBody(
 ####                                                                ####
 ########################################################################
 
+@callback(
+        Output("cancel-analysis", 'n_clicks'),
+        Input("cancel-analysis", 'n_clicks')
+)
+def cancel_analysis(n_clicks):
+    if n_clicks:
+       # Connect to the Docker daemon
+        client = docker.from_env()
+
+        # Get a list of all running containers
+        containers = client.containers.list()
+
+        # Find the most recent container based on creation timestamp
+        most_recent_container = max(containers, key=lambda c: c.attrs['Created'])
+
+        # Kill the most recent container
+        most_recent_container.kill()
+
+        print(f"Killed container {most_recent_container.id}")
+    return n_clicks
 
 @callback(
     [Output('analysis-postview', 'figure'),
