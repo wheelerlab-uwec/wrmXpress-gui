@@ -16,7 +16,9 @@ from dash import html
 # Worm Information accordian items
 worm_information = dbc.AccordionItem(
     [
-        html.H6("Species:"),
+        html.H6(
+            "Species:"
+        ),
         # Radio button items for species
         dbc.RadioItems(
             id="species",
@@ -33,7 +35,9 @@ worm_information = dbc.AccordionItem(
             persistence=True,
             persistence_type='memory'
         ),
-        html.H6("Stages:"),
+        html.H6(
+            "Stages:"
+        ),
         # Radio button items for stage information
         dbc.RadioItems(
             id="stages",
