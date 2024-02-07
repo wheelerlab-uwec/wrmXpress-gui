@@ -169,6 +169,9 @@ def callback(set_progress, n_clicks, store):
         plate_base = platename.split("_", 1)[0]
         htd_file_path = folder_containing_img / f'{plate_base}.HTD'
 
+        if os.path.exists(Path(volume, 'work')):
+            os.remove(Path(volume, 'work'))
+
         full_yaml = Path(volume, platename + '.yml')
 
         # reading in yaml file
@@ -206,6 +209,8 @@ def callback(set_progress, n_clicks, store):
         # if input folder exists, check to see if platename folder exists, if not create it
         # then copy necessay files into platename folder
         elif os.path.exists(Path(volume, 'input')):
+            os.remove(input_folder)
+            os.makedirs(input_folder)
             if not os.path.exists(htd_file_path):
                 shutil.copy(htd_file_path, platename_input_folder)
 
