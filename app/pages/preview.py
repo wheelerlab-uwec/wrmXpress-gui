@@ -549,7 +549,7 @@ def run_analysis(
         print(client)  # Print the client
 
         # The command to be run
-        command = f"python wrmXpress/wrapper.py {preview_yaml_platename} {platename}"
+        command = f"python -u wrmXpress/wrapper.py {preview_yaml_platename} {platename}"
         # The command message
         command_message = f"```python wrmXpress/wrapper.py {platename}.yml {platename}```"
 
