@@ -19,6 +19,7 @@ import subprocess
 import yaml
 from dash.long_callback import DiskcacheLongCallbackManager
 import shutil
+import shlex
 
 # Importing Components
 from app.utils.styling import SIDEBAR_STYLE, CONTENT_STYLE
@@ -201,7 +202,7 @@ def callback(set_progress, n_clicks, store):
         try:
             good_to_go = False  # Set good_to_go to False
             # Set check_for_names to a list containing the names of the container
-            check_for_names = ['zamanianlab/wrmxpress', 'latest']
+            check_for_names = ['wheelern/wrmxpress', '1.4.1']
             client = docker.from_env()  # Create a docker client
             images_in_docker = client.images.list()  # List all images in the docker client
             for img in images_in_docker:  # Iterate through each image in the docker client
@@ -297,12 +298,16 @@ def callback(set_progress, n_clicks, store):
         # Command message
         command_message = f"```python wrmXpress/wrapper.py {platename}.yml {platename}```"
 
-        container = client.containers.run('zamanianlab/wrmxpress', command=f"{command}", detach=True,
+        container = client.containers.run('wheelern/wrmxpress:1.4.1', command=f"{command}", detach=True,
                                           volumes={f'{volume}/input/': {'bind': '/input/', 'mode': 'rw'},
                                                    f'{volume}/output/': {'bind': '/output/', 'mode': 'rw'},
                                                    f'{volume}/work/': {'bind': '/work/', 'mode': 'rw'},
                                                    f'{volume}/{platename}.yml': {'bind': f'/{platename}.yml', 'mode': 'rw'}
                                                    })
+
+        wrmxpress_command = f'python /Users/njwheeler/GitHub/wrmXpress/wrapper.py /Users/njwheeler/mount/{platename}.yml {platename}'
+        wrmxpress_command_split = shlex.split(wrmxpress_command)
+        subprocess.run(wrmxpress_command_split)
 
         # Get the name of the most recent container
         container_name = container.name
