@@ -25,7 +25,7 @@
 
 ## III. Installation 
 
-***Prerequisites*** - Install [Docker Desktop](https://www.docker.com/products/docker-desktop/)
+***Prerequisites*** - Install [Docker Desktop](https://www.docker.com/products/docker-desktop/) ![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white)
 
 1. Create a folder that contains all the input images. This folder is where temporary working files/images will be stored, where output data will be written, and will be mounted as a volume in the Docker container.
 2. Start the Docker engine and open up the Dashboard.
@@ -106,7 +106,6 @@
 ### Testing
 
 ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/wheelerlab-uwec/wrmxpress-gui/dash-test.yml)
-<!---![Code coverage](https://wheelerlab-uwec.github.io/wrmxpress-gui/badges/coverage.svg) --->
 
 ## XII. Changelog
    - Optional. Include a brief summary of changes in each version of the project.
