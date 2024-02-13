@@ -8,7 +8,6 @@ import dash_bootstrap_components as dbc
 import dash
 from dash import dcc, html, callback
 from dash.dependencies import Input, Output, State
-import docker
 import yaml
 import time
 from pathlib import Path
@@ -18,6 +17,7 @@ from PIL import Image
 import os
 import subprocess
 import shutil
+import shlex
 
 # importing utils
 from app.utils.styling import layout
@@ -441,28 +441,6 @@ def run_analysis(
     # Check if the button has been clicked
     if nclicks:
 
-        # Checking if wrmXpress container exists and is the latest image
-        try:
-            good_to_go = False
-            check_for_names = ['zamanianlab/wrmxpress', 'latest']
-            client = docker.from_env()
-            images_in_docker = client.images.list()
-            for img in images_in_docker:
-                img = f"{img}"
-
-                # Remove angle brackets, quotes, and split
-                image_info = img.strip()[8:-1].strip("'").split("', '")
-                image_tag = image_info[-1]
-                if check_for_names[0] in image_tag:
-                    good_to_go = True
-                    if check_for_names[1] in image_tag:
-                        good_to_go = True
-
-            if good_to_go == False:
-                return None, None, True, f'Please ensure that you have the Image "{check_for_names[0]}" and is the "{check_for_names[1]}" image.', True
-        except ValueError as ve:
-            return None, None, True, 'An error occured somewhere', True
-
         # Check to see if first well already exists, if it does insert the img
         # rather than running wrmXpress again
         first_well_path = Path(
@@ -560,34 +538,13 @@ def run_analysis(
         # filepath of the yaml file
         yaml_file = Path(platename + '.yml')
 
-        print(client)  # Print the client
-
-        # The command to be run
-        command = f"python -u wrmXpress/wrapper.py {preview_yaml_platename} {platename}"
-        # The command message
+        # Command message
         command_message = f"```python wrmXpress/wrapper.py {platename}.yml {platename}```"
 
-        container = client.containers.run('zamanianlab/wrmxpress', command=f"{command}", detach=True,
-                                          volumes={f'{volume}/input/': {'bind': '/input/', 'mode': 'rw'},
-                                                   f'{volume}/output/': {'bind': '/output/', 'mode': 'rw'},
-                                                   f'{volume}/work/': {'bind': '/work/', 'mode': 'rw'},
-                                                   f'{volume}/{preview_yaml_platename}': {'bind': f'/{preview_yaml_platename}', 'mode': 'rw'}
-                                                   })
-
-        # Get the name of the most recent container
-        container_name = container.name
-
-        # Wait for the container to finish running (adjust timeout as needed)
-        container.wait(timeout=300)
-
-        # Retrieve and process the logs after the container has finished
-        result = subprocess.run(
-            ['docker', 'logs', container_name], capture_output=True, text=True)
-        output_lines = result.stdout.splitlines()
-
-        # Convert each line into an HTML paragraph element
-        result = [dcc.Markdown(f"```{line}```", className="mb-0")
-                  for line in output_lines]
+        print('Running wrmXpress.')
+        wrmxpress_command = f'python -u wrmXpress/wrapper.py {volume}/.{platename}.yml {platename}'
+        wrmxpress_command_split = shlex.split(wrmxpress_command)
+        subprocess.run(wrmxpress_command_split)
 
         # assumes IX-like file structure
         img_path = Path(

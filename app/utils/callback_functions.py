@@ -4,6 +4,7 @@
 ####                                                                ####
 ########################################################################
 import pandas as pd
+from pathlib import Path
 
 ########################################################################
 ####                                                                ####
@@ -85,7 +86,8 @@ def prep_yaml(
         cellprofilerrun,
         cellprofilerpipeline,
         diagnosticdx,
-        wellselection):
+        wellselection,
+        volume):
     """
     This function prepares a dictionary for the YAML file.
     ===============================================================================
@@ -157,9 +159,9 @@ def prep_yaml(
         },
         "wells": wellselection,
         "directories": {
-            "work": ['/work'],
-            "input": ['/input'],
-            "output": ['/output']
+            "work": [str(Path(volume, 'work'))],
+            "input": [str(Path(volume, 'input'))],
+            "output": [str(Path(volume, 'output'))]
         }
     }
 

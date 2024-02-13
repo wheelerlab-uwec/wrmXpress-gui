@@ -518,7 +518,8 @@ def run_analysis(  # function to save the yaml file from the sections in the con
             cellprofilerrun,
             cellprofilerpipeline,
             diagnosticdx,
-            wells
+            wells,
+            volume
         )
 
         output_file = Path(volume, platename + '.yml')

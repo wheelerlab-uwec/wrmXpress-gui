@@ -1,8 +1,6 @@
-name: wrmxpress_gui_minimal
+name: base
 channels:
-  - anaconda
   - conda-forge
-  - defaults
 dependencies:
 
 # gui
@@ -11,6 +9,7 @@ dependencies:
   - dash-core-components
   - dash-html-components
   - dash-table
+  - diskcache
   - docker-py
   - ffmpeg
   - flask
@@ -21,6 +20,7 @@ dependencies:
   - pillow
   - plotly
   - pydantic
+  - python ~=3.9
   - selenium
   - waitress
   - webdriver-manager
@@ -33,9 +33,18 @@ dependencies:
   - scipy==1.9.0
   - h5py~=3.6.0,<4
   - bioconda::prokaryote==2.4.4
+  - pyarrow
   - pyzmq~=22.3
   - scikit-learn>=0.20,<1
+  - python-javabridge==4.0.3
+  - pyarrow
   - wxPython>=4.1.0,<5
+  - r-base
+  - r-stringr
+  - r-dplyr
+  - r-tidyr
+  - r-purrr
+  - r-readr
   
   - pip:
     - dash[testing]

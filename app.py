@@ -8,7 +8,6 @@ import dash
 import dash_bootstrap_components as dbc
 from dash import Dash, html, dcc
 from dash.dependencies import Input, Output, State
-import docker
 import time
 from pathlib import Path
 import numpy as np
@@ -198,35 +197,6 @@ def callback(set_progress, n_clicks, store):
     # Check if the submit button has been clicked
     if n_clicks:
 
-        # Checking if wrmXpress container exists
-        try:
-            good_to_go = False  # Set good_to_go to False
-            # Set check_for_names to a list containing the names of the container
-            check_for_names = ['wheelern/wrmxpress', '1.4.1']
-            client = docker.from_env()  # Create a docker client
-            images_in_docker = client.images.list()  # List all images in the docker client
-            for img in images_in_docker:  # Iterate through each image in the docker client
-                img = f"{img}"  # Convert the image to a string
-
-                # Remove angle brackets, quotes, and split
-                image_info = img.strip()[8:-1].strip("'").split("', '")
-                image_tag = image_info[-1]
-
-                # Check if the image tag is in the list of names
-                if check_for_names[0] in image_tag:
-                    good_to_go = True
-                    if check_for_names[1] not in image_tag:
-                        good_to_go = False
-
-            # If good_to_go is False, return an error message
-            if good_to_go == False:
-                return None, True, True, "wrmXpress container not found. Please install the container and try again."
-
-        # return an error message if an error occurs that was not anticipated
-        except ValueError as ve:
-            return None, True, True, f"Error: {ve}"
-
-
         # necessary file paths
         img_dir = Path(volume, platename)
         input_dir = Path(volume, 'input')
@@ -287,78 +257,15 @@ def callback(set_progress, n_clicks, store):
                 well_path = Path(img_dir,
                                  time_point, f'{plate_base}_{well}.TIF')
                 shutil.copy(well_path, time_point_dir)
-        """
-        End of section to replace 
-        """
 
-        print(client)  # Print the client
-
-        # Command to run the analysis
-        command = f"python -u wrmXpress/wrapper.py {platename}.yml {platename}"
         # Command message
         command_message = f"```python wrmXpress/wrapper.py {platename}.yml {platename}```"
 
-        container = client.containers.run('wheelern/wrmxpress:1.4.1', command=f"{command}", detach=True,
-                                          volumes={f'{volume}/input/': {'bind': '/input/', 'mode': 'rw'},
-                                                   f'{volume}/output/': {'bind': '/output/', 'mode': 'rw'},
-                                                   f'{volume}/work/': {'bind': '/work/', 'mode': 'rw'},
-                                                   f'{volume}/{platename}.yml': {'bind': f'/{platename}.yml', 'mode': 'rw'}
-                                                   })
-
-        wrmxpress_command = f'python /Users/njwheeler/GitHub/wrmXpress/wrapper.py /Users/njwheeler/mount/{platename}.yml {platename}'
+        print('Running wrmXpress.')
+        wrmxpress_command = f'python -u wrmXpress/wrapper.py {volume}/{platename}.yml {platename}'
         wrmxpress_command_split = shlex.split(wrmxpress_command)
         subprocess.run(wrmxpress_command_split)
 
-        # Get the name of the most recent container
-        container_name = container.name
-        container_status = container.status
-        wells_to_be_analyzed = len(store["wells"])
-        wells_analyzed = []
-
-        # While the container is running
-        while container_status in ['created', 'running']:
-            container.reload()  # Reload the container
-            container_status = container.status  # Get the status of the container
-            time.sleep(1)  # Sleep for 1 second
-
-            # Retrieve and process the logs after the container has finished
-            result = subprocess.run(
-                ['docker', 'logs', container_name], capture_output=True, text=True)
-
-            output_lines = result.stdout.splitlines()  # Split the output lines
-
-            for line in output_lines:  # Iterate through each line in the output lines
-
-                if "Running" in line:  # If "Running" is in the line
-
-                    # Get the well that is running
-                    well_running = line.split(" ")[-1]
-
-                    if well_running not in wells_analyzed:  # If the well that is running is not in the wells analyzed
-
-                        # Append the well that is running to the wells analyzed
-                        wells_analyzed.append(well_running)
-
-                        # Optain filepath for the well being analyzed
-                        img_path = Path(
-                            volume, f'{platename}/TimePoint_1/{plate_base}_{wells_analyzed[-1]}.TIF')
-
-                        # create a figure for the well being analyzed
-                        img = np.array(Image.open(img_path))
-                        fig = px.imshow(img, color_continuous_scale="gray")
-                        fig.update_layout(coloraxis_showscale=False)
-                        fig.update_xaxes(showticklabels=False)
-                        fig.update_yaxes(showticklabels=False)
-
-                        # Set the progress of the analysis which
-                        # includes the number of wells analyzed, the number of wells to be analyzed,
-                        # the figure, and the image path
-                        set_progress((
-                            str(len(wells_analyzed)),
-                            str(wells_to_be_analyzed),
-                            fig,
-                            f'```{img_path}```'
-                        ))
 
         # get the platename (default) file in output dir that have .png extension
         output_path = Path(volume, 'output', 'thumbs', platename + '.png')
