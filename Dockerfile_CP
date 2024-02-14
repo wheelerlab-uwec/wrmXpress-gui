@@ -1,0 +1,30 @@
+FROM cellprofiler/cellprofiler:4.2.6
+
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+
+ARG DEBIAN_FRONTEND=noninteractive
+
+RUN apt update && apt install -y --no-install-recommends \
+    r-base r-cran-dplyr r-cran-stringr r-cran-tidyr r-cran-purrr r-cran-readr && \
+    rm -r /var/lib/apt/lists/*
+
+ARG CACHEBUST=1
+RUN echo ${CACHEBUST} && git clone --branch gui-backend https://github.com/zamanianlab/wrmXpress.git
+
+RUN mkdir /root/wrmXpress/
+RUN mkdir /root/wrmXpress/cp_pipelines
+RUN mkdir /root/wrmXpress/cp_pipelines/masks
+RUN mkdir /root/wrmXpress/cp_pipelines/worm_models
+RUN cp wrmXpress/cp_pipelines/masks/* /root/wrmXpress/cp_pipelines/masks
+RUN cp wrmXpress/cp_pipelines/worm_models/*.xml /root/wrmXpress/cp_pipelines/worm_models
+
+# copy gui files
+RUN mkdir app
+COPY app/ app/
+COPY app.py .
+
+EXPOSE 9000
+
+# The code to run when container is started:
+ENTRYPOINT ["python", "app.py"]
