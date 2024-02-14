@@ -27,7 +27,8 @@ RUN micromamba install --yes --file /tmp/env.yml && \
 ARG MAMBA_DOCKERFILE_ACTIVATE=1  
 
 # clone wrmxpress
-RUN git clone --branch gui-backend https://github.com/zamanianlab/wrmXpress.git
+ARG CACHEBUST=1
+RUN echo ${CACHEBUST} && git clone --branch gui-backend https://github.com/zamanianlab/wrmXpress.git
 
 RUN mkdir /root/wrmXpress/
 RUN mkdir /root/wrmXpress/cp_pipelines
