@@ -325,6 +325,7 @@ def save_the_metadata_tables_to_csv(n_clicks, metadata_tabs, store):
             df = df[sorted_columns]
 
             volume = store['mount'] # Get the volume from the store
+            plate = store['platename']
 
             # Save the DataFrame to a CSV file
             metadata_dir = Path(volume).joinpath('metadata') # Join the volume and the metadata directory
@@ -334,12 +335,14 @@ def save_the_metadata_tables_to_csv(n_clicks, metadata_tabs, store):
                 metadata_dir.mkdir(parents=True, exist_ok=True)
 
             # Save the DataFrame to a CSV file    
-            file_path = metadata_dir.joinpath(f"{tab_id}.csv")
+            file_path = metadata_dir.joinpath(plate, f"{tab_id}.csv")
             df.to_csv(file_path, index=False, header=False)
 
-        # Get the directory path    
+        # Get the directory path and make if not there
         directory_path = os.path.dirname(file_path)
-        
+        if os.path.exists(metadata_dir.joinpath(plate)) == False:
+            os.mkdir(metadata_dir.joinpath(plate))
+
         # Enable the button if not clicked
         return "success", True, f"Metadata tables saved to destination: {directory_path}", "success", False
     else:

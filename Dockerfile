@@ -1,12 +1,10 @@
 # Use the official micromamba base image
 FROM --platform=linux/amd64 mambaorg/micromamba:jammy
 
-WORKDIR /
-
 # install mysql server and java
 USER 0
 RUN apt update && apt install -y --no-install-recommends \
-    make gcc build-essential libgtk-3-dev wget git \
+    make gcc build-essential libgtk-3-dev wget git vim \
     mysql-server libmysqlclient-dev \
     openjdk-11-jdk-headless && \
     rm -r /var/lib/apt/lists/*
@@ -29,13 +27,6 @@ ARG MAMBA_DOCKERFILE_ACTIVATE=1
 # clone wrmxpress
 ARG CACHEBUST=1
 RUN echo ${CACHEBUST} && git clone --branch gui-backend https://github.com/zamanianlab/wrmXpress.git
-
-RUN mkdir /root/wrmXpress/
-RUN mkdir /root/wrmXpress/cp_pipelines
-RUN mkdir /root/wrmXpress/cp_pipelines/masks
-RUN mkdir /root/wrmXpress/cp_pipelines/worm_models
-RUN cp wrmXpress/cp_pipelines/masks/* /root/wrmXpress/cp_pipelines/masks
-RUN cp wrmXpress/cp_pipelines/worm_models/*.xml /root/wrmXpress/cp_pipelines/worm_models
 
 # copy gui files
 RUN mkdir app
