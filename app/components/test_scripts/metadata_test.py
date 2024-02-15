@@ -9,6 +9,7 @@ from dash import Dash, html, dcc
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+import os 
 
 from app.utils.styling import SIDEBAR_STYLE, CONTENT_STYLE
 from app.components.header import header
@@ -20,9 +21,12 @@ from app.components.header import header
 ########################################################################
 def test_005_metadata_checklist(dash_duo):
     #defining the app
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    
+    #defining the app
     app = Dash(__name__,
                use_pages=True,
-               pages_folder='pages',
+               pages_folder = os.path.join(script_dir, "..", "..", "..", "app", "pages"),
                external_stylesheets=[
                    dbc.themes.FLATLY,
                    dbc.icons.FONT_AWESOME],
