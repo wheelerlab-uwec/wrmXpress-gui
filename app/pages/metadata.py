@@ -336,12 +336,14 @@ def save_the_metadata_tables_to_csv(n_clicks, metadata_tabs, store):
 
             # Save the DataFrame to a CSV file    
             file_path = metadata_dir.joinpath(plate, f"{tab_id}.csv")
+            
+            # Get the directory path and make if not there
+            directory_path = os.path.dirname(file_path)
+            
+            if os.path.exists(metadata_dir.joinpath(plate)) == False:
+                os.mkdir(metadata_dir.joinpath(plate))
+            
             df.to_csv(file_path, index=False, header=False)
-
-        # Get the directory path and make if not there
-        directory_path = os.path.dirname(file_path)
-        if os.path.exists(metadata_dir.joinpath(plate)) == False:
-            os.mkdir(metadata_dir.joinpath(plate))
 
         # Enable the button if not clicked
         return "success", True, f"Metadata tables saved to destination: {directory_path}", "success", False

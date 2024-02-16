@@ -197,6 +197,8 @@ def callback(set_progress, n_clicks, store):
     # Check if the submit button has been clicked
     if n_clicks:
 
+        print('Running wrmXpress.')
+
         # necessary file paths
         img_dir = Path(volume, platename)
         input_dir = Path(volume, 'input')
@@ -261,7 +263,6 @@ def callback(set_progress, n_clicks, store):
         # Command message
         command_message = f"```python wrmXpress/wrapper.py {platename}.yml {platename}```"
 
-        print('Running wrmXpress.')
         wrmxpress_command = f'python -u wrmXpress/wrapper.py {volume}/{platename}.yml {platename}'
         wrmxpress_command_split = shlex.split(wrmxpress_command)
         subprocess.run(wrmxpress_command_split)
