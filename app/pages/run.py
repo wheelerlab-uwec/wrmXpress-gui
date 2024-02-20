@@ -13,11 +13,14 @@ import numpy as np
 import plotly.express as px
 from PIL import Image
 import os
+import subprocess
+import signal
 import dash
 from dash.long_callback import DiskcacheLongCallbackManager
 
 # importing utils
 from app.utils.styling import layout
+from app.utils.callback_functions import send_ctrl_c
 
 # Diskcache
 import diskcache
@@ -253,7 +256,7 @@ layout = dbc.ModalBody(
 )
 def cancel_analysis(n_clicks):
     """
-    This function cancels the analysis by killing the most recent container.
+    This function cancels the analysis by typing "Control" + "C" in the terminal.
     =========================================================================================
     Arguments:
         - n_clicks : int : The number of clicks
@@ -262,19 +265,11 @@ def cancel_analysis(n_clicks):
         - n_clicks : int : The number of clicks
     """
     if n_clicks:
-       # Connect to the Docker daemon
-        client = docker.from_env()
-
-        # Get a list of all running containers
-        containers = client.containers.list()
-
-        # Find the most recent container based on creation timestamp
-        most_recent_container = max(
-            containers, key=lambda c: c.attrs['Created'])
-
-        # Kill the most recent container
-        most_recent_container.kill()
-
+        
+        # Replace `1234` with the actual PID
+        send_ctrl_c(1234)
+        print('Control + C', 'wrmxpress analysis cancelled')
+        
     return n_clicks
 
 

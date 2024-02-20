@@ -5,6 +5,9 @@
 ########################################################################
 import pandas as pd
 from pathlib import Path
+import os
+import signal
+import subprocess
 
 ########################################################################
 ####                                                                ####
@@ -167,3 +170,20 @@ def prep_yaml(
 
     # Return the dictionary
     return yaml_dict
+
+def send_ctrl_c(pid):
+    """
+    Sends a SIGINT signal to the process with the given PID.
+    ===============================================================================
+    Arguments:
+        - pid : int : Process ID
+    ===============================================================================
+    Returns:
+        - None
+    """
+
+    try:
+        os.killpg(os.getpgid(pid), signal.SIGINT)
+        print('Control + C', 'wrmxpress analysis cancelled')
+    except ProcessLookupError:
+        print("Process with PID", pid, "not found.")

@@ -66,7 +66,7 @@ module_selection = dbc.AccordionItem(
                                 {"label": "True", "value": "True"},
                                 {"label": "False", "value": "False"}
                             ],
-                            value="True",
+                            value="False",
                             persistence=True,
                             persistence_type='memory'
                         ),
@@ -181,7 +181,7 @@ module_selection = dbc.AccordionItem(
                                 {"label": "True", "value": "True"},
                                 {"label": "False", "value": "False"}
                             ],
-                            value="True",
+                            value="False",
                             persistence=True,
                             persistence_type='memory'
                         ),
@@ -303,7 +303,7 @@ module_selection = dbc.AccordionItem(
                 {"label": "True", "value": "True"},
                 {"label": "False", "value": "False"}
             ],
-            value="True",
+            value="False",
             persistence=True,
             persistence_type='memory'
         )

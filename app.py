@@ -265,8 +265,39 @@ def callback(set_progress, n_clicks, store):
 
         wrmxpress_command = f'python -u wrmXpress/wrapper.py {volume}/{platename}.yml {platename}'
         wrmxpress_command_split = shlex.split(wrmxpress_command)
-        subprocess.run(wrmxpress_command_split)
+        process = subprocess.Popen(wrmxpress_command_split, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
 
+        wells_to_be_analyzed = len(store["wells"])
+        wells_analyzed = []
+
+        for line in iter(process.stdout.readline, b''):
+
+            if "Generating" in line:
+                # break from the line loop
+                break
+
+            if "Running" in line:
+                well_running = line.split(" ")[-1]
+                if well_running not in wells_analyzed:
+                    # remove the '\n' from the well_running
+                    well_running = well_running.replace('\n', '')
+                    wells_analyzed.append(well_running)
+
+                    img_path = Path(
+                        volume, f'{platename}/TimePoint_1/{plate_base}_{wells_analyzed[-1]}.TIF')
+                    img = np.array(Image.open(img_path))
+                    fig = px.imshow(img, color_continuous_scale="gray")
+                    fig.update_layout(coloraxis_showscale=False)
+                    fig.update_xaxes(showticklabels=False)
+                    fig.update_yaxes(showticklabels=False)
+                    set_progress((
+                        str(len(wells_analyzed)),
+                        str(wells_to_be_analyzed),
+                        fig,
+                        f'```{img_path}```'
+                    ))
+
+        process.wait()  # Wait for the process to finish
 
         # get the platename (default) file in output dir that have .png extension
         output_path = Path(volume, 'output', 'thumbs', platename + '.png')
@@ -278,6 +309,8 @@ def callback(set_progress, n_clicks, store):
         fig_1.update_xaxes(showticklabels=False)
         fig_1.update_yaxes(showticklabels=False)
 
+        print('wrmXpress has finished.')
+        
         # Return the figure, False, False, and an empty string
         return fig_1, False, False, ''
 
