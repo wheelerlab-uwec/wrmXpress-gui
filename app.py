@@ -268,7 +268,6 @@ def callback(set_progress, n_clicks, store):
         wrmxpress_command = f'python -u wrmXpress/wrapper.py {volume}/{platename}.yml {platename}'
         wrmxpress_command_split = shlex.split(wrmxpress_command)
 
-
         process = subprocess.Popen(
             wrmxpress_command_split, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
 
@@ -279,18 +278,45 @@ def callback(set_progress, n_clicks, store):
         docker_output = []
         wells_analyzed = []
         wells_to_be_analyzed = len(wells)
+        indented_lines = [
+            'imaging mode:',
+            'file structure:',
+            'well detection:',
+            'well rows per image:',
+            'well columns per image:',
+            'species:',
+            'stages:',
+            'cellprofiler:',
+            'convert:',
+            'dx:',
+            'motility:',
+            'segment:',
+            'wells:',
+            'plate:',
+            'input directory:',
+            'work directory:',
+            'output directory:',
+            'experiment description:',
+            'time points:',
+            'columns:',
+            'rows:',
+            'x sites:',
+            'y sites:',
+            'number of wavelengths:',
+            'wavelengths:'
+        ]
 
         for line in iter(process.stdout.readline, b''):
             # Strip the line and remove leading/trailing whitespaces
             line = line.strip()
 
             # Increase the indentation level for each 'instrument settings:', 'wormzzzz:', 'modules:', 'run-time settings:', 'HTD metadata:'
-            if any(word in line for word in ['instrument settings:', 'wormzzzz:', 'modules:', 'run-time settings:', 'HTD metadata:']):
-                indent_level += 1
+            if any(word in line for word in indented_lines):
+                indent_level = 2
 
             # Decrease the indentation level for 'The number of identified wells', 'Running well', 'Completed in', 'Error in', 'Warning message:', 'Execution halted', 'Generating'
-            if any(word in line for word in ['The number of identified wells', 'Running well', 'Completed in', 'Error in', 'Warning message:', 'Execution halted', 'Generating']):
-                indent_level -= 1
+            else:
+                indent_level = 0
 
             # Add indentation
             formatted_line = "    " * indent_level + line
@@ -318,7 +344,8 @@ def callback(set_progress, n_clicks, store):
                     fig.update_layout(coloraxis_showscale=False)
                     fig.update_xaxes(showticklabels=False)
                     fig.update_yaxes(showticklabels=False)
-                    docker_output_formatted = '```\n' + '\n'.join(docker_output) + '\n```'
+                    docker_output_formatted = '```\n' + \
+                        '\n'.join(docker_output) + '\n```'
                     set_progress((
                         str(len(wells_analyzed)),
                         str(wells_to_be_analyzed),

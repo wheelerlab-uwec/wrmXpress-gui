@@ -156,13 +156,14 @@ layout = dbc.ModalBody(
                                     children=[
                                         dcc.Markdown(  # Markdown for the progress message
                                             children=[],
-                                            id='progress-message-run-page-markdown'
+                                            id='progress-message-run-page-markdown',
+                                            style={'white-space': 'pre-line',
+                                                   'text-align': 'left'}
                                         )
                                     ],
                                     className='text-center',
                                     style={'height': '200px',
                                            'width': '95%',
-                                           'textAlign': 'right',
                                            'overflowY': 'scroll'}
                                 ),
 
