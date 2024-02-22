@@ -271,60 +271,15 @@ def callback(set_progress, n_clicks, store):
         process = subprocess.Popen(
             wrmxpress_command_split, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
 
-        # Indentation level for formatting
-        indent_level = 0
-
         # Create an empty list to store the docker output
         docker_output = []
         wells_analyzed = []
         wells_to_be_analyzed = len(wells)
-        indented_lines = [
-            'imaging mode:',
-            'file structure:',
-            'well detection:',
-            'well rows per image:',
-            'well columns per image:',
-            'species:',
-            'stages:',
-            'cellprofiler:',
-            'convert:',
-            'dx:',
-            'motility:',
-            'segment:',
-            'wells:',
-            'plate:',
-            'input directory:',
-            'work directory:',
-            'output directory:',
-            'experiment description:',
-            'time points:',
-            'columns:',
-            'rows:',
-            'x sites:',
-            'y sites:',
-            'number of wavelengths:',
-            'wavelengths:'
-        ]
 
         for line in iter(process.stdout.readline, b''):
-            # Strip the line and remove leading/trailing whitespaces
-            line = line.strip()
-
-            # Increase the indentation level for each 'instrument settings:', 'wormzzzz:', 'modules:', 'run-time settings:', 'HTD metadata:'
-            if any(word in line for word in indented_lines):
-                indent_level = 2
-
-            # Decrease the indentation level for 'The number of identified wells', 'Running well', 'Completed in', 'Error in', 'Warning message:', 'Execution halted', 'Generating'
-            else:
-                indent_level = 0
-
-            # Add indentation
-            formatted_line = "    " * indent_level + line
-            print(formatted_line)
 
             # Add the line to docker_output for further processing
-            docker_output.append(formatted_line)
-
+            docker_output.append(line)
             # Break the loop if 'Generating' is in the line
             if "Generating" in line:
                 break
@@ -344,8 +299,8 @@ def callback(set_progress, n_clicks, store):
                     fig.update_layout(coloraxis_showscale=False)
                     fig.update_xaxes(showticklabels=False)
                     fig.update_yaxes(showticklabels=False)
-                    docker_output_formatted = '```\n' + \
-                        '\n'.join(docker_output) + '\n```'
+                    docker_output_formatted = ''.join(docker_output) 
+                    print(docker_output_formatted)
                     set_progress((
                         str(len(wells_analyzed)),
                         str(wells_to_be_analyzed),
@@ -368,7 +323,7 @@ def callback(set_progress, n_clicks, store):
 
         print('wrmXpress has finished.')
         docker_output.append('wrmXpress has finished.')
-        docker_output_formatted = '```\n' + '\n'.join(docker_output) + '\n```'
+        docker_output_formatted = ''.join(docker_output) 
 
         # Return the figure, False, False, and an empty string
         return fig_1, False, False, '', f'```{docker_output_formatted}```'

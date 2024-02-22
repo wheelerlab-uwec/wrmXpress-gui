@@ -50,46 +50,6 @@ layout = dbc.ModalBody(
                                     className="text-center"
                                 ),
                                 html.Br(),
-                                dcc.Markdown(
-                                    # Imaging Mode
-                                    id='img-mode-output',
-                                    className="card-subtitle"
-                                ),
-                                dcc.Markdown(
-                                    # File Structure
-                                    id='file-structure-output',
-                                    className='card-subtitle'
-                                ),
-                                dcc.Markdown(
-                                    # Plate Format
-                                    id='plate-format-output',
-                                    className='card-subtitle'
-                                ),
-                                dcc.Markdown(
-                                    # Image Masking
-                                    id='img-masking-output',
-                                    className='card-subtitle'
-                                ),
-                                dcc.Markdown(
-                                    # Module Selection
-                                    id='mod-selection-output',
-                                    className='card-subtitle'
-                                ),
-                                dcc.Markdown(
-                                    # Volume Name
-                                    id='volume-name-output',
-                                    className='card-subtitle'
-                                ),
-                                dcc.Markdown(
-                                    # Plate Name
-                                    id='plate-name-output',
-                                    className='card-subtitle'
-                                ),
-                                dcc.Markdown(
-                                    # Wells Content
-                                    id='wells-content-output',
-                                    className='card-subtitle'
-                                ),
                                 dbc.Row([
                                     dbc.Col(
                                         dbc.Button(
@@ -162,11 +122,25 @@ layout = dbc.ModalBody(
                                         )
                                     ],
                                     className='text-center',
-                                    style={'height': '200px',
-                                           'width': '95%',
-                                           'overflowY': 'scroll'}
-                                ),
-
+                                    style={
+                                        'height': '200px',
+                                        'overflowY': 'scroll',  # Always show vertical scrollbar
+                                        'position': 'relative',  # Position relative for pseudo-element
+                                        **{
+                                            '::after': {
+                                                'content': "''",
+                                                'position': 'absolute',
+                                                'top': 0,
+                                                'right': 0,
+                                                'width': '16px',  # Width of the scrollbar
+                                                # Height of the scrollbar
+                                                'height': 'calc(100% - 16px)',
+                                                # Background color of the scrollbar
+                                                'background': 'rgba(255, 255, 255, 0.9)',
+                                            }
+                                        }
+                                    }
+                                )
                             ]),
                             style={'height': '100%',
                                    'width': '99%'},
