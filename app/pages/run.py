@@ -97,9 +97,10 @@ layout = dbc.ModalBody(
                                             'Begin Analysis',
                                             id='submit-analysis',
                                             className="d-grid gap-2 col-8 mx-auto",
-                                            color="primary", # Defines the color of the button (wrmxpress) blue
-                                            n_clicks=0, # Defines the number of clicks
-                                            disabled=False # Defines if the button is disabled or not
+                                            # Defines the color of the button (wrmxpress) blue
+                                            color="primary",
+                                            n_clicks=0,  # Defines the number of clicks
+                                            disabled=False  # Defines if the button is disabled or not
                                         ),
                                     ),
                                     dbc.Col(
@@ -108,17 +109,19 @@ layout = dbc.ModalBody(
                                             'Cancel Analysis',
                                             id='cancel-analysis',
                                             className="d-grid gap-2 col-8 mx-auto",
-                                            color="danger", # Defines the color of the button (wrmxpress) red
+                                            # Defines the color of the button (wrmxpress) red
+                                            color="danger",
                                             n_clicks=0,
-                                            disabled=True # Defines if the button is disabled or not
+                                            disabled=True  # Defines if the button is disabled or not
                                         ),
                                     ),
                                 ]),
                                 dbc.Alert(
                                     # Alert for no store
                                     id='run-page-no-store-alert',
-                                    color='danger', # Defines the color of the alert (red)
-                                    is_open=False, # Defines if the alert is open or not
+                                    # Defines the color of the alert (red)
+                                    color='danger',
+                                    is_open=False,  # Defines if the alert is open or not
                                     children=[
                                         # Alert message
                                         'No configuration found. Please go to the configuration page to set up the analysis.'
@@ -129,20 +132,40 @@ layout = dbc.ModalBody(
                                     dbc.Alert(
                                         # Alert message
                                         id='run-page-alert',
-                                        color='danger', # Defines the color of the alert (red)
-                                        is_open=False, # Defines if the alert is open or not
-                                        duration=30000, # Defines the duration of the alert in milliseconds (30 seconds)
+                                        # Defines the color of the alert (red)
+                                        color='danger',
+                                        is_open=False,  # Defines if the alert is open or not
+                                        # Defines the duration of the alert in milliseconds (30 seconds)
+                                        duration=30000,
                                     ),
                                 ]),
                                 html.Br(),
                                 dbc.Progress(
                                     # Progress bar for run page
                                     id='progress-bar-run-page',
-                                    striped=True, # Defines if the progress bar is striped or not
-                                    color="primary", # Defines the color of the progress bar (wrmxpress) blue
-                                    value=0, # Defines the default value of the progress bar
-                                    animated=True, # Defines if the progress bar is animated or not
+                                    striped=True,  # Defines if the progress bar is striped or not
+                                    # Defines the color of the progress bar (wrmxpress) blue
+                                    color="primary",
+                                    value=0,  # Defines the default value of the progress bar
+                                    animated=True,  # Defines if the progress bar is animated or not
                                 ),
+                                html.Br(),
+                                html.Div(
+                                    # Progress message for analysis
+                                    id='progress-message-run-page',
+                                    children=[
+                                        dcc.Markdown(  # Markdown for the progress message
+                                            children=[],
+                                            id='progress-message-run-page-markdown'
+                                        )
+                                    ],
+                                    className='text-center',
+                                    style={'height': '200px',
+                                           'width': '95%',
+                                           'textAlign': 'right',
+                                           'overflowY': 'scroll'}
+                                ),
+
                             ]),
                             style={'height': '100%',
                                    'width': '99%'},
@@ -265,11 +288,11 @@ def cancel_analysis(n_clicks):
         - n_clicks : int : The number of clicks
     """
     if n_clicks:
-        
+
         # Replace `1234` with the actual PID
         send_ctrl_c(1234)
         print('Control + C', 'wrmxpress analysis cancelled')
-        
+
     return n_clicks
 
 
@@ -329,7 +352,8 @@ def load_analysis_img(selection, n_clicks, store):
             fig.update_xaxes(showticklabels=False)
             fig.update_yaxes(showticklabels=False)
 
-            return fig, f'```{output_plate_path}```', False, True # return the figure and the output thumbs path
+            # return the figure and the output thumbs path
+            return fig, f'```{output_plate_path}```', False, True
 
         # check to see if selection option exists in output thumbs folder
         output_thumbs_path = Path(
@@ -346,7 +370,8 @@ def load_analysis_img(selection, n_clicks, store):
             fig.update_xaxes(showticklabels=False)
             fig.update_yaxes(showticklabels=False)
 
-            return fig, f'```{output_thumbs_path}```', False, True # return the figure and the output thumbs path
+            # return the figure and the output thumbs path
+            return fig, f'```{output_thumbs_path}```', False, True
     else:
         return None, None, True, False
 
@@ -375,7 +400,7 @@ def get_options_analysis(nclicks, store):
     # check to see if store exists
     if not store:
         return []
-    
+
     # get the store from the data
     motility = store['motility']
     segment = store['segment']
@@ -390,11 +415,12 @@ def get_options_analysis(nclicks, store):
 
         # iterate through the selection dictionary
         for selection in selection_dict.keys():
-            if eval(selection) == 'True': # check to see if the selection is true
-                option_dict[selection] = selection_dict[selection] # add the selection to the option dictionary
+            if eval(selection) == 'True':  # check to see if the selection is true
+                # add the selection to the option dictionary
+                option_dict[selection] = selection_dict[selection]
     dict_option = {v: k for k, v in option_dict.items()}
-    dict_option['plate'] = 'plate' # add the plate to the option dictionary
-    return dict_option # return the option dictionary
+    dict_option['plate'] = 'plate'  # add the plate to the option dictionary
+    return dict_option  # return the option dictionary
 
 
 @callback(
@@ -456,5 +482,5 @@ def update_results_message_for_run_page(
         platename,
         wells
     ]
-    if nclicks: # check to see if the button has been clicked
-        return results # return the results
+    if nclicks:  # check to see if the button has been clicked
+        return results  # return the results

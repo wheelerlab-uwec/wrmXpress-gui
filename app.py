@@ -100,6 +100,7 @@ app.layout = html.Div([
         Output('load-analysis-img', 'disabled'),
         Output("run-page-alert", 'is_open'),
         Output("run-page-alert", 'children'),
+        Output("progress-message-run-page-markdown", "children"),
     ],
     inputs=[
         Input("submit-analysis", "n_clicks"),
@@ -137,6 +138,7 @@ app.layout = html.Div([
         Output("progress-bar-run-page", "max"),
         Output("image-analysis-preview", "figure"),
         Output("progress-message-run-page-for-analysis", "children"),
+        Output("progress-message-run-page-markdown", "children"),
     ],
     prevent_initial_call=True,
     allow_duplicate=True
@@ -187,7 +189,7 @@ def callback(set_progress, n_clicks, store):
     """
     # Check if store is empty
     if not store:
-        return None, True, True, "No configuration found. Please go to the configuration page to set up the analysis."
+        return None, True, True, "No configuration found. Please go to the configuration page to set up the analysis.", "No configuration found. Please go to the configuration page to set up the analysis."
 
     # obtain the necessary data from the store
     volume = store['mount']
@@ -218,7 +220,7 @@ def callback(set_progress, n_clicks, store):
         with open(full_yaml, 'w') as yaml_file:
             yaml.dump(data, yaml_file,
                       default_flow_style=False)
-            
+
         # wipe previous runs
         if os.path.exists(Path(volume, 'work', platename)):
             shutil.rmtree(Path(volume, 'work', platename))
@@ -254,7 +256,7 @@ def callback(set_progress, n_clicks, store):
         for time_point in time_points:
             time_point_dir = Path(platename_input_dir, time_point)
             time_point_dir.mkdir(parents=True, exist_ok=True)
-            
+
             for well in store["wells"]:
                 well_path = Path(img_dir,
                                  time_point, f'{plate_base}_{well}.TIF')
@@ -265,21 +267,47 @@ def callback(set_progress, n_clicks, store):
 
         wrmxpress_command = f'python -u wrmXpress/wrapper.py {volume}/{platename}.yml {platename}'
         wrmxpress_command_split = shlex.split(wrmxpress_command)
-        process = subprocess.Popen(wrmxpress_command_split, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
 
-        wells_to_be_analyzed = len(store["wells"])
+
+        process = subprocess.Popen(
+            wrmxpress_command_split, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+
+        # Indentation level for formatting
+        indent_level = 0
+
+        # Create an empty list to store the docker output
+        docker_output = []
         wells_analyzed = []
+        wells_to_be_analyzed = len(wells)
 
         for line in iter(process.stdout.readline, b''):
+            # Strip the line and remove leading/trailing whitespaces
+            line = line.strip()
 
+            # Increase the indentation level for each 'instrument settings:', 'wormzzzz:', 'modules:', 'run-time settings:', 'HTD metadata:'
+            if any(word in line for word in ['instrument settings:', 'wormzzzz:', 'modules:', 'run-time settings:', 'HTD metadata:']):
+                indent_level += 1
+
+            # Decrease the indentation level for 'The number of identified wells', 'Running well', 'Completed in', 'Error in', 'Warning message:', 'Execution halted', 'Generating'
+            if any(word in line for word in ['The number of identified wells', 'Running well', 'Completed in', 'Error in', 'Warning message:', 'Execution halted', 'Generating']):
+                indent_level -= 1
+
+            # Add indentation
+            formatted_line = "    " * indent_level + line
+            print(formatted_line)
+
+            # Add the line to docker_output for further processing
+            docker_output.append(formatted_line)
+
+            # Break the loop if 'Generating' is in the line
             if "Generating" in line:
-                # break from the line loop
                 break
 
+            # Process the line if 'Running' is in the line
             if "Running" in line:
                 well_running = line.split(" ")[-1]
                 if well_running not in wells_analyzed:
-                    # remove the '\n' from the well_running
+                    # Remove the '\n' from the well_running
                     well_running = well_running.replace('\n', '')
                     wells_analyzed.append(well_running)
 
@@ -290,11 +318,13 @@ def callback(set_progress, n_clicks, store):
                     fig.update_layout(coloraxis_showscale=False)
                     fig.update_xaxes(showticklabels=False)
                     fig.update_yaxes(showticklabels=False)
+                    docker_output_formatted = '```\n' + '\n'.join(docker_output) + '\n```'
                     set_progress((
                         str(len(wells_analyzed)),
                         str(wells_to_be_analyzed),
                         fig,
-                        f'```{img_path}```'
+                        f'```{img_path}```',
+                        f'```{docker_output_formatted}```'
                     ))
 
         process.wait()  # Wait for the process to finish
@@ -310,9 +340,11 @@ def callback(set_progress, n_clicks, store):
         fig_1.update_yaxes(showticklabels=False)
 
         print('wrmXpress has finished.')
-        
+        docker_output.append('wrmXpress has finished.')
+        docker_output_formatted = '```\n' + '\n'.join(docker_output) + '\n```'
+
         # Return the figure, False, False, and an empty string
-        return fig_1, False, False, ''
+        return fig_1, False, False, '', f'```{docker_output_formatted}```'
 
 ########################################################################
 ####                                                                ####
