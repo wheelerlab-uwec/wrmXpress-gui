@@ -13,8 +13,6 @@ import numpy as np
 import plotly.express as px
 from PIL import Image
 import os
-import subprocess
-import signal
 import dash
 from dash.long_callback import DiskcacheLongCallbackManager
 
@@ -121,30 +119,17 @@ layout = dbc.ModalBody(
                                                    'text-align': 'left'}
                                         )
                                     ],
-                                    className='text-center',
+                                    className='div-with-scroll',
                                     style={
                                         'height': '200px',
                                         'overflowY': 'scroll',  # Always show vertical scrollbar
-                                        'position': 'relative',  # Position relative for pseudo-element
-                                        **{
-                                            '::after': {
-                                                'content': "''",
-                                                'position': 'absolute',
-                                                'top': 0,
-                                                'right': 0,
-                                                'width': '16px',  # Width of the scrollbar
-                                                # Height of the scrollbar
-                                                'height': 'calc(100% - 16px)',
-                                                # Background color of the scrollbar
-                                                'background': 'rgba(255, 255, 255, 0.9)',
-                                            }
-                                        }
                                     }
                                 )
                             ]),
                             style={'height': '100%',
                                    'width': '99%'},
-                        )
+                        ),
+                        width=6
                     ),
                     dbc.Col(
                         dbc.Card(
@@ -233,7 +218,8 @@ layout = dbc.ModalBody(
                             ]),
                             style={'height': '100%',
                                    'width': '99%'},
-                        )
+                        ),
+                        width=6
                     ),
                 ]),
             ])

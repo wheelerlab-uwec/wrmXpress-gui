@@ -38,7 +38,8 @@ app = Dash(__name__,
            pages_folder='app/pages',
            external_stylesheets=[
                dbc.themes.FLATLY,
-               dbc.icons.FONT_AWESOME],
+               dbc.icons.FONT_AWESOME
+               ],
            suppress_callback_exceptions=True)
 
 ########################################################################

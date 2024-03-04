@@ -2,3 +2,25 @@
     color: #fff;
     background-color: #18BC9C;
 }
+
+
+/* Always show scrollbar for div with div-with-scroll class */
+html .div-with-scroll {
+    scrollbar-width: thin; /* For Firefox */
+    scrollbar-color: #888 #ffffff; /* For Firefox */
+}
+
+/* For Chrome, Edge, and Safari */
+html .div-with-scroll::-webkit-scrollbar {
+    width: 12px; /* Adjust width of the scrollbar */
+}
+
+html .div-with-scroll::-webkit-scrollbar-track {
+    background: #ffffff; /* Track color */
+}
+
+html .div-with-scroll::-webkit-scrollbar-thumb {
+    background-color: #888; /* Scroll thumb color */
+    border-radius: 6px; /* Roundness of the scroll thumb */
+    border: 3px solid #ffffff; /* Creates padding around scroll thumb */
+}
