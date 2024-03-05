@@ -8,19 +8,51 @@
 html .div-with-scroll {
     scrollbar-width: thin; /* For Firefox */
     scrollbar-color: #888 #ffffff; /* For Firefox */
+    overflow-y: scroll; /* Show vertical scrollbar */
 }
 
 /* For Chrome, Edge, and Safari */
 html .div-with-scroll::-webkit-scrollbar {
     width: 12px; /* Adjust width of the scrollbar */
+    overflow-y: scroll; /* Show vertical scrollbar */
 }
 
 html .div-with-scroll::-webkit-scrollbar-track {
     background: #ffffff; /* Track color */
+    overflow-y: scroll; /* Show vertical scrollbar */
 }
 
 html .div-with-scroll::-webkit-scrollbar-thumb {
     background-color: #888; /* Scroll thumb color */
     border-radius: 6px; /* Roundness of the scroll thumb */
     border: 3px solid #ffffff; /* Creates padding around scroll thumb */
+    overflow-y: scroll; /* Show vertical scrollbar */
 }
+
+/* For Chrome, Edge, and Safari */
+/* Style the scrollbar track */
+.div-with-scroll::-webkit-scrollbar-track {
+    background: #f0f0f0; /* Light grey track */
+    overflow-y: scroll; /* Show vertical scrollbar */
+}
+
+/* Style the scrollbar thumb (the draggable part) */
+.div-with-scroll::-webkit-scrollbar-thumb {
+    background: #cccccc84; /* Darker grey thumb */
+    border-radius: 6px;
+    overflow-y: scroll; /* Show vertical scrollbar */
+}
+
+/* Style the scrollbar thumb when hovering over it */
+.div-with-scroll::-webkit-scrollbar-thumb:hover {
+    background: #b3b3b3; /* Even darker grey on hover */
+    overflow-y: scroll; /* Show vertical scrollbar */
+}
+
+/* For Firefox */
+.div-with-scroll {
+    scrollbar-width: thin; /* Make scrollbar thinner */
+    scrollbar-color: #cccccc84 #f0f0f0; /* Thumb and track color */
+    overflow-y: scroll; /* Show vertical scrollbar */
+}
+

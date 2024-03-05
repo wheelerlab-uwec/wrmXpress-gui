@@ -310,11 +310,12 @@ def callback(set_progress, n_clicks, store):
                         f'```{docker_output_formatted}```'
                     ))
 
-        process.wait()  # Wait for the process to finish
 
         # get the platename (default) file in output dir that have .png extension
         output_path = Path(volume, 'output', 'thumbs', platename + '.png')
-
+        while not os.path.exists(output_path):
+            time.sleep(1)
+            
         # create a figure for the output
         img1 = np.array(Image.open(output_path))
         fig_1 = px.imshow(img1, color_continuous_scale="gray")

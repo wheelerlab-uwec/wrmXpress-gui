@@ -121,7 +121,7 @@ layout = dbc.ModalBody(
                                     ],
                                     className='div-with-scroll',
                                     style={
-                                        'height': '200px',
+                                        'height': '500px',
                                         'overflowY': 'scroll',  # Always show vertical scrollbar
                                     }
                                 )
