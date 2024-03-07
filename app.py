@@ -6,7 +6,7 @@
 
 import dash
 import dash_bootstrap_components as dbc
-from dash import Dash, html, dcc
+from dash import Dash, html, dcc, DiskcacheManager
 from dash.dependencies import Input, Output, State
 import time
 from pathlib import Path
@@ -16,7 +16,6 @@ from PIL import Image
 import os
 import subprocess
 import yaml
-from dash.long_callback import DiskcacheLongCallbackManager
 import shutil
 import shlex
 
@@ -30,16 +29,15 @@ from app.utils.styling import layout
 # Diskcache
 import diskcache
 cache = diskcache.Cache("./cache")
-long_callback_manager = DiskcacheLongCallbackManager(cache)
+background_callback_manager = DiskcacheManager(cache)
 
 app = Dash(__name__,
-           long_callback_manager=long_callback_manager,
+           long_callback_manager=background_callback_manager,
            use_pages=True,
            pages_folder='app/pages',
            external_stylesheets=[
                dbc.themes.FLATLY,
-               dbc.icons.FONT_AWESOME
-               ],
+               dbc.icons.FONT_AWESOME],
            suppress_callback_exceptions=True)
 
 ########################################################################
@@ -95,7 +93,7 @@ app.layout = html.Div([
 ########################################################################
 
 
-@app.long_callback(
+@app.callback(
     output=[
         Output("image-analysis-preview", "figure"),
         Output('load-analysis-img', 'disabled'),
@@ -142,7 +140,8 @@ app.layout = html.Div([
         Output("progress-message-run-page-markdown", "children"),
     ],
     prevent_initial_call=True,
-    allow_duplicate=True
+    allow_duplicate=True,
+    background=True
 )
 def callback(set_progress, n_clicks, store):
     """
