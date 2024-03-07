@@ -268,7 +268,8 @@ def callback(set_progress, n_clicks, store):
 
         wrmxpress_command = f'python -u wrmXpress/wrapper.py {volume}/{platename}.yml {platename}'
         wrmxpress_command_split = shlex.split(wrmxpress_command)
-
+        subprocess.run(wrmxpress_command_split)
+        '''
         process = subprocess.Popen(
             wrmxpress_command_split, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
 
@@ -309,7 +310,7 @@ def callback(set_progress, n_clicks, store):
                         f'```{img_path}```',
                         f'```{docker_output_formatted}```'
                     ))
-
+        '''
 
         # get the platename (default) file in output dir that have .png extension
         output_path = Path(volume, 'output', 'thumbs', platename + '.png')
@@ -324,11 +325,11 @@ def callback(set_progress, n_clicks, store):
         fig_1.update_yaxes(showticklabels=False)
 
         print('wrmXpress has finished.')
-        docker_output.append('wrmXpress has finished.')
-        docker_output_formatted = ''.join(docker_output) 
+        #docker_output.append('wrmXpress has finished.')
+        #docker_output_formatted = ''.join(docker_output) 
 
         # Return the figure, False, False, and an empty string
-        return fig_1, False, False, '', f'```{docker_output_formatted}```'
+        return fig_1, False, False, '', f'```Finished running wrmXpress```'
 
 ########################################################################
 ####                                                                ####
