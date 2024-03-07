@@ -542,7 +542,7 @@ def run_analysis(
         command_message = f"```python wrmXpress/wrapper.py {platename}.yml {platename}```"
 
         print('Running wrmXpress.')
-        wrmxpress_command = f'python -u wrmXpress/wrapper.py {volume}/.{platename}.yml {platename}'
+        wrmxpress_command = f'python wrmXpress/wrapper.py {volume}/.{platename}.yml {platename}'
         wrmxpress_command_split = shlex.split(wrmxpress_command)
         subprocess.run(wrmxpress_command_split)
 
