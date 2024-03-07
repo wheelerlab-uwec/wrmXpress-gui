@@ -268,68 +268,72 @@ def callback(set_progress, n_clicks, store):
 
         wrmxpress_command = f'python -u wrmXpress/wrapper.py {volume}/{platename}.yml {platename}'
         wrmxpress_command_split = shlex.split(wrmxpress_command)
-        subprocess.run(wrmxpress_command_split)
-        '''
-        process = subprocess.Popen(
-            wrmxpress_command_split, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+        output_file = Path(volume, 'work', platename, "output.txt")  # Specify the name and location of the output file
 
-        # Create an empty list to store the docker output
-        docker_output = []
-        wells_analyzed = []
-        wells_to_be_analyzed = len(wells)
-
-        for line in iter(process.stdout.readline, b''):
-
-            # Add the line to docker_output for further processing
-            docker_output.append(line)
-            # Break the loop if 'Generating' is in the line
-            if "Generating" in line:
-                break
-
-            # Process the line if 'Running' is in the line
-            if "Running" in line:
-                well_running = line.split(" ")[-1]
-                if well_running not in wells_analyzed:
-                    # Remove the '\n' from the well_running
-                    well_running = well_running.replace('\n', '')
-                    wells_analyzed.append(well_running)
-
-                    img_path = Path(
-                        volume, f'{platename}/TimePoint_1/{plate_base}_{wells_analyzed[-1]}.TIF')
-                    img = np.array(Image.open(img_path))
-                    fig = px.imshow(img, color_continuous_scale="gray")
-                    fig.update_layout(coloraxis_showscale=False)
-                    fig.update_xaxes(showticklabels=False)
-                    fig.update_yaxes(showticklabels=False)
-                    docker_output_formatted = ''.join(docker_output) 
-                    print(docker_output_formatted)
-                    set_progress((
-                        str(len(wells_analyzed)),
-                        str(wells_to_be_analyzed),
-                        fig,
-                        f'```{img_path}```',
-                        f'```{docker_output_formatted}```'
-                    ))
-        '''
-
-        # get the platename (default) file in output dir that have .png extension
-        output_path = Path(volume, 'output', 'thumbs', platename + '.png')
-        while not os.path.exists(output_path):
-            time.sleep(1)
+        with open(output_file, "w") as file:
             
-        # create a figure for the output
-        img1 = np.array(Image.open(output_path))
-        fig_1 = px.imshow(img1, color_continuous_scale="gray")
-        fig_1.update_layout(coloraxis_showscale=False)
-        fig_1.update_xaxes(showticklabels=False)
-        fig_1.update_yaxes(showticklabels=False)
+            process = subprocess.Popen(
+                wrmxpress_command_split, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
 
-        print('wrmXpress has finished.')
-        #docker_output.append('wrmXpress has finished.')
-        #docker_output_formatted = ''.join(docker_output) 
+            # Create an empty list to store the docker output
+            docker_output = []
+            wells_analyzed = []
+            wells_to_be_analyzed = len(wells)
 
-        # Return the figure, False, False, and an empty string
-        return fig_1, False, False, '', f'```Finished running wrmXpress```'
+            for line in iter(process.stdout.readline, b''):
+                # Add the line to docker_output for further processing
+                docker_output.append(line)
+                file.write(line)
+                file.flush()
+                # Break the loop if 'Generating' is in the line
+                if "Generating" in line:
+                    break
+
+                # Process the line if 'Running' is in the line
+                if "Running" in line:
+                    well_running = line.split(" ")[-1]
+                    if well_running not in wells_analyzed:
+                        # Remove the '\n' from the well_running
+                        well_running = well_running.replace('\n', '')
+                        wells_analyzed.append(well_running)
+
+                        img_path = Path(
+                            volume, f'{platename}/TimePoint_1/{plate_base}_{wells_analyzed[-1]}.TIF')
+                        img = np.array(Image.open(img_path))
+                        fig = px.imshow(img, color_continuous_scale="gray")
+                        fig.update_layout(coloraxis_showscale=False)
+                        fig.update_xaxes(showticklabels=False)
+                        fig.update_yaxes(showticklabels=False)
+                        docker_output_formatted = ''.join(docker_output) 
+                        print(docker_output_formatted)
+                        set_progress((
+                            str(len(wells_analyzed)),
+                            str(wells_to_be_analyzed),
+                            fig,
+                            f'```{img_path}```',
+                            f'```{docker_output_formatted}```'
+                        ))
+            
+
+            # get the platename (default) file in output dir that have .png extension
+            output_path = Path(volume, 'output', 'thumbs', platename + '.png')
+            while not os.path.exists(output_path):
+                time.sleep(1)
+                
+            # create a figure for the output
+            img1 = np.array(Image.open(output_path))
+            fig_1 = px.imshow(img1, color_continuous_scale="gray")
+            fig_1.update_layout(coloraxis_showscale=False)
+            fig_1.update_xaxes(showticklabels=False)
+            fig_1.update_yaxes(showticklabels=False)
+
+            print('wrmXpress has finished.')
+            docker_output.append('wrmXpress has finished.')
+            docker_output_formatted = ''.join(docker_output) 
+            
+                
+            # Return the figure, False, False, and an empty string
+            return fig_1, False, False, '', f'```{docker_output_formatted}```'
 
 ########################################################################
 ####                                                                ####

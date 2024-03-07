@@ -276,7 +276,6 @@ def update_wells(table_contents):  # list of cells from selection table
     State('segmentation-wavelength', 'value'),
     State('cell-profiler-run', 'value'),
     State('cell-profiler-pipeline', 'value'),
-    State('diagnostics-dx', 'value'),
     State('plate-name', 'value'),
     State('mounted-volume', 'value'),
     State('well-selection-list', 'children'),
@@ -300,7 +299,6 @@ def run_analysis(  # function to save the yaml file from the sections in the con
     wavelength,
     cellprofilerrun,
     cellprofilerpipeline,
-    diagnosticdx,
     platename,
     volume,
     wells,
@@ -475,6 +473,13 @@ def run_analysis(  # function to save the yaml file from the sections in the con
                     'Cannot run Cellprofiler and Motility together.'
                 )
 
+            # check to see if no module is selected
+            if eval_bool(segmentrun) == False and eval_bool(motilityrun) == False and eval_bool(cellprofilerrun) == False:
+                error_occured = True
+                error_messages.append(
+                    'You have not selected any module to run.'
+                )
+
             # check to see if there was an error message
             if error_occured == True:
 
@@ -499,6 +504,8 @@ def run_analysis(  # function to save the yaml file from the sections in the con
             return 'danger', True, 'A ValueError occurred', 'danger'
         except Exception as e:
             return 'danger', True, f'An unexpected error occurred: {str(e)}', 'danger'
+        
+        diagnosticdx = "True" # set diagnosticdx to True 
 
         # if no error messages are found, write the configuration to a YAML file
         config = prep_yaml(

@@ -283,30 +283,6 @@ module_selection = dbc.AccordionItem(
                       'padding-left': 5
             }
         ),
-
-        dbc.Tooltip(
-            # Tooltip element for information symbol, displays message when cursor over the symbol
-            "Generate and export diagnostic images (recommended).",
-            target="dx-symbol"
-        ),
-        html.H6(
-            "dx"
-        ),
-        # Radio buttons for dx
-        dbc.RadioItems(
-            id="diagnostics-dx",
-            className="btn-group",
-            inputClassName="btn-check",
-            labelClassName="btn btn-outline-primary",
-            labelCheckedClassName="active",
-            options=[
-                {"label": "True", "value": "True"},
-                {"label": "False", "value": "False"}
-            ],
-            value="False",
-            persistence=True,
-            persistence_type='memory'
-        )
     ],
     id="module-selection",
     title="Module Selection"
