@@ -18,6 +18,8 @@ import subprocess
 import yaml
 import shutil
 import shlex
+import pandas as pd
+import re
 
 # Importing Components
 from app.utils.styling import SIDEBAR_STYLE, CONTENT_STYLE
@@ -195,7 +197,10 @@ def callback(set_progress, n_clicks, store):
     volume = store['mount']
     platename = store['platename']
     wells = store["wells"]
-
+    motility = store["motility"]
+    segment = store["segment"]
+    cellprofiler = store["cellprofiler"]
+    cellprofilepipeline = store["cellprofilepipeline"]
     # Check if the submit button has been clicked
     if n_clicks:
 
@@ -269,70 +274,135 @@ def callback(set_progress, n_clicks, store):
         wrmxpress_command_split = shlex.split(wrmxpress_command)
         output_file = Path(volume, 'work', platename, "output.txt")  # Specify the name and location of the output file
 
-        with open(output_file, "w") as file:
+        if motility == 'True' or segment == 'True':
+            with open(output_file, "w") as file:
             
-            process = subprocess.Popen(
-                wrmxpress_command_split, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+                process = subprocess.Popen(
+                    wrmxpress_command_split, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
 
-            # Create an empty list to store the docker output
-            docker_output = []
-            wells_analyzed = []
-            wells_to_be_analyzed = len(wells)
+                # Create an empty list to store the docker output
+                docker_output = []
+                wells_analyzed = []
+                wells_to_be_analyzed = len(wells)
 
-            for line in iter(process.stdout.readline, b''):
-                # Add the line to docker_output for further processing
-                docker_output.append(line)
-                file.write(line)
-                file.flush()
-                # Break the loop if 'Generating' is in the line
-                if "Generating" in line:
-                    break
+                for line in iter(process.stdout.readline, b''):
+                    # Add the line to docker_output for further processing
+                    docker_output.append(line)
+                    file.write(line)
+                    file.flush()
+                    # Break the loop if 'Generating' is in the line
+                    if "Generating" in line:
+                        break
 
-                # Process the line if 'Running' is in the line
-                if "Running" in line:
-                    well_running = line.split(" ")[-1]
-                    if well_running not in wells_analyzed:
-                        # Remove the '\n' from the well_running
-                        well_running = well_running.replace('\n', '')
-                        wells_analyzed.append(well_running)
+                    # Process the line if 'Running' is in the line
+                    if "Running" in line:
+                        well_running = line.split(" ")[-1]
+                        if well_running not in wells_analyzed:
+                            # Remove the '\n' from the well_running
+                            well_running = well_running.replace('\n', '')
+                            wells_analyzed.append(well_running)
 
-                        img_path = Path(
-                            volume, f'{platename}/TimePoint_1/{plate_base}_{wells_analyzed[-1]}.TIF')
-                        img = np.array(Image.open(img_path))
-                        fig = px.imshow(img, color_continuous_scale="gray")
-                        fig.update_layout(coloraxis_showscale=False)
-                        fig.update_xaxes(showticklabels=False)
-                        fig.update_yaxes(showticklabels=False)
+                            img_path = Path(
+                                volume, f'{platename}/TimePoint_1/{plate_base}_{wells_analyzed[-1]}.TIF')
+                            img = np.array(Image.open(img_path))
+                            fig = px.imshow(img, color_continuous_scale="gray")
+                            fig.update_layout(coloraxis_showscale=False)
+                            fig.update_xaxes(showticklabels=False)
+                            fig.update_yaxes(showticklabels=False)
+                            docker_output_formatted = ''.join(docker_output) 
+                            print(docker_output_formatted)
+                            set_progress((
+                                str(len(wells_analyzed)),
+                                str(wells_to_be_analyzed),
+                                fig,
+                                f'```{img_path}```',
+                                f'```{docker_output_formatted}```'
+                            ))
+                
+
+                # get the platename (default) file in output dir that have .png extension
+                output_path = Path(volume, 'output', 'thumbs', platename + '.png')
+                while not os.path.exists(output_path):
+                    time.sleep(1)
+                    
+                # create a figure for the output
+                img1 = np.array(Image.open(output_path))
+                fig_1 = px.imshow(img1, color_continuous_scale="gray")
+                fig_1.update_layout(coloraxis_showscale=False)
+                fig_1.update_xaxes(showticklabels=False)
+                fig_1.update_yaxes(showticklabels=False)
+
+                print('wrmXpress has finished.')
+                docker_output.append('wrmXpress has finished.')
+                docker_output_formatted = ''.join(docker_output) 
+                
+                    
+                # Return the figure, False, False, and an empty string
+                return fig_1, False, False, '', f'```{docker_output_formatted}```'
+            
+        if cellprofiler == 'True': 
+            with open(output_file, "w") as file:
+                process = subprocess.Popen(
+                    wrmxpress_command_split, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+                docker_output = []
+                wells_analyzed = []
+                wells_to_be_analyzed = len(wells)
+
+                # After starting the subprocess and opening the output file
+                for line in iter(process.stdout.readline, b''):
+                    docker_output.append(line)
+                    file.write(line)
+                    file.flush()
+
+                    # load the csv file which indicates which well is being analyzed
+                    csv_file_path = Path(
+                                volume, 'input', f'image_paths_{cellprofilepipeline}.csv')
+                    while not os.path.exists(csv_file_path):
+                        time.sleep(1)
+
+                    read_csv = pd.read_csv(csv_file_path)
+                    # find the row titled Metadata_Well
+                    well_column = read_csv['Metadata_Well']
+                    
+                    if 'Execution halted' in line:
+                        output_path = Path(volume, 'output', 'thumbs', platename + '.png')
+                        while not os.path.exists(output_path):
+                            time.sleep(1)
+                        img1 = np.array(Image.open(output_path))
+                        fig_1 = px.imshow(img1, color_continuous_scale="gray")
+                        fig_1.update_layout(coloraxis_showscale=False)
+                        fig_1.update_xaxes(showticklabels=False)
+                        fig_1.update_yaxes(showticklabels=False)
+                        print('wrmXpress has finished.')
+                        docker_output.append('wrmXpress has finished.')
                         docker_output_formatted = ''.join(docker_output) 
-                        print(docker_output_formatted)
-                        set_progress((
-                            str(len(wells_analyzed)),
-                            str(wells_to_be_analyzed),
-                            fig,
-                            f'```{img_path}```',
-                            f'```{docker_output_formatted}```'
-                        ))
-            
+                        return fig_1, False, False, '', f'```{docker_output_formatted}```'
 
-            # get the platename (default) file in output dir that have .png extension
-            output_path = Path(volume, 'output', 'thumbs', platename + '.png')
-            while not os.path.exists(output_path):
-                time.sleep(1)
-                
-            # create a figure for the output
-            img1 = np.array(Image.open(output_path))
-            fig_1 = px.imshow(img1, color_continuous_scale="gray")
-            fig_1.update_layout(coloraxis_showscale=False)
-            fig_1.update_xaxes(showticklabels=False)
-            fig_1.update_yaxes(showticklabels=False)
+                    # Check for the 'Image #' pattern and extract the number
+                    elif 'Image #' in line:
+                        # Extracting the image number
+                        image_number_pattern = re.search(r'Image # (\d+)', line)
+                        if image_number_pattern:
+                            image_number = int(image_number_pattern.group(1))
+                            
+                            # Find the well from the CSV using the image number
+                            well_id = well_column.iloc[image_number - 1]  # Adjusting for zero indexing
 
-            print('wrmXpress has finished.')
-            docker_output.append('wrmXpress has finished.')
-            docker_output_formatted = ''.join(docker_output) 
-            
-                
-            # Return the figure, False, False, and an empty string
-            return fig_1, False, False, '', f'```{docker_output_formatted}```'
+                            # Construct the image path
+                            img_path = Path(volume, f'input/{platename}/TimePoint_1/{plate_base}_{well_id}.TIF')
+                            if img_path.exists():
+                                # Load and display the image
+                                img = np.array(Image.open(img_path))
+                                fig = px.imshow(img, color_continuous_scale="gray")
+                                fig.update_layout(coloraxis_showscale=False)
+                                fig.update_xaxes(showticklabels=False)
+                                fig.update_yaxes(showticklabels=False)
+                                docker_output_formatted = ''.join(docker_output) 
+                                print(docker_output_formatted)
+
+                                # Update progress
+                                set_progress((str(image_number), str(len(wells)), fig, f'```{img_path}```', f'```{docker_output_formatted}```'))
+                            
 
 ########################################################################
 ####                                                                ####

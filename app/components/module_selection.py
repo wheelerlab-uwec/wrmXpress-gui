@@ -263,26 +263,6 @@ module_selection = dbc.AccordionItem(
                 )
             ]
         ),
-
-        html.Hr(),
-
-        # Diagnostic Module
-        html.H4(
-            "Diagnostics",
-            style={'display': 'inline-block'}
-        ),
-        # Using info button image
-        html.I(
-            className="fa-solid fa-circle-info",
-            id='dx-symbol',
-            style={
-                'display': 'inline-block',
-                      'width': '1.5%',
-                      'height': '1.5%',
-                      'padding-bottom': 10,
-                      'padding-left': 5
-            }
-        ),
     ],
     id="module-selection",
     title="Module Selection"

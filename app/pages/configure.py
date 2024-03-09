@@ -129,7 +129,9 @@ def update_options_visibility(imaging_mode, file_structure):
     Input('well-selection-list', 'children'),
     Input('imaging-mode', 'value'),
     Input("file-structure", 'value'),
-    Input("circ-or-square-img-masking", 'value')
+    Input("circ-or-square-img-masking", 'value'),
+    Input("cell-profiler-run", 'value'),
+    Input("cell-profiler-pipeline", 'value'),
 )
 def rows_cols(
     cols,
@@ -142,7 +144,9 @@ def rows_cols(
     wells,
     imgaging_mode,
     file_sturcture,
-    img_masking
+    img_masking,
+    cellprofiler,
+    cellprofilepipeline
 ):
     """
     This function will store the values of the inputs to be used in different pages.
@@ -175,7 +179,9 @@ def rows_cols(
         'wells': wells,
         'img_mode': imgaging_mode,
         'file_structure': file_sturcture,
-        'img_masking': img_masking
+        'img_masking': img_masking,
+        'cellprofiler': cellprofiler,
+        'cellprofilepipeline': cellprofilepipeline
     }
 
 
@@ -424,25 +430,23 @@ def run_analysis(  # function to save the yaml file from the sections in the con
                         "No Plate/Folder in the volume."
                     )
 
-                # check to see if the wells selected exist
                 plate_base = platename.split("_", 1)[0]
-                well_fail = False
-                index = 0
-                # iterate through the wells that have been selected
-                while not well_fail and index < len(wells):
-                    well = wells[index]  # obtain the well
-                    img_path = Path(
-                        volume, f'{platename}/TimePoint_1/{plate_base}_{well}.TIF'
-                    )
 
-                    # check to see if the image path exists
-                    if not os.path.exists(img_path):
+                # Directory containing the TIFF files
+                folder_path = Path(volume, f'{platename}/TimePoint_1')
+
+                # Iterate through the wells that have been selected
+                for well in wells:
+                    # Construct a pattern to match files for the current well, ignoring suffixes
+                    pattern = f"{plate_base}_{well}"
+
+                    # Find all files in the directory that match the well pattern
+                    matched_files = list(folder_path.glob(pattern + "*.TIF"))
+
+                    # If no files match the current well, set error flags
+                    if not matched_files:
                         error_occured = True
-                        error_messages.append(
-                            'You have selected more wells than you have images. This may result in unexpected errors or results.'
-                        )
-                        well_fail = True  # set well fail to true if the image path does not exist
-                    index += 1  # increment the index
+                        error_messages.append(f'No images found for well {well}. This may result in unexpected errors or results.')
 
                 # check if video module is selected with only one time point
                 if eval_bool(cellprofilerrun) == True:
