@@ -8,6 +8,11 @@ from pathlib import Path
 import os
 import signal
 import subprocess
+import shutil
+import numpy as np
+from PIL import Image
+import plotly.express as px
+import yaml
 
 ########################################################################
 ####                                                                ####
@@ -118,19 +123,20 @@ def prep_yaml(
     """
     # Check if wellselection is a list or a string
     if isinstance(wellselection, list):
-        if len(wellselection) == 96: # If all wells are selected
-            wellselection = ['All'] # Set wellselection to 'All'
-        else: # If not all wells are selected
-            wellselection = wellselection # Set wellselection to the input list
-    elif isinstance(wellselection, str): # If wellselection is a string
-        wellselection = [wellselection] # Set wellselection to a list containing the input string
+        if len(wellselection) == 96:  # If all wells are selected
+            wellselection = ['All']  # Set wellselection to 'All'
+        else:  # If not all wells are selected
+            wellselection = wellselection  # Set wellselection to the input list
+    elif isinstance(wellselection, str):  # If wellselection is a string
+        # Set wellselection to a list containing the input string
+        wellselection = [wellselection]
 
-    if multiwellrows is None: # If multiwellrows is None
-        multiwellrows = 0 # Set multiwellrows to 0
-    if multiwellcols is None: # If multiwellcols is None
-        multiwellcols = 0 # Set multiwellcols to 0
-    if conversionrescalemultiplier is None: # If conversionrescalemultiplier is None
-        conversionrescalemultiplier = 0 # Set conversionrescalemultiplier to 0
+    if multiwellrows is None:  # If multiwellrows is None
+        multiwellrows = 0  # Set multiwellrows to 0
+    if multiwellcols is None:  # If multiwellcols is None
+        multiwellcols = 0  # Set multiwellcols to 0
+    if conversionrescalemultiplier is None:  # If conversionrescalemultiplier is None
+        conversionrescalemultiplier = 0  # Set conversionrescalemultiplier to 0
 
     # Create a dictionary for the YAML file in the required format
     yaml_dict = {
@@ -171,6 +177,7 @@ def prep_yaml(
     # Return the dictionary
     return yaml_dict
 
+
 def send_ctrl_c(pid):
     """
     Sends a SIGINT signal to the process with the given PID.
@@ -187,3 +194,130 @@ def send_ctrl_c(pid):
         print('Control + C', 'wrmxpress analysis cancelled')
     except ProcessLookupError:
         print("Process with PID", pid, "not found.")
+
+
+def clean_and_create_directories(input_path, 
+                                 work_path, 
+                                 output_path = False
+                                 ):
+    """
+    The purpose of this function is to clean and create the input, work, and output directories.
+    That is to say, it will delete the contents of the input, work, and output directories (if they exist)
+    and then recreate them.
+    ===============================================================================
+    Arguments:
+        - input_path : str : Path to the input directory
+        - work_path : str : Path to the work directory
+        - output_path : str : Path to the output directory
+    ===============================================================================
+    Returns:
+        - None
+    """
+    # wipe previous runs
+    if os.path.exists(work_path):
+        shutil.rmtree(work_path)
+        work_path.mkdir(parents=True, exist_ok=True)
+    else:
+        work_path.mkdir(parents=True, exist_ok=True)
+
+    if os.path.exists(input_path):
+        shutil.rmtree(input_path)
+        input_path.mkdir(parents=True, exist_ok=True)
+    else:
+        input_path.mkdir(parents=True, exist_ok=True)
+    if output_path != False:
+        # wipe contents of output (different logic because backend doesn't put all output in a platename dir)
+        if os.path.exists(output_path):
+            for filename in os.listdir(output_path):
+                file_path = os.path.join(output_path, filename)
+                try:
+                    if os.path.isfile(file_path) or os.path.islink(file_path):
+                        os.unlink(file_path)
+                    elif os.path.isdir(file_path):
+                        shutil.rmtree(file_path)
+                except Exception as e:
+                    print('Failed to delete %s because %s' % (file_path, e))
+
+
+def copy_files_to_input_directory(platename_input_dir,
+                                  htd_file,
+                                  img_dir,
+                                  plate_base,
+                                  wells
+                                  ):
+    """
+    The purpose of this function is to copy the input files to the input directory.
+    ===============================================================================
+    Arguments:
+        - platename_input_dir : str : Path to the input directory
+        - htd_file : str : Path to the .HTD file
+        - img_dir : str : Path to the directory containing the images
+        - plate_base : str : Base name of the plate
+        - wells : list : List of well names
+    ===============================================================================
+    Returns:
+        - None
+    """
+    # Copy .HTD file into platename input dir
+    shutil.copy(htd_file, platename_input_dir)
+
+    # Iterate through each time point and copy images into new dirs
+    time_points = [item for item in os.listdir(img_dir) if os.path.isdir(
+        Path(img_dir, item))]
+
+    for time_point in time_points:
+        time_point_dir = Path(platename_input_dir, time_point)
+        time_point_dir.mkdir(parents=True, exist_ok=True)
+        if isinstance(wells, list):
+            for well in wells:
+                print(well)
+                well_path = Path(img_dir,
+                                time_point, f'{plate_base}_{well}.TIF')
+                shutil.copy(well_path, time_point_dir)
+        else:
+            well_path = Path(img_dir,
+                            time_point, f'{plate_base}_{wells}.TIF')
+            shutil.copy(well_path, time_point_dir)
+
+def create_figure_from_filepath(img_path,
+                                scale = 'gray'):
+    """
+    This function creates a figure from the input file path.
+    ===============================================================================
+    Arguments:
+        - img_path : str : Path to the image file
+    ===============================================================================
+    Returns:
+        - fig : matplotlib.figure.Figure : A figure
+    """
+    img = np.array(Image.open(img_path))
+    fig = px.imshow(img, color_continuous_scale=scale)
+    fig.update_layout(coloraxis_showscale=False)
+    fig.update_xaxes(showticklabels=False)
+    fig.update_yaxes(showticklabels=False)
+    return fig
+
+def update_yaml_file(input_full_yaml, output_full_yaml, updates):
+    """
+    This function updates the YAML file with the specified updates.
+    ===============================================================================
+    Arguments:
+        - full_yaml : str : Path to the YAML file
+        - updates : dict : Dictionary of updates
+    ===============================================================================
+    Returns:
+        - None
+    """
+     # reading in yaml file
+    with open(input_full_yaml, 'r') as file:
+        data = yaml.safe_load(file)
+
+    # replace the YAML config option with ['All'] as a workaround for wrmXpress bug
+    # instead, we'll copy the selected files to input and analyze all of them
+    # Update data based on the updates dict
+    for key, value in updates.items():
+        data[key] = value
+
+    with open(output_full_yaml, 'w') as yaml_file:
+        yaml.dump(data, yaml_file,
+                    default_flow_style=False)

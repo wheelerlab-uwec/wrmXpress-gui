@@ -21,6 +21,7 @@ import shlex
 
 # importing utils
 from app.utils.styling import layout
+from app.utils.callback_functions import clean_and_create_directories, copy_files_to_input_directory, create_figure_from_filepath, update_yaml_file
 
 dash.register_page(__name__)
 
@@ -287,11 +288,7 @@ def update_analysis_preview_imgage(selection, nclicks, store):
                 scale = 'gray'
 
             # Open the image and create a figure
-            img = np.array(Image.open(img_path))
-            fig = px.imshow(img, color_continuous_scale=scale)
-            fig.update_layout(coloraxis_showscale=False)
-            fig.update_xaxes(showticklabels=False)
-            fig.update_yaxes(showticklabels=False)
+            fig = create_figure_from_filepath(img_path)
 
             # Return the figure and the open status of the alerts
             return fig, False, True, False, ''
@@ -335,11 +332,7 @@ def update_preview_image(n_clicks, store):
         )
 
         # Open the image and create a figure
-        img = np.array(Image.open(img_path))
-        fig = px.imshow(img, color_continuous_scale="gray")
-        fig.update_layout(coloraxis_showscale=False)
-        fig.update_xaxes(showticklabels=False)
-        fig.update_yaxes(showticklabels=False)
+        fig = create_figure_from_filepath(img_path)
         return f'```{img_path}```', fig  # Return the path and the figure
     n_clicks = 0
 
@@ -427,6 +420,8 @@ def run_analysis(
     plate_base = platename.split("_", 1)[0]
     motility_selection = store['motility']
     segment_selection = store['segment']
+    cellprofiler = store["cellprofiler"]
+    cellprofilepipeline = store["cellprofilepipeline"]
 
     # Check if motility or segment selection is True
     if motility_selection == 'True':
@@ -440,15 +435,92 @@ def run_analysis(
 
     # Check if the button has been clicked
     if nclicks:
+        
+        if motility_selection == 'True' or segment_selection == 'True':
+            # Check to see if first well already exists, if it does insert the img
+            # rather than running wrmXpress again
+            first_well_path = Path(
+                volume, 'work', f'{platename}/{wells[0]}/img/{platename}_{wells[0]}{selection1}.png'
+            )
 
-        # Check to see if first well already exists, if it does insert the img
-        # rather than running wrmXpress again
-        first_well_path = Path(
-            volume, 'work', f'{platename}/{wells[0]}/img/{platename}_{wells[0]}{selection1}.png'
-        )
+            # Check if the first well path exists
+            if os.path.exists(first_well_path):
 
-        # Check if the first well path exists
-        if os.path.exists(first_well_path):
+                # checking the selection and changing the scale accordingly
+                if selection == 'motility':
+                    scale = 'inferno'
+                else:
+                    scale = 'gray'
+
+                # Open the image and create a figure
+                fig = create_figure_from_filepath(first_well_path, scale=scale)
+
+                # Return the path and the figure and the open status of the alerts
+                return f"```{first_well_path}```", fig, False, f'', False
+
+
+            # replace the YAML config option with ['All'] as a workaround for wrmXpress bug
+            # instead, we'll copy the selected files to input and analyze all of them
+            if wells != 'All':
+                first_well = ['All']
+
+            # defining the yaml file path (same as the filepath from configure.py)
+            preview_yaml_platename = '.' + platename + '.yml'
+            preview_yaml_platenmaefull_yaml = Path(volume, preview_yaml_platename)
+            full_yaml = Path(volume, platename + '.yml')
+
+            update_yaml_file(
+                full_yaml, 
+                preview_yaml_platenmaefull_yaml,
+                {'wells': ['All']}
+            )
+            
+            if wells == 'All':
+                first_well = "A01"
+            else:
+                first_well = wells[0]
+
+
+            # Checking if input folder exists, and if not, create it,
+            # then subsequently copy the images into this folder
+            # Input and platename input folder paths
+            # necessary file paths
+            img_dir = Path(volume, platename)
+            input_dir = Path(volume, 'input')
+            platename_input_dir = Path(input_dir, platename)
+            plate_base = platename.split("_", 1)[0]
+            htd_file = Path(img_dir, f'{plate_base}.HTD')
+
+            # Clean and create directories
+            clean_and_create_directories(
+                input_path=Path(volume, 'input', platename),
+                work_path=Path(volume, 'work', platename)
+                )
+            
+            # Copy files to input directory
+            copy_files_to_input_directory(
+                platename_input_dir=platename_input_dir,
+                htd_file=htd_file,
+                img_dir=img_dir,    
+                plate_base=plate_base,
+                wells = first_well
+            )
+
+            # Command message
+            command_message = f"```python wrmXpress/wrapper.py {platename}.yml {platename}```"
+
+            print('Running wrmXpress.')
+            wrmxpress_command = f'python wrmXpress/wrapper.py {volume}/.{platename}.yml {platename}'
+            wrmxpress_command_split = shlex.split(wrmxpress_command)
+            subprocess.run(wrmxpress_command_split)
+
+            # assumes IX-like file structure
+            img_path = Path(
+                volume, 'work', f'{platename}/{first_well}/img/{platename}_{first_well}{selection1}.png')
+
+            # Wait for the image to be created
+            while not os.path.exists(img_path):
+                time.sleep(1)
 
             # checking the selection and changing the scale accordingly
             if selection == 'motility':
@@ -457,115 +529,94 @@ def run_analysis(
                 scale = 'gray'
 
             # Open the image and create a figure
-            img = np.array(Image.open(first_well_path))
-            fig = px.imshow(img, color_continuous_scale=scale)
-            fig.update_layout(coloraxis_showscale=False)
-            fig.update_xaxes(showticklabels=False)
-            fig.update_yaxes(showticklabels=False)
-            # Return the path and the figure and the open status of the alerts
-            return f"```{first_well_path}```", fig, False, f'', False
+            fig = create_figure_from_filepath(img_path, scale=scale)
+
+            # Return the command message, the figure, and the open status of the alerts
+            return command_message, fig, False, f'', False
+        
+        elif cellprofiler == 'True':
+            if cellprofilepipeline == 'wormsize':
+                # Check to see if first well already exists, if it does insert the img
+                # rather than running wrmXpress again
+                print(wells[0])
+                first_well_path = Path(
+                    volume, 'output', 'straightened_worms' f'{plate_base}_{wells[0]}.tiff'
+                )
+
+                # Check if the first well path exists
+                if os.path.exists(first_well_path):
+
+                    # Open the image and create a figure
+                    fig = create_figure_from_filepath(first_well_path)
+
+                    # Return the path and the figure and the open status of the alerts
+                    return f"```{first_well_path}```", fig, False, f'', False
 
 
-        # replace the YAML config option with ['All'] as a workaround for wrmXpress bug
-        # instead, we'll copy the selected files to input and analyze all of them
-        if wells != 'All':
-            first_well = ['All']
+                # replace the YAML config option with ['All'] as a workaround for wrmXpress bug
+                # instead, we'll copy the selected files to input and analyze all of them
+                if wells != 'All':
+                    first_well = ['All']
 
-        # defining the yaml file path (same as the filepath from configure.py)
-        preview_yaml_platename = '.' + platename + '.yml'
-        preview_yaml_platenmaefull_yaml = Path(volume, preview_yaml_platename)
-        full_yaml = Path(volume, platename + '.yml')
+                # defining the yaml file path (same as the filepath from configure.py)
+                preview_yaml_platename = '.' + platename + '.yml'
+                preview_yaml_platenmaefull_yaml = Path(volume, preview_yaml_platename)
+                full_yaml = Path(volume, platename + '.yml')
 
-        # reading in yaml file
-        with open(full_yaml, 'r') as file:
-            data = yaml.safe_load(file)
+                update_yaml_file(
+                    full_yaml, 
+                    preview_yaml_platenmaefull_yaml,
+                    {'wells': ['All']}
+                )
+                
+                if wells == 'All':
+                    first_well = "A01"
+                else:
+                    first_well = wells[0]
 
-        # assigning first well to the well value
-        data['wells'] = first_well
 
-        # Dump preview data to temp YAML file
-        with open(preview_yaml_platenmaefull_yaml, 'w') as yaml_file:
-            yaml.dump(data, yaml_file,
-                      default_flow_style=False)
-        if wells == 'All':
-            first_well = "A01"
-        else:
-            first_well = wells[0]
-        """
-        End of section to remove following the fix in the wrmXpress bug
-        """
+                # Checking if input folder exists, and if not, create it,
+                # then subsequently copy the images into this folder
+                # Input and platename input folder paths
+                # necessary file paths
+                img_dir = Path(volume, platename)
+                input_dir = Path(volume, 'input')
+                platename_input_dir = Path(input_dir, platename)
+                plate_base = platename.split("_", 1)[0]
+                htd_file = Path(img_dir, f'{plate_base}.HTD')
 
-        # Checking if input folder exists, and if not, create it,
-        # then subsequently copy the images into this folder
-        # Input and platename input folder paths
-        # necessary file paths
-        img_dir = Path(volume, platename)
-        input_dir = Path(volume, 'input')
-        platename_input_dir = Path(input_dir, platename)
-        plate_base = platename.split("_", 1)[0]
-        htd_file = Path(img_dir, f'{plate_base}.HTD')
+                # Clean and create directories
+                clean_and_create_directories(
+                    input_path=Path(volume, 'input', platename),
+                    work_path=Path(volume, 'work', platename),
+                    )
+                
+                # Copy files to input directory
+                copy_files_to_input_directory(
+                    platename_input_dir=platename_input_dir,
+                    htd_file=htd_file,
+                    img_dir=img_dir,    
+                    plate_base=plate_base,
+                    wells = wells[0]
+                )
 
-        # wipe previous runs
-        if os.path.exists(Path(volume, 'work', platename)):
-            shutil.rmtree(Path(volume, 'work', platename))
-            Path(volume, 'work', platename).mkdir(parents=True, exist_ok=True)
-        else:
-            Path(volume, 'work', platename).mkdir(parents=True, exist_ok=True)
+                # Command message
+                command_message = f"```python wrmXpress/wrapper.py {platename}.yml {platename}```"
 
-        if os.path.exists(Path(volume, 'input', platename)):
-            shutil.rmtree(Path(volume, 'input', platename))
-            Path(volume, 'input', platename).mkdir(parents=True, exist_ok=True)
-        else:
-            Path(volume, 'input', platename).mkdir(parents=True, exist_ok=True)
+                print('Running wrmXpress.')
+                wrmxpress_command = f'python wrmXpress/wrapper.py {volume}/.{platename}.yml {platename}'
+                wrmxpress_command_split = shlex.split(wrmxpress_command)
+                subprocess.run(wrmxpress_command_split)
 
-        # Copy .HTD file into platename input dir
-        shutil.copy(htd_file, platename_input_dir)
+                # assumes IX-like file structure
+                img_path = Path(
+                    volume, 'output', 'straightened_worms', f'{plate_base}_{first_well}.tiff')
+                
+                while not os.path.exists(img_path):
+                    time.sleep(1)
+                
+                # Open the image and create a figure
+                fig = create_figure_from_filepath(img_path)
 
-        # Collecting the time point folders
-        time_points = [item for item in os.listdir(img_dir) if os.path.isdir(
-            Path(img_dir, item))]
-
-        # Iterate through each time point
-        for time_point in time_points:
-            time_point_dir = Path(platename_input_dir, time_point)
-            time_point_dir.mkdir(parents=True, exist_ok=True)
-
-            # Copy first and second well image into time point folder
-            first_well_path = Path(img_dir,
-                                   time_point, f'{plate_base}_{first_well}.TIF')
-            shutil.copy(first_well_path, time_point_dir)
-
-        # filepath of the yaml file
-        yaml_file = Path(platename + '.yml')
-
-        # Command message
-        command_message = f"```python wrmXpress/wrapper.py {platename}.yml {platename}```"
-
-        print('Running wrmXpress.')
-        wrmxpress_command = f'python wrmXpress/wrapper.py {volume}/.{platename}.yml {platename}'
-        wrmxpress_command_split = shlex.split(wrmxpress_command)
-        subprocess.run(wrmxpress_command_split)
-
-        # assumes IX-like file structure
-        img_path = Path(
-            volume, 'work', f'{platename}/{first_well}/img/{platename}_{first_well}{selection1}.png')
-
-        # Wait for the image to be created
-        while not os.path.exists(img_path):
-            time.sleep(1)
-
-        # checking the selection and changing the scale accordingly
-        img = np.array(Image.open(img_path))
-        if selection == 'motility':
-            scale = 'inferno'
-        else:
-            scale = 'gray'
-
-        # Open the image and create a figure
-        fig = px.imshow(img, color_continuous_scale=scale)
-        fig.update_layout(coloraxis_showscale=False)
-        fig.update_xaxes(showticklabels=False)
-        fig.update_yaxes(showticklabels=False)
-
-        # Return the command message, the figure, and the open status of the alerts
-        return command_message, fig, False, f'', False
+                # Return the first well path, the figure, and the open status of the alerts
+                return f"```{first_well_path}```", fig, False, f'', False
