@@ -540,7 +540,7 @@ def run_analysis(
                 # rather than running wrmXpress again
                 print(wells[0])
                 first_well_path = Path(
-                    volume, 'output', 'straightened_worms' f'{plate_base}_{wells[0]}.tiff'
+                    volume, 'output', 'straightened_worms' f'{plate_base}_{first_well}.tiff'
                 )
 
                 # Check if the first well path exists
