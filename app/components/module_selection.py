@@ -247,6 +247,10 @@ module_selection = dbc.AccordionItem(
                                     "value": "mf_celltox"
                                 },
                                 {
+                                    'label': "Feeding",
+                                    'value': 'feeding'
+                                },
+                                {
                                     "label": "Wormsize",
                                     "value": "wormsize"
                                 },
