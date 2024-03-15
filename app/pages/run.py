@@ -7,7 +7,6 @@
 import dash_bootstrap_components as dbc
 from dash import dcc, html, callback
 from dash.dependencies import Input, Output, State
-import docker
 from pathlib import Path
 import numpy as np
 import plotly.express as px

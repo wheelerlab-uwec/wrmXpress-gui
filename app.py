@@ -10,13 +10,8 @@ from dash import Dash, html, dcc, DiskcacheManager
 from dash.dependencies import Input, Output, State
 import time
 from pathlib import Path
-import numpy as np
-import plotly.express as px
-from PIL import Image
 import os
 import subprocess
-import yaml
-import shutil
 import shlex
 import pandas as pd
 import re
@@ -242,7 +237,7 @@ def callback(set_progress, n_clicks, store):
         wrmxpress_command = f'python -u wrmXpress/wrapper.py {volume}/{platename}.yml {platename}'
         wrmxpress_command_split = shlex.split(wrmxpress_command)
         output_folder = Path(volume, 'work', platename)
-        output_file = Path(volume, 'work', platename, "output.txt")  # Specify the name and location of the output file
+        output_file = Path(volume, 'work', platename, f"{platename}_run.log")  # Specify the name and location of the output file
 
         if motility == 'True' or segment == 'True':
             while not os.path.exists(output_folder):
@@ -279,7 +274,6 @@ def callback(set_progress, n_clicks, store):
                             fig = create_figure_from_filepath(img_path)
 
                             docker_output_formatted = ''.join(docker_output) 
-                            print(docker_output_formatted)
                             set_progress((
                                 str(len(wells_analyzed)),
                                 str(wells_to_be_analyzed),
@@ -362,7 +356,6 @@ def callback(set_progress, n_clicks, store):
                                     fig = create_figure_from_filepath(img_path)
 
                                     docker_output_formatted = ''.join(docker_output) 
-                                    print(docker_output_formatted)
 
                                     # Update progress
                                     set_progress((str(image_number), str(len(wells)), fig, f'```{img_path}```', f'```{docker_output_formatted}```'))
@@ -373,10 +366,12 @@ def callback(set_progress, n_clicks, store):
                 with open(output_file, "w") as file:
                     process = subprocess.Popen(
                         wrmxpress_command_split, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+                    fig = None
                     docker_output = []
                     wells_analyzed = []
                     wells_to_be_analyzed = len(wells)
-
+                    progress = 0
+                    total_progress = 2* wells_to_be_analyzed
                     # After starting the subprocess and opening the output file
                     for line in iter(process.stdout.readline, b''):
                         docker_output.append(line)
@@ -389,29 +384,70 @@ def callback(set_progress, n_clicks, store):
                                 time.sleep(1)
 
                             # create a figure for the output
-                            fig_1 = create_figure_from_filepath(output_path)
+                            fig_1 = create_figure_from_filepath(output_path, 'grey')
                             
                             print('wrmXpress has finished.')
                             docker_output.append('wrmXpress has finished.')
                             docker_output_formatted = ''.join(docker_output) 
-                            return fig_1, False, False, '', f'```{docker_output_formatted}```'  
-                        elif '%' in line:
-                            progress = line.split('%')[0].split(' ')[-1]   
+                            return fig_1, False, False, '', f'```{docker_output_formatted}```'
+                          
+                        elif '[INFO]' in line and '%' in line:  
                             well_analyzed = line.split('|')[-1].split('/')[0].strip()
                             total_wells = line.split('|')[-1].split('/')[1].split(' ')[0].strip()
-                            current_well = wells[int(well_analyzed)]
 
                             if well_analyzed == total_wells: 
                                 current_well = wells[int(well_analyzed)-1]
                                 img_path = Path(volume, f'input/{platename}/TimePoint_1/{plate_base}_{current_well}.TIF')
-                                fig = create_figure_from_filepath(img_path)
+                                fig = create_figure_from_filepath(img_path, 'grey')
                                 docker_output_formatted = ''.join(docker_output)
-                                set_progress((progress, '100', fig, f'```{img_path}```', f'```{docker_output_formatted}```'))
-                            else:    
+                                
+                                set_progress((str(progress), str(total_progress), fig, f'```{img_path}```', f'```{docker_output_formatted}```'))
+                            else:
+                                current_well = wells[int(well_analyzed)]
                                 img_path = Path(volume, f'input/{platename}/TimePoint_1/{plate_base}_{current_well}.TIF')
-                                fig = create_figure_from_filepath(img_path)
+                                fig = create_figure_from_filepath(img_path, 'grey')
+                                print(fig)
                                 docker_output_formatted = ''.join(docker_output)
-                                set_progress((progress, '100', fig, f'```{img_path}```', f'```{docker_output_formatted}```'))      
+                                progress = int(progress) + 1
+                                set_progress((str(progress), str(total_progress), fig, f'```{img_path}```', f'```{docker_output_formatted}```'))
+
+                            # Check for the 'Image #' pattern and extract the number
+                        elif 'Image #' in line:
+                            wells_analyzed = []
+                            wells_to_be_analyzed = len(wells)
+                            # load the csv file which indicates which well is being analyzed
+                            csv_file_path = Path(
+                                        volume, 'input', f'image_paths_{cellprofilepipeline}.csv')
+                            while not os.path.exists(csv_file_path):
+                                time.sleep(1)
+
+                            read_csv = pd.read_csv(csv_file_path)
+                            # find the row titled Metadata_Well
+                            well_column = read_csv['Metadata_Well']
+                            # Extracting the image number
+                            image_number_pattern = re.search(r'Image # (\d+)', line)
+                            if image_number_pattern:
+                                image_number = int(image_number_pattern.group(1))
+                                
+                                # Find the well from the CSV using the image number
+                                well_id = well_column.iloc[image_number - 1]  # Adjusting for zero indexing
+
+                                # Construct the image path
+                                img_path = Path(volume, f'input/{platename}/TimePoint_1/{plate_base}_{well_id}.TIF')
+                                if img_path.exists():
+                                    # Load and display the image
+                                    fig = create_figure_from_filepath(img_path, 'grey')
+                                    docker_output_formatted = ''.join(docker_output) 
+                                    progress = int(progress) + 1
+                                    # Update progress
+                                    set_progress((str(progress), (str(total_progress)), fig, f'```{img_path}```', f'```{docker_output_formatted}```')) 
+                        else:
+                            docker_output_formatted = ''.join(docker_output)
+                            if fig is not None:         
+                                set_progress((str(progress), str(total_progress), fig, f'```{img_path}```', f'```{docker_output_formatted}```'))
+                            else:
+                                set_progress((str(progress), str(total_progress), None, f'', f'```{docker_output_formatted}```'))
+
                             
 
 ########################################################################

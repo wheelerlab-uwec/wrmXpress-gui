@@ -13,6 +13,20 @@ import numpy as np
 from PIL import Image
 import plotly.express as px
 import yaml
+import time
+import sys
+import traceback
+import logging
+import datetime
+import re
+import plotly.graph_objects as go
+import plotly.express as px
+import plotly.io as pio
+import dash
+import dash as dcc
+import csv
+
+
 
 ########################################################################
 ####                                                                ####
@@ -196,9 +210,9 @@ def send_ctrl_c(pid):
         print("Process with PID", pid, "not found.")
 
 
-def clean_and_create_directories(input_path, 
-                                 work_path, 
-                                 output_path = False
+def clean_and_create_directories(input_path,
+                                 work_path,
+                                 output_path=False
                                  ):
     """
     The purpose of this function is to clean and create the input, work, and output directories.
@@ -270,17 +284,17 @@ def copy_files_to_input_directory(platename_input_dir,
         time_point_dir.mkdir(parents=True, exist_ok=True)
         if isinstance(wells, list):
             for well in wells:
-                print(well)
                 well_path = Path(img_dir,
-                                time_point, f'{plate_base}_{well}.TIF')
+                                 time_point, f'{plate_base}_{well}.TIF')
                 shutil.copy(well_path, time_point_dir)
         else:
             well_path = Path(img_dir,
-                            time_point, f'{plate_base}_{wells}.TIF')
+                             time_point, f'{plate_base}_{wells}.TIF')
             shutil.copy(well_path, time_point_dir)
 
+
 def create_figure_from_filepath(img_path,
-                                scale = 'gray'):
+                                scale='grey'):
     """
     This function creates a figure from the input file path.
     ===============================================================================
@@ -297,6 +311,7 @@ def create_figure_from_filepath(img_path,
     fig.update_yaxes(showticklabels=False)
     return fig
 
+
 def update_yaml_file(input_full_yaml, output_full_yaml, updates):
     """
     This function updates the YAML file with the specified updates.
@@ -308,7 +323,7 @@ def update_yaml_file(input_full_yaml, output_full_yaml, updates):
     Returns:
         - None
     """
-     # reading in yaml file
+    # reading in yaml file
     with open(input_full_yaml, 'r') as file:
         data = yaml.safe_load(file)
 
@@ -320,4 +335,110 @@ def update_yaml_file(input_full_yaml, output_full_yaml, updates):
 
     with open(output_full_yaml, 'w') as yaml_file:
         yaml.dump(data, yaml_file,
-                    default_flow_style=False)
+                  default_flow_style=False)
+
+
+def motility_and_segment_run_function(
+        output_folder,
+        output_file,
+        wrmxpress_command_split,
+        wells,
+        volume,
+        platename,
+        plate_base,
+        temp_output_file
+
+):
+    """
+    This function runs the motility and segment functions of wrmXpress.
+    ===============================================================================
+    Arguments:
+        - output_folder : str : Path to the output folder
+        - output_file : str : Path to the output file
+        - wrmxpress_command_split : list : List of wrmXpress commands
+        - wells : list : List of well names
+        - volume : str : Path to the volume
+        - platename : str : Name of the plate
+        - plate_base : str : Base name of the plate
+    ===============================================================================
+    Returns:
+        - fig_1 : plotly.graph_objs._figure.Figure : A figure
+        - False : bool : False
+        - False : bool : False
+        - '' : str : An empty string
+        - docker_output_formatted : str : Formatted docker output
+    """
+    
+    columns = ['wells_analyzed', 'wells_to_be_analyzed',
+               'fig', 'img_path', 'docker_output_formatted', 
+               'finished']
+    while not os.path.exists(output_folder):
+        time.sleep(1)
+    with open(temp_output_file, 'w', newline='') as csv_file:
+        with open(output_file, "w") as file:
+
+            process = subprocess.Popen(
+                wrmxpress_command_split, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+
+            # Create an empty list to store the docker output
+            docker_output = []
+            wells_analyzed = []
+            wells_to_be_analyzed = len(wells)
+
+            for line in iter(process.stdout.readline, b''):
+                # Add the line to docker_output for further processing
+                docker_output.append(line)
+                file.write(line)
+                file.flush()
+                # Break the loop if 'Generating' is in the line
+                if "Generating" in line:
+                    break
+
+                # Process the line if 'Running' is in the line
+                if "Running" in line:
+                    well_running = line.split(" ")[-1]
+                    if well_running not in wells_analyzed:
+                        # Remove the '\n' from the well_running
+                        well_running = well_running.replace('\n', '')
+                        wells_analyzed.append(well_running)
+
+                        img_path = Path(
+                            volume, f'{platename}/TimePoint_1/{plate_base}_{wells_analyzed[-1]}.TIF')
+                        fig = create_figure_from_filepath(img_path)
+
+                        docker_output_formatted = ''.join(docker_output)
+                        csv_file.writerow(
+                            [
+                                str(len(wells_analyzed)),
+                                str(wells_to_be_analyzed),
+                                fig,
+                                f'```{docker_output_formatted}```',
+                                False
+                            ]
+                        )
+
+            # get the platename (default) file in output dir that have .png extension
+            output_path = Path(volume, 'output', 'thumbs', platename + '.png')
+            while not os.path.exists(output_path):
+                time.sleep(1)
+
+            # create a figure for the output
+            fig_1 = create_figure_from_filepath(output_path)
+
+            print('wrmXpress has finished.')
+            docker_output.append('wrmXpress has finished.')
+            docker_output_formatted = ''.join(docker_output)
+
+            csv_file.writerow(
+                [
+                    str(len(wells_analyzed)),
+                    str(wells_to_be_analyzed),
+                    output_path,
+                    f'```{output_path}```',
+                    f'```{docker_output_formatted}```',
+                    True
+                ]
+            )
+
+            # Return the figure, False, False, and an empty string
+            return fig_1, False, False, '', f'```{docker_output_formatted}```'
