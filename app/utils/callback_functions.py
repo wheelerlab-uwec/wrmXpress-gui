@@ -294,7 +294,7 @@ def copy_files_to_input_directory(platename_input_dir,
 
 
 def create_figure_from_filepath(img_path,
-                                scale='grey'):
+                                scale='gray'):
     """
     This function creates a figure from the input file path.
     ===============================================================================
