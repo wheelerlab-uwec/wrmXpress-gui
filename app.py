@@ -441,6 +441,95 @@ def callback(set_progress, n_clicks, store):
                                             docker_output_formatted = ''.join(docker_output)
                                             progress = int(progress) + 1
                                             set_progress((str(progress), str(total_progress), fig, f'```{img_path}```', f'```{docker_output_formatted}```'))
+            elif cellprofilepipeline == "mf_celltox":
+                while not os.path.exists(output_folder):
+                    time.sleep(1)
+                with open(output_file, "w") as file:
+                    process = subprocess.Popen(
+                        wrmxpress_command_split, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+                    docker_output = []
+                    wells_analyzed = []
+                    wells_to_be_analyzed = len(wells)
+                    progress = 0
+                    total_progress = 2 * wells_to_be_analyzed
+                    # After starting the subprocess and opening the output file
+                    for line in iter(process.stdout.readline, b''):
+                        docker_output.append(line)
+                        file.write(line)
+                        file.flush()
+
+                        if 'Generating w1 thumbnails' in line:
+                            output_path = Path(volume, 'output', 'thumbs', platename + '.png')
+                            while not os.path.exists(output_path):
+                                time.sleep(1)
+
+                            # create a figure for the output
+                            fig_1 = create_figure_from_filepath(output_path)
+                            print('wrmXpress has finished.')
+                            docker_output.append('wrmXpress has finished.')
+                            docker_output_formatted = ''.join(docker_output) 
+                            return fig_1, False, False, f'', f'```{docker_output_formatted}```'
+                        
+            elif cellprofilepipeline == "feeding":
+                while not os.path.exists(output_folder):
+                    time.sleep(1)
+                with open(output_file, "w") as file:
+                    process = subprocess.Popen(
+                        wrmxpress_command_split, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+                    docker_output = []
+                    wells_analyzed = []
+                    wells_to_be_analyzed = len(wells)
+
+                    # After starting the subprocess and opening the output file
+                    for line in iter(process.stdout.readline, b''):
+                        docker_output.append(line)
+                        file.write(line)
+                        file.flush()
+
+                        # load the csv file which indicates which well is being analyzed
+                        csv_file_path = Path(
+                                    volume, 'input', f'image_paths_{cellprofilepipeline}.csv')
+                        while not os.path.exists(csv_file_path):
+                            time.sleep(1)
+
+                        read_csv = pd.read_csv(csv_file_path)
+                        # find the row titled Metadata_Well
+                        well_column = read_csv['Metadata_Well']
+                        
+                        if 'Generating w1 thumbnails' in line:
+                            output_path = Path(volume, 'output', 'thumbs', platename + "_w1" + '.png')
+                            while not os.path.exists(output_path):
+                                time.sleep(1)
+
+                            # create a figure for the output
+                            fig_1 = create_figure_from_filepath(output_path)
+                            
+                            print('wrmXpress has finished.')
+                            docker_output.append('wrmXpress has finished.')
+                            docker_output_formatted = ''.join(docker_output) 
+                            return fig_1, False, False, '', f'```{docker_output_formatted}```'
+
+                        # Check for the 'Image #' pattern and extract the number
+                        elif 'Image #' in line:
+                            # Extracting the image number
+                            image_number_pattern = re.search(r'Image # (\d+)', line)
+                            if image_number_pattern:
+                                image_number = int(image_number_pattern.group(1))
+                                
+                                # Find the well from the CSV using the image number
+                                well_id = well_column.iloc[image_number - 1]  # Adjusting for zero indexing
+
+                                # Construct the image path
+                                img_path = Path(volume, f'input/{platename}/TimePoint_1/{plate_base}_{well_id}_w1.TIF')
+                                if img_path.exists():
+                                    # Load and display the image
+                                    fig = create_figure_from_filepath(img_path)
+
+                                    docker_output_formatted = ''.join(docker_output) 
+
+                                    # Update progress
+                                    set_progress((str(image_number), str(len(wells)), fig, f'```{img_path}```', f'```{docker_output_formatted}```'))
+                                
                             
                             
                         

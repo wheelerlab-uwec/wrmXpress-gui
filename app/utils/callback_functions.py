@@ -25,6 +25,7 @@ import plotly.io as pio
 import dash
 import dash as dcc
 import csv
+import glob
 
 
 
@@ -276,21 +277,19 @@ def copy_files_to_input_directory(platename_input_dir,
     shutil.copy(htd_file, platename_input_dir)
 
     # Iterate through each time point and copy images into new dirs
-    time_points = [item for item in os.listdir(img_dir) if os.path.isdir(
-        Path(img_dir, item))]
+    time_points = [item for item in os.listdir(img_dir) if os.path.isdir(Path(img_dir, item))]
 
     for time_point in time_points:
         time_point_dir = Path(platename_input_dir, time_point)
         time_point_dir.mkdir(parents=True, exist_ok=True)
-        if isinstance(wells, list):
-            for well in wells:
-                well_path = Path(img_dir,
-                                 time_point, f'{plate_base}_{well}.TIF')
-                shutil.copy(well_path, time_point_dir)
-        else:
-            well_path = Path(img_dir,
-                             time_point, f'{plate_base}_{wells}.TIF')
-            shutil.copy(well_path, time_point_dir)
+        
+        for well in wells if isinstance(wells, list) else [wells]:
+            # Use glob to find all files that match the pattern, accounting for potential extensions
+            well_files_pattern = Path(img_dir, time_point, f'{plate_base}_{well}*.TIF')
+            well_files = glob.glob(str(well_files_pattern))
+            
+            for file_path in well_files:
+                shutil.copy(file_path, time_point_dir)
 
 
 def create_figure_from_filepath(img_path,
