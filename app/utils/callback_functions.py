@@ -14,20 +14,8 @@ from PIL import Image
 import plotly.express as px
 import yaml
 import time
-import sys
-import traceback
-import logging
-import datetime
-import re
-import plotly.graph_objects as go
 import plotly.express as px
-import plotly.io as pio
-import dash
-import dash as dcc
-import csv
 import glob
-
-
 
 ########################################################################
 ####                                                                ####
@@ -110,7 +98,9 @@ def prep_yaml(
         cellprofilerpipeline,
         diagnosticdx,
         wellselection,
-        volume):
+        volume,
+        fecundity
+        ):
     """
     This function prepares a dictionary for the YAML file.
     ===============================================================================
@@ -179,6 +169,9 @@ def prep_yaml(
             },
             "dx": {
                 "run": eval_bool(diagnosticdx)
+            },
+            'fecundity': {
+                eval_bool(fecundity)
             }
         },
         "wells": wellselection,

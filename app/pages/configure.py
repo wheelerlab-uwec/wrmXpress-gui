@@ -132,6 +132,7 @@ def update_options_visibility(imaging_mode, file_structure):
     Input("circ-or-square-img-masking", 'value'),
     Input("cell-profiler-run", 'value'),
     Input("cell-profiler-pipeline", 'value'),
+    Input('fecundity-run', 'value'),
 )
 def rows_cols(
     cols,
@@ -146,7 +147,8 @@ def rows_cols(
     file_sturcture,
     img_masking,
     cellprofiler,
-    cellprofilepipeline
+    cellprofilepipeline,
+    fecundity
 ):
     """
     This function will store the values of the inputs to be used in different pages.
@@ -181,7 +183,8 @@ def rows_cols(
         'file_structure': file_sturcture,
         'img_masking': img_masking,
         'cellprofiler': cellprofiler,
-        'cellprofilepipeline': cellprofilepipeline
+        'cellprofilepipeline': cellprofilepipeline,
+        'fecundity': fecundity 
     }
 
 
@@ -285,6 +288,7 @@ def update_wells(table_contents):  # list of cells from selection table
     State('plate-name', 'value'),
     State('mounted-volume', 'value'),
     State('well-selection-list', 'children'),
+    State('fecundity-run', 'value'),
     prevent_initial_call=True,
     allow_duplicate=True
 )
@@ -308,6 +312,7 @@ def run_analysis(  # function to save the yaml file from the sections in the con
     platename,
     volume,
     wells,
+    fecundityrun
 ):
     """
     This function will save the yaml file from the sections in the configuration page.
@@ -530,7 +535,8 @@ def run_analysis(  # function to save the yaml file from the sections in the con
             cellprofilerpipeline,
             diagnosticdx,
             wells,
-            volume
+            volume,
+            fecundityrun
         )
 
         output_file = Path(volume, platename + '.yml')

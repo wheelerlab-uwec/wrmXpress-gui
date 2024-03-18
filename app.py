@@ -470,6 +470,15 @@ def callback(set_progress, n_clicks, store):
                             docker_output_formatted = ''.join(docker_output) 
                             return fig_1, False, False, f'', f'```{docker_output_formatted}```'
                         
+                        elif "Stitching w1 of multi-site images" in line:
+                            wells_analyzed.append(wells[int(progress)])
+                            progress = int(progress) + 1
+                            img_path = Path(volume, f'input/{platename}/TimePoint_1/{plate_base}_{wells_analyzed[-1]}_s1.TIF')
+                            if os.path.exists(img_path):
+                                fig = create_figure_from_filepath(img_path)
+                                docker_output_formatted = ''.join(docker_output)
+                                set_progress((str(progress), str(total_progress), fig, f'```{img_path}```', f'```{docker_output_formatted}```'))
+                        
             elif cellprofilepipeline == "feeding":
                 while not os.path.exists(output_folder):
                     time.sleep(1)

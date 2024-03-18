@@ -26,7 +26,7 @@ module_selection = dbc.AccordionItem(
 
                 # Video analysis tab
                 dcc.Tab(
-                    label="Video Analysis",
+                    label="wrmXpress Modules",
                     value='video-analysis-tab',
                     children=[
 
@@ -195,12 +195,34 @@ module_selection = dbc.AccordionItem(
                             type="text",
                             persistence=True,
                             persistence_type='memory'
+                        ),
+                        html.Br(),
+                        html.H4(
+                            'Fecundity'
+                        ),
+                        html.H6(
+                            "Fecundity Run"
+                        ),
+                        # Radio button items for fecundity run
+                        dbc.RadioItems(
+                            id="fecundity-run",
+                            className="btn-group",
+                            inputClassName="btn-check",
+                            labelClassName="btn btn-outline-primary",
+                            labelCheckedClassName="active",
+                            options=[
+                                {"label": "True", "value": "True"},
+                                {"label": "False", "value": "False"}
+                            ],
+                            value="False",
+                            persistence=True,
+                            persistence_type='memory'
                         )
                     ]),
 
                 # Image analysis tab
                 dcc.Tab(
-                    label="Image Analysis (CellProfiler)",
+                    label="CellProfiler Pipelines",
                     value='still-analysis-tab',
                     children=[
 
