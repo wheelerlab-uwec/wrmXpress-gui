@@ -171,7 +171,7 @@ def prep_yaml(
                 "run": eval_bool(diagnosticdx)
             },
             'fecundity': {
-                eval_bool(fecundity)
+                "run": eval_bool(fecundity)
             }
         },
         "wells": wellselection,
