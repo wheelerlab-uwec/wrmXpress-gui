@@ -436,11 +436,27 @@ def motility_and_segment_run_function(
             # Return the figure, False, False, and an empty string
             return fig_1, False, False, '', f'```{docker_output_formatted}```'
 
-def preamble_to_run_wrmXpress(
+def preamble_to_run_wrmXpress_preview(
        platename,
        volume, 
        wells 
 ):
+    """
+    This function prepares the wrmXpress command, output preview log file, command message, and first well.
+    ===============================================================================
+    Arguments:
+        - platename : str : Name of the plate
+        - volume : str : Path to the volume
+        - wells : list : List of well names
+    ===============================================================================
+    Returns:
+        - wrmxpress_command_split : list : List of wrmXpress commands
+        - output_preview_log_file : str : Path to the output preview log file
+        - command_message : str : A command message
+        - first_well : str : The first well in the list of wells
+    ===============================================================================
+    
+    """
      # defining the yaml file path (same as the filepath from configure.py)
     preview_yaml_platename = '.' + platename + '.yml'
     preview_yaml_platenmaefull_yaml = Path(volume, preview_yaml_platename)

@@ -21,7 +21,7 @@ import shlex
 
 # importing utils
 from app.utils.styling import layout
-from app.utils.callback_functions import clean_and_create_directories, copy_files_to_input_directory, create_figure_from_filepath, update_yaml_file, preamble_to_run_wrmXpress
+from app.utils.callback_functions import clean_and_create_directories, copy_files_to_input_directory, create_figure_from_filepath, update_yaml_file, preamble_to_run_wrmXpress_preview
 
 dash.register_page(__name__)
 
@@ -485,7 +485,7 @@ def run_analysis(
                 return f"```{first_well_path}```", fig, False, f'', False
 
 
-            wrmxpress_command_split, output_preview_log_file, command_message = preamble_to_run_wrmXpress(
+            wrmxpress_command_split, output_preview_log_file, command_message = preamble_to_run_wrmXpress_preview(
                 platename=platename,
                 volume=volume,
                 wells=wells
@@ -550,7 +550,7 @@ def run_analysis(
                     # Return the path and the figure and the open status of the alerts
                     return f"```{first_well_path}```", fig, False, f'', False
 
-                wrmxpress_command_split, output_preview_log_file, command_message, first_well = preamble_to_run_wrmXpress(
+                wrmxpress_command_split, output_preview_log_file, command_message, first_well = preamble_to_run_wrmXpress_preview(
                     platename=platename,
                     volume=volume,
                     wells=wells
@@ -600,7 +600,7 @@ def run_analysis(
                     # Return the path and the figure and the open status of the alerts
                     return f"```{first_well_path}```", fig, False, f'', False
                 
-                wrmxpress_command_split, output_preview_log_file, command_message, first_well = preamble_to_run_wrmXpress(
+                wrmxpress_command_split, output_preview_log_file, command_message, first_well = preamble_to_run_wrmXpress_preview(
                     platename=platename,
                     volume=volume,
                     wells=wells
@@ -649,7 +649,7 @@ def run_analysis(
                     # Return the path and the figure and the open status of the alerts
                     return f"```{first_well_path}```", fig, False, f'', False
                 
-                wrmxpress_command_split, output_preview_log_file, command_message, first_well = preamble_to_run_wrmXpress(
+                wrmxpress_command_split, output_preview_log_file, command_message, first_well = preamble_to_run_wrmXpress_preview(
                     platename=platename,
                     volume=volume,
                     wells=wells
@@ -698,7 +698,7 @@ def run_analysis(
                     # Return the path and the figure and the open status of the alerts
                     return f"```{first_well_path}```", fig, False, f'', False
                 
-                wrmxpress_command_split, output_preview_log_file, command_message, first_well  = preamble_to_run_wrmXpress(
+                wrmxpress_command_split, output_preview_log_file, command_message, first_well  = preamble_to_run_wrmXpress_preview(
                     platename=platename,
                     volume=volume,
                     wells=wells
