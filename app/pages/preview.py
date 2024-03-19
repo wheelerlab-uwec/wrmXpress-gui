@@ -689,7 +689,7 @@ def run_analysis(
                 # Check to see if first well already exists, if it does insert the img
                 # rather than running wrmXpress again
                 first_well_path = Path(
-                    volume, 'work', f'{platename}',f'{first_well}', 'img', f'{platename}_{first_well}.png'
+                    volume, 'work', f'{platename}',f'{first_well}', 'img', f'{platename}_{first_well}_w1.png'
                 )
                 if os.path.exists(first_well_path):
                     # Open the image and create a figure
