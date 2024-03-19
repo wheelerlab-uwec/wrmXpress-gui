@@ -16,6 +16,7 @@ import yaml
 import time
 import plotly.express as px
 import glob
+import shlex
 
 ########################################################################
 ####                                                                ####
@@ -434,3 +435,58 @@ def motility_and_segment_run_function(
 
             # Return the figure, False, False, and an empty string
             return fig_1, False, False, '', f'```{docker_output_formatted}```'
+
+def preamble_to_run_wrmXpress(
+       platename,
+       volume, 
+       wells 
+):
+     # defining the yaml file path (same as the filepath from configure.py)
+    preview_yaml_platename = '.' + platename + '.yml'
+    preview_yaml_platenmaefull_yaml = Path(volume, preview_yaml_platename)
+    full_yaml = Path(volume, platename + '.yml')
+
+    update_yaml_file(
+                full_yaml, 
+                preview_yaml_platenmaefull_yaml,
+                {'wells': ['All']}
+            )
+            
+    if wells == 'All':
+            first_well = "A01"
+    else:
+            first_well = wells[0]
+
+
+        # Checking if input folder exists, and if not, create it,
+        # then subsequently copy the images into this folder
+        # Input and platename input folder paths
+        # necessary file paths
+    img_dir = Path(volume, platename)
+    input_dir = Path(volume, 'input')
+    platename_input_dir = Path(input_dir, platename)
+    plate_base = platename.split("_", 1)[0]
+    htd_file = Path(img_dir, f'{plate_base}.HTD')
+
+    # Clean and create directories
+    clean_and_create_directories(
+                input_path=Path(volume, 'input', platename),
+                work_path=Path(volume, 'work', platename)
+    )
+            
+            # Copy files to input directory
+    copy_files_to_input_directory(
+                platename_input_dir=platename_input_dir,
+                htd_file=htd_file,
+                img_dir=img_dir,    
+                plate_base=plate_base,
+                wells = first_well
+            )
+
+        # Command message
+    command_message = f"```python wrmXpress/wrapper.py {platename}.yml {platename}```"
+
+    wrmxpress_command = f'python wrmXpress/wrapper.py {volume}/.{platename}.yml {platename}'
+    wrmxpress_command_split = shlex.split(wrmxpress_command)
+    output_preview_log_file = Path(volume, 'input', platename, f'{platename}_preview.log')
+    return wrmxpress_command_split, output_preview_log_file, command_message, first_well
