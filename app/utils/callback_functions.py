@@ -17,6 +17,8 @@ import time
 import plotly.express as px
 import glob
 import shlex
+import cv2
+import tifffile as tiff
 
 ########################################################################
 ####                                                                ####
@@ -297,13 +299,35 @@ def create_figure_from_filepath(img_path,
     Returns:
         - fig : matplotlib.figure.Figure : A figure
     """
-    img = np.array(Image.open(img_path))
+
+    #else:
+    try:
+        # Attempt to open with PIL first
+        img = np.array(Image.open(img_path))
+    except Exception as e:
+        # If PIL fails, attempt to open with tifffile
+        print(f"Error opening {img_path} with PIL, trying with tifffile: {e}")
+        try:
+            img = tiff.imread(img_path)
+            scale = 'inferno'
+        except Exception as e:
+            # Handle the case where both libraries fail to open the image
+            print(f"Both PIL and tifffile failed to open {img_path}: Trying with CV2 {e}")
+
+            try: 
+                img = cv2.imread(img_path, cv2.IMREAD_GRAYSCALE)
+                scale = 'gray'
+                
+            except Exception as e:
+                print(f"Error opening {img_path} with CV2, PIL, and tifffile: {e}")
+                return None  # Or handle the error as appropriate for your application
+    
+    # Proceed with creating the figure using plotly
     fig = px.imshow(img, color_continuous_scale=scale)
     fig.update_layout(coloraxis_showscale=False)
     fig.update_xaxes(showticklabels=False)
     fig.update_yaxes(showticklabels=False)
     return fig
-
 
 def update_yaml_file(input_full_yaml, output_full_yaml, updates):
     """
@@ -506,3 +530,21 @@ def preamble_to_run_wrmXpress_preview(
     wrmxpress_command_split = shlex.split(wrmxpress_command)
     output_preview_log_file = Path(volume, 'input', platename, f'{platename}_preview.log')
     return wrmxpress_command_split, output_preview_log_file, command_message, first_well
+
+def convert_tiff_to_tif(input_file, output_file):
+    """
+    This function was developed for the conversion of a .tiff file to a .TIF file.
+    However, this can be used for other file types as well. 
+    ===============================================================================
+    Arguments:
+        - input_file : str : Path to the .tiff file
+        - output_file : str : Path to the .TIF file
+    ===============================================================================
+    Returns:
+        - None    
+    """
+    # Open the .tiff file
+    with Image.open(input_file) as img:
+        # Save the image as .TIF
+        img.save(output_file)
+

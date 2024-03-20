@@ -438,7 +438,7 @@ def run_analysis(
     segment_selection = store['segment']
     cellprofiler = store["cellprofiler"]
     cellprofilepipeline = store["cellprofilepipeline"]
-
+    fecundity_selection = store['fecundity']
     # Check if motility or segment selection is True
     if motility_selection == 'True':
         selection1 = '_motility'
@@ -448,6 +448,7 @@ def run_analysis(
         selection = 'segment'
     else:
         selection1 = ''
+        selection = ''
 
     # Check if the button has been clicked
     if nclicks:
@@ -462,7 +463,7 @@ def run_analysis(
         else:
             first_well = wells[0]
         
-        if motility_selection == 'True' or segment_selection == 'True':
+        if motility_selection == 'True' or segment_selection == 'True' or fecundity_selection == 'True':
             # Check to see if first well already exists, if it does insert the img
             # rather than running wrmXpress again
             first_well_path = Path(
@@ -485,7 +486,7 @@ def run_analysis(
                 return f"```{first_well_path}```", fig, False, f'', False
 
 
-            wrmxpress_command_split, output_preview_log_file, command_message = preamble_to_run_wrmXpress_preview(
+            wrmxpress_command_split, output_preview_log_file, command_message, first_well = preamble_to_run_wrmXpress_preview(
                 platename=platename,
                 volume=volume,
                 wells=wells
@@ -523,10 +524,12 @@ def run_analysis(
 
                     # Open the image and create a figure
                     fig = create_figure_from_filepath(img_path, scale=scale)
+                    
+                    if 'Generating w1 thumbnails' in line:
 
-                    # Return the command message, the figure, and the open status of the alerts
-                    return command_message, fig, False, f'', False
-        
+                        # Return the command message, the figure, and the open status of the alerts
+                        return command_message, fig, False, f'', False
+            
         ############################
         #
         # CellProfiler pipeline
@@ -537,8 +540,10 @@ def run_analysis(
                 first_well = wells[0]
                 # Check to see if first well already exists, if it does insert the img
                 # rather than running wrmXpress again
-                first_well_path = Path(
-                    volume, 'work', f'{platename}',f'{first_well}', 'img', f'{platename}_{first_well}.png'
+                print(first_well)
+                # assumes IX-like file structure
+                first_well_path =  Path(
+                            volume, f'output/straightened_worms/{plate_base}_{first_well}.tiff'
                 )
 
                 # Check if the first well path exists
@@ -569,20 +574,16 @@ def run_analysis(
                         file.write(line)
                         file.flush()
                     
-                        # assumes IX-like file structure
-                        img_path = Path(
-                            volume, 'work', f'{platename}',f'{first_well}', 'img', f'{platename}_{first_well}.png'
-                        )
-                        # Wait for the image to be created
-                        while not os.path.exists(img_path):
-                            time.sleep(1)
+                        
+                        if 'Generating w1 thumbnails' in line:
+                            # assumes IX-like file structure
+                            file_path =  Path( volume, f'output/straightened_worms/{plate_base}_{first_well}.tiff')
+                            # Open the image and create a figure
+                            fig = create_figure_from_filepath(file_path)
 
-                        # Open the image and create a figure
-                        fig = create_figure_from_filepath(img_path)
-
-                        # Return the command message, the figure, and the open status of the alerts
-                        return command_message, fig, False, f'', False
-                    
+                            # Return the command message, the figure, and the open status of the alerts
+                            return command_message, fig, False, f'', False
+                        
 
             elif cellprofilepipeline == 'wormsize_intensity_cellpose':
                 output_folder = Path(volume, 'input', platename)
@@ -590,8 +591,9 @@ def run_analysis(
 
                 # Check to see if first well already exists, if it does insert the img
                 # rather than running wrmXpress again
-                first_well_path = Path(
-                    volume, 'work', f'{platename}',f'{first_well}', 'img', f'{platename}_{first_well}.png'
+                
+                first_well_path =  Path(
+                    volume, f'output/straightened_worms/{plate_base}_{first_well}.tiff'
                 )
                 if os.path.exists(first_well_path):
                     # Open the image and create a figure
@@ -609,10 +611,6 @@ def run_analysis(
                     process = subprocess.Popen(
                         wrmxpress_command_split, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
                     docker_output = []
-                        # After starting the subprocess and opening the output file
-                    
-                    while not os.path.exists(output_folder):
-                        time.sleep(1)
 
                     for line in iter(process.stdout.readline, b''):
                         docker_output.append(line)
@@ -620,8 +618,8 @@ def run_analysis(
                         file.flush()
                     
                         # assumes IX-like file structure
-                        img_path = Path(
-                            volume, 'work', f'{platename}',f'{first_well}', 'img', f'{platename}_{first_well}.png'
+                        img_path =  Path(
+                            volume, f'output/straightened_worms/{plate_base}_{first_well}.tiff'
                         )
                         # Wait for the image to be created
                         while not os.path.exists(img_path):
@@ -630,9 +628,11 @@ def run_analysis(
                         # Open the image and create a figure
                         fig = create_figure_from_filepath(img_path)
 
-                        # Return the command message, the figure, and the open status of the alerts
-                        return command_message, fig, False, f'', False
-                    
+                        if 'Generating w1 thumbnails' in line:
+                        
+                            # Return the command message, the figure, and the open status of the alerts
+                            return command_message, fig, False, f'', False
+                        
             elif cellprofilepipeline == 'mf_celltox':
                 output_folder = Path(volume, 'input', platename)
                 output_preview_log_file = Path(output_folder, f'{platename}_preview.log')
@@ -679,8 +679,11 @@ def run_analysis(
                         # Open the image and create a figure
                         fig = create_figure_from_filepath(img_path)
 
-                        # Return the command message, the figure, and the open status of the alerts
-                        return command_message, fig, False, f'', False
+                        if 'Generating w1 thumbnails' in line:
+                            
+
+                            # Return the command message, the figure, and the open status of the alerts
+                            return command_message, fig, False, f'', False
                     
             elif cellprofilepipeline == 'feeding':
                 output_folder = Path(volume, 'input', platename)
@@ -688,8 +691,9 @@ def run_analysis(
 
                 # Check to see if first well already exists, if it does insert the img
                 # rather than running wrmXpress again
-                first_well_path = Path(
-                    volume, 'work', f'{platename}',f'{first_well}', 'img', f'{platename}_{first_well}_w1.png'
+                # assumes IX-like file structure
+                first_well_path =  Path(
+                    volume, f'output/straightened_worms/{plate_base}-{first_well}.tiff'
                 )
                 if os.path.exists(first_well_path):
                     # Open the image and create a figure
@@ -718,17 +722,14 @@ def run_analysis(
                         file.write(line)
                         file.flush()
                     
-                        # assumes IX-like file structure
-                        img_path = Path(
-                            volume, 'work', f'{platename}',f'{first_well}', 'img', f'{platename}_{first_well}_w1.png'
-                        )
-                        # Wait for the image to be created
-                        while not os.path.exists(img_path):
-                            time.sleep(1)
+                        if 'Generating w1 thumbnails' in line:
+                            # Wait for the image to be created
+                            while not os.path.exists(first_well_path):
+                                time.sleep(1)
 
-                        # Open the image and create a figure
-                        fig = create_figure_from_filepath(img_path)
+                            # Open the image and create a figure
+                            fig = create_figure_from_filepath(first_well_path)
 
-                        # Return the command message, the figure, and the open status of the alerts
-                        return command_message, fig, False, f'', False
-               
+                            # Return the command message, the figure, and the open status of the alerts
+                            return command_message, fig, False, f'', False
+                

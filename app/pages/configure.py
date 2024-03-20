@@ -481,9 +481,15 @@ def run_analysis(  # function to save the yaml file from the sections in the con
                 error_messages.append(
                     'Cannot run Cellprofiler and Motility together.'
                 )
-
+                
+            if eval_bool(fecundityrun) == True and eval_bool(cellprofilerrun) == True:
+                error_occured = True
+                error_messages.append(
+                    'Cannot run Cellprofiler and Fecundity together.'
+                )
+            
             # check to see if no module is selected
-            if eval_bool(segmentrun) == False and eval_bool(motilityrun) == False and eval_bool(cellprofilerrun) == False:
+            if eval_bool(segmentrun) == False and eval_bool(motilityrun) == False and eval_bool(cellprofilerrun) == False and eval_bool(fecundityrun) == False:
                 error_occured = True
                 error_messages.append(
                     'You have not selected any module to run.'

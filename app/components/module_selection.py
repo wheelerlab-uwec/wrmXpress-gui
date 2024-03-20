@@ -261,24 +261,20 @@ module_selection = dbc.AccordionItem(
                             labelCheckedClassName="active",
                             options=[
                                 {
-                                    "label": "Worm Size, Intensity, Cell Pose",
+                                    "label": "C. elegans size and intensity (Cellpose)",
                                     "value": "wormsize_intensity_cellpose"
                                 },
                                 {
-                                    "label": "Mf Celltox",
+                                    "label": "Microfilariae viability",
                                     "value": "mf_celltox"
                                 },
                                 {
-                                    'label': "Feeding",
+                                    'label': "C. elegans feeding",
                                     'value': 'feeding'
                                 },
                                 {
-                                    "label": "Wormsize",
+                                    "label": "C. elegans size",
                                     "value": "wormsize"
-                                },
-                                {
-                                    "label": "Wormsize Trans",
-                                    "value": "wormsize_trans"
                                 }
                             ],
                             value="wormsize_intensity_cellpose",
