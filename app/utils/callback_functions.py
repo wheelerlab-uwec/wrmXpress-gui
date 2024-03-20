@@ -19,6 +19,7 @@ import glob
 import shlex
 import cv2
 import tifffile as tiff
+from skimage import exposure, transform
 
 ########################################################################
 ####                                                                ####
@@ -300,28 +301,31 @@ def create_figure_from_filepath(img_path,
         - fig : matplotlib.figure.Figure : A figure
     """
 
-    #else:
     try:
         # Attempt to open with PIL first
         img = np.array(Image.open(img_path))
     except Exception as e:
-        # If PIL fails, attempt to open with tifffile
         print(f"Error opening {img_path} with PIL, trying with tifffile: {e}")
         try:
             img = tiff.imread(img_path)
-            scale = 'inferno'
-        except Exception as e:
-            # Handle the case where both libraries fail to open the image
-            print(f"Both PIL and tifffile failed to open {img_path}: Trying with CV2 {e}")
+            
+            # Check if the image is not in a compatible shape
+            if len(img.shape) == 3 and img.shape[2] == 2:
+                # Assuming we can just take the first channel for visualization
+                img = img[:, :, 0]
+            
+            # Rescale pixel values from 0 to 255 if necessary
+            if img.dtype != np.uint8:
+                img = exposure.rescale_intensity(img, out_range=(0, 255)).astype(np.uint8)
 
-            try: 
-                img = cv2.imread(img_path, cv2.IMREAD_GRAYSCALE)
-                scale = 'gray'
-                
-            except Exception as e:
-                print(f"Error opening {img_path} with CV2, PIL, and tifffile: {e}")
-                return None  # Or handle the error as appropriate for your application
-    
+            # Resize the image if necessary, here it is skipped but you can use transform.rescale as before
+            # img = transform.rescale(img, 0.5, anti_aliasing=True, multichannel=False)
+            # img = (img * 255).astype(np.uint8)
+
+        except Exception as e:
+            print(f"Error opening {img_path} with tifffile: {e}")
+            return None
+
     # Proceed with creating the figure using plotly
     fig = px.imshow(img, color_continuous_scale=scale)
     fig.update_layout(coloraxis_showscale=False)
