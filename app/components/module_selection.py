@@ -217,7 +217,26 @@ module_selection = dbc.AccordionItem(
                             value="False",
                             persistence=True,
                             persistence_type='memory'
-                        )
+                        ),
+                        html.H4('Tracking'),
+                        html.H6(
+                            "Tracking Run"
+                        ),
+                        # Radio button items for tracking run
+                        dbc.RadioItems(
+                            id="tracking-run",
+                            className="btn-group",
+                            inputClassName="btn-check",
+                            labelClassName="btn btn-outline-primary",
+                            labelCheckedClassName="active",
+                            options=[
+                                {"label": "True", "value": "True"},
+                                {"label": "False", "value": "False"}
+                            ],
+                            value="False",
+                            persistence=True,
+                            persistence_type='memory'
+                        ),
                     ]),
 
                 # Image analysis tab

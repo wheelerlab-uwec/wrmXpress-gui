@@ -46,6 +46,7 @@ dependencies:
   - r-tidyr
   - r-purrr
   - r-readr
+  - trackpy
   
   - pip:
     - dash[testing]

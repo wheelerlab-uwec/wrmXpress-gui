@@ -7,19 +7,23 @@ import pandas as pd
 from pathlib import Path
 import os
 import signal
-import subprocess
 import shutil
 import numpy as np
 from PIL import Image
 import plotly.express as px
 import yaml
-import time
 import plotly.express as px
 import glob
-import shlex
-import cv2
 import tifffile as tiff
-from skimage import exposure, transform
+from skimage import exposure
+import pandas as pd
+from pathlib import Path
+import os
+import subprocess
+import time
+import shlex
+import re
+
 
 ########################################################################
 ####                                                                ####
@@ -48,7 +52,6 @@ def create_df_from_inputs(_rows, _cols):
     df = pd.DataFrame(data, columns=columns, index=rows)  # Create dataframe
     return df  # Return dataframe
 
-
 def create_empty_df_from_inputs(_rows, _cols):
     """
     This function creates an empty dataframe from the input rows and columns.
@@ -70,7 +73,6 @@ def create_empty_df_from_inputs(_rows, _cols):
                       index=rows)  # Create dataframe
     return df  # Return dataframe
 
-
 def eval_bool(v):
     """
     This function evaluates a boolean value from a string.
@@ -82,7 +84,6 @@ def eval_bool(v):
           - bool : A boolean value
     """
     return str(v).lower() in ("yes", "true", "t", "1", "True")
-
 
 def prep_yaml(
         imagingmode,
@@ -103,7 +104,8 @@ def prep_yaml(
         diagnosticdx,
         wellselection,
         volume,
-        fecundity
+        fecundity,
+        trackingrun
         ):
     """
     This function prepares a dictionary for the YAML file.
@@ -176,7 +178,11 @@ def prep_yaml(
             },
             'fecundity': {
                 "run": eval_bool(fecundity)
-            }
+            },
+            'tracking': {
+                    'run': eval_bool(trackingrun)
+                }
+            
         },
         "wells": wellselection,
         "directories": {
@@ -188,7 +194,6 @@ def prep_yaml(
 
     # Return the dictionary
     return yaml_dict
-
 
 def send_ctrl_c(pid):
     """
@@ -206,7 +211,6 @@ def send_ctrl_c(pid):
         print('Control + C', 'wrmxpress analysis cancelled')
     except ProcessLookupError:
         print("Process with PID", pid, "not found.")
-
 
 def clean_and_create_directories(input_path,
                                  work_path,
@@ -250,12 +254,12 @@ def clean_and_create_directories(input_path,
                 except Exception as e:
                     print('Failed to delete %s because %s' % (file_path, e))
 
-
 def copy_files_to_input_directory(platename_input_dir,
                                   htd_file,
                                   img_dir,
                                   plate_base,
-                                  wells
+                                  wells,
+                                  platename
                                   ):
     """
     The purpose of this function is to copy the input files to the input directory.
@@ -270,24 +274,32 @@ def copy_files_to_input_directory(platename_input_dir,
     Returns:
         - None
     """
-    # Copy .HTD file into platename input dir
-    shutil.copy(htd_file, platename_input_dir)
+    if htd_file is not None:
+        # Copy .HTD file into platename input dir
+        shutil.copy(htd_file, platename_input_dir)
 
-    # Iterate through each time point and copy images into new dirs
-    time_points = [item for item in os.listdir(img_dir) if os.path.isdir(Path(img_dir, item))]
+        # Iterate through each time point and copy images into new dirs
+        time_points = [item for item in os.listdir(img_dir) if os.path.isdir(Path(img_dir, item))]
 
-    for time_point in time_points:
-        time_point_dir = Path(platename_input_dir, time_point)
-        time_point_dir.mkdir(parents=True, exist_ok=True)
-        
+        for time_point in time_points:
+            time_point_dir = Path(platename_input_dir, time_point)
+            time_point_dir.mkdir(parents=True, exist_ok=True)
+            
+            for well in wells if isinstance(wells, list) else [wells]:
+                # Use glob to find all files that match the pattern, accounting for potential extensions
+                well_files_pattern = Path(img_dir, time_point, f'{plate_base}_{well}*.TIF')
+                well_files = glob.glob(str(well_files_pattern))
+                
+                for file_path in well_files:
+                    shutil.copy(file_path, time_point_dir)
+    else:
         for well in wells if isinstance(wells, list) else [wells]:
             # Use glob to find all files that match the pattern, accounting for potential extensions
-            well_files_pattern = Path(img_dir, time_point, f'{plate_base}_{well}*.TIF')
+            well_files_pattern = Path(img_dir, f'{platename}_{well}*.avi')
             well_files = glob.glob(str(well_files_pattern))
             
             for file_path in well_files:
-                shutil.copy(file_path, time_point_dir)
-
+                shutil.copy(file_path, platename_input_dir)
 
 def create_figure_from_filepath(img_path,
                                 scale='gray'):
@@ -358,111 +370,28 @@ def update_yaml_file(input_full_yaml, output_full_yaml, updates):
         yaml.dump(data, yaml_file,
                   default_flow_style=False)
 
-
-def motility_and_segment_run_function(
-        output_folder,
-        output_file,
-        wrmxpress_command_split,
-        wells,
-        volume,
-        platename,
-        plate_base,
-        temp_output_file
-
-):
+def convert_tiff_to_tif(input_file, output_file):
     """
-    This function runs the motility and segment functions of wrmXpress.
+    This function was developed for the conversion of a .tiff file to a .TIF file.
+    However, this can be used for other file types as well. 
     ===============================================================================
     Arguments:
-        - output_folder : str : Path to the output folder
-        - output_file : str : Path to the output file
-        - wrmxpress_command_split : list : List of wrmXpress commands
-        - wells : list : List of well names
-        - volume : str : Path to the volume
-        - platename : str : Name of the plate
-        - plate_base : str : Base name of the plate
+        - input_file : str : Path to the .tiff file
+        - output_file : str : Path to the .TIF file
     ===============================================================================
     Returns:
-        - fig_1 : plotly.graph_objs._figure.Figure : A figure
-        - False : bool : False
-        - False : bool : False
-        - '' : str : An empty string
-        - docker_output_formatted : str : Formatted docker output
+        - None    
     """
-    
-    columns = ['wells_analyzed', 'wells_to_be_analyzed',
-               'fig', 'img_path', 'docker_output_formatted', 
-               'finished']
-    while not os.path.exists(output_folder):
-        time.sleep(1)
-    with open(temp_output_file, 'w', newline='') as csv_file:
-        with open(output_file, "w") as file:
+    # Open the .tiff file
+    with Image.open(input_file) as img:
+        # Save the image as .TIF
+        img.save(output_file)
 
-            process = subprocess.Popen(
-                wrmxpress_command_split, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
-
-            # Create an empty list to store the docker output
-            docker_output = []
-            wells_analyzed = []
-            wells_to_be_analyzed = len(wells)
-
-            for line in iter(process.stdout.readline, b''):
-                # Add the line to docker_output for further processing
-                docker_output.append(line)
-                file.write(line)
-                file.flush()
-                # Break the loop if 'Generating' is in the line
-                if "Generating" in line:
-                    break
-
-                # Process the line if 'Running' is in the line
-                if "Running" in line:
-                    well_running = line.split(" ")[-1]
-                    if well_running not in wells_analyzed:
-                        # Remove the '\n' from the well_running
-                        well_running = well_running.replace('\n', '')
-                        wells_analyzed.append(well_running)
-
-                        img_path = Path(
-                            volume, f'{platename}/TimePoint_1/{plate_base}_{wells_analyzed[-1]}.TIF')
-                        fig = create_figure_from_filepath(img_path)
-
-                        docker_output_formatted = ''.join(docker_output)
-                        csv_file.writerow(
-                            [
-                                str(len(wells_analyzed)),
-                                str(wells_to_be_analyzed),
-                                fig,
-                                f'```{docker_output_formatted}```',
-                                False
-                            ]
-                        )
-
-            # get the platename (default) file in output dir that have .png extension
-            output_path = Path(volume, 'output', 'thumbs', platename + '.png')
-            while not os.path.exists(output_path):
-                time.sleep(1)
-
-            # create a figure for the output
-            fig_1 = create_figure_from_filepath(output_path)
-
-            print('wrmXpress has finished.')
-            docker_output.append('wrmXpress has finished.')
-            docker_output_formatted = ''.join(docker_output)
-
-            csv_file.writerow(
-                [
-                    str(len(wells_analyzed)),
-                    str(wells_to_be_analyzed),
-                    output_path,
-                    f'```{output_path}```',
-                    f'```{docker_output_formatted}```',
-                    True
-                ]
-            )
-
-            # Return the figure, False, False, and an empty string
-            return fig_1, False, False, '', f'```{docker_output_formatted}```'
+########################################################################
+####                                                                ####
+####                   preview.py functions                         ####
+####                                                                ####
+########################################################################
 
 def preamble_to_run_wrmXpress_preview(
        platename,
@@ -535,20 +464,647 @@ def preamble_to_run_wrmXpress_preview(
     output_preview_log_file = Path(volume, 'input', platename, f'{platename}_preview.log')
     return wrmxpress_command_split, output_preview_log_file, command_message, first_well
 
-def convert_tiff_to_tif(input_file, output_file):
-    """
-    This function was developed for the conversion of a .tiff file to a .TIF file.
-    However, this can be used for other file types as well. 
-    ===============================================================================
-    Arguments:
-        - input_file : str : Path to the .tiff file
-        - output_file : str : Path to the .TIF file
-    ===============================================================================
-    Returns:
-        - None    
-    """
-    # Open the .tiff file
-    with Image.open(input_file) as img:
-        # Save the image as .TIF
-        img.save(output_file)
+def motility_segment_fecundity_preview(volume, platename, wells, selection):
+    # Check to see if first well already exists, if it does insert the img
+    # rather than running wrmXpress again
+    first_well_path = Path(volume, 'work', f'{platename}/{wells[0]}/img/{platename}_{wells[0]}.png')
+
+    # Check if the first well path exists
+    if os.path.exists(first_well_path):
+        # Checking the selection and changing the scale accordingly
+        if selection == 'motility':
+            scale = 'inferno'
+        else:
+            scale = 'gray'
+
+        # Open the image and create a figure
+        fig = create_figure_from_filepath(first_well_path, scale=scale)
+
+        # Return the path and the figure and the open status of the alerts
+        return f"```{first_well_path}```", fig, False, f'', False
+
+    wrmxpress_command_split, output_preview_log_file, command_message, first_well = preamble_to_run_wrmXpress_preview(
+        platename=platename, volume=volume, wells=wells
+    )
+    with open(output_preview_log_file, 'w') as file:
+        process = subprocess.Popen(
+            wrmxpress_command_split, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+        docker_output = []
+
+        print('Running wrmXpress.')
+        docker_output.append('Running wrmXpress.')
+
+        while not os.path.exists(Path(volume, 'input')):
+            time.sleep(1)
+
+        for line in iter(process.stdout.readline, b''):
+            docker_output.append(line)
+            file.write(line)
+            file.flush()
+            
+            # Assumes IX-like file structure
+            img_path = Path(volume, 'work', f'{platename}/{first_well}/img/{platename}_{first_well}.png')
+
+            # Wait for the image to be created
+            while not os.path.exists(img_path):
+                time.sleep(1)
+
+            # Checking the selection and changing the scale accordingly
+            if selection == 'motility':
+                scale = 'inferno'
+            else:
+                scale = 'gray'
+
+            # Open the image and create a figure
+            fig = create_figure_from_filepath(img_path, scale=scale)
+            
+            if 'Generating w1 thumbnails' in line:
+                # Return the command message, the figure, and the open status of the alerts
+                return command_message, fig, False, f'', False
+
+def cellprofile_wormsize_preview(wells, volume, platename, plate_base):
+    first_well = wells[0]
+    print(first_well)
+    # Assumes IX-like file structure
+    first_well_path = Path(volume, f'output/straightened_worms/{plate_base}_{first_well}.tiff')
+
+    # Check if the first well path exists
+    if os.path.exists(first_well_path):
+        # Open the image and create a figure
+        fig = create_figure_from_filepath(first_well_path)
+
+        # Return the path and the figure and the open status of the alerts
+        return f"```{first_well_path}```", fig, False, f'', False
+
+    wrmxpress_command_split, output_preview_log_file, command_message, first_well = preamble_to_run_wrmXpress_preview(
+        platename=platename,
+        volume=volume,
+        wells=wells
+    )
+    with open(output_preview_log_file, 'w') as file:
+        process = subprocess.Popen(
+            wrmxpress_command_split, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+        docker_output = []
+
+        while not os.path.exists(Path(volume, 'input')):
+            time.sleep(1)
+
+        for line in iter(process.stdout.readline, b''):
+            docker_output.append(line)
+            file.write(line)
+            file.flush()
+
+            if 'Generating w1 thumbnails' in line:
+                # Assumes IX-like file structure
+                file_path = Path(volume, f'output/straightened_worms/{plate_base}_{first_well}.tiff')
+                # Open the image and create a figure
+                fig = create_figure_from_filepath(file_path)
+
+                # Return the command message, the figure, and the open status of the alerts
+                return command_message, fig, False, f'', False
+
+def cellprofile_wormsize_intensity_cellpose_preview(wells, volume, platename, plate_base):
+    output_folder = Path(volume, 'input', platename)
+    output_preview_log_file = Path(output_folder, f'{platename}_preview.log')
+
+    # Assumes the first well in the list is the one to check
+    first_well = wells[0]
+    
+    # Check to see if first well already exists, if it does insert the img
+    # rather than running wrmXpress again
+    first_well_path = Path(volume, f'output/straightened_worms/{plate_base}_{first_well}.tiff')
+    if os.path.exists(first_well_path):
+        # Open the image and create a figure
+        fig = create_figure_from_filepath(first_well_path)
+
+        # Return the path and the figure and the open status of the alerts
+        return f"```{first_well_path}```", fig, False, f'', False
+
+    wrmxpress_command_split, output_preview_log_file, command_message, first_well = preamble_to_run_wrmXpress_preview(
+        platename=platename,
+        volume=volume,
+        wells=wells
+    )
+    with open(output_preview_log_file, 'w') as file:
+        process = subprocess.Popen(
+            wrmxpress_command_split, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+        docker_output = []
+
+        for line in iter(process.stdout.readline, b''):
+            docker_output.append(line)
+            file.write(line)
+            file.flush()
+
+            img_path = Path(volume, f'output/straightened_worms/{plate_base}_{first_well}.tiff')
+
+            # Wait for the image to be created
+            while not os.path.exists(img_path):
+                time.sleep(1)
+
+            # Open the image and create a figure
+            fig = create_figure_from_filepath(img_path)
+
+            if 'Generating w1 thumbnails' in line:
+                # Return the command message, the figure, and the open status of the alerts
+                return command_message, fig, False, f'', False
+            
+def cellprofile_mf_celltox_preview(wells, volume, platename, plate_base):
+    output_folder = Path(volume, 'input', platename)
+    output_preview_log_file = Path(output_folder, f'{platename}_preview.log')
+
+    first_well = wells[0]  # Assuming first_well is defined here as the first item in wells
+
+    # Check to see if first well already exists, if it does insert the img
+    # rather than running wrmXpress again
+    first_well_path = Path(volume, 'work', platename, first_well, 'img', f'{platename}_{first_well}.png')
+    if os.path.exists(first_well_path):
+        # Open the image and create a figure
+        fig = create_figure_from_filepath(first_well_path)
+
+        # Return the path and the figure and the open status of the alerts
+        return f"```{first_well_path}```", fig, False, f'', False
+
+    wrmxpress_command_split, output_preview_log_file, command_message, first_well = preamble_to_run_wrmXpress_preview(
+        platename=platename,
+        volume=volume,
+        wells=wells
+    )
+    with open(output_preview_log_file, 'w') as file:
+        process = subprocess.Popen(
+            wrmxpress_command_split, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+        docker_output = []
+
+        while not os.path.exists(output_folder):
+            time.sleep(1)
+
+        for line in iter(process.stdout.readline, b''):
+            docker_output.append(line)
+            file.write(line)
+            file.flush()
+
+            img_path = Path(volume, 'work', platename, first_well, 'img', f'{platename}_{first_well}.png')
+
+            # Wait for the image to be created
+            while not os.path.exists(img_path):
+                time.sleep(1)
+
+            # Open the image and create a figure
+            fig = create_figure_from_filepath(img_path)
+
+            if 'Generating w1 thumbnails' in line:
+                # Return the command message, the figure, and the open status of the alerts
+                return command_message, fig, False, f'', False
+
+def cellprofile_feeding_preview(wells, volume, platename, plate_base):
+    output_folder = Path(volume, 'input', platename)
+    output_preview_log_file = Path(output_folder, f'{platename}_preview.log')
+
+    first_well = wells[0]  # Assuming first_well is the first item in wells list
+
+    # Check to see if first well already exists, if it does insert the img
+    # rather than running wrmXpress again
+    first_well_path = Path(volume, f'output/straightened_worms/{plate_base}-{first_well}.tiff')
+    if os.path.exists(first_well_path):
+        # Open the image and create a figure
+        fig = create_figure_from_filepath(first_well_path)
+
+        # Return the path and the figure and the open status of the alerts
+        return f"```{first_well_path}```", fig, False, f'', False
+
+    wrmxpress_command_split, output_preview_log_file, command_message, first_well = preamble_to_run_wrmXpress_preview(
+        platename=platename,
+        volume=volume,
+        wells=wells
+    )
+
+    with open(output_preview_log_file, 'w') as file:
+        process = subprocess.Popen(
+            wrmxpress_command_split, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+        docker_output = []
+
+        while not os.path.exists(output_folder):
+            time.sleep(1)
+
+        for line in iter(process.stdout.readline, b''):
+            docker_output.append(line)
+            file.write(line)
+            file.flush()
+
+            if 'Generating w1 thumbnails' in line:
+                # Wait for the image to be created
+                while not os.path.exists(first_well_path):
+                    time.sleep(1)
+
+                # Open the image and create a figure
+                fig = create_figure_from_filepath(first_well_path)
+
+                # Return the command message, the figure, and the open status of the alerts
+                return command_message, fig, False, f'', False
+
+########################################################################
+####                                                                ####
+####                       app.py functions                         ####
+####                                                                ####
+########################################################################
+
+def preamble_to_run_wrmXpress_tracking(store):
+    volume = store['mount']
+    platename = store['platename']
+    wells = store["wells"]
+    motility = store["motility"]
+    segment = store["segment"]
+    cellprofiler = store["cellprofiler"]
+    cellprofilepipeline = store["cellprofilepipeline"]
+    print('Running wrmXpress.')
+    # necessary file paths
+    img_dir = Path(volume, platename)
+    input_dir = Path(volume, 'input')
+    platename_input_dir = Path(input_dir, platename)
+    full_yaml = Path(volume, platename + '.yml')
+
+    update_yaml_file(
+            full_yaml,
+            full_yaml,
+            {'wells': ['All']}
+        )
+
+        # clean and create directories
+    clean_and_create_directories(
+            input_path=Path(volume, 'input', platename), 
+            work_path=Path(volume, 'work', platename),
+            output_path=Path(volume, 'output')
+        )
+
+    copy_files_to_input_directory(
+            platename_input_dir=platename_input_dir,
+            htd_file= None,
+            img_dir=img_dir,
+            wells=wells,
+            plate_base=None,
+            platename=platename
+        )
+
+        # Command message
+    command_message = f"```python wrmXpress/wrapper.py {platename}.yml {platename}```"
+
+    wrmxpress_command = f'python -u wrmXpress/wrapper.py {volume}/{platename}.yml {platename}'
+    wrmxpress_command_split = shlex.split(wrmxpress_command)
+    output_folder = Path(volume, 'work', platename)
+    output_file = Path(volume, 'work', platename, f"{platename}_run.log")  # Specify the name and location of the output file
+    wells_analyzed = []
+    return wrmxpress_command_split, output_folder, output_file, command_message, wells, volume, platename, motility, segment, cellprofiler, cellprofilepipeline, wells_analyzed
+
+def tracking_wrmXpress_run():
+    return # finish when the function is ready
+
+def preamble_to_run_wrmXpress_non_tracking(store):
+    volume = store['mount']
+    platename = store['platename']
+    wells = store["wells"]
+    motility = store["motility"]
+    segment = store["segment"]
+    cellprofiler = store["cellprofiler"]
+    cellprofilepipeline = store["cellprofilepipeline"]
+    print('Running wrmXpress.')
+
+    # necessary file paths
+    img_dir = Path(volume, platename)
+    input_dir = Path(volume, 'input')
+    platename_input_dir = Path(input_dir, platename)
+    plate_base = platename.split("_", 1)[0]
+    htd_file = Path(img_dir, f'{plate_base}.HTD')
+    full_yaml = Path(volume, platename + '.yml')
+
+    update_yaml_file(
+            full_yaml,
+            full_yaml,
+            {'wells': ['All']}
+        )
+
+        # clean and create directories
+    clean_and_create_directories(
+            input_path=Path(volume, 'input', platename), 
+            work_path=Path(volume, 'work', platename),
+            output_path=Path(volume, 'output')
+        )
+
+    copy_files_to_input_directory(
+            platename_input_dir=platename_input_dir,
+            htd_file=htd_file,
+            img_dir=img_dir,
+            plate_base=plate_base,
+            wells=wells,
+            platename=platename
+        )
+
+        # Command message
+    command_message = f"```python wrmXpress/wrapper.py {platename}.yml {platename}```"
+
+    wrmxpress_command = f'python -u wrmXpress/wrapper.py {volume}/{platename}.yml {platename}'
+    wrmxpress_command_split = shlex.split(wrmxpress_command)
+    output_folder = Path(volume, 'work', platename)
+    output_file = Path(volume, 'work', platename, f"{platename}_run.log")  # Specify the name and location of the output file
+    return wrmxpress_command_split, output_folder, output_file, command_message, wells, volume, platename, plate_base, motility, segment, cellprofiler, cellprofilepipeline
+
+def motility_or_segment_run(
+        output_folder,
+        output_file,
+        wrmxpress_command_split,
+        wells,
+        volume,
+        platename,
+        plate_base,
+        set_progress
+):
+    while not os.path.exists(output_folder):
+                time.sleep(1)
+    with open(output_file, "w") as file:
+            
+        process = subprocess.Popen(
+                    wrmxpress_command_split, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+
+        # Create an empty list to store the docker output
+        docker_output = []
+        wells_analyzed = []
+        wells_to_be_analyzed = len(wells)
+
+        for line in iter(process.stdout.readline, b''):
+                    # Add the line to docker_output for further processing
+            docker_output.append(line)
+            file.write(line)
+            file.flush()
+            # Break the loop if 'Generating' is in the line
+            if "Generating" in line:
+                        break
+
+            # Process the line if 'Running' is in the line
+            if "Running" in line:
+                well_running = line.split(" ")[-1]
+                if well_running not in wells_analyzed:
+                    # Remove the '\n' from the well_running
+                    well_running = well_running.replace('\n', '')
+                    wells_analyzed.append(well_running)
+
+                    img_path = Path(
+                                volume, f'{platename}/TimePoint_1/{plate_base}_{wells_analyzed[-1]}.TIF')
+                    fig = create_figure_from_filepath(img_path)
+
+                    docker_output_formatted = ''.join(docker_output) 
+                    set_progress((
+                                str(len(wells_analyzed)),
+                                str(wells_to_be_analyzed),
+                                fig,
+                                f'```{img_path}```',
+                                f'```{docker_output_formatted}```'
+                            ))
+                
+
+        # get the platename (default) file in output dir that have .png extension
+        output_path = Path(volume, 'output', 'thumbs', platename + '.png')
+        while not os.path.exists(output_path):
+                    time.sleep(1)
+
+        # create a figure for the output
+        fig_1 = create_figure_from_filepath(output_path) 
+                
+        print('wrmXpress has finished.')
+        docker_output.append('wrmXpress has finished.')
+        docker_output_formatted = ''.join(docker_output) 
+                
+                    
+        # Return the figure, False, False, and an empty string
+        return fig_1, False, False, f'', f'```{docker_output_formatted}```'
+    
+def cellprofile_wormsize_run(output_folder, output_file, wrmxpress_command_split,
+                             wells, volume, platename, plate_base, set_progress,
+                             cellprofilepipeline):
+    # Ensure the output folder exists
+    while not os.path.exists(output_folder):
+        time.sleep(1)
+    
+    # Open the output file and begin the subprocess
+    with open(output_file, "w") as file:
+        process = subprocess.Popen(wrmxpress_command_split, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+        docker_output = []
+        wells_analyzed = []
+        wells_to_be_analyzed = len(wells)
+
+        # Read and process output from the subprocess
+        for line in iter(process.stdout.readline, b''):
+            docker_output.append(line)
+            file.write(line)
+            file.flush()
+
+            # Load the CSV file to find out which well is being analyzed
+            csv_file_path = Path(volume, 'input', f'image_paths_{cellprofilepipeline}.csv')
+            while not os.path.exists(csv_file_path):
+                time.sleep(1)
+            
+            read_csv = pd.read_csv(csv_file_path)
+            well_column = read_csv['Metadata_Well']  # Find the well column
+            
+            if 'Execution halted' in line:
+                output_path = Path(volume, 'output', 'thumbs', platename + '.png')
+                while not os.path.exists(output_path):
+                    time.sleep(1)
+
+                # Create a figure for the output
+                fig_1 = create_figure_from_filepath(output_path)
+                
+                print('wrmXpress has finished.')
+                docker_output.append('wrmXpress has finished.')
+                docker_output_formatted = ''.join(docker_output) 
+                return fig_1, False, False, '', f'```{docker_output_formatted}```'
+
+            # Check for the 'Image #' pattern to update progress
+            elif 'Image #' in line:
+                image_number_pattern = re.search(r'Image # (\d+)', line)
+                if image_number_pattern:
+                    image_number = int(image_number_pattern.group(1))
+                    well_id = well_column.iloc[image_number - 1]  # Adjust for zero indexing
+
+                    # Construct the image path
+                    img_path = Path(volume, f'input/{platename}/TimePoint_1/{plate_base}_{well_id}.TIF')
+                    if img_path.exists():
+                        # Load and display the image
+                        fig = create_figure_from_filepath(img_path)
+                        docker_output_formatted = ''.join(docker_output) 
+                        
+                        # Update progress
+                        set_progress((str(image_number), str(wells_to_be_analyzed), fig, f'```{img_path}```', f'```{docker_output_formatted}```'))
+
+def cellprofile_wormsize_intesity_cellpose_run(
+    output_folder, output_file, wrmxpress_command_split,
+    wells, volume, platename, plate_base, set_progress,
+    cellprofilepipeline
+):
+    while not os.path.exists(output_folder):
+        time.sleep(1)
+        
+    with open(output_file, "w") as file:
+        process = subprocess.Popen(
+            wrmxpress_command_split, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True
+        )
+        docker_output = []
+        wells_analyzed = []
+        wells_to_be_analyzed = len(wells)
+        progress = 0
+        total_progress = 2 * wells_to_be_analyzed
+        
+        for line in iter(process.stdout.readline, b''):
+            docker_output.append(line)
+            file.write(line)
+            file.flush()
+            
+            if 'Generating w1 thumbnails' in line:
+                output_path = Path(volume, 'output', 'thumbs', platename + '.png')
+                while not os.path.exists(output_path):
+                    time.sleep(1)
+                
+                fig_1 = create_figure_from_filepath(output_path)
+                print('wrmXpress has finished.')
+                docker_output.append('wrmXpress has finished.')
+                docker_output_formatted = ''.join(docker_output)
+                return fig_1, False, False, f'', f'```{docker_output_formatted}```'
+            
+            elif 'Image #' in line:
+                csv_file_path = Path(volume, 'input', f'image_paths_{cellprofilepipeline}.csv')
+                while not os.path.exists(csv_file_path):
+                    time.sleep(1)
+                
+                read_csv = pd.read_csv(csv_file_path)
+                well_column = read_csv['Metadata_Well']
+                
+                image_number_pattern = re.search(r'Image # (\d+)', line)
+                if image_number_pattern:
+                    image_number = int(image_number_pattern.group(1))
+                    well_id = well_column.iloc[image_number - 1]
+                    img_path = Path(volume, f'input/{platename}/TimePoint_1/{plate_base}_{well_id}.TIF')
+                    if img_path.exists():
+                        fig = create_figure_from_filepath(img_path)
+                        progress += 1
+                        docker_output_formatted = ''.join(docker_output)
+                        set_progress((str(len(wells) + image_number), str(total_progress), fig, f'```{img_path}```', f'```{docker_output_formatted}```'))
+            
+            elif "[INFO]" in line and "%" in line:
+                info_parts = line.split('/')
+                info_well_analyzed = info_parts[0].split(' ')[-1]
+                info_total_wells = info_parts[1].split(' ')[0]
+                
+                if info_well_analyzed == info_total_wells:
+                    current_well = wells[int(info_well_analyzed)-1]
+                    img_path = Path(volume, f'input/{platename}/TimePoint_1/{plate_base}_{current_well}.TIF')
+                    if os.path.exists(img_path):
+                        fig = create_figure_from_filepath(img_path)
+                        docker_output_formatted = ''.join(docker_output)
+                        set_progress((str(progress), str(total_progress), fig, f'```{img_path}```', f'```{docker_output_formatted}```'))
+                else:
+                    current_well = wells[int(info_well_analyzed)]
+                    img_path = Path(volume, f'input/{platename}/TimePoint_1/{plate_base}_{current_well}.TIF')
+                    if os.path.exists(img_path):
+                        fig = create_figure_from_filepath(img_path, 'gray')
+                        docker_output_formatted = ''.join(docker_output)
+                        progress += 1
+                        set_progress((str(progress), str(total_progress), fig, f'```{img_path}```', f'```{docker_output_formatted}```'))
+
+def cellprofile_mf_celltox_run(output_folder, output_file, wrmxpress_command_split,
+                           wells, volume, platename, plate_base, set_progress,
+                           cellprofilepipeline):
+    while not os.path.exists(output_folder):
+        time.sleep(1)
+    
+    with open(output_file, "w") as file:
+        process = subprocess.Popen(wrmxpress_command_split, stdout=subprocess.PIPE,
+                                   stderr=subprocess.STDOUT, text=True)
+        docker_output = []
+        wells_analyzed = []
+        wells_to_be_analyzed = len(wells)
+
+        for line in iter(process.stdout.readline, b''):
+            docker_output.append(line)
+            file.write(line)
+            file.flush()
+
+            csv_file_path = Path(volume, 'input', f'image_paths_{cellprofilepipeline}.csv')
+            while not os.path.exists(csv_file_path):
+                time.sleep(1)
+
+            read_csv = pd.read_csv(csv_file_path)
+            well_column = read_csv['Metadata_Well']
+            
+            if 'Generating w1 thumbnails' in line:
+                output_path = Path(volume, 'output', 'thumbs', platename + '.png')
+                while not os.path.exists(output_path):
+                    time.sleep(1)
+                
+                fig_1 = create_figure_from_filepath(output_path)
+                
+                print('wrmXpress has finished.')
+                docker_output.append('wrmXpress has finished.')
+                docker_output_formatted = ''.join(docker_output) 
+                return fig_1, False, False, '', f'```{docker_output_formatted}```'
+            
+            elif 'Image #' in line:
+                image_number_pattern = re.search(r'Image # (\d+)', line)
+                if image_number_pattern:
+                    image_number = int(image_number_pattern.group(1))
+                    well_id = well_column.iloc[image_number - 1]
+
+                    img_path = Path(volume, f'input/{platename}/TimePoint_1/{plate_base}_{well_id}_s1.TIF')
+                    if img_path.exists():
+                        fig = create_figure_from_filepath(img_path)
+                        docker_output_formatted = ''.join(docker_output) 
+                        set_progress((str(image_number), str(len(wells)), fig, f'```{img_path}```', f'```{docker_output_formatted}```'))
+
+def cellprofile_feeding_run(
+    output_folder, output_file, wrmxpress_command_split,
+    wells, volume, platename, plate_base, set_progress,
+    cellprofilepipeline
+):
+    while not os.path.exists(output_folder):
+        time.sleep(1)
+    
+    with open(output_file, "w") as file:
+        process = subprocess.Popen(
+            wrmxpress_command_split, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+        docker_output = []
+        wells_analyzed = []
+        wells_to_be_analyzed = len(wells)
+
+        for line in iter(process.stdout.readline, b''):
+            docker_output.append(line)
+            file.write(line)
+            file.flush()
+
+            csv_file_path = Path(volume, 'input', f'image_paths_{cellprofilepipeline}.csv')
+            while not os.path.exists(csv_file_path):
+                time.sleep(1)
+
+            read_csv = pd.read_csv(csv_file_path)
+            well_column = read_csv['Metadata_Well']
+            
+            if 'Generating w1 thumbnails' in line:
+                output_path = Path(volume, 'output', 'thumbs', platename + "_w1" + '.png')
+                while not os.path.exists(output_path):
+                    time.sleep(1)
+
+                fig_1 = create_figure_from_filepath(output_path)
+                print('wrmXpress has finished.')
+                docker_output.append('wrmXpress has finished.')
+                docker_output_formatted = ''.join(docker_output) 
+                return fig_1, False, False, '', f'```{docker_output_formatted}```'
+
+            elif 'Image #' in line:
+                image_number_pattern = re.search(r'Image # (\d+)', line)
+                if image_number_pattern:
+                    image_number = int(image_number_pattern.group(1))
+                    well_id = well_column.iloc[image_number - 1]
+
+                    img_path = Path(volume, f'input/{platename}/TimePoint_1/{plate_base}_{well_id}_w1.TIF')
+                    if img_path.exists():
+                        fig = create_figure_from_filepath(img_path)
+                        docker_output_formatted = ''.join(docker_output) 
+                        set_progress((str(image_number), str(len(wells)), fig, f'```{img_path}```', f'```{docker_output_formatted}```'))
+
+
 

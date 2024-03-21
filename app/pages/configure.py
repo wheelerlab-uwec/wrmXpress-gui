@@ -110,7 +110,7 @@ def update_options_visibility(imaging_mode, file_structure):
         multi_well_options_style = {'display': 'flex'}
 
         if file_structure == 'avi':  # if avi is selected
-            # display the additional options
+                # display the additional options
             additional_options_style = {'display': 'flex'}
 
     return multi_well_options_style, additional_options_style  # return the styles
@@ -133,8 +133,9 @@ def update_options_visibility(imaging_mode, file_structure):
     Input("cell-profiler-run", 'value'),
     Input("cell-profiler-pipeline", 'value'),
     Input('fecundity-run', 'value'),
+    Input('tracking-run', 'value'),
 )
-def rows_cols(
+def store_values(
     cols,
     rows,
     mounter,
@@ -148,7 +149,8 @@ def rows_cols(
     img_masking,
     cellprofiler,
     cellprofilepipeline,
-    fecundity
+    fecundity,
+    tracking 
 ):
     """
     This function will store the values of the inputs to be used in different pages.
@@ -184,7 +186,8 @@ def rows_cols(
         'img_masking': img_masking,
         'cellprofiler': cellprofiler,
         'cellprofilepipeline': cellprofilepipeline,
-        'fecundity': fecundity 
+        'fecundity': fecundity,
+        'tracking': tracking
     }
 
 
@@ -289,6 +292,7 @@ def update_wells(table_contents):  # list of cells from selection table
     State('mounted-volume', 'value'),
     State('well-selection-list', 'children'),
     State('fecundity-run', 'value'),
+    State('tracking-run', 'value'),
     prevent_initial_call=True,
     allow_duplicate=True
 )
@@ -312,7 +316,8 @@ def run_analysis(  # function to save the yaml file from the sections in the con
     platename,
     volume,
     wells,
-    fecundityrun
+    fecundityrun,
+    trackingrun
 ):
     """
     This function will save the yaml file from the sections in the configuration page.
@@ -439,20 +444,23 @@ def run_analysis(  # function to save the yaml file from the sections in the con
 
                 # Directory containing the TIFF files
                 folder_path = Path(volume, f'{platename}/TimePoint_1')
-
+                avi_folder_path = Path(volume, platename)
                 # Iterate through the wells that have been selected
                 for well in wells:
                     # Construct a pattern to match files for the current well, ignoring suffixes
                     pattern = f"{plate_base}_{well}"
-
+                    avi_pattern = f'{platename}_{well}'
+                    
                     # Find all files in the directory that match the well pattern
-                    matched_files = list(folder_path.glob(pattern + "*.TIF"))
-
+                    matched_files_tif = list(folder_path.glob(pattern + "*.TIF"))
+                    matched_files_avi = list(avi_folder_path.glob(avi_pattern + "*.avi"))
+                    matched_files = matched_files_tif + matched_files_avi
                     # If no files match the current well, set error flags
                     if not matched_files:
                         error_occured = True
                         error_messages.append(f'No images found for well {well}. This may result in unexpected errors or results.')
 
+                   
                 # check if video module is selected with only one time point
                 if eval_bool(cellprofilerrun) == True:
 
@@ -489,7 +497,7 @@ def run_analysis(  # function to save the yaml file from the sections in the con
                 )
             
             # check to see if no module is selected
-            if eval_bool(segmentrun) == False and eval_bool(motilityrun) == False and eval_bool(cellprofilerrun) == False and eval_bool(fecundityrun) == False:
+            if eval_bool(segmentrun) == False and eval_bool(motilityrun) == False and eval_bool(cellprofilerrun) == False and eval_bool(fecundityrun) == False and eval_bool(trackingrun) == False:
                 error_occured = True
                 error_messages.append(
                     'You have not selected any module to run.'
@@ -542,7 +550,8 @@ def run_analysis(  # function to save the yaml file from the sections in the con
             diagnosticdx,
             wells,
             volume,
-            fecundityrun
+            fecundityrun,
+            trackingrun
         )
 
         output_file = Path(volume, platename + '.yml')
