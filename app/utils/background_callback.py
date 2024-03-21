@@ -89,9 +89,10 @@ def run_analysis_tracking(
           segment, 
           cellprofiler, 
           cellprofilepipeline, 
-          wells_analyzed
+          wells_analyzed, 
+          tracking_well
     ] = preamble_to_run_wrmXpress_tracking(store)
-    
+ 
     while not os.path.exists(output_folder):
         time.sleep(1)
     with open(output_file, "w") as file:
@@ -107,7 +108,19 @@ def run_analysis_tracking(
             file.write(line)
             file.flush()
             if 'Generating w1 thumbnails' in line:
-                return None, False, False, f'', f'```hello world```'
+                tracks_file_path = Path(volume, 'output', platename, f'{platename}_tracks.png')
+
+                while not os.path.exists(tracks_file_path):
+                    time.sleep(1)
+
+                # create figure from file path
+                fig_1 = create_figure_from_filepath(tracks_file_path)
+                docker_output_formatted = ''.join(docker_output)
+
+                print('wrmXpress is finished')
+                docker_output.append('wrmXpress is finished')
+                docker_output_formatted = ''.join(docker_output)
+                return fig_1, False, False, f'', f'```{docker_output_formatted}```'
             elif 'Reconfiguring' in line:
                 # find the well that is being analyzed
                 current_well = line.split('.')[0].split('_')[-1]
@@ -126,8 +139,27 @@ def run_analysis_tracking(
                 fig = create_figure_from_filepath(current_well_path)
                 docker_output_formatted = ''.join(docker_output)
 
-                set_progress((str(len(wells_analyzed)), str(len(wells)), fig, f'```{current_well_path}```' ,f'```{docker_output_formatted}```'))
+                set_progress((str(len(wells_analyzed)), str(2*len(wells)), fig, f'```{current_well_path}```' ,f'```{docker_output_formatted}```'))
             
+            elif 'Tracking well' in line:
+                # find the well that is being analyzed
+                current_well = line.split(' ')[-1].split('.')[0]
+                # add the well to the list of wells analyzed if it is not already there
+                if current_well not in tracking_well:
+                    tracking_well.append(current_well)
+                
+                # obtain file path to current well
+                current_well_path = Path(volume, 'input', platename, 'TimePoint_1', f'{platename}_{tracking_well[-1]}.TIF')
+
+                # ensure file path exists
+                while not os.path.exists(current_well_path):
+                    time.sleep(1)
+                
+                # create figure from file path
+                fig = create_figure_from_filepath(current_well_path)
+                docker_output_formatted = ''.join(docker_output)
+
+                set_progress((str(len(tracking_well)+ len(wells_analyzed)), str(2*len(wells)), fig, f'```{current_well_path}```' ,f'```{docker_output_formatted}```'))
             
 # create function to run analysis
 def run_analysis_non_tracking(

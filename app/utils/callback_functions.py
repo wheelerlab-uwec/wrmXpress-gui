@@ -24,13 +24,11 @@ import time
 import shlex
 import re
 
-
 ########################################################################
 ####                                                                ####
 ####                             LAYOUT                             ####
 ####                                                                ####
 ########################################################################
-
 
 def create_df_from_inputs(_rows, _cols):
     """
@@ -752,7 +750,8 @@ def preamble_to_run_wrmXpress_tracking(store):
     output_folder = Path(volume, 'work', platename)
     output_file = Path(volume, 'work', platename, f"{platename}_run.log")  # Specify the name and location of the output file
     wells_analyzed = []
-    return wrmxpress_command_split, output_folder, output_file, command_message, wells, volume, platename, motility, segment, cellprofiler, cellprofilepipeline, wells_analyzed
+    tracking_well = []
+    return wrmxpress_command_split, output_folder, output_file, command_message, wells, volume, platename, motility, segment, cellprofiler, cellprofilepipeline, wells_analyzed, tracking_well
 
 def tracking_wrmXpress_run():
     return # finish when the function is ready
@@ -1105,6 +1104,3 @@ def cellprofile_feeding_run(
                         fig = create_figure_from_filepath(img_path)
                         docker_output_formatted = ''.join(docker_output) 
                         set_progress((str(image_number), str(len(wells)), fig, f'```{img_path}```', f'```{docker_output_formatted}```'))
-
-
-
