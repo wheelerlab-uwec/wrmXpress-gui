@@ -222,7 +222,6 @@ layout = dbc.ModalBody(
     ],
 )
 
-
 ########################################################################
 ####                                                                ####
 ####                           Callbacks                            ####
@@ -297,7 +296,6 @@ def update_analysis_preview_imgage(selection, nclicks, store):
             return None, True, False, False, False
     return None, True, False,  False, False
 
-
 @callback(
     Output('input-path-output', 'children'),
     Output('input-preview', 'figure'),
@@ -353,7 +351,6 @@ def update_preview_image(n_clicks, store):
 
     n_clicks = 0
 
-
 @callback(
     Output('preview-dropdown', 'options'),
 
@@ -395,7 +392,6 @@ def get_options(nclicks, store):
     # Return the options
     dict_option = {v: k for k, v in option_dict.items()}
     return dict_option
-
 
 @callback(
     Output('analysis-preview-message', 'children'),

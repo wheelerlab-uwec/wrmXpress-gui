@@ -232,7 +232,6 @@ layout = dbc.ModalBody(
 ####                                                                ####
 ########################################################################
 
-
 @callback(
     Output("cancel-analysis", 'n_clicks'),
     Input("cancel-analysis", 'n_clicks')
@@ -254,7 +253,6 @@ def cancel_analysis(n_clicks):
         print('Control + C', 'wrmxpress analysis cancelled')
 
     return n_clicks
-
 
 @callback(
     [
@@ -335,7 +333,6 @@ def load_analysis_img(selection, n_clicks, store):
     else:
         return None, None, True, False
 
-
 @callback(
     Output('analysis-dropdown', 'options'),
 
@@ -381,7 +378,6 @@ def get_options_analysis(nclicks, store):
     dict_option = {v: k for k, v in option_dict.items()}
     dict_option['plate'] = 'plate'  # add the plate to the option dictionary
     return dict_option  # return the option dictionary
-
 
 @callback(
     Output("img-mode-output", 'children'),

@@ -133,7 +133,6 @@ layout = dbc.Container(
 ####                                                                ####
 ########################################################################
 
-
 @callback(
     [
         Output('metadata-tabs', 'children'),
@@ -223,7 +222,6 @@ def create_tabs_from_checklist(store, n_clicks, checklist_values):
         # If no checklist values are available, return an empty list and set 'batch-data-tab' as the selected tab
         return [], 'batch-data-tab', 'primary'
 
-
 @callback(
     Output("checklist-input", "options"),
     [
@@ -255,7 +253,6 @@ def update_metadata_checklist(n_clicks, new_table_name, existing_options):
         return updated_options # Return the updated options
     else:
         return existing_options # Return the existing options
-
 
 @callback(
     [

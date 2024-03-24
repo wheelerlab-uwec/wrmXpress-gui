@@ -78,7 +78,6 @@ layout = dbc.Container([
 ####                                                                ####
 ########################################################################
 
-
 @callback(
     [
         Output('multi-well-options-row', 'style'),
@@ -114,7 +113,6 @@ def update_options_visibility(imaging_mode, file_structure):
             additional_options_style = {'display': 'flex'}
 
     return multi_well_options_style, additional_options_style  # return the styles
-
 
 @callback(
     # Storing values of inputs to be used in different pages
@@ -190,7 +188,6 @@ def store_values(
         'tracking': tracking
     }
 
-
 @callback(
     Output("well-selection-table", 'children'),
     [
@@ -233,9 +230,6 @@ def update_table(rows, cols):
     )
     return well_selection  # return the table
 
-# Populate list of wells to be analyzed
-
-
 @callback(
     Output('well-selection-list', 'children'),
     Input('dynamic-table-container-well-selection-table', 'data')
@@ -263,7 +257,6 @@ def update_wells(table_contents):  # list of cells from selection table
 
     sorted_list = sorted(filtered_list)  # sort the list
     return sorted_list  # return the sorted list
-
 
 @callback(
     [

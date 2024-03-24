@@ -3,6 +3,7 @@
 ####                             Imports                            ####
 ####                                                                ####
 ########################################################################
+
 import pandas as pd
 from pathlib import Path
 import os
@@ -451,7 +452,8 @@ def preamble_to_run_wrmXpress_preview(
                 htd_file=htd_file,
                 img_dir=img_dir,    
                 plate_base=plate_base,
-                wells = first_well
+                wells = first_well,
+                platename=platename
             )
 
         # Command message
@@ -463,6 +465,26 @@ def preamble_to_run_wrmXpress_preview(
     return wrmxpress_command_split, output_preview_log_file, command_message, first_well
 
 def motility_segment_fecundity_preview(volume, platename, wells, selection):
+    """
+    This function is used to preview the analysis of the selected options from
+    the configuration page, including motility, segment, and fecundity. This function
+    will run wrmXpress and return the path to the image, the figure, and the open status
+    if the first well has not already been analyzed.
+    ===============================================================================
+    Arguments:
+        - volume : str : Path to the volume
+        - platename : str : Name of the plate
+        - wells : list : List of well names
+        - selection : str : Selection
+    ===============================================================================
+    Returns:
+        - path : str : Path to the image
+        - fig : matplotlib.figure.Figure : A figure
+        - open_status : bool : Open status of the alerts
+        - command_message : str : A command message
+        - open_status : bool : Open status of the alerts
+    ===============================================================================
+    """
     # Check to see if first well already exists, if it does insert the img
     # rather than running wrmXpress again
     first_well_path = Path(volume, 'work', f'{platename}/{wells[0]}/img/{platename}_{wells[0]}.png')
@@ -521,6 +543,25 @@ def motility_segment_fecundity_preview(volume, platename, wells, selection):
                 return command_message, fig, False, f'', False
 
 def cellprofile_wormsize_preview(wells, volume, platename, plate_base):
+    """
+    The purpose of this function is to preview the analysis of the selected options from
+    the configuration page, including worm size. This function will run wrmXpress and return
+    the path to the image, the figure, and the open status if the first well has not already been analyzed.
+    ===============================================================================
+    Arguments:
+        - wells : list : List of well names
+        - volume : str : Path to the volume
+        - platename : str : Name of the plate
+        - plate_base : str : Base name of the plate
+    ===============================================================================
+    Returns:
+        - path : str : Path to the image
+        - fig : matplotlib.figure.Figure : A figure
+        - open_status : bool : Open status of the alerts
+        - command_message : str : A command message
+        - open_status : bool : Open status of the alerts
+    ===============================================================================
+    """
     first_well = wells[0]
     print(first_well)
     # Assumes IX-like file structure
@@ -562,6 +603,25 @@ def cellprofile_wormsize_preview(wells, volume, platename, plate_base):
                 return command_message, fig, False, f'', False
 
 def cellprofile_wormsize_intensity_cellpose_preview(wells, volume, platename, plate_base):
+    """
+    The purpose of this function is to preview the analysis of the selected options from
+    the configuration page, including worm size and intensity using CellPose. This function
+    will run wrmXpress and return the path to the image, the figure, and the open status if the first well has not already been analyzed.
+    ===============================================================================
+    Arguments:
+        - wells : list : List of well names
+        - volume : str : Path to the volume
+        - platename : str : Name of the plate
+        - plate_base : str : Base name of the plate
+    ===============================================================================
+    Returns:
+        - path : str : Path to the image
+        - fig : matplotlib.figure.Figure : A figure
+        - open_status : bool : Open status of the alerts
+        - command_message : str : A command message
+        - open_status : bool : Open status of the alerts
+    ===============================================================================
+    """
     output_folder = Path(volume, 'input', platename)
     output_preview_log_file = Path(output_folder, f'{platename}_preview.log')
 
@@ -607,6 +667,25 @@ def cellprofile_wormsize_intensity_cellpose_preview(wells, volume, platename, pl
                 return command_message, fig, False, f'', False
             
 def cellprofile_mf_celltox_preview(wells, volume, platename, plate_base):
+    """
+    The purpose of this function is to preview the analysis of the selected options from
+    the configuration page, including motility, fecundity, and celltox. This function
+    will run wrmXpress and return the path to the image, the figure, and the open status if the first well has not already been analyzed.
+    ===============================================================================
+    Arguments:
+        - wells : list : List of well names
+        - volume : str : Path to the volume
+        - platename : str : Name of the plate
+        - plate_base : str : Base name of the plate
+    ===============================================================================
+    Returns:
+        - path : str : Path to the image
+        - fig : matplotlib.figure.Figure : A figure
+        - open_status : bool : Open status of the alerts
+        - command_message : str : A command message
+        - open_status : bool : Open status of the alerts
+    =============================================================================== 
+    """
     output_folder = Path(volume, 'input', platename)
     output_preview_log_file = Path(output_folder, f'{platename}_preview.log')
 
@@ -654,6 +733,25 @@ def cellprofile_mf_celltox_preview(wells, volume, platename, plate_base):
                 return command_message, fig, False, f'', False
 
 def cellprofile_feeding_preview(wells, volume, platename, plate_base):
+    """
+    The purpose of this function is to preview the analysis of the selected options from
+    the configuration page, including feeding. This function will run wrmXpress and return
+    the path to the image, the figure, and the open status if the first well has not already been analyzed.
+    ===============================================================================
+    Arguments:
+        - wells : list : List of well names
+        - volume : str : Path to the volume
+        - platename : str : Name of the plate
+        - plate_base : str : Base name of the plate
+    ===============================================================================
+    Returns:
+        - path : str : Path to the image
+        - fig : matplotlib.figure.Figure : A figure
+        - open_status : bool : Open status of the alerts
+        - command_message : str : A command message
+        - open_status : bool : Open status of the alerts
+    ===============================================================================
+    """
     output_folder = Path(volume, 'input', platename)
     output_preview_log_file = Path(output_folder, f'{platename}_preview.log')
 
@@ -706,6 +804,30 @@ def cellprofile_feeding_preview(wells, volume, platename, plate_base):
 ########################################################################
 
 def preamble_to_run_wrmXpress_tracking(store):
+    """
+    The purpose of this function is to prepare the wrmXpress command, output folder, output file, 
+    command message, wells, volume, platename, motility, segment, cellprofiler, and cellprofilepipeline.
+    ===============================================================================
+    Arguments:
+        - store : dict : A dictionary containing the store
+    ===============================================================================
+    Returns:
+        - wrmxpress_command_split : list : List of wrmXpress commands
+        - output_folder : str : Path to the output folder
+        - output_file : str : Path to the output file
+        - command_message : str : A command message
+        - wells : list : List of well names
+        - volume : str : Path to the volume
+        - platename : str : Name of the plate
+        - motility : str : Motility
+        - segment : str : Segment
+        - cellprofiler : str : CellProfiler
+        - cellprofilepipeline : str : CellProfiler pipeline
+        - wells_analyzed : list : List of wells analyzed
+        - tracking_well : list : List of tracking wells
+    ===============================================================================
+
+    """
     volume = store['mount']
     platename = store['platename']
     wells = store["wells"]
@@ -753,10 +875,127 @@ def preamble_to_run_wrmXpress_tracking(store):
     tracking_well = []
     return wrmxpress_command_split, output_folder, output_file, command_message, wells, volume, platename, motility, segment, cellprofiler, cellprofilepipeline, wells_analyzed, tracking_well
 
-def tracking_wrmXpress_run():
-    return # finish when the function is ready
+def tracking_wrmXpress_run(
+    output_folder,
+    output_file,
+    wrmxpress_command_split,
+    volume,
+    platename,
+    wells,
+    wells_analyzed,
+    tracking_well,
+    set_progress
+    ):
+    """
+    The purpose of this function is to run wrmXpress for tracking and return the figure, open status, and command message.
+    ===============================================================================
+    Arguments:
+        - output_folder : str : Path to the output folder
+        - output_file : str : Path to the output file
+        - wrmxpress_command_split : list : List of wrmXpress commands
+        - volume : str : Path to the volume
+        - platename : str : Name of the plate
+        - wells : list : List of well names
+        - wells_analyzed : list : List of wells analyzed
+        - tracking_well : list : List of tracking wells
+        - set_progress : function : Function to set the progress
+    ===============================================================================
+    Returns:
+        - fig : matplotlib.figure.Figure : A figure
+        - open_status : bool : Open status of the alerts
+        - command_message : str : A command message
+    ===============================================================================
+    """
+    while not os.path.exists(output_folder):
+        time.sleep(1)
+    with open(output_file, "w") as file:
+        process = subprocess.Popen(
+            wrmxpress_command_split, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+
+        # Create an empty list to store the docker output
+        docker_output = []
+
+        for line in iter(process.stdout.readline, b''):
+            # Add the line to docker_output for further processing
+            docker_output.append(line)
+            file.write(line)
+            file.flush()
+            if 'Generating w1 thumbnails' in line:
+                tracks_file_path = Path(volume, 'output', 'thumbs', f'{platename}_tracks.png')
+
+                while not os.path.exists(tracks_file_path):
+                    time.sleep(1)
+
+                # create figure from file path
+                fig_1 = create_figure_from_filepath(tracks_file_path)
+                docker_output_formatted = ''.join(docker_output)
+
+                print('wrmXpress is finished')
+                docker_output.append('wrmXpress is finished')
+                docker_output_formatted = ''.join(docker_output)
+                return fig_1, False, False, f'', f'```{docker_output_formatted}```'
+            elif 'Reconfiguring' in line:
+                # find the well that is being analyzed
+                current_well = line.split('.')[0].split('_')[-1]
+
+                # add the well to the list of wells analyzed if it is not already there
+                if current_well not in wells_analyzed:
+                    wells_analyzed.append(current_well)
+                # obtain file path to current well
+                current_well_path = Path(volume, 'input', platename, 'TimePoint_1', f'{platename}_{wells_analyzed[-1]}.TIF')
+
+                # ensure file path exists
+                while not os.path.exists(current_well_path):
+                    time.sleep(1)
+
+                # create figure from file path
+                fig = create_figure_from_filepath(current_well_path)
+                docker_output_formatted = ''.join(docker_output)
+
+                set_progress((str(len(wells_analyzed)), str(2*len(wells)), fig, f'```{current_well_path}```' ,f'```{docker_output_formatted}```'))
+            
+            elif 'Tracking well' in line:
+                # find the well that is being analyzed
+                current_well = line.split(' ')[-1].split('.')[0]
+                # add the well to the list of wells analyzed if it is not already there
+                if current_well not in tracking_well:
+                    tracking_well.append(current_well)
+                
+                # obtain file path to current well
+                current_well_path = Path(volume, 'input', platename, 'TimePoint_1', f'{platename}_{tracking_well[-1]}.TIF')
+
+                # ensure file path exists
+                while not os.path.exists(current_well_path):
+                    time.sleep(1)
+                
+                # create figure from file path
+                fig = create_figure_from_filepath(current_well_path)
+                docker_output_formatted = ''.join(docker_output)
+
+                set_progress((str(len(tracking_well)+ len(wells_analyzed)), str(2*len(wells)), fig, f'```{current_well_path}```' ,f'```{docker_output_formatted}```'))
 
 def preamble_to_run_wrmXpress_non_tracking(store):
+    """
+    The purpose of this function is to prepare the wrmXpress command, output folder, output file,
+    command message, wells, volume, platename, motility, segment, cellprofiler, and cellprofilepipeline.
+    ===============================================================================
+    Arguments:
+        - store : dict : A dictionary containing the store
+    ===============================================================================
+    Returns:
+        - wrmxpress_command_split : list : List of wrmXpress commands
+        - output_folder : str : Path to the output folder
+        - output_file : str : Path to the output file
+        - command_message : str : A command message
+        - wells : list : List of well names
+        - volume : str : Path to the volume
+        - platename : str : Name of the plate
+        - motility : str : Motility
+        - segment : str : Segment
+        - cellprofiler : str : CellProfiler
+        - cellprofilepipeline : str : CellProfiler pipeline
+    ===============================================================================
+    """
     volume = store['mount']
     platename = store['platename']
     wells = store["wells"]
@@ -815,6 +1054,25 @@ def motility_or_segment_run(
         plate_base,
         set_progress
 ):
+    """
+    The purpose of this function is to run wrmXpress for motility or segment and return the figure, open status, and command message.
+    ===============================================================================
+    Arguments:
+        - output_folder : str : Path to the output folder
+        - output_file : str : Path to the output file
+        - wrmxpress_command_split : list : List of wrmXpress commands
+        - wells : list : List of well names
+        - volume : str : Path to the volume
+        - platename : str : Name of the plate
+        - plate_base : str : Base name of the plate
+        - set_progress : function : Function to set the progress
+    ===============================================================================
+    Returns:
+        - fig : matplotlib.figure.Figure : A figure
+        - open_status : bool : Open status of the alerts
+        - command_message : str : A command message
+    ===============================================================================
+    """
     while not os.path.exists(output_folder):
                 time.sleep(1)
     with open(output_file, "w") as file:
@@ -877,6 +1135,26 @@ def motility_or_segment_run(
 def cellprofile_wormsize_run(output_folder, output_file, wrmxpress_command_split,
                              wells, volume, platename, plate_base, set_progress,
                              cellprofilepipeline):
+    """
+    The purpose of this function is to run wrmXpress for worm size and return the figure, open status, and command message.
+    ===============================================================================
+    Arguments:
+        - output_folder : str : Path to the output folder
+        - output_file : str : Path to the output file
+        - wrmxpress_command_split : list : List of wrmXpress commands
+        - wells : list : List of well names
+        - volume : str : Path to the volume
+        - platename : str : Name of the plate
+        - plate_base : str : Base name of the plate
+        - set_progress : function : Function to set the progress
+        - cellprofilepipeline : str : CellProfiler pipeline
+    ===============================================================================
+    Returns:
+        - fig : matplotlib.figure.Figure : A figure
+        - open_status : bool : Open status of the alerts
+        - command_message : str : A command message
+    ===============================================================================
+    """
     # Ensure the output folder exists
     while not os.path.exists(output_folder):
         time.sleep(1)
@@ -937,6 +1215,26 @@ def cellprofile_wormsize_intesity_cellpose_run(
     wells, volume, platename, plate_base, set_progress,
     cellprofilepipeline
 ):
+    """
+    The purpose of this function is to run wrmXpress for worm size and intensity using CellPose and return the figure, open status, and command message.
+    ===============================================================================
+    Arguments:
+        - output_folder : str : Path to the output folder
+        - output_file : str : Path to the output file
+        - wrmxpress_command_split : list : List of wrmXpress commands
+        - wells : list : List of well names
+        - volume : str : Path to the volume
+        - platename : str : Name of the plate
+        - plate_base : str : Base name of the plate
+        - set_progress : function : Function to set the progress
+        - cellprofilepipeline : str : CellProfiler pipeline
+    ===============================================================================
+    Returns:
+        - fig : matplotlib.figure.Figure : A figure
+        - open_status : bool : Open status of the alerts
+        - command_message : str : A command message
+    ===============================================================================
+    """
     while not os.path.exists(output_folder):
         time.sleep(1)
         
@@ -1009,6 +1307,26 @@ def cellprofile_wormsize_intesity_cellpose_run(
 def cellprofile_mf_celltox_run(output_folder, output_file, wrmxpress_command_split,
                            wells, volume, platename, plate_base, set_progress,
                            cellprofilepipeline):
+    """
+    The purpose of this function is to run wrmXpress for motility, fecundity, and celltox and return the figure, open status, and command message.
+    ===============================================================================
+    Arguments:
+        - output_folder : str : Path to the output folder
+        - output_file : str : Path to the output file
+        - wrmxpress_command_split : list : List of wrmXpress commands
+        - wells : list : List of well names
+        - volume : str : Path to the volume
+        - platename : str : Name of the plate
+        - plate_base : str : Base name of the plate
+        - set_progress : function : Function to set the progress
+        - cellprofilepipeline : str : CellProfiler pipeline
+    ===============================================================================
+    Returns:
+        - fig : matplotlib.figure.Figure : A figure
+        - open_status : bool : Open status of the alerts
+        - command_message : str : A command message
+    ===============================================================================
+    """
     while not os.path.exists(output_folder):
         time.sleep(1)
     
@@ -1060,6 +1378,26 @@ def cellprofile_feeding_run(
     wells, volume, platename, plate_base, set_progress,
     cellprofilepipeline
 ):
+    """
+    The purpose of this function is to run wrmXpress for feeding and return the figure, open status, and command message.
+    ===============================================================================
+    Arguments:
+        - output_folder : str : Path to the output folder
+        - output_file : str : Path to the output file
+        - wrmxpress_command_split : list : List of wrmXpress commands
+        - wells : list : List of well names
+        - volume : str : Path to the volume
+        - platename : str : Name of the plate
+        - plate_base : str : Base name of the plate
+        - set_progress : function : Function to set the progress
+        - cellprofilepipeline : str : CellProfiler pipeline
+    ===============================================================================
+    Returns:
+        - fig : matplotlib.figure.Figure : A figure
+        - open_status : bool : Open status of the alerts
+        - command_message : str : A command message
+    ===============================================================================
+    """
     while not os.path.exists(output_folder):
         time.sleep(1)
     

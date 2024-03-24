@@ -3,12 +3,10 @@
 ####                        Imports                                 ####
 ####                                                                ####
 ########################################################################
-from app.utils.callback_functions import create_figure_from_filepath, eval_bool
-from app.utils.callback_functions import motility_or_segment_run, cellprofile_wormsize_run, cellprofile_wormsize_intesity_cellpose_run, cellprofile_mf_celltox_run, cellprofile_feeding_run, preamble_to_run_wrmXpress_non_tracking, preamble_to_run_wrmXpress_tracking
-import time
-from pathlib import Path
-import os
-import subprocess
+from app.utils.callback_functions import eval_bool, tracking_wrmXpress_run
+from app.utils.callback_functions import motility_or_segment_run, cellprofile_wormsize_run 
+from app.utils.callback_functions import cellprofile_wormsize_intesity_cellpose_run, cellprofile_mf_celltox_run, cellprofile_feeding_run
+from app.utils.callback_functions import preamble_to_run_wrmXpress_non_tracking, preamble_to_run_wrmXpress_tracking
 
 ########################################################################
 ####                                                                ####
@@ -72,11 +70,21 @@ def callback(set_progress, n_clicks, store):
         elif eval_bool(tracking) == True:
             return run_analysis_tracking(set_progress, store)
        
-
 def run_analysis_tracking(
     set_progress,
     store,
 ):
+    """
+    The function runs the tracking analysis
+    ===============================================================================
+    Arguments:
+        - set_progress : function : A function that sets the progress of the analysis        
+        - store : dict : A dictionary containing the data from the store
+    ===============================================================================
+    Returns:
+        - function : function : A function that runs the tracking analysis
+    ===============================================================================
+    """
     [
         wrmxpress_command_split, 
         output_folder, 
@@ -92,80 +100,34 @@ def run_analysis_tracking(
           wells_analyzed, 
           tracking_well
     ] = preamble_to_run_wrmXpress_tracking(store)
- 
-    while not os.path.exists(output_folder):
-        time.sleep(1)
-    with open(output_file, "w") as file:
-        process = subprocess.Popen(
-            wrmxpress_command_split, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
 
-        # Create an empty list to store the docker output
-        docker_output = []
-
-        for line in iter(process.stdout.readline, b''):
-            # Add the line to docker_output for further processing
-            docker_output.append(line)
-            file.write(line)
-            file.flush()
-            if 'Generating w1 thumbnails' in line:
-                tracks_file_path = Path(volume, 'output', platename, f'{platename}_tracks.png')
-
-                while not os.path.exists(tracks_file_path):
-                    time.sleep(1)
-
-                # create figure from file path
-                fig_1 = create_figure_from_filepath(tracks_file_path)
-                docker_output_formatted = ''.join(docker_output)
-
-                print('wrmXpress is finished')
-                docker_output.append('wrmXpress is finished')
-                docker_output_formatted = ''.join(docker_output)
-                return fig_1, False, False, f'', f'```{docker_output_formatted}```'
-            elif 'Reconfiguring' in line:
-                # find the well that is being analyzed
-                current_well = line.split('.')[0].split('_')[-1]
-
-                # add the well to the list of wells analyzed if it is not already there
-                if current_well not in wells_analyzed:
-                    wells_analyzed.append(current_well)
-                # obtain file path to current well
-                current_well_path = Path(volume, 'input', platename, 'TimePoint_1', f'{platename}_{wells_analyzed[-1]}.TIF')
-
-                # ensure file path exists
-                while not os.path.exists(current_well_path):
-                    time.sleep(1)
-
-                # create figure from file path
-                fig = create_figure_from_filepath(current_well_path)
-                docker_output_formatted = ''.join(docker_output)
-
-                set_progress((str(len(wells_analyzed)), str(2*len(wells)), fig, f'```{current_well_path}```' ,f'```{docker_output_formatted}```'))
+    return tracking_wrmXpress_run(
+        output_folder,
+        output_file,
+        wrmxpress_command_split,
+        volume,
+        platename,
+        wells,
+        wells_analyzed,
+        tracking_well,
+        set_progress
+    )
             
-            elif 'Tracking well' in line:
-                # find the well that is being analyzed
-                current_well = line.split(' ')[-1].split('.')[0]
-                # add the well to the list of wells analyzed if it is not already there
-                if current_well not in tracking_well:
-                    tracking_well.append(current_well)
-                
-                # obtain file path to current well
-                current_well_path = Path(volume, 'input', platename, 'TimePoint_1', f'{platename}_{tracking_well[-1]}.TIF')
-
-                # ensure file path exists
-                while not os.path.exists(current_well_path):
-                    time.sleep(1)
-                
-                # create figure from file path
-                fig = create_figure_from_filepath(current_well_path)
-                docker_output_formatted = ''.join(docker_output)
-
-                set_progress((str(len(tracking_well)+ len(wells_analyzed)), str(2*len(wells)), fig, f'```{current_well_path}```' ,f'```{docker_output_formatted}```'))
-            
-# create function to run analysis
 def run_analysis_non_tracking(
   set_progress,
   store,      
 ):
+    """
+    The function runs the non-tracking analysis
+    ===============================================================================
+    Arguments:
+        - set_progress : function : A function that sets the progress of the analysis        
+        - store : dict : A dictionary containing the data from the store
+    ===============================================================================
+    Returns:
+        - function : function : A function that runs the non-tracking analysis  
+    ===============================================================================
+    """
     [wrmxpress_command_split,
     output_folder, 
     output_file, 
@@ -180,7 +142,7 @@ def run_analysis_non_tracking(
     cellprofilepipeline] = preamble_to_run_wrmXpress_non_tracking(store)
 
     if motility == 'True' or segment == 'True':
-        motility_or_segment_run(output_folder=output_folder, 
+        return motility_or_segment_run(output_folder=output_folder, 
                                        output_file=output_file, 
                                        wrmxpress_command_split=wrmxpress_command_split, 
                                        set_progress=set_progress, 
@@ -191,7 +153,7 @@ def run_analysis_non_tracking(
             
     if cellprofiler == 'True': 
             if cellprofilepipeline == 'wormsize':
-                cellprofile_wormsize_run(
+                return cellprofile_wormsize_run(
                     output_folder=output_folder,
                     output_file=output_file,
                     wrmxpress_command_split=wrmxpress_command_split,
@@ -204,7 +166,7 @@ def run_analysis_non_tracking(
                 )
             
             elif cellprofilepipeline == 'wormsize_intensity_cellpose':
-                cellprofile_wormsize_intesity_cellpose_run(
+                return cellprofile_wormsize_intesity_cellpose_run(
                     output_folder=output_folder,
                     output_file=output_file,
                     wrmxpress_command_split=wrmxpress_command_split,
@@ -217,14 +179,14 @@ def run_analysis_non_tracking(
                 )
             
             elif cellprofilepipeline == "mf_celltox":
-               cellprofile_mf_celltox_run(
+                return cellprofile_mf_celltox_run(
                     output_folder, output_file, wrmxpress_command_split,
                     wells, volume, platename, plate_base, set_progress,
                     cellprofilepipeline
                 ) 
             
             elif cellprofilepipeline == "feeding":
-                cellprofile_feeding_run(
+                return cellprofile_feeding_run(
                     output_folder, output_file, wrmxpress_command_split,
                     wells, volume, platename, plate_base, set_progress,
                     cellprofilepipeline

@@ -83,7 +83,6 @@ app.layout = html.Div([
 ####                                                                ####
 ########################################################################
 
-
 @app.callback(
     output=[
         Output("image-analysis-preview", "figure"),
@@ -142,7 +141,6 @@ def background_callback(set_progress, n_clicks, store):
 ####                        RUNNING SERVER                          ####
 ####                                                                ####
 ########################################################################
-
 
 if __name__ == '__main__':
     app.run_server(debug=True, host='0.0.0.0', port=9000)
