@@ -22,7 +22,7 @@ import shlex
 # importing utils
 from app.utils.styling import layout
 from app.utils.callback_functions import create_figure_from_filepath, eval_bool
-from app.utils.preview_callback_functions import preview_callback_functions
+from app.utils.preview_callback_functions import preview_callback_functions, motility_segment_fecundity_preview
 
 dash.register_page(__name__)
 
@@ -361,37 +361,33 @@ def update_preview_image(n_clicks, store):
 )
 def get_options(nclicks, store):
     """
-    This function gets the options for the dropdown
-    =======================================================
+    This function gets the options for the analysis.
+    =========================================================================================
     Arguments:
-        - nclicks : int : The number of times the button has been clicked
+        - nclicks : int : The number of clicks
         - store : dict : The store data
-    =======================================================
+    =========================================================================================
     Returns:
-        - list : The options for the dropdown
+        - options : list : The options
     """
-    # Get the store data
-    motility = store['motility']
-    segment = store['segment']
 
-    # Create a dictionary of the options
-    selection_dict = {'motility': 'motility', 'segment': 'binary'}
-    option_dict = {}
+    # check to see if store exists
+    if not store:
+        return []
 
-    # Check if the button has been clicked
-    if nclicks is not None:
+    # get the store from the data
+    pipeline_selection = store['pipeline_selection']
+    print(pipeline_selection)
+    if pipeline_selection == 'motility':
 
-        # Iterate through the selection dictionary
-        for selection in selection_dict.keys():
-
-            # Check if the selection is True
-            if eval(selection) == 'True':
-                # Add the selection to the option dictionary
-                option_dict[selection] = selection_dict[selection]
-
-    # Return the options
-    dict_option = {v: k for k, v in option_dict.items()}
-    return dict_option
+        # create the options
+        selection_dict = {'motility': 'motility', 'segment': 'binary', 'plate': 'plate'}
+        
+        # check to see if the button has been clicked (nclicks)
+        if nclicks is not None:
+            return selection_dict  # return the option dictionary
+    else:   
+        return {'plate': 'plate'}
 
 @callback(
     Output('analysis-preview-message', 'children'),
@@ -431,39 +427,18 @@ def run_analysis(
     platename = store['platename']
     wells = store["wells"]
     plate_base = platename.split("_", 1)[0]
-    motility_selection = store['motility']
-    segment_selection = store['segment']
-    cellprofiler = store["cellprofiler"]
-    cellprofilepipeline = store["cellprofilepipeline"]
-    fecundity_selection = store['fecundity']
-    tracking_selection = store['tracking']
-    
-    # Check if motility or segment selection is True
-    if motility_selection == 'True':
-        selection = 'motility'
-    elif segment_selection == 'True':
-        selection = 'segment'
-    else:
-        selection = ''
+    pipeline_selection = store['pipeline_selection']
 
     # Check if the button has been clicked
     if nclicks:
         
-        if eval_bool(tracking_selection) == False:
-            return preview_callback_functions(
-                motility_selection=motility_selection,
-                segment_selection=segment_selection,
-                fecundity_selection=fecundity_selection,
-                selection=selection,
-                cellprofiler=cellprofiler,
-                cellprofilepipeline=cellprofilepipeline,
+        return preview_callback_functions(
+                pipeline_selection=pipeline_selection,
                 volume=volume,
                 platename=platename,
                 wells=wells,
                 plate_base=plate_base,
             )
-        else:
-            # Insert the function for tracking here
-            return f"```None```", None, False, f'', False
+       
         
                 

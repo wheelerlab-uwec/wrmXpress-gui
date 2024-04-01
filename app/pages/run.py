@@ -359,84 +359,15 @@ def get_options_analysis(nclicks, store):
         return []
 
     # get the store from the data
-    motility = store['motility']
-    segment = store['segment']
-    platename = store['platename']
+    pipeline_selection = store['pipeline_selection']
+    print(pipeline_selection)
+    if pipeline_selection == 'motility':
 
-    # create the options
-    selection_dict = {'motility': 'motility', 'segment': 'binary'}
-    option_dict = {}
-
-    # check to see if the button has been clicked (nclicks)
-    if nclicks is not None:
-
-        # iterate through the selection dictionary
-        for selection in selection_dict.keys():
-            if eval(selection) == 'True':  # check to see if the selection is true
-                # add the selection to the option dictionary
-                option_dict[selection] = selection_dict[selection]
-    dict_option = {v: k for k, v in option_dict.items()}
-    dict_option['plate'] = 'plate'  # add the plate to the option dictionary
-    return dict_option  # return the option dictionary
-
-@callback(
-    Output("img-mode-output", 'children'),
-    Output('file-structure-output', 'children'),
-    Output('plate-format-output', 'children'),
-    Output('img-masking-output',  'children'),
-    Output('mod-selection-output', 'children'),
-    Output('volume-name-output', 'children'),
-    Output('plate-name-output',  'children'),
-    Output('wells-content-output',  'children'),
-    Input('submit-analysis', 'n_clicks'),
-    State('store', 'data'),
-    prevent_initial_call=True,
-    allow_duplicate=True
-)
-def update_results_message_for_run_page(
-    nclicks,
-    store
-):
-    """
-    This function updates the results message for the run page.
-    =========================================================================================
-    Arguments:
-        - nclicks : int : The number of clicks
-        - store : dict : The store data
-    =========================================================================================
-    Returns:
-        - results : list : The results
-    """
-    # check to see if store exists
-    if not store:
-        return None, None, None, None, None, None, None, None
-
-    # checking to see if the rows and cols are None
-    if store['rows'] == None:
-        rows = 8
-    if store['cols'] == None:
-        cols = 12
-
-    # get the store from the data and create the results
-    img_mode = f'Imaging Mode: {store["img_mode"]}'
-    file_structure = f'File Structure: {store["file_structure"]}'
-    plate_format = f'Plate Format: Rows = {rows}, Cols = {cols}'
-    img_masking = f'Image Masking: {store["img_masking"]}'
-    mod_selection = f'Module Selection: {store["pipeline_selection"]}'
-    volume = f'Volume: {store["mount"]}'
-    platename = f'Platename: {store["platename"]}'
-    wells = f'Wells: {store["wells"]}'
-
-    # create a list of the results
-    results = [
-        img_mode,
-        file_structure,
-        plate_format,
-        img_masking,
-        mod_selection,
-        volume,
-        platename,
-        wells
-    ]
-    if nclicks:  # check to see if the button has been clicked
-        return results  # return the results
+        # create the options
+        selection_dict = {'motility': 'motility', 'segment': 'binary', 'plate': 'plate'}
+        
+        # check to see if the button has been clicked (nclicks)
+        if nclicks is not None:
+            return selection_dict  # return the option dictionary
+    else:   
+        return {'plate': 'plate'}
