@@ -1,7 +1,7 @@
 # Table of Contents
 
-| Section        | Header                                           |
-|:---------------:|:---------------------------------------------------:|
+| Section       | Header                                           |
+|---------------|---------------------------------------------------|
 | I.            | [Project Title](#i-project-title)                 | 
 | II.           | [Project Description](#ii-project-description)    | 
 | III.          | [Installations](#iii-installation)                |
