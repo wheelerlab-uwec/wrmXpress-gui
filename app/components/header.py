@@ -18,13 +18,6 @@ header = dbc.Row(
     [
         dbc.Col([
             html.A(
-                html.I(className="fa-solid fa-circle-info", # Information Symbol
-                       id='information-symbol'),
-                href='https://www.combinatorics.org/files/Surveys/ds5/ds5v3-2005/VennGraphEJC.html#:~:text=The%20Planar%20Dual%20of%20a,segments%20of%20curves%20between%20intersections.',
-            )],
-            width="auto"),
-        dbc.Col([
-            html.A(
                 html.I(className="fa-solid fa-prescription", # Prescription Symbol
                        id='rx-symbol'),
             )],

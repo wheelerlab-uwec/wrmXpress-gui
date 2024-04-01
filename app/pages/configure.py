@@ -43,6 +43,7 @@ layout = dbc.Container([
         ],
         start_collapsed=False,  # Start with the accordian open
         always_open=True,  # Always open the accordian
+        id="configure-accordion",  # ID of the accordian
     ),
     html.Hr(),
     dbc.Alert(
@@ -122,16 +123,11 @@ def update_options_visibility(imaging_mode, file_structure):
     Input('mounted-volume', 'value'),
     Input('plate-name', 'value'),
     Input('well-selection-list', 'children'),
-    Input('motility-run', 'value'),
-    Input('segment-run', 'value'),
     Input('well-selection-list', 'children'),
     Input('imaging-mode', 'value'),
     Input("file-structure", 'value'),
-    Input("circ-or-square-img-masking", 'value'),
-    Input("cell-profiler-run", 'value'),
-    Input("cell-profiler-pipeline", 'value'),
-    Input('fecundity-run', 'value'),
-    Input('tracking-run', 'value'),
+    Input('pipeline-selection', 'value'),
+    # Input("circ-or-square-img-masking", 'value'), # Image masking
 )
 def store_values(
     cols,
@@ -139,16 +135,11 @@ def store_values(
     mounter,
     platename,
     well_selection,
-    motility,
-    segment,
     wells,
     imgaging_mode,
     file_sturcture,
-    img_masking,
-    cellprofiler,
-    cellprofilepipeline,
-    fecundity,
-    tracking 
+    pipeline_selection,
+    # img_masking, # Image masking
 ):
     """
     This function will store the values of the inputs to be used in different pages.
@@ -159,12 +150,10 @@ def store_values(
         - mounter : str : The mounted volume
         - platename : str : The plate name
         - well_selection : list : The list of wells selected
-        - motility : str : The motility run
-        - segment : str : The segment run
         - wells : list : The list of wells
         - imgaging_mode : str : The imaging mode
         - file_sturcture : str : The file structure
-        - img_masking : str : The image masking
+        - pipeline_selection : str : The pipeline selection
     =======================================================================================================
     Returns:
         - dict : The values of the inputs to be used in different pages
@@ -176,16 +165,11 @@ def store_values(
         'mount': mounter,
         'platename': platename,
         'wells': well_selection,
-        'motility': motility,
-        'segment': segment,
         'wells': wells,
         'img_mode': imgaging_mode,
         'file_structure': file_sturcture,
-        'img_masking': img_masking,
-        'cellprofiler': cellprofiler,
-        'cellprofilepipeline': cellprofilepipeline,
-        'fecundity': fecundity,
-        'tracking': tracking
+        'pipeline_selection': pipeline_selection,
+        #'img_masking': img_masking, # Image masking
     }
 
 @callback(
@@ -273,19 +257,10 @@ def update_wells(table_contents):  # list of cells from selection table
     State('multi-well-detection', 'value'),
     State('species', 'value'),
     State('stages', 'value'),
-    State('motility-run', 'value'),
-    State('conversion-run', 'value'),
-    State('conversion-scale-video', 'value'),
-    State('conversion-rescale-multiplier', 'value'),
-    State('segment-run', 'value'),
-    State('segmentation-wavelength', 'value'),
-    State('cell-profiler-run', 'value'),
-    State('cell-profiler-pipeline', 'value'),
     State('plate-name', 'value'),
     State('mounted-volume', 'value'),
     State('well-selection-list', 'children'),
-    State('fecundity-run', 'value'),
-    State('tracking-run', 'value'),
+    State('pipeline-selection', 'value'),
     prevent_initial_call=True,
     allow_duplicate=True
 )
@@ -298,19 +273,10 @@ def run_analysis(  # function to save the yaml file from the sections in the con
     multiwelldetection,
     species,
     stages,
-    motilityrun,
-    conversionrun,
-    conversionscalevideo,
-    conversionrescalemultiplier,
-    segmentrun,
-    wavelength,
-    cellprofilerrun,
-    cellprofilerpipeline,
     platename,
     volume,
     wells,
-    fecundityrun,
-    trackingrun
+    pipeline
 ):
     """
     This function will save the yaml file from the sections in the configuration page.
@@ -452,50 +418,11 @@ def run_analysis(  # function to save the yaml file from the sections in the con
                     if not matched_files:
                         error_occured = True
                         error_messages.append(f'No images found for well {well}. This may result in unexpected errors or results.')
-
-                   
-                # check if video module is selected with only one time point
-                if eval_bool(cellprofilerrun) == True:
-
-                    # obtain the time point path
-                    timept = Path(
-                        volume,
-                        f'{platename}/TimePoint_2'
+                if pipeline is None:
+                    error_occured = True
+                    error_messages.append(
+                        'No pipeline selected.'
                     )
-
-                    # check to see if the time point exists
-                    if os.path.exists(timept):
-                        error_occured = True
-                        error_messages.append(
-                            'You have selected a Cell Profiler pipeline while having multiple time points.'
-                        )
-
-            # check for conflicting modules
-            if eval_bool(cellprofilerrun) == True and eval_bool(segmentrun):
-                error_occured = True
-                error_messages.append(
-                    'Cannot run Cellprofiler and Segment together.'
-                )
-
-            if eval_bool(cellprofilerrun) == True and eval_bool(motilityrun):
-                error_occured = True
-                error_messages.append(
-                    'Cannot run Cellprofiler and Motility together.'
-                )
-                
-            if eval_bool(fecundityrun) == True and eval_bool(cellprofilerrun) == True:
-                error_occured = True
-                error_messages.append(
-                    'Cannot run Cellprofiler and Fecundity together.'
-                )
-            
-            # check to see if no module is selected
-            if eval_bool(segmentrun) == False and eval_bool(motilityrun) == False and eval_bool(cellprofilerrun) == False and eval_bool(fecundityrun) == False and eval_bool(trackingrun) == False:
-                error_occured = True
-                error_messages.append(
-                    'You have not selected any module to run.'
-                )
-
             # check to see if there was an error message
             if error_occured == True:
 
@@ -532,19 +459,9 @@ def run_analysis(  # function to save the yaml file from the sections in the con
             multiwelldetection,
             species,
             stages,
-            motilityrun,
-            conversionrun,
-            conversionscalevideo,
-            conversionrescalemultiplier,
-            segmentrun,
-            wavelength,
-            cellprofilerrun,
-            cellprofilerpipeline,
-            diagnosticdx,
             wells,
             volume,
-            fecundityrun,
-            trackingrun
+            pipeline
         )
 
         output_file = Path(volume, platename + '.yml')

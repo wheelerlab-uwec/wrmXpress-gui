@@ -72,6 +72,27 @@ def create_empty_df_from_inputs(_rows, _cols):
                       index=rows)  # Create dataframe
     return df  # Return dataframe
 
+def create_na_df_from_inputs(_rows, _cols):
+    """
+    This function creates an NA dataframe from the input rows and columns.
+    ===============================================================================
+    Arguments:
+        - _rows : int : Number of rows in the dataframe
+        - _cols : int : Number of columns in the dataframe
+    ===============================================================================
+    Returns:
+        - df : pd.DataFrame : An NA dataframe with the specified number of rows and columns
+    """
+    rows_total = list("ABCDEFGHIJKLMNOP")  # List of letters A-P
+    rows = rows_total[:int(_rows)]  # List of letters A-_rows
+    columns = [str(num).zfill(2) for num in range(
+        1, int(_cols) + 1)]  # List of numbers 01-_cols
+    empty_data = [['NA' for _ in columns]
+                  for _ in rows]  # List of lists of None
+    df = pd.DataFrame(empty_data, columns=columns,
+                      index=rows)  # Create dataframe
+    return df  # Return dataframe
+
 def eval_bool(v):
     """
     This function evaluates a boolean value from a string.
@@ -92,19 +113,9 @@ def prep_yaml(
         multiwelldetection,
         species,
         stages,
-        motilityrun,
-        conversionrun,
-        conversionscalevideo,
-        conversionrescalemultiplier,
-        segmentrun,
-        wavelength,
-        cellprofilerrun,
-        cellprofilerpipeline,
-        diagnosticdx,
         wellselection,
         volume,
-        fecundity,
-        trackingrun
+        pipeline
         ):
     """
     This function prepares a dictionary for the YAML file.
@@ -145,9 +156,22 @@ def prep_yaml(
         multiwellrows = 0  # Set multiwellrows to 0
     if multiwellcols is None:  # If multiwellcols is None
         multiwellcols = 0  # Set multiwellcols to 0
-    if conversionrescalemultiplier is None:  # If conversionrescalemultiplier is None
-        conversionrescalemultiplier = 0  # Set conversionrescalemultiplier to 0
+    #if conversionrescalemultiplier is None:  # If conversionrescalemultiplier is None
+    #    conversionrescalemultiplier = 0  # Set conversionrescalemultiplier to 0
 
+    [
+        motilityrun, 
+        conversionrun,
+        segmentrun, 
+        cellprofilerrun, 
+        diagnosticdx, 
+        fecundity, 
+        trackingrun, 
+        cellprofilerpipeline, 
+        save_video, 
+        rescale_multiplier,
+        wavelength
+     ] = formatting_module_for_yaml(pipeline)
     # Create a dictionary for the YAML file in the required format
     yaml_dict = {
         "imaging_mode": [imagingmode],
@@ -161,8 +185,8 @@ def prep_yaml(
             "motility": {"run": eval_bool(motilityrun)},
             "convert": {
                 "run": eval_bool(conversionrun),
-                "save_video": conversionscalevideo,
-                "rescale_multiplier": float(conversionrescalemultiplier)
+                "save_video": eval_bool(save_video),
+                "rescale_multiplier": float(rescale_multiplier)
             },
             "segment": {
                 "run": eval_bool(segmentrun),
@@ -1442,3 +1466,98 @@ def cellprofile_feeding_run(
                         fig = create_figure_from_filepath(img_path)
                         docker_output_formatted = ''.join(docker_output) 
                         set_progress((str(image_number), str(len(wells)), fig, f'```{img_path}```', f'```{docker_output_formatted}```'))
+
+def formatting_module_for_yaml(pipeline):
+    if pipeline == 'motility':
+        motilityrun = 'yes'
+        conversionrun = 'no'
+        segmentrun = 'yes'
+        cellprofilerrun = 'no'
+        diagnosticdx = 'yes'
+        fecundity = 'no'
+        trackingrun = 'no'
+        cellprofilerpipeline = None
+        save_video ='no'
+        rescale_multiplier = 0.0
+        wavelength = None
+
+    elif pipeline == 'fecundity':
+        motilityrun = 'no'
+        conversionrun = 'no'
+        segmentrun = 'no'
+        cellprofilerrun = 'no'
+        diagnosticdx = 'yes'
+        fecundity = 'yes'
+        trackingrun = 'no'
+        cellprofilerpipeline = None
+        save_video ='no'
+        rescale_multiplier = 0.0
+        wavelength = None
+
+    elif pipeline == 'tracking':
+        motilityrun = 'no'
+        conversionrun = 'no'
+        segmentrun = 'no'
+        cellprofilerrun = 'no'
+        diagnosticdx = 'yes'
+        fecundity = 'no'
+        trackingrun = 'yes'
+        cellprofilerpipeline = None
+        save_video ='no'
+        rescale_multiplier = 0.0
+        wavelength = None
+
+    elif pipeline == 'wormsize':
+        motilityrun = 'no'
+        conversionrun = 'no'
+        segmentrun = 'no'
+        cellprofilerrun = 'yes'
+        diagnosticdx = 'yes'
+        fecundity = 'no'
+        trackingrun = 'no'
+        cellprofilerpipeline = 'wormsize'
+        save_video ='no'
+        rescale_multiplier = 0.0
+        wavelength = None
+
+    elif pipeline == 'wormsize_intensity_cellpose':
+        motilityrun = 'no'
+        conversionrun = 'no'
+        segmentrun = 'no'
+        cellprofilerrun = 'yes'
+        diagnosticdx = 'yes'
+        fecundity = 'no'
+        trackingrun = 'no'
+        cellprofilerpipeline = 'wormsize_intensity_cellpose'
+        save_video ='no'
+        rescale_multiplier = 0.0
+        wavelength = None
+
+    elif pipeline == 'mf_celltox':
+        motilityrun = 'no'
+        conversionrun = 'no'
+        segmentrun = 'no'
+        cellprofilerrun = 'yes'
+        diagnosticdx = 'yes'
+        fecundity = 'no'
+        trackingrun = 'no'
+        cellprofilerpipeline = 'mf_celltox'
+        save_video ='no'
+        rescale_multiplier = 0.0
+        wavelength = None
+
+    elif pipeline == 'feeding':
+        motilityrun = 'yes'
+        conversionrun = 'no'
+        segmentrun = 'yes'
+        cellprofilerrun = 'no'
+        diagnosticdx = 'yes'
+        fecundity = 'yes'
+        trackingrun = 'no'
+        cellprofilerpipeline = 'feeding'
+        save_video ='no'
+        rescale_multiplier = 0.0
+        wavelength = None
+
+
+    return motilityrun, conversionrun, segmentrun, cellprofilerrun, diagnosticdx, fecundity, trackingrun, cellprofilerpipeline, save_video, rescale_multiplier, wavelength

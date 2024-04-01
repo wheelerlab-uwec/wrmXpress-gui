@@ -422,7 +422,7 @@ def update_results_message_for_run_page(
     file_structure = f'File Structure: {store["file_structure"]}'
     plate_format = f'Plate Format: Rows = {rows}, Cols = {cols}'
     img_masking = f'Image Masking: {store["img_masking"]}'
-    mod_selection = f'Module Selection: {store["motility"]}'
+    mod_selection = f'Module Selection: {store["pipeline_selection"]}'
     volume = f'Volume: {store["mount"]}'
     platename = f'Platename: {store["platename"]}'
     wells = f'Wells: {store["wells"]}'

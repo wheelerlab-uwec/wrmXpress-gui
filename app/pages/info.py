@@ -94,38 +94,43 @@ layout = [
     ),
     dcc.Markdown(
         # Content of developers
-        "wrmXpress is entirely open-source. The code for the back-end is maintained by the [Zamanian Lab](https://www.zamanianlab.org/) at the University of Wisconsin-Madison and can be found [here](https://github.com/zamanianlab/wrmXpress). The code for the front-end is maintained by the [Wheeler Lab](wheelerlab.bio) at the University of Wisconsin-Eau Claire and can be found [here](https://github.com/wheelerlab-uwec/wrmXpress-gui)."),
+        "wrmXpress is entirely open-source. The code for the back-end is maintained by the [Zamanian Lab](https://www.zamanianlab.org/) at the University of Wisconsin-Madison and can be found [here](https://github.com/zamanianlab/wrmXpress). The code for the front-end is maintained by the [Wheeler Lab](https://wheelerlab.bio/) at the University of Wisconsin-Eau Claire and can be found [here](https://github.com/wheelerlab-uwec/wrmXpress-gui)."),
     html.Br(),
     dbc.Row(
         [
-            # Images of the developers
             dbc.Col(
                 [
-                    html.Img(
-
-                        # Link to wheeler lab logo
-                        src='https://assets.super.so/6d48c8d3-6e72-45c3-a5b9-04514883421e/images/9da71b53-e8f2-4234-9e55-e50d302f5c46/Lab_logo.svg',
-                        style={'width': '30%'} # Defines the width of the image
+                    html.A(
+                        html.Img(
+                            src='https://assets.super.so/6d48c8d3-6e72-45c3-a5b9-04514883421e/images/9da71b53-e8f2-4234-9e55-e50d302f5c46/Lab_logo.svg',
+                            style={'width': '30%'}
+                        ),
+                        href='https://wheelerlab.bio/',
+                        target='_blank'  # Opens the link in a new tab
                     ),
-                    html.Img(
-
-                        # Link to uwec seal
-                        src='https://lib02.uwec.edu/Omeka/files/original/37b67b60cca3c3ad308515aab27a66afe6c75b2f.gif',
-                        style={'width': '30%'} # Defines the width of the image
+                    html.A(
+                        html.Img(
+                            src='https://lib02.uwec.edu/Omeka/files/original/37b67b60cca3c3ad308515aab27a66afe6c75b2f.gif',
+                            style={'width': '30%'}
+                        ),
+                        href='https://www.uwec.edu/',
+                        target='_blank'  # Opens the link in a new tab
                     )
                 ],
-                style={'textAlign': 'center'} # Defines the style of the column ( centering the images )
+                style={'textAlign': 'center'}
             ),
             dbc.Col(
                 [
-                    html.Img(
-
-                        # Link to UW seal
-                        src='https://upload.wikimedia.org/wikipedia/commons/4/45/Seal_of_the_University_of_Wisconsin.svg',
-                        style={'width': '30%'} # Defines the width of the image
+                    html.A(
+                        html.Img(
+                            src='https://upload.wikimedia.org/wikipedia/commons/4/45/Seal_of_the_University_of_Wisconsin.svg',
+                            style={'width': '30%'}
+                        ),
+                        href='https://www.wisc.edu/',
+                        target='_blank'  # Opens the link in a new tab
                     )
                 ],
-                style={'textAlign': 'center'} # Defines the style of the column ( centering the image )
+                style={'textAlign': 'center'}
             )
         ]
     )

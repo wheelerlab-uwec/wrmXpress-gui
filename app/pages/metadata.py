@@ -16,7 +16,7 @@ import os
 from app.components.metadata_components import metadata_checklist
 
 # functions
-from app.utils.callback_functions import create_empty_df_from_inputs
+from app.utils.callback_functions import create_empty_df_from_inputs, create_na_df_from_inputs
 
 # registering dash page
 dash.register_page(__name__)
@@ -70,6 +70,28 @@ layout = dbc.Container(
                     ],
                     align="center"  # Align the input box to the center
                 ),
+                html.Br(),
+                dbc.Row([
+                    dbc.Col([
+                            dbc.Button(
+                                'Select All',  # Select All button
+                                id='select-all-metadata-tables',
+                                className='me-2',
+                                color='primary'
+                            ),
+                        ],
+                        width=2),
+                        dbc.Col([
+                            dbc.Button(
+                                'Deselect All',  # Deselect All button
+                                id='deselect-all-metadata-tables',
+                                className='me-2',
+                                color='primary',
+                            ),
+                        ],
+                        width=2
+                        ),
+                ]),
                 html.Hr(),
                 dbc.Row(
                     [
@@ -189,8 +211,7 @@ def create_tabs_from_checklist(store, n_clicks, checklist_values):
         num_cols = default_cols
 
     # Create an empty DataFrame with the specified dimensions, see callback_functions.py
-    df_empty = create_empty_df_from_inputs(num_rows, num_cols)
-
+    df_na = create_na_df_from_inputs(num_rows, num_cols)
     if n_clicks and checklist_values: # If the checklist values are available and the button has been clicked
 
         # Create a list of dcc.Tab components from the checked items
@@ -200,10 +221,10 @@ def create_tabs_from_checklist(store, n_clicks, checklist_values):
                     children=[
                         html.Div(
                             dash_table.DataTable(
-                                data=df_empty.reset_index().to_dict('records'),
+                                data=df_na.reset_index().to_dict('records'),
                                 columns=[{'name': 'Row', 'id': 'index', 'editable': False}] +
                                 [{'name': col, 'id': col}
-                                    for col in df_empty.columns],
+                                    for col in df_na.columns],
                                 editable=True,
                                 style_table={'overflowX': 'auto'},
                                 style_cell={'textAlign': 'center'},
@@ -346,3 +367,31 @@ def save_the_metadata_tables_to_csv(n_clicks, metadata_tabs, store):
         return "success", True, f"Metadata tables saved to destination: {directory_path}", "success", False
     else:
         return "primary", False, '', "success", False
+    
+# Callback for the 'Select All' and 'Deselect All' buttons
+@callback(
+    Output('checklist-input', 'value'),  # Update the values of the checklist
+    [
+        Input('select-all-metadata-tables', 'n_clicks'),  # Button for selecting all items
+        Input('deselect-all-metadata-tables', 'n_clicks')  # Button for deselecting all items
+    ],
+    [
+        State('checklist-input', 'options')  # Existing options of the checklist
+    ],
+    prevent_initial_call=True
+)
+def select_deselect_all(select_all_clicks, deselect_all_clicks, checklist_options):
+    ctx = dash.callback_context  # Getting context to find which button was clicked
+    if not ctx.triggered:  # If no button was clicked, return no update
+        raise PreventUpdate
+    else:
+        button_id = ctx.triggered[0]['prop_id'].split('.')[0]  # Get the ID of the button that was clicked
+
+    if button_id == 'select-all-metadata-tables' and select_all_clicks:
+        # If 'Select All' was clicked, return all the values to be selected
+        return [option['value'] for option in checklist_options]
+    elif button_id == 'deselect-all-metadata-tables' and deselect_all_clicks:
+        # If 'Deselect All' was clicked, return an empty list to deselect all
+        return []
+
+    return dash.no_update  # In case of any other condition, don't update

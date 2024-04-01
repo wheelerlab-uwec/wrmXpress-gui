@@ -15,6 +15,50 @@ from dash import dcc, html
 
 module_selection = dbc.AccordionItem(
     [
+        html.H5('wrmXpress Pipeline:'),
+                 # Radio buttons for motility run
+                dbc.RadioItems(
+                            id="pipeline-selection",
+                            className="btn-group",
+                            inputClassName="btn-check",
+                            labelClassName="btn btn-outline-primary",
+                            labelCheckedClassName="active",
+                            options=[
+                                {
+                                    "label": "Motility", "value": "motility"
+                                },
+                                {
+                                    "label": "Fecundity", "value": "fecundity"
+                                },
+                                {
+                                    'label': "Tracking", 'value': 'tracking'
+                                },
+                                {
+                                    "label": "C. elegans size and intensity (Cellpose)",
+                                    "value": "wormsize_intensity_cellpose"
+                                },
+                                {
+                                    "label": "Microfilariae viability",
+                                    "value": "mf_celltox"
+                                },
+                                {
+                                    'label': "C. elegans feeding",
+                                    'value': 'feeding'
+                                },
+                                {
+                                    "label": "C. elegans size",
+                                    "value": "wormsize"
+                                }
+                            ],
+                            value="False",
+                            persistence=True,
+                            persistence_type='memory'
+                        ),
+    ],
+    id="module-selection",
+    title="Pipeline Selection",
+)
+"""
         # Create separate tabs for video/image analysis
         dcc.Tabs(
             id="module-tabs",
@@ -301,10 +345,5 @@ module_selection = dbc.AccordionItem(
                             persistence_type='memory'
                         )
                     ]
-                )
-            ]
-        ),
-    ],
-    id="module-selection",
-    title="Module Selection"
-)
+                )"""
+            

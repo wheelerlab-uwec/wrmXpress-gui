@@ -62,87 +62,54 @@ def callback(set_progress, n_clicks, store):
         return None, True, True, "No configuration found. Please go to the configuration page to set up the analysis.", "No configuration found. Please go to the configuration page to set up the analysis."
 
     # obtain the necessary data from the store
-    tracking = store["tracking"]
+    pipeline_selection = store["pipeline_selection"]
     # Check if the submit button has been clicked
     if n_clicks:
-        if eval_bool(tracking) == False:
-            return run_analysis_non_tracking(set_progress, store)
-        elif eval_bool(tracking) == True:
-            return run_analysis_tracking(set_progress, store)
-       
-def run_analysis_tracking(
-    set_progress,
-    store,
-):
-    """
-    The function runs the tracking analysis
-    ===============================================================================
-    Arguments:
-        - set_progress : function : A function that sets the progress of the analysis        
-        - store : dict : A dictionary containing the data from the store
-    ===============================================================================
-    Returns:
-        - function : function : A function that runs the tracking analysis
-    ===============================================================================
-    """
-    [
-        wrmxpress_command_split, 
-        output_folder, 
-        output_file, 
-        command_message, 
-        wells, 
-        volume,
-          platename, 
-          motility, 
-          segment, 
-          cellprofiler, 
-          cellprofilepipeline, 
-          wells_analyzed, 
-          tracking_well
-    ] = preamble_to_run_wrmXpress_tracking(store)
+        if pipeline_selection == 'tracking':
+            [
+                wrmxpress_command_split, 
+                output_folder, 
+                output_file, 
+                command_message, 
+                wells, 
+                volume,
+                platename, 
+                motility, 
+                segment, 
+                cellprofiler, 
+                cellprofilepipeline, 
+                wells_analyzed, 
+                tracking_well
+            ] = preamble_to_run_wrmXpress_tracking(store)
+            return tracking_wrmXpress_run(
+                output_folder,
+                output_file,
+                wrmxpress_command_split,
+                volume,
+                platename,
+                wells,
+                wells_analyzed,
+                tracking_well,
+                set_progress
+            )
+        
+        else:
 
-    return tracking_wrmXpress_run(
-        output_folder,
-        output_file,
-        wrmxpress_command_split,
-        volume,
-        platename,
-        wells,
-        wells_analyzed,
-        tracking_well,
-        set_progress
-    )
+            [wrmxpress_command_split,
+                output_folder, 
+                output_file, 
+                command_message, 
+                wells, 
+                volume, 
+                platename, 
+                plate_base, 
+                motility, 
+                segment, 
+                cellprofiler, 
+                cellprofilepipeline] = preamble_to_run_wrmXpress_non_tracking(store)
             
-def run_analysis_non_tracking(
-  set_progress,
-  store,      
-):
-    """
-    The function runs the non-tracking analysis
-    ===============================================================================
-    Arguments:
-        - set_progress : function : A function that sets the progress of the analysis        
-        - store : dict : A dictionary containing the data from the store
-    ===============================================================================
-    Returns:
-        - function : function : A function that runs the non-tracking analysis  
-    ===============================================================================
-    """
-    [wrmxpress_command_split,
-    output_folder, 
-    output_file, 
-    command_message, 
-    wells, 
-    volume, 
-    platename, 
-    plate_base, 
-    motility, 
-    segment, 
-    cellprofiler, 
-    cellprofilepipeline] = preamble_to_run_wrmXpress_non_tracking(store)
-
-    if motility == 'True' or segment == 'True':
-        return motility_or_segment_run(output_folder=output_folder, 
+            if pipeline_selection == 'motility':
+                return motility_or_segment_run(output_folder=output_folder, 
                                        output_file=output_file, 
                                        wrmxpress_command_split=wrmxpress_command_split, 
                                        set_progress=set_progress, 
@@ -151,21 +118,10 @@ def run_analysis_non_tracking(
                                        wells=wells, 
                                        plate_base=plate_base)
             
-    if cellprofiler == 'True': 
-            if cellprofilepipeline == 'wormsize':
-                return cellprofile_wormsize_run(
-                    output_folder=output_folder,
-                    output_file=output_file,
-                    wrmxpress_command_split=wrmxpress_command_split,
-                    wells = wells,
-                    volume=volume,
-                    platename=platename,
-                    plate_base=plate_base,
-                    set_progress=set_progress,
-                    cellprofilepipeline=cellprofilepipeline
-                )
+            elif pipeline_selection == 'fecundity':
+                return
             
-            elif cellprofilepipeline == 'wormsize_intensity_cellpose':
+            elif pipeline_selection == 'wormsize_intensity_cellpose':
                 return cellprofile_wormsize_intesity_cellpose_run(
                     output_folder=output_folder,
                     output_file=output_file,
@@ -178,16 +134,26 @@ def run_analysis_non_tracking(
                     cellprofilepipeline=cellprofilepipeline
                 )
             
-            elif cellprofilepipeline == "mf_celltox":
+            elif pipeline_selection == 'mf_celltox':
                 return cellprofile_mf_celltox_run(
-                    output_folder, output_file, wrmxpress_command_split,
-                    wells, volume, platename, plate_base, set_progress,
+                    output_folder, 
+                    output_file, 
+                    wrmxpress_command_split,
+                    wells, 
+                    volume, 
+                    platename, 
+                    plate_base, 
+                    set_progress,
                     cellprofilepipeline
                 ) 
             
-            elif cellprofilepipeline == "feeding":
+            elif pipeline_selection == 'feeding':
                 return cellprofile_feeding_run(
                     output_folder, output_file, wrmxpress_command_split,
                     wells, volume, platename, plate_base, set_progress,
                     cellprofilepipeline
                 )
+            
+            elif pipeline_selection == 'wormsize':  
+                return
+       
