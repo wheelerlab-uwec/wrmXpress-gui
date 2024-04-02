@@ -272,14 +272,10 @@ def clean_and_create_directories(input_path,
                         shutil.rmtree(file_path)
                 except Exception as e:
                     print('Failed to delete %s because %s' % (file_path, e))
+        else:
+            output_path.mkdir(parents=True, exist_ok=True)
 
-def copy_files_to_input_directory(platename_input_dir,
-                                  htd_file,
-                                  img_dir,
-                                  plate_base,
-                                  wells,
-                                  platename
-                                  ):
+def copy_files_to_input_directory(platename_input_dir, htd_file, img_dir, plate_base, wells, platename, file_types=None):
     """
     The purpose of this function is to copy the input files to the input directory.
     ===============================================================================
@@ -289,36 +285,33 @@ def copy_files_to_input_directory(platename_input_dir,
         - img_dir : str : Path to the directory containing the images
         - plate_base : str : Base name of the plate
         - wells : list : List of well names
+        - file_types : list : List of file extensions to consider. Example: ['.tif', '.avi']
     ===============================================================================
     Returns:
         - None
     """
-    if htd_file is not None:
-        # Copy .HTD file into platename input dir
+    if file_types is None:
+        file_types = ['.tif', '.avi', '.TIF']  # Default file types
+
+    # Ensure wells is a list
+    wells = wells if isinstance(wells, list) else [wells]
+    
+    if htd_file:
         shutil.copy(htd_file, platename_input_dir)
-
-        # Iterate through each time point and copy images into new dirs
-        time_points = [item for item in os.listdir(img_dir) if os.path.isdir(Path(img_dir, item))]
-
+        
+    try:
+        time_points = [item for item in os.listdir(img_dir) if os.path.isdir(Path(img_dir, item))] if htd_file else [None]
         for time_point in time_points:
-            time_point_dir = Path(platename_input_dir, time_point)
-            time_point_dir.mkdir(parents=True, exist_ok=True)
-            
-            for well in wells if isinstance(wells, list) else [wells]:
-                # Use glob to find all files that match the pattern, accounting for potential extensions
-                well_files_pattern = Path(img_dir, time_point, f'{plate_base}_{well}*.TIF')
-                well_files = glob.glob(str(well_files_pattern))
-                
-                for file_path in well_files:
-                    shutil.copy(file_path, time_point_dir)
-    else:
-        for well in wells if isinstance(wells, list) else [wells]:
-            # Use glob to find all files that match the pattern, accounting for potential extensions
-            well_files_pattern = Path(img_dir, f'{platename}_{well}*.avi')
-            well_files = glob.glob(str(well_files_pattern))
-            
-            for file_path in well_files:
-                shutil.copy(file_path, platename_input_dir)
+            for well in wells:
+                for file_type in file_types:
+                    pattern = f'{plate_base}_{well}*' if htd_file else f'{platename}_{well}*'
+                    search_pattern = Path(img_dir, time_point if time_point else '', pattern + file_type)
+                    for file_path in glob.glob(str(search_pattern)):
+                        dest_dir = Path(platename_input_dir, time_point) if time_point else platename_input_dir
+                        dest_dir.mkdir(parents=True, exist_ok=True)
+                        shutil.copy(file_path, dest_dir)
+    except Exception as e:
+        print(f"Error copying files to input directory: {e}")   
 
 def create_figure_from_filepath(img_path,
                                 scale='gray'):
@@ -486,12 +479,12 @@ def formatting_module_for_yaml(pipeline):
         wavelength = None
 
     elif pipeline == 'feeding':
-        motilityrun = 'yes'
+        motilityrun = 'no'
         conversionrun = 'no'
-        segmentrun = 'yes'
-        cellprofilerrun = 'no'
+        segmentrun = 'no'
+        cellprofilerrun = 'yes'
         diagnosticdx = 'yes'
-        fecundity = 'yes'
+        fecundity = 'no'
         trackingrun = 'no'
         cellprofilerpipeline = 'feeding'
         save_video ='no'

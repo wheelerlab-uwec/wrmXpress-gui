@@ -377,7 +377,6 @@ def get_options(nclicks, store):
 
     # get the store from the data
     pipeline_selection = store['pipeline_selection']
-    print(pipeline_selection)
     if pipeline_selection == 'motility':
 
         # create the options

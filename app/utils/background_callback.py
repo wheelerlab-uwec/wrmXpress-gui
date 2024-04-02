@@ -14,6 +14,7 @@ import subprocess
 import time
 import shlex
 import re
+import glob
 
 from app.utils.callback_functions import eval_bool, create_figure_from_filepath
 from app.utils.callback_functions import update_yaml_file, clean_and_create_directories, copy_files_to_input_directory
@@ -123,7 +124,7 @@ def callback(set_progress, n_clicks, store):
                                        plate_base=plate_base)
             
             elif pipeline_selection == 'fecundity':
-                return motility_or_segment_run(output_folder=output_folder, 
+                return fecundity_run(output_folder=output_folder, 
                                        output_file=output_file, 
                                        wrmxpress_command_split=wrmxpress_command_split, 
                                        set_progress=set_progress, 
@@ -198,6 +199,7 @@ def preamble_to_run_wrmXpress_tracking(store):
     volume = store['mount']
     platename = store['platename']
     wells = store["wells"]
+    file_structure = store['file_structure']
     print('Running wrmXpress.')
     # necessary file paths
     img_dir = Path(volume, platename)
@@ -217,16 +219,25 @@ def preamble_to_run_wrmXpress_tracking(store):
             work_path=Path(volume, 'work', platename),
             output_path=Path(volume, 'output')
         )
-
-    copy_files_to_input_directory(
-            platename_input_dir=platename_input_dir,
-            htd_file= None,
-            img_dir=img_dir,
-            wells=wells,
-            plate_base=None,
-            platename=platename
-        )
-
+    if file_structure == 'avi':
+        copy_files_to_input_directory(
+                platename_input_dir=platename_input_dir,
+                htd_file= None,
+                img_dir=img_dir,
+                wells=wells,
+                plate_base=None,
+                platename=platename
+            )
+    elif file_structure == 'imagexpress':
+        htd_file = Path(img_dir, f'{platename}.HTD')
+        copy_files_to_input_directory(
+                platename_input_dir=platename_input_dir,
+                htd_file= htd_file,
+                img_dir=img_dir,
+                wells=wells,
+                plate_base=None,
+                platename=platename
+            )
         # Command message
     command_message = f"```python wrmXpress/wrapper.py {platename}.yml {platename}```"
 
@@ -486,6 +497,92 @@ def motility_or_segment_run(
                     
         # Return the figure, False, False, and an empty string
         return fig_1, False, False, f'', f'```{docker_output_formatted}```'
+
+def fecundity_run(
+        output_folder,
+        output_file,
+        wrmxpress_command_split,
+        wells,
+        volume,
+        platename,
+        plate_base,
+        set_progress
+):
+    """
+    The purpose of this function is to run wrmXpress for motility or segment and return the figure, open status, and command message.
+    ===============================================================================
+    Arguments:
+        - output_folder : str : Path to the output folder
+        - output_file : str : Path to the output file
+        - wrmxpress_command_split : list : List of wrmXpress commands
+        - wells : list : List of well names
+        - volume : str : Path to the volume
+        - platename : str : Name of the plate
+        - plate_base : str : Base name of the plate
+        - set_progress : function : Function to set the progress
+    ===============================================================================
+    Returns:
+        - fig : matplotlib.figure.Figure : A figure
+        - open_status : bool : Open status of the alerts
+        - command_message : str : A command message
+    ===============================================================================
+    """
+    while not os.path.exists(output_folder):
+        time.sleep(1)
+    
+    with open(output_file, "w") as file:
+        process = subprocess.Popen(wrmxpress_command_split, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+        docker_output = []
+        wells_analyzed = []
+        wells_to_be_analyzed = len(wells)
+
+        for line in iter(process.stdout.readline, ''):
+            docker_output.append(line)
+            file.write(line)
+            file.flush()
+
+            if "Generating" in line:
+                break
+
+            if "Running" in line:
+                well_running = line.split(" ")[-1].strip()  # Use strip() to remove '\n'
+                if well_running not in wells_analyzed:
+                    wells_analyzed.append(well_running)
+                    well_base_path = Path(volume, f"{platename}/TimePoint_1/{plate_base}_{well_running}")
+                    # Use rglob with case-insensitive pattern matching for .TIF and .tif
+                    file_paths = list(well_base_path.parent.rglob(well_base_path.name + '*[._][tT][iI][fF]'))
+                    
+                    # Sort the matching files to find the one with the lowest suffix number
+                    if file_paths:
+                        file_paths_sorted = sorted(file_paths, key=lambda x: x.stem)
+                        # Select the first file (with the lowest number) if multiple matches are found
+                        img_path = file_paths_sorted[0]
+                    else:
+                        # Fallback if no matching files are found
+                        img_path = well_base_path.with_suffix('.TIF')  # Default to .TIF if no files found
+
+                    fig = create_figure_from_filepath(img_path)
+                    
+                    docker_output_formatted = ''.join(docker_output)
+                    set_progress((
+                        str(len(wells_analyzed)),
+                        str(wells_to_be_analyzed),
+                        fig,
+                        f'```{img_path}```',
+                        f'```{docker_output_formatted}```'
+                    ))
+
+        output_path = Path(volume, 'output', 'thumbs', platename + '.png')
+        while not os.path.exists(output_path):
+            time.sleep(1)
+
+        fig_1 = create_figure_from_filepath(output_path)
+                
+        print('wrmXpress has finished.')
+        docker_output.append('wrmXpress has finished.')
+        docker_output_formatted = ''.join(docker_output)
+                
+        return fig_1, False, False, '', f'```{docker_output_formatted}```'
     
 def cellprofile_wormsize_run(output_folder, output_file, wrmxpress_command_split,
                              wells, volume, platename, plate_base, set_progress

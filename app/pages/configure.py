@@ -411,9 +411,10 @@ def run_analysis(  # function to save the yaml file from the sections in the con
                     avi_pattern = f'{platename}_{well}'
                     
                     # Find all files in the directory that match the well pattern
-                    matched_files_tif = list(folder_path.glob(pattern + "*.TIF"))
+                    matched_files_TIF = list(folder_path.glob(pattern + "*.TIF"))
+                    matched_files_tif = list(folder_path.glob(pattern + "*.tif"))
                     matched_files_avi = list(avi_folder_path.glob(avi_pattern + "*.avi"))
-                    matched_files = matched_files_tif + matched_files_avi
+                    matched_files = matched_files_tif + matched_files_avi + matched_files_TIF
                     # If no files match the current well, set error flags
                     if not matched_files:
                         error_occured = True

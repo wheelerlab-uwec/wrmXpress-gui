@@ -360,14 +360,29 @@ def get_options_analysis(nclicks, store):
 
     # get the store from the data
     pipeline_selection = store['pipeline_selection']
-    print(pipeline_selection)
     if pipeline_selection == 'motility':
 
         # create the options
         selection_dict = {'motility': 'motility', 'segment': 'binary', 'plate': 'plate'}
-        
+
         # check to see if the button has been clicked (nclicks)
         if nclicks is not None:
             return selection_dict  # return the option dictionary
+    elif pipeline_selection == 'fecundity':
+            
+        # create the options
+        selection_dict = {'binary': 'binary', 'plate': 'plate'}
+    
+        # check to see if the button has been clicked (nclicks)
+        if nclicks is not None:
+            return selection_dict
+    elif pipeline_selection == 'tracking':
+            
+        # create the options
+        selection_dict = {'tracks': 'tracks', 'plate': 'plate'}
+        
+        # check to see if the button has been clicked (nclicks)
+        if nclicks is not None:
+            return selection_dict
     else:   
         return {'plate': 'plate'}
