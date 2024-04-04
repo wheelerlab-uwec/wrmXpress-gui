@@ -507,19 +507,35 @@ def create_figure_from_url(image_url, scale='gray'):
     Returns:
         - fig : plotly.graph_objs._figure.Figure : A Plotly figure
     """
+    from urllib.request import urlopen
+
     try:
-        urllib.request.urlretrieve(image_url, 'temp_image.png')
-        img = np.array(Image.open('temp_image.png'))
+        img = np.array(Image.open(urlopen(image_url)))
 
-        # Now img is a numpy array, we can create a figure directly with plotly
-        fig = px.imshow(img, color_continuous_scale=scale)
-        fig.update_layout(coloraxis_showscale=False)
-        fig.update_xaxes(showticklabels=False)
-        fig.update_yaxes(showticklabels=False)
-        print('returning fig')
-        return fig
-
-    except requests.HTTPError as http_err:
-        print(f"HTTP error occurred: {http_err}")  # HTTP error
     except Exception as e:
-        print(f"Other error occurred: {e}")  # Other errors
+        try:
+            img = tiff.imread(urlopen(image_url))
+            
+            # Check if the image is not in a compatible shape
+            if len(img.shape) == 3 and img.shape[2] == 2:
+                # Assuming we can just take the first channel for visualization
+                img = img[:, :, 0]
+            
+            # Rescale pixel values from 0 to 255 if necessary
+            if img.dtype != np.uint8:
+                img = exposure.rescale_intensity(img, out_range=(0, 255)).astype(np.uint8)
+
+            # Resize the image if necessary, here it is skipped but you can use transform.rescale as before
+            # img = transform.rescale(img, 0.5, anti_aliasing=True, multichannel=False)
+            # img = (img * 255).astype(np.uint8)
+
+        except Exception as e:
+            print(f"Error opening {image_url} with tifffile and PIL: {e}")
+            return None
+        
+    # Now img is a numpy array, we can create a figure directly with plotly
+    fig = px.imshow(img, color_continuous_scale=scale)
+    fig.update_layout(coloraxis_showscale=False)
+    fig.update_xaxes(showticklabels=False)
+    fig.update_yaxes(showticklabels=False)
+    return fig

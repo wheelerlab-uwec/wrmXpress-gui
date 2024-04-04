@@ -92,3 +92,18 @@ html .div-with-scroll::-webkit-scrollbar-thumb {
     font-size: 1em;
     /* Adjust the size as needed */
 }
+
+.graph-style {
+    height: 400px;
+    /* Set a fixed height or use '100%' if you want to be responsive */
+    width: 100%;
+    /* Use 100% of the width */
+}
+
+.fixed-header {
+    height: 60px;
+}
+
+.fixed-button {
+    height: 40px;
+}

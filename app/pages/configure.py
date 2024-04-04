@@ -508,6 +508,7 @@ def run_analysis(  # function to save the yaml file from the sections in the con
 @callback(
     Output('configure-input-preview', 'figure'),  # Targeting the figure of the non-working graph
     Output("configure-preview-dropdown", "options"),  # Targeting the dropdown options
+    Output('configure-preview-dropdown-text', 'children'),  # Targeting the dropdown text
     [Input('pipeline-selection', 'value')],  # Assuming this is how the user selects the pipeline
     Input("configure-preview-dropdown", 'value'),
     prevent_initial_call=True  # Preventing callback from running before any action is taken
@@ -523,12 +524,11 @@ def update_figure_based_on_selection(module_initial, image):
     Returns:
         - fig : The image module for the selected pipeline
     """
-    permalink_to_folder = "https://github.com/wheelerlab-uwec/wrmXpress-gui/tree/7007c5ced2b1c9d20a0e60ad1af606951ab1c3a2/assets/configure_assets"
+    configure_preview_dropdown_text = 'This is a preview of the selected module image'
     # obtain the volume and plate name from the stored values
     options = {
         'plate':'plate'
     }
-
     # identify which module is selected
     if module_initial == 'motility':
         options = {
@@ -543,43 +543,44 @@ def update_figure_based_on_selection(module_initial, image):
 
         if image == 'plate':
             # obtain the motility image
-            motility_img = "https://github.com/wheelerlab-uwec/wrmXpress-gui/blob/7007c5ced2b1c9d20a0e60ad1af606951ab1c3a2/assets/configure_assets/motility/A01/img/20210819-p01-NJW_753_A01.png"
+            motility_img = 'https://raw.githubusercontent.com/wheelerlab-uwec/wrmXpress-gui/7007c5ced2b1c9d20a0e60ad1af606951ab1c3a2/assets/configure_assets/motility/A01/img/20210819-p01-NJW_753_A01.png'
             # motility_img = "/Users/zc/Library/CloudStorage/OneDrive-UW-EauClaire/Academics/Wheeler_Lab/wrmXpress-gui/assets/configure_assets/motility/A01/img/20210819-p01-NJW_753_A01.png"
 
             fig = create_figure_from_url(motility_img)
-            return fig, options
+            return fig, options, configure_preview_dropdown_text
         elif image == 'binary':
             # obtain the motility image
-            binary_img = "/Users/zc/Library/CloudStorage/OneDrive-UW-EauClaire/Academics/Wheeler_Lab/wrmXpress-gui/assets/configure_assets/motility/A01/img/20210819-p01-NJW_753_A01_binary.png"
+            binary_img = "https://raw.githubusercontent.com/wheelerlab-uwec/wrmXpress-gui/7007c5ced2b1c9d20a0e60ad1af606951ab1c3a2/assets/configure_assets/motility/A01/img/20210819-p01-NJW_753_A01_binary.png"
             
-            if os.path.exists(binary_img):
-                # create figure from file path 
-                fig = create_figure_from_filepath(binary_img)
-                return fig, options
+            
+            # create figure from file path 
+            fig = create_figure_from_url(binary_img)
+            return fig, options, configure_preview_dropdown_text
             
         elif image == 'blur':
-            blur_img = "/Users/zc/Library/CloudStorage/OneDrive-UW-EauClaire/Academics/Wheeler_Lab/wrmXpress-gui/assets/configure_assets/motility/A01/img/20210819-p01-NJW_753_A01_blur.png"
+            blur_img = "https://raw.githubusercontent.com/wheelerlab-uwec/wrmXpress-gui/7007c5ced2b1c9d20a0e60ad1af606951ab1c3a2/assets/configure_assets/motility/A01/img/20210819-p01-NJW_753_A01_blur.png"
 
-            if os.path.exists(blur_img):
-                # create figure from file path 
-                fig = create_figure_from_filepath(blur_img)
-                return fig, options
+            # create figure from file path 
+            fig = create_figure_from_url(blur_img)
+            return fig, options, configure_preview_dropdown_text
             
         elif image == 'edge':
-            edge_img = "/Users/zc/Library/CloudStorage/OneDrive-UW-EauClaire/Academics/Wheeler_Lab/wrmXpress-gui/assets/configure_assets/motility/A01/img/20210819-p01-NJW_753_A01_edge.png"
+            edge_img = "https://raw.githubusercontent.com/wheelerlab-uwec/wrmXpress-gui/7007c5ced2b1c9d20a0e60ad1af606951ab1c3a2/assets/configure_assets/motility/A01/img/20210819-p01-NJW_753_A01_edge.png"
 
-            if os.path.exists(edge_img):
-                # create figure from file path 
-                fig = create_figure_from_filepath(edge_img)
-                return fig, options
+            # create figure from file path 
+            fig = create_figure_from_url(edge_img)
+            return fig, options, configure_preview_dropdown_text
             
         elif image == 'motility':
-            motility_img = "/Users/zc/Library/CloudStorage/OneDrive-UW-EauClaire/Academics/Wheeler_Lab/wrmXpress-gui/assets/configure_assets/motility/A01/img/20210819-p01-NJW_753_A01_motility.png"
+            # GitHub permalink
+            github_url = "https://github.com/wheelerlab-uwec/wrmXpress-gui/blob/c67b5b06f4f6084cd0f9575750798ca2469fb39c/assets/configure_assets/motility/A01/img/20210819-p01-NJW_753_A01_motility.png"
 
-            if os.path.exists(motility_img):
-                # create figure from file path 
-                fig = create_figure_from_filepath(motility_img,scale = 'inferno')
-                return fig, options
+            # Transform the GitHub permalink into a raw content URL
+            raw_image_url = github_url.replace('github.com', 'raw.githubusercontent.com').replace('/blob', '')
+
+            # create figure from file path 
+            fig = create_figure_from_url(raw_image_url,scale = 'inferno')
+            return fig, options, configure_preview_dropdown_text
         else:
             print('No motility image found')
     
@@ -594,33 +595,46 @@ def update_figure_based_on_selection(module_initial, image):
             image = 'plate'
 
         if image == 'plate':
-            # obtain the motility image
-            fecundity_img ="/Users/zc/Library/CloudStorage/OneDrive-UW-EauClaire/Academics/Wheeler_Lab/wrmXpress-gui/assets/configure_assets/fecundity/A01/img/20210906-p01-NJW_857_A01.png"
-            if os.path.exists(fecundity_img):
-                # create figure from file path 
-                fig = create_figure_from_filepath(fecundity_img)
-                return fig, options
+            # GitHub permalink
+            github_url = "https://github.com/wheelerlab-uwec/wrmXpress-gui/blob/c6fead59f56e4312f0a3d3e228dd0af7e335875b/assets/configure_assets/fecundity/A01/img/20210906-p01-NJW_857_A01.png"
+
+            # Transform the GitHub permalink into a raw content URL
+            raw_image_url = github_url.replace('github.com', 'raw.githubusercontent.com').replace('/blob', '')
+
+            # create figure from file path 
+            fig = create_figure_from_url(raw_image_url)
+            return fig, options, configure_preview_dropdown_text
+        
         elif image == 'binary':
             # obtain the motility image
-            fecundity_img = "/Users/zc/Library/CloudStorage/OneDrive-UW-EauClaire/Academics/Wheeler_Lab/wrmXpress-gui/assets/configure_assets/fecundity/A01/img/20210906-p01-NJW_857_A01_binary.png"
+            fecundity_img = "https://github.com/wheelerlab-uwec/wrmXpress-gui/blob/c6fead59f56e4312f0a3d3e228dd0af7e335875b/assets/configure_assets/fecundity/A01/img/20210906-p01-NJW_857_A01_binary.png"
 
-            if os.path.exists(fecundity_img):
-                # create figure from file path 
-                fig = create_figure_from_filepath(fecundity_img)
-                return fig, options
+             # Transform the GitHub permalink into a raw content URL
+            raw_image_url = fecundity_img.replace('github.com', 'raw.githubusercontent.com').replace('/blob', '')
+
+            # create figure from file path 
+            fig = create_figure_from_url(raw_image_url)
+            return fig, options, configure_preview_dropdown_text
+        
         elif image == 'blur':
-            fecundity_img = "/Users/zc/Library/CloudStorage/OneDrive-UW-EauClaire/Academics/Wheeler_Lab/wrmXpress-gui/assets/configure_assets/fecundity/A01/img/20210906-p01-NJW_857_A01_blur.png"
+            fecundity_img = "https://github.com/wheelerlab-uwec/wrmXpress-gui/blob/c6fead59f56e4312f0a3d3e228dd0af7e335875b/assets/configure_assets/fecundity/A01/img/20210906-p01-NJW_857_A01_blur.png"
 
-            if os.path.exists(fecundity_img):
-                # create figure from file path 
-                fig = create_figure_from_filepath(fecundity_img)
-                return fig, options
+             # Transform the GitHub permalink into a raw content URL
+            raw_image_url = fecundity_img.replace('github.com', 'raw.githubusercontent.com').replace('/blob', '')
+
+            # create figure from file path 
+            fig = create_figure_from_url(raw_image_url)
+            return fig, options, configure_preview_dropdown_text
+        
         elif image == 'edge':
-            fecundity_img = "/Users/zc/Library/CloudStorage/OneDrive-UW-EauClaire/Academics/Wheeler_Lab/wrmXpress-gui/assets/configure_assets/fecundity/A01/img/20210906-p01-NJW_857_A01_edge.png"
+            fecundity_img = "https://github.com/wheelerlab-uwec/wrmXpress-gui/blob/c6fead59f56e4312f0a3d3e228dd0af7e335875b/assets/configure_assets/fecundity/A01/img/20210906-p01-NJW_857_A01_edge.png"
 
-            if os.path.exists(fecundity_img):
-                fig = create_figure_from_filepath(fecundity_img)
-                return fig, options
+             # Transform the GitHub permalink into a raw content URL
+            raw_image_url = fecundity_img.replace('github.com', 'raw.githubusercontent.com').replace('/blob', '')
+
+            # create figure from file path 
+            fig = create_figure_from_url(raw_image_url)
+            return fig, options, configure_preview_dropdown_text
         else:
             print('No fecundity image found')
          
@@ -633,21 +647,28 @@ def update_figure_based_on_selection(module_initial, image):
             image = 'plate'
         
         if image == 'plate':
-            tracking_img = "/Users/zc/Library/CloudStorage/OneDrive-UW-EauClaire/Academics/Wheeler_Lab/wrmXpress-gui/assets/configure_assets/tracking/A01/img/20240222-p01-RVH_A01.png"
+            # GitHub permalink
+            github_url = "https://github.com/wheelerlab-uwec/wrmXpress-gui/blob/c6fead59f56e4312f0a3d3e228dd0af7e335875b/assets/configure_assets/tracking/A01/img/20240222-p01-RVH_A01.png"
 
-            if os.path.exists(tracking_img):
-                # create figure from file path 
-                fig = create_figure_from_filepath(tracking_img)
-                return fig, options
+            # Transform the GitHub permalink into a raw content URL
+            raw_image_url = github_url.replace('github.com', 'raw.githubusercontent.com').replace('/blob', '')
+
+            # create figure from file path 
+            fig = create_figure_from_url(raw_image_url)
+            return fig, options, configure_preview_dropdown_text
+            
             
         elif image == 'tracks':
-            # obtain the motility image
-            tracking_img = "/Users/zc/Library/CloudStorage/OneDrive-UW-EauClaire/Academics/Wheeler_Lab/wrmXpress-gui/assets/configure_assets/tracking/A01/img/20240222-p01-RVH_A01_tracks.png"
+            # GitHub permalink
+            github_url = "https://github.com/wheelerlab-uwec/wrmXpress-gui/blob/c6fead59f56e4312f0a3d3e228dd0af7e335875b/assets/configure_assets/tracking/A01/img/20240222-p01-RVH_A01_tracks.png"
+
+            # Transform the GitHub permalink into a raw content URL
+            raw_image_url = github_url.replace('github.com', 'raw.githubusercontent.com').replace('/blob', '')
+
+            # create figure from file path 
+            fig = create_figure_from_url(raw_image_url)
+            return fig, options, configure_preview_dropdown_text
             
-            if os.path.exists(tracking_img):
-                # create figure from file path 
-                fig = create_figure_from_filepath(tracking_img)
-                return fig, options
         else:
             print('No tracking image found')
     
@@ -661,27 +682,38 @@ def update_figure_based_on_selection(module_initial, image):
             image = 'plate'
         
         if image == 'plate':
-            # obtain the motility image
-            wrmsize_inten_cellpose = "/Users/zc/Library/CloudStorage/OneDrive-UW-EauClaire/Academics/Wheeler_Lab/wrmXpress-gui/assets/configure_assets/wormsize_intensity_cellpose/A01/img/20220408-p01-MGC_1351_A01.png"
+            # GitHub permalink
+            github_url = "https://github.com/wheelerlab-uwec/wrmXpress-gui/blob/c6fead59f56e4312f0a3d3e228dd0af7e335875b/assets/configure_assets/wormsize_intensity_cellpose/A01/img/20220408-p01-MGC_1351_A01.png"
 
-            if os.path.exists(wrmsize_inten_cellpose):
-                # create figure from file path 
-                fig = create_figure_from_filepath(wrmsize_inten_cellpose)
-                return fig, options
+            # Transform the GitHub permalink into a raw content URL
+            raw_image_url = github_url.replace('github.com', 'raw.githubusercontent.com').replace('/blob', '')
+
+            # create figure from file path 
+            fig = create_figure_from_url(raw_image_url)
+            return fig, options, configure_preview_dropdown_text
+
         elif image == 'straightened_worms':
-            straightend_worm = "/Users/zc/Library/CloudStorage/OneDrive-UW-EauClaire/Academics/Wheeler_Lab/wrmXpress-gui/assets/configure_assets/wormsize_intensity_cellpose/A01/img/20220408-p01-MGC_A01.tiff"
+            # GitHub permalink
+            github_url = "https://github.com/wheelerlab-uwec/wrmXpress-gui/blob/c6fead59f56e4312f0a3d3e228dd0af7e335875b/assets/configure_assets/wormsize_intensity_cellpose/A01/img/20220408-p01-MGC_A01.tiff"
 
-            if os.path.exists(straightend_worm):
-                # create figure from file path 
-                fig = create_figure_from_filepath(straightend_worm)
-                return fig, options
+            # Transform the GitHub permalink into a raw content URL
+            raw_image_url = github_url.replace('github.com', 'raw.githubusercontent.com').replace('/blob', '')
+
+            # create figure from file path 
+            fig = create_figure_from_url(raw_image_url)
+            return fig, options, configure_preview_dropdown_text
+            
         elif image == 'cp_masks':
-            cp_masks = "/Users/zc/Library/CloudStorage/OneDrive-UW-EauClaire/Academics/Wheeler_Lab/wrmXpress-gui/assets/configure_assets/wormsize_intensity_cellpose/A01/img/20220408-p01-MGC_A01_cp_masks.png"
+            # GitHub permalink
+            github_url = "https://github.com/wheelerlab-uwec/wrmXpress-gui/blob/c6fead59f56e4312f0a3d3e228dd0af7e335875b/assets/configure_assets/wormsize_intensity_cellpose/A01/img/20220408-p01-MGC_A01_cp_masks.png"
 
-            if os.path.exists(cp_masks):
-                # create figure from file path 
-                fig = create_figure_from_filepath(cp_masks)
-                return fig, options
+            # Transform the GitHub permalink into a raw content URL
+            raw_image_url = github_url.replace('github.com', 'raw.githubusercontent.com').replace('/blob', '')
+
+            # create figure from file path 
+            fig = create_figure_from_url(raw_image_url)
+            return fig, options, configure_preview_dropdown_text
+            
         else:
             print('No wormsize_intensity_cellpose image found')
     
@@ -694,19 +726,27 @@ def update_figure_based_on_selection(module_initial, image):
             image = 'plate'
         
         if image == 'plate':
-            plate_img = "/Users/zc/Library/CloudStorage/OneDrive-UW-EauClaire/Academics/Wheeler_Lab/wrmXpress-gui/assets/configure_assets/mf_celltox/A01/img/20210917-p15-NJW_913_A01.png"
+            # GitHub permalink
+            github_url = "https://github.com/wheelerlab-uwec/wrmXpress-gui/blob/c6fead59f56e4312f0a3d3e228dd0af7e335875b/assets/configure_assets/mf_celltox/A01/img/20210917-p15-NJW_913_A01.png"
 
-            if os.path.exists(plate_img):
-                # create figure from file path 
-                fig = create_figure_from_filepath(plate_img)
-                return fig, options
+            # Transform the GitHub permalink into a raw content URL
+            raw_image_url = github_url.replace('github.com', 'raw.githubusercontent.com').replace('/blob', '')
+
+            # create figure from file path 
+            fig = create_figure_from_url(raw_image_url)
+            return fig, options, configure_preview_dropdown_text
+            
         elif image == 'straightened_worms':
-            # obtain the motility image
-            mf_celltox_img = "/Users/zc/Library/CloudStorage/OneDrive-UW-EauClaire/Academics/Wheeler_Lab/wrmXpress-gui/assets/configure_assets/mf_celltox/A01/img/20210917-p15-NJW_913_A01.TIF"
-            if os.path.exists(mf_celltox_img):
-                # create figure from file path 
-                fig = create_figure_from_filepath(mf_celltox_img)
-                return fig, options
+            # GitHub permalink
+            github_url = "https://github.com/wheelerlab-uwec/wrmXpress-gui/blob/c6fead59f56e4312f0a3d3e228dd0af7e335875b/assets/configure_assets/mf_celltox/A01/img/20210917-p15-NJW_913_A01.TIF"
+
+            # Transform the GitHub permalink into a raw content URL
+            raw_image_url = github_url.replace('github.com', 'raw.githubusercontent.com').replace('/blob', '')
+
+            # create figure from file path 
+            fig = create_figure_from_url(raw_image_url)
+            return fig, options, configure_preview_dropdown_text
+    
         else:
             print('No mf_celltox image found')
     
@@ -721,31 +761,47 @@ def update_figure_based_on_selection(module_initial, image):
             image = 'plate'
         
         if image == 'plate':
+            # GitHub permalink
+            github_url = "https://github.com/wheelerlab-uwec/wrmXpress-gui/blob/c6fead59f56e4312f0a3d3e228dd0af7e335875b/assets/configure_assets/feeding/A01/img/20210823-p01-KJG-A01.tiff"
 
-            # obtain the motility image
-            feeding_img = "/Users/zc/Library/CloudStorage/OneDrive-UW-EauClaire/Academics/Wheeler_Lab/wrmXpress-gui/assets/configure_assets/feeding/A01/img/20210823-p01-KJG-A01.tiff"
-            if os.path.exists(feeding_img):
-                # create figure from file path 
-                fig = create_figure_from_filepath(feeding_img)
-                return fig, options
+            # Transform the GitHub permalink into a raw content URL
+            raw_image_url = github_url.replace('github.com', 'raw.githubusercontent.com').replace('/blob', '')
+
+            # create figure from file path 
+            fig = create_figure_from_url(raw_image_url)
+            return fig, options, configure_preview_dropdown_text
+            
         elif image == 'w1':
-            w1_path = "/Users/zc/Library/CloudStorage/OneDrive-UW-EauClaire/Academics/Wheeler_Lab/wrmXpress-gui/assets/configure_assets/feeding/A01/img/20210823-p01-KJG_795_A01_w1.png"
-            if os.path.exists(w1_path):
-                # create figure from file path 
-                fig = create_figure_from_filepath(w1_path)
-                return fig, options
+            # GitHub permalink
+            github_url = "https://github.com/wheelerlab-uwec/wrmXpress-gui/blob/c6fead59f56e4312f0a3d3e228dd0af7e335875b/assets/configure_assets/feeding/A01/img/20210823-p01-KJG_795_A01_w1.png"
+
+            # Transform the GitHub permalink into a raw content URL
+            raw_image_url = github_url.replace('github.com', 'raw.githubusercontent.com').replace('/blob', '')
+
+            # create figure from file path 
+            fig = create_figure_from_url(raw_image_url)
+            return fig, options, configure_preview_dropdown_text
+            
         elif image == 'w2':
-            w2_path = "/Users/zc/Library/CloudStorage/OneDrive-UW-EauClaire/Academics/Wheeler_Lab/wrmXpress-gui/assets/configure_assets/feeding/A01/img/20210823-p01-KJG_795_A01_w2.png"
-            if os.path.exists(w2_path):
-                # create figure from file path 
-                fig = create_figure_from_filepath(w2_path)
-                return fig, options
+            github_url = "https://github.com/wheelerlab-uwec/wrmXpress-gui/blob/c6fead59f56e4312f0a3d3e228dd0af7e335875b/assets/configure_assets/feeding/A01/img/20210823-p01-KJG_795_A01_w2.png"
+
+            # Transform the GitHub permalink into a raw content URL
+            raw_image_url = github_url.replace('github.com', 'raw.githubusercontent.com').replace('/blob', '')
+
+            # create figure from file path 
+            fig = create_figure_from_url(raw_image_url)
+            return fig, options, configure_preview_dropdown_text
+            
         elif image == 'w3':
-            w3_path = "/Users/zc/Library/CloudStorage/OneDrive-UW-EauClaire/Academics/Wheeler_Lab/wrmXpress-gui/assets/configure_assets/feeding/A01/img/20210823-p01-KJG_795_A01_w3.png"
-            if os.path.exists(w3_path):
-                # create figure from file path 
-                fig = create_figure_from_filepath(w3_path)
-                return fig, options
+            github_url = "https://github.com/wheelerlab-uwec/wrmXpress-gui/blob/c6fead59f56e4312f0a3d3e228dd0af7e335875b/assets/configure_assets/feeding/A01/img/20210823-p01-KJG_795_A01_w3.png"
+
+            # Transform the GitHub permalink into a raw content URL
+            raw_image_url = github_url.replace('github.com', 'raw.githubusercontent.com').replace('/blob', '')
+
+            # create figure from file path 
+            fig = create_figure_from_url(raw_image_url)
+            return fig, options, configure_preview_dropdown_text
+            
         else:
             print('No feeding image found')
     
@@ -758,18 +814,25 @@ def update_figure_based_on_selection(module_initial, image):
             image = 'plate'
 
         if image == 'plate':
-            plate_img = "/Users/zc/Library/CloudStorage/OneDrive-UW-EauClaire/Academics/Wheeler_Lab/wrmXpress-gui/assets/configure_assets/wormsize/A01/img/20220408-p01-MGC_1351_A01.png"
-            if os.path.exists(plate_img):
-                # create figure from file path 
-                fig = create_figure_from_filepath(plate_img)
-                return fig, options
-        elif image == 'straightened_worms':    
-            # obtain the motility image
-            wrmsize_img = "/Users/zc/Library/CloudStorage/OneDrive-UW-EauClaire/Academics/Wheeler_Lab/wrmXpress-gui/assets/configure_assets/wormsize/A01/img/20220408-p01-MGC_A01.tiff"
-            if os.path.exists(wrmsize_img):
-                # create figure from file path 
-                fig = create_figure_from_filepath(wrmsize_img)
-                return fig, options
+            github_url = "https://github.com/wheelerlab-uwec/wrmXpress-gui/blob/c6fead59f56e4312f0a3d3e228dd0af7e335875b/assets/configure_assets/wormsize/A01/img/20220408-p01-MGC_1351_A01.png"
+
+            # Transform the GitHub permalink into a raw content URL
+            raw_image_url = github_url.replace('github.com', 'raw.githubusercontent.com').replace('/blob', '')
+
+            # create figure from file path 
+            fig = create_figure_from_url(raw_image_url)
+            return fig, options, configure_preview_dropdown_text
+        
+        elif image == 'straightened_worms':
+            github_url = "https://github.com/wheelerlab-uwec/wrmXpress-gui/blob/c6fead59f56e4312f0a3d3e228dd0af7e335875b/assets/configure_assets/wormsize/A01/img/20220408-p01-MGC_A01.tiff"
+
+            # Transform the GitHub permalink into a raw content URL
+            raw_image_url = github_url.replace('github.com', 'raw.githubusercontent.com').replace('/blob', '')
+
+            # create figure from file path 
+            fig = create_figure_from_url(raw_image_url)
+            return fig, options, configure_preview_dropdown_text  
+           
         else:
             print('No wormsize image found')
     

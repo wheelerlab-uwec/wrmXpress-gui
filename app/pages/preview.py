@@ -18,6 +18,10 @@ from app.utils.preview_callback_functions import preview_callback_functions, mot
 
 dash.register_page(__name__)
 
+# Assuming we have a fixed height for the headers and buttons in CSS
+fixed_header_class = "fixed-header"
+fixed_button_class = "fixed-button"
+
 ########################################################################
 ####                                                                ####
 ####                              Layout                            ####
@@ -35,13 +39,13 @@ layout = dbc.ModalBody(
                                 dbc.CardBody([
                                     html.H4(
                                         "Input preview", # Header of input preview
-                                        className="text-center mb-5"
+                                        className=f"text-center {fixed_header_class} mb-5"
                                     ),
                                     dbc.Row([
                                         dbc.Button(
                                             'Preview Analysis', # Button to preview analysis
                                             id='submit-val',
-                                            className="d-grid gap-2 col-6 mx-auto",
+                                            className=f"d-grid gap-2 col-6 mx-auto {fixed_button_class}",
                                             color="primary", # Color of the button (wrmXpress) blue
                                             n_clicks=0 # Number of times the button has been clicked
                                         ),
@@ -103,7 +107,7 @@ layout = dbc.ModalBody(
                                 dbc.CardBody([
                                     html.H4(
                                         "Analysis preview", # Header of analysis preview
-                                        className="text-center"
+                                        className=f"text-center {fixed_header_class} mb-5"
                                     ),
                                     html.Br(),
                                     dbc.Row(
@@ -118,7 +122,7 @@ layout = dbc.ModalBody(
                                                 dbc.Button(
                                                     "Load Image", # Button to load image
                                                     id="preview-change-img-button",
-                                                    className="d-grid gap-2 col-6 mx-auto",
+                                                    className=f"d-grid gap-2 col-6 mx-auto {fixed_button_class}",
                                                     color="primary", # Color of the button (wrmXpress) blue
                                                     disabled=True, # Whether the button is disabled
                                                     n_clicks=0 # Number of times the button has been clicked
