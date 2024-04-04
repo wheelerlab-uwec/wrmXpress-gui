@@ -30,7 +30,8 @@ dash.register_page(__name__)
 layout = dbc.Container(
     [
         html.Div(
-            [
+            [   dbc.Row([
+                dbc.Col([
                 metadata_checklist,  # Metadata checklist, see metadata_components.py
                 html.Br(),
                 dbc.Row(
@@ -80,7 +81,7 @@ layout = dbc.Container(
                                 color='primary'
                             ),
                         ],
-                        width=2),
+                        width=3),
                         dbc.Col([
                             dbc.Button(
                                 'Deselect All',  # Deselect All button
@@ -89,9 +90,25 @@ layout = dbc.Container(
                                 color='primary',
                             ),
                         ],
-                        width=2
+                        width=3
                         ),
                 ]),
+                ],
+                width=3,
+                ),
+                html.Br(),
+                dbc.Col([
+                dbc.Container([
+                    dcc.Tabs(
+                        id='metadata-tabs',
+                        value='batch-data-tab',
+                        children=[]  # Empty children for the tabs to be filled in by the user, see function below
+                    )
+                ]
+                ),
+                ],
+                        width=9),
+            ]),
                 html.Hr(),
                 dbc.Row(
                     [
@@ -110,14 +127,6 @@ layout = dbc.Container(
                 ),
                 html.Br(),
                 html.Br(),
-                dbc.Container([
-                    dcc.Tabs(
-                        id='metadata-tabs',
-                        value='batch-data-tab',
-                        children=[]  # Empty children for the tabs to be filled in by the user, see function below
-                    )
-                ]
-                ),
                 html.Br(),
                 dbc.Row(
                     dbc.Col(

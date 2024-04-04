@@ -63,8 +63,7 @@ module_selection = dbc.AccordionItem(
                     options={'plate':'plate'},
                     style={'width': '75%',    
                     'margin-left': 'auto',
-                    'margin-right': 'auto',
-                    'display': 'block'
+                    'margin-right': 'auto'
                     },
                     value = 'plate',
                     persistence=True,
