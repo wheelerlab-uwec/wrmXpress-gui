@@ -21,7 +21,7 @@ from app.components.instrument_settings import instrument_settings
 from app.components.worm_information import worm_information
 from app.components.module_selection import module_selection
 from app.components.run_time_settings import run_time_settings
-from app.utils.callback_functions import eval_bool, create_figure_from_filepath
+from app.utils.callback_functions import eval_bool, create_figure_from_filepath, create_figure_from_url
 
 # Registering this page
 dash.register_page(__name__)
@@ -523,10 +523,12 @@ def update_figure_based_on_selection(module_initial, image):
     Returns:
         - fig : The image module for the selected pipeline
     """
+    permalink_to_folder = "https://github.com/wheelerlab-uwec/wrmXpress-gui/tree/7007c5ced2b1c9d20a0e60ad1af606951ab1c3a2/assets/configure_assets"
     # obtain the volume and plate name from the stored values
     options = {
         'plate':'plate'
     }
+
     # identify which module is selected
     if module_initial == 'motility':
         options = {
@@ -541,12 +543,11 @@ def update_figure_based_on_selection(module_initial, image):
 
         if image == 'plate':
             # obtain the motility image
-            motility_img = "/Users/zc/Library/CloudStorage/OneDrive-UW-EauClaire/Academics/Wheeler_Lab/wrmXpress-gui/assets/configure_assets/motility/A01/img/20210819-p01-NJW_753_A01.png"
+            motility_img = "https://github.com/wheelerlab-uwec/wrmXpress-gui/blob/7007c5ced2b1c9d20a0e60ad1af606951ab1c3a2/assets/configure_assets/motility/A01/img/20210819-p01-NJW_753_A01.png"
+            # motility_img = "/Users/zc/Library/CloudStorage/OneDrive-UW-EauClaire/Academics/Wheeler_Lab/wrmXpress-gui/assets/configure_assets/motility/A01/img/20210819-p01-NJW_753_A01.png"
 
-            if os.path.exists(motility_img):
-                # create figure from file path 
-                fig = create_figure_from_filepath(motility_img)
-                return fig, options
+            fig = create_figure_from_url(motility_img)
+            return fig, options
         elif image == 'binary':
             # obtain the motility image
             binary_img = "/Users/zc/Library/CloudStorage/OneDrive-UW-EauClaire/Academics/Wheeler_Lab/wrmXpress-gui/assets/configure_assets/motility/A01/img/20210819-p01-NJW_753_A01_binary.png"

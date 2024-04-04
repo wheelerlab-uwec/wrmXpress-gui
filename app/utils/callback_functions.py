@@ -19,7 +19,10 @@ import tifffile as tiff
 from skimage import exposure
 import pandas as pd
 from pathlib import Path
-import os
+import requests
+from io import BytesIO
+from skimage import exposure
+import urllib.request
 
 ########################################################################
 ####                                                                ####
@@ -493,3 +496,30 @@ def formatting_module_for_yaml(pipeline):
 
 
     return motilityrun, conversionrun, segmentrun, cellprofilerrun, diagnosticdx, fecundity, trackingrun, cellprofilerpipeline, save_video, rescale_multiplier, wavelength
+
+def create_figure_from_url(image_url, scale='gray'):
+    """
+    This function creates a Plotly figure from the input image URL.
+    ===============================================================================
+    Arguments:
+        - image_url : str : URL to the image file
+    ===============================================================================
+    Returns:
+        - fig : plotly.graph_objs._figure.Figure : A Plotly figure
+    """
+    try:
+        urllib.request.urlretrieve(image_url, 'temp_image.png')
+        img = np.array(Image.open('temp_image.png'))
+
+        # Now img is a numpy array, we can create a figure directly with plotly
+        fig = px.imshow(img, color_continuous_scale=scale)
+        fig.update_layout(coloraxis_showscale=False)
+        fig.update_xaxes(showticklabels=False)
+        fig.update_yaxes(showticklabels=False)
+        print('returning fig')
+        return fig
+
+    except requests.HTTPError as http_err:
+        print(f"HTTP error occurred: {http_err}")  # HTTP error
+    except Exception as e:
+        print(f"Other error occurred: {e}")  # Other errors
