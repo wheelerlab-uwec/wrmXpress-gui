@@ -8,16 +8,8 @@ import dash_bootstrap_components as dbc
 import dash
 from dash import dcc, html, callback
 from dash.dependencies import Input, Output, State
-import yaml
 import time
 from pathlib import Path
-import numpy as np
-import plotly.express as px
-from PIL import Image
-import os
-import subprocess
-import shutil
-import shlex
 
 # importing utils
 from app.utils.styling import layout
@@ -321,34 +313,45 @@ def update_preview_image(n_clicks, store):
     platename = store['platename']  # Get the platename
     plate_base = platename.split("_", 1)[0]  # Get the plate base
     volume = store['mount']  # Get the volume
+    file_structure = store['file_structure']  # Get the file structure
 
     # Check if the button has been clicked
     if n_clicks >= 1:
-
-        # assumes IX-like file structure
-        img_path = Path(
-            volume, f'{platename}/TimePoint_1/{plate_base}_{first_well}.TIF'
-        )
-        if os.path.exists(img_path):
-            # Open the image and create a figure
-            fig = create_figure_from_filepath(img_path)
-            return f'```{img_path}```', fig  # Return the path and the figure
-        else:
-            img_path_s1 = Path(
-                volume, f'{platename}/TimePoint_1/{plate_base}_{first_well}_s1.TIF'
+        if file_structure == 'imagexpress':
+            # assumes IX-like file structure
+            img_path = Path(
+                volume, f'{platename}/TimePoint_1/{plate_base}_{first_well}.TIF'
             )
-            img_path_w1 = Path(
-                volume, f'{platename}/TimePoint_1/{plate_base}_{first_well}_w1.TIF'
+            if os.path.exists(img_path):
+                # Open the image and create a figure
+                fig = create_figure_from_filepath(img_path)
+                return f'```{img_path}```', fig  # Return the path and the figure
+            else:
+                img_path_s1 = Path(
+                    volume, f'{platename}/TimePoint_1/{plate_base}_{first_well}_s1.TIF'
+                )
+                img_path_w1 = Path(
+                    volume, f'{platename}/TimePoint_1/{plate_base}_{first_well}_w1.TIF'
+                )
+                if os.path.exists(img_path_s1):
+                    # Open the image and create a figure
+                    fig = create_figure_from_filepath(img_path_s1)
+                    return f'```{img_path_s1}```', fig
+                elif os.path.exists(img_path_w1):
+                    # Open the image and create a figure
+                    fig = create_figure_from_filepath(img_path_w1)
+                    return f'```{img_path_w1}```', fig
+        elif file_structure == 'avi':
+            # assumes AVI-like file structure
+            img_path = Path(
+                volume, 'input', f'{platename}/TimePoint_1/{platename}_{first_well}.TIF'
             )
-            if os.path.exists(img_path_s1):
+            while not os.path.exists(img_path):
+                time.sleep(1)
+            if os.path.exists(img_path):
                 # Open the image and create a figure
-                fig = create_figure_from_filepath(img_path_s1)
-                return f'```{img_path_s1}```', fig
-            elif os.path.exists(img_path_w1):
-                # Open the image and create a figure
-                fig = create_figure_from_filepath(img_path_w1)
-                return f'```{img_path_w1}```', fig
-
+                fig = create_figure_from_filepath(img_path)
+                return f'```{img_path}```', fig
     n_clicks = 0
 
 @callback(
@@ -420,23 +423,11 @@ def run_analysis(
             +- True : The button is disabled
             +- False : The button is enabled
     """
-
-    # Obtain the store data
-    volume = store['mount']
-    platename = store['platename']
-    wells = store["wells"]
-    plate_base = platename.split("_", 1)[0]
-    pipeline_selection = store['pipeline_selection']
-
     # Check if the button has been clicked
     if nclicks:
         
         return preview_callback_functions(
-                pipeline_selection=pipeline_selection,
-                volume=volume,
-                platename=platename,
-                wells=wells,
-                plate_base=plate_base,
+            store
             )
        
         

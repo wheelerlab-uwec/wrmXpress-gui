@@ -21,7 +21,7 @@ from app.components.instrument_settings import instrument_settings
 from app.components.worm_information import worm_information
 from app.components.module_selection import module_selection
 from app.components.run_time_settings import run_time_settings
-from app.utils.callback_functions import eval_bool
+from app.utils.callback_functions import eval_bool, create_figure_from_filepath
 
 # Registering this page
 dash.register_page(__name__)
@@ -384,6 +384,7 @@ def run_analysis(  # function to save the yaml file from the sections in the con
                 # check to see if volume, plate, and input directories exist
                 # obtain and full plate name path
                 platename_path = Path(volume, platename)
+                plate_base = platename.split("_", 1)[0]
 
                 # ensure all of these file paths exist (volume, input path, and plate name path)
                 if not os.path.exists(volume):
@@ -397,6 +398,35 @@ def run_analysis(  # function to save the yaml file from the sections in the con
                     error_occured = True
                     error_messages.append(
                         "No Plate/Folder in the volume."
+                    )
+
+                # check to see if imagexpress mode is selected
+                # if so, ensure that an .htd file exists
+                if filestructure == 'imagexpress':
+                    HTD_file = Path(platename_path, f'{plate_base}.HTD')
+                    htd_file = Path(platename_path, f'{plate_base}.htd')
+                    if not os.path.exists(htd_file) or not os.path.exists(HTD_file):
+                        error_occured = True
+                        error_messages.append(
+                            'No .HTD file found in the Plate/Folder.'
+                        )
+                if filestructure == 'avi':
+                    avi_folder_path = Path(volume, platename)
+                    avi_pattern = f'{platename}_'
+                    matched_files_avi = list(avi_folder_path.glob(avi_pattern + "*.avi"))
+                    if not matched_files_avi:
+                        error_occured = True
+                        error_messages.append(
+                            'No AVI files found in the Plate/Folder.'
+                        )
+                
+                # check to see if avi mode is selected for fecundity, and any
+                # of the cellprofiler modules, if it is thow an error
+                if filestructure == 'avi' and pipeline in ['fecundity', 'wormsize_intensity_cellpose',
+                                                           "mf_celltox", 'feeding', 'wormsize']:
+                    error_occured = True
+                    error_messages.append(
+                        'AVI mode is not supported for the selected pipeline.'
                     )
 
                 plate_base = platename.split("_", 1)[0]
@@ -474,3 +504,271 @@ def run_analysis(  # function to save the yaml file from the sections in the con
 
         # return success message
         return 'success', True, f'Configuration written to {output_file}', 'success'
+
+@callback(
+    Output('configure-input-preview', 'figure'),  # Targeting the figure of the non-working graph
+    Output("configure-preview-dropdown", "options"),  # Targeting the dropdown options
+    [Input('pipeline-selection', 'value')],  # Assuming this is how the user selects the pipeline
+    Input("configure-preview-dropdown", 'value'),
+    prevent_initial_call=True  # Preventing callback from running before any action is taken
+)
+def update_figure_based_on_selection(module_initial, image):
+    """
+    This function will load the image module for the selected pipeline.
+    =======================================================================================================
+    Arguments:
+        - module : str : The selected module
+        - store : dict : The stored values
+    =======================================================================================================
+    Returns:
+        - fig : The image module for the selected pipeline
+    """
+    # obtain the volume and plate name from the stored values
+    options = {
+        'plate':'plate'
+    }
+    # identify which module is selected
+    if module_initial == 'motility':
+        options = {
+            'plate':'plate',
+            'binary':'binary',
+            'blur':'blur',
+            'edge':'edge',
+            'motility':'motility'
+        }
+        if image not in options:
+            image = 'plate'
+
+        if image == 'plate':
+            # obtain the motility image
+            motility_img = "/Users/zc/Library/CloudStorage/OneDrive-UW-EauClaire/Academics/Wheeler_Lab/wrmXpress-gui/assets/configure_assets/motility/A01/img/20210819-p01-NJW_753_A01.png"
+
+            if os.path.exists(motility_img):
+                # create figure from file path 
+                fig = create_figure_from_filepath(motility_img)
+                return fig, options
+        elif image == 'binary':
+            # obtain the motility image
+            binary_img = "/Users/zc/Library/CloudStorage/OneDrive-UW-EauClaire/Academics/Wheeler_Lab/wrmXpress-gui/assets/configure_assets/motility/A01/img/20210819-p01-NJW_753_A01_binary.png"
+            
+            if os.path.exists(binary_img):
+                # create figure from file path 
+                fig = create_figure_from_filepath(binary_img)
+                return fig, options
+            
+        elif image == 'blur':
+            blur_img = "/Users/zc/Library/CloudStorage/OneDrive-UW-EauClaire/Academics/Wheeler_Lab/wrmXpress-gui/assets/configure_assets/motility/A01/img/20210819-p01-NJW_753_A01_blur.png"
+
+            if os.path.exists(blur_img):
+                # create figure from file path 
+                fig = create_figure_from_filepath(blur_img)
+                return fig, options
+            
+        elif image == 'edge':
+            edge_img = "/Users/zc/Library/CloudStorage/OneDrive-UW-EauClaire/Academics/Wheeler_Lab/wrmXpress-gui/assets/configure_assets/motility/A01/img/20210819-p01-NJW_753_A01_edge.png"
+
+            if os.path.exists(edge_img):
+                # create figure from file path 
+                fig = create_figure_from_filepath(edge_img)
+                return fig, options
+            
+        elif image == 'motility':
+            motility_img = "/Users/zc/Library/CloudStorage/OneDrive-UW-EauClaire/Academics/Wheeler_Lab/wrmXpress-gui/assets/configure_assets/motility/A01/img/20210819-p01-NJW_753_A01_motility.png"
+
+            if os.path.exists(motility_img):
+                # create figure from file path 
+                fig = create_figure_from_filepath(motility_img,scale = 'inferno')
+                return fig, options
+        else:
+            print('No motility image found')
+    
+    elif module_initial == 'fecundity':
+        options = {
+            'plate':'plate',
+            'binary':'binary',
+            'blur':'blur',
+            'edge':'edge',
+        }
+        if image not in options:
+            image = 'plate'
+
+        if image == 'plate':
+            # obtain the motility image
+            fecundity_img ="/Users/zc/Library/CloudStorage/OneDrive-UW-EauClaire/Academics/Wheeler_Lab/wrmXpress-gui/assets/configure_assets/fecundity/A01/img/20210906-p01-NJW_857_A01.png"
+            if os.path.exists(fecundity_img):
+                # create figure from file path 
+                fig = create_figure_from_filepath(fecundity_img)
+                return fig, options
+        elif image == 'binary':
+            # obtain the motility image
+            fecundity_img = "/Users/zc/Library/CloudStorage/OneDrive-UW-EauClaire/Academics/Wheeler_Lab/wrmXpress-gui/assets/configure_assets/fecundity/A01/img/20210906-p01-NJW_857_A01_binary.png"
+
+            if os.path.exists(fecundity_img):
+                # create figure from file path 
+                fig = create_figure_from_filepath(fecundity_img)
+                return fig, options
+        elif image == 'blur':
+            fecundity_img = "/Users/zc/Library/CloudStorage/OneDrive-UW-EauClaire/Academics/Wheeler_Lab/wrmXpress-gui/assets/configure_assets/fecundity/A01/img/20210906-p01-NJW_857_A01_blur.png"
+
+            if os.path.exists(fecundity_img):
+                # create figure from file path 
+                fig = create_figure_from_filepath(fecundity_img)
+                return fig, options
+        elif image == 'edge':
+            fecundity_img = "/Users/zc/Library/CloudStorage/OneDrive-UW-EauClaire/Academics/Wheeler_Lab/wrmXpress-gui/assets/configure_assets/fecundity/A01/img/20210906-p01-NJW_857_A01_edge.png"
+
+            if os.path.exists(fecundity_img):
+                fig = create_figure_from_filepath(fecundity_img)
+                return fig, options
+        else:
+            print('No fecundity image found')
+         
+    elif module_initial == 'tracking':
+        options = {
+            'plate':'plate',
+            'tracks':'tracks',
+        }
+        if image not in options:
+            image = 'plate'
+        
+        if image == 'plate':
+            tracking_img = "/Users/zc/Library/CloudStorage/OneDrive-UW-EauClaire/Academics/Wheeler_Lab/wrmXpress-gui/assets/configure_assets/tracking/A01/img/20240222-p01-RVH_A01.png"
+
+            if os.path.exists(tracking_img):
+                # create figure from file path 
+                fig = create_figure_from_filepath(tracking_img)
+                return fig, options
+            
+        elif image == 'tracks':
+            # obtain the motility image
+            tracking_img = "/Users/zc/Library/CloudStorage/OneDrive-UW-EauClaire/Academics/Wheeler_Lab/wrmXpress-gui/assets/configure_assets/tracking/A01/img/20240222-p01-RVH_A01_tracks.png"
+            
+            if os.path.exists(tracking_img):
+                # create figure from file path 
+                fig = create_figure_from_filepath(tracking_img)
+                return fig, options
+        else:
+            print('No tracking image found')
+    
+    elif module_initial == 'wormsize_intensity_cellpose':
+        options = {
+            "plate": "plate",
+            'straightened_worms': 'straightened_worms',
+            'cp_masks': 'cp_masks'
+        }
+        if image not in options:
+            image = 'plate'
+        
+        if image == 'plate':
+            # obtain the motility image
+            wrmsize_inten_cellpose = "/Users/zc/Library/CloudStorage/OneDrive-UW-EauClaire/Academics/Wheeler_Lab/wrmXpress-gui/assets/configure_assets/wormsize_intensity_cellpose/A01/img/20220408-p01-MGC_1351_A01.png"
+
+            if os.path.exists(wrmsize_inten_cellpose):
+                # create figure from file path 
+                fig = create_figure_from_filepath(wrmsize_inten_cellpose)
+                return fig, options
+        elif image == 'straightened_worms':
+            straightend_worm = "/Users/zc/Library/CloudStorage/OneDrive-UW-EauClaire/Academics/Wheeler_Lab/wrmXpress-gui/assets/configure_assets/wormsize_intensity_cellpose/A01/img/20220408-p01-MGC_A01.tiff"
+
+            if os.path.exists(straightend_worm):
+                # create figure from file path 
+                fig = create_figure_from_filepath(straightend_worm)
+                return fig, options
+        elif image == 'cp_masks':
+            cp_masks = "/Users/zc/Library/CloudStorage/OneDrive-UW-EauClaire/Academics/Wheeler_Lab/wrmXpress-gui/assets/configure_assets/wormsize_intensity_cellpose/A01/img/20220408-p01-MGC_A01_cp_masks.png"
+
+            if os.path.exists(cp_masks):
+                # create figure from file path 
+                fig = create_figure_from_filepath(cp_masks)
+                return fig, options
+        else:
+            print('No wormsize_intensity_cellpose image found')
+    
+    elif module_initial == 'mf_celltox':
+        options = {
+            "plate": "plate",
+            "straightened_worms": "straightened_worms"
+        }
+        if image not in options:
+            image = 'plate'
+        
+        if image == 'plate':
+            plate_img = "/Users/zc/Library/CloudStorage/OneDrive-UW-EauClaire/Academics/Wheeler_Lab/wrmXpress-gui/assets/configure_assets/mf_celltox/A01/img/20210917-p15-NJW_913_A01.png"
+
+            if os.path.exists(plate_img):
+                # create figure from file path 
+                fig = create_figure_from_filepath(plate_img)
+                return fig, options
+        elif image == 'straightened_worms':
+            # obtain the motility image
+            mf_celltox_img = "/Users/zc/Library/CloudStorage/OneDrive-UW-EauClaire/Academics/Wheeler_Lab/wrmXpress-gui/assets/configure_assets/mf_celltox/A01/img/20210917-p15-NJW_913_A01.TIF"
+            if os.path.exists(mf_celltox_img):
+                # create figure from file path 
+                fig = create_figure_from_filepath(mf_celltox_img)
+                return fig, options
+        else:
+            print('No mf_celltox image found')
+    
+    elif module_initial == 'feeding':
+        options = {
+            "plate": "plate",
+            'w1': 'w1',
+            'w2': 'w2',
+            'w3': 'w3',
+        }
+        if image not in options:
+            image = 'plate'
+        
+        if image == 'plate':
+
+            # obtain the motility image
+            feeding_img = "/Users/zc/Library/CloudStorage/OneDrive-UW-EauClaire/Academics/Wheeler_Lab/wrmXpress-gui/assets/configure_assets/feeding/A01/img/20210823-p01-KJG-A01.tiff"
+            if os.path.exists(feeding_img):
+                # create figure from file path 
+                fig = create_figure_from_filepath(feeding_img)
+                return fig, options
+        elif image == 'w1':
+            w1_path = "/Users/zc/Library/CloudStorage/OneDrive-UW-EauClaire/Academics/Wheeler_Lab/wrmXpress-gui/assets/configure_assets/feeding/A01/img/20210823-p01-KJG_795_A01_w1.png"
+            if os.path.exists(w1_path):
+                # create figure from file path 
+                fig = create_figure_from_filepath(w1_path)
+                return fig, options
+        elif image == 'w2':
+            w2_path = "/Users/zc/Library/CloudStorage/OneDrive-UW-EauClaire/Academics/Wheeler_Lab/wrmXpress-gui/assets/configure_assets/feeding/A01/img/20210823-p01-KJG_795_A01_w2.png"
+            if os.path.exists(w2_path):
+                # create figure from file path 
+                fig = create_figure_from_filepath(w2_path)
+                return fig, options
+        elif image == 'w3':
+            w3_path = "/Users/zc/Library/CloudStorage/OneDrive-UW-EauClaire/Academics/Wheeler_Lab/wrmXpress-gui/assets/configure_assets/feeding/A01/img/20210823-p01-KJG_795_A01_w3.png"
+            if os.path.exists(w3_path):
+                # create figure from file path 
+                fig = create_figure_from_filepath(w3_path)
+                return fig, options
+        else:
+            print('No feeding image found')
+    
+    elif module_initial == 'wormsize':
+        options = {
+            "plate": "plate",
+            'straightened_worms': 'straightened_worms',
+        }
+        if image not in options:
+            image = 'plate'
+
+        if image == 'plate':
+            plate_img = "/Users/zc/Library/CloudStorage/OneDrive-UW-EauClaire/Academics/Wheeler_Lab/wrmXpress-gui/assets/configure_assets/wormsize/A01/img/20220408-p01-MGC_1351_A01.png"
+            if os.path.exists(plate_img):
+                # create figure from file path 
+                fig = create_figure_from_filepath(plate_img)
+                return fig, options
+        elif image == 'straightened_worms':    
+            # obtain the motility image
+            wrmsize_img = "/Users/zc/Library/CloudStorage/OneDrive-UW-EauClaire/Academics/Wheeler_Lab/wrmXpress-gui/assets/configure_assets/wormsize/A01/img/20220408-p01-MGC_A01.tiff"
+            if os.path.exists(wrmsize_img):
+                # create figure from file path 
+                fig = create_figure_from_filepath(wrmsize_img)
+                return fig, options
+        else:
+            print('No wormsize image found')
+    

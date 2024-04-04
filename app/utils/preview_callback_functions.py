@@ -35,11 +35,7 @@ from app.utils.callback_functions import copy_files_to_input_directory, create_f
 ########################################################################
 
 def preview_callback_functions(
-    pipeline_selection,
-    platename, 
-    volume, 
-    wells, 
-    plate_base
+    store
 ):
         """
         This function is used to preview the analysis of the selected options.
@@ -63,59 +59,35 @@ def preview_callback_functions(
         ======================================================================
 
         """
+        pipeline_selection = store['pipeline_selection']
+
         if pipeline_selection == 'motility':
-            selection = ['motility', 'segment']
-            return motility_segment_fecundity_preview(volume, 
-                                               platename,
-                                               wells,
-                                               selection)
+            return motility_segment_fecundity_preview(store)
         
         elif pipeline_selection == 'fecundity':
-            selection = ['motility', 'segment']
-            return motility_segment_fecundity_preview(volume, 
-                                               platename,
-                                               wells,
-                                               selection)
+            return motility_segment_fecundity_preview(store)
         
         elif pipeline_selection == 'tracking':
-            selection = ['motility', 'segment']
-            # need to change to the tracking function and 
-            # not the motility segment fecundity preview function
-            return motility_segment_fecundity_preview(volume, 
-                                                platename,
-                                                wells,
-                                                selection)
+            return tracking_wrmXpress_preview(store)
         
         elif pipeline_selection == 'wormsize':
             return cellprofile_wormsize_preview(
-                wells, 
-                volume,
-                platename,
-                plate_base,
+                store
             )
         
         elif pipeline_selection == 'wormsize_intensity_cellpose':
             return cellprofile_wormsize_intensity_cellpose_preview(
-                wells, 
-                volume,
-                platename,
-                plate_base,
+                store
             )
         
         elif pipeline_selection == 'mf_celltox':
             return cellprofile_mf_celltox_preview(
-                wells, 
-                volume,
-                platename,
-                plate_base,
+                store
             )
         
         elif pipeline_selection == 'feeding':
             return cellprofile_feeding_preview(
-                wells, 
-                volume,
-                platename,
-                plate_base,
+                store
             )
             
 ########################################################################
@@ -196,7 +168,7 @@ def preamble_to_run_wrmXpress_preview(
     output_preview_log_file = Path(volume, 'input', platename, f'{platename}_preview.log')
     return wrmxpress_command_split, output_preview_log_file, command_message, first_well
 
-def motility_segment_fecundity_preview(volume, platename, wells, selection):
+def motility_segment_fecundity_preview(store):
     """
     This function is used to preview the analysis of the selected options from
     the configuration page, including motility, segment, and fecundity. This function
@@ -217,6 +189,14 @@ def motility_segment_fecundity_preview(volume, platename, wells, selection):
         - open_status : bool : Open status of the alerts
     ===============================================================================
     """
+    # Obtain the store data
+    volume = store['mount']
+    platename = store['platename']
+    wells = store["wells"]
+    plate_base = platename.split("_", 1)[0]
+    pipeline_selection = store['pipeline_selection']
+    selection = ['motility', 'segment']
+    file_structure = store['file_structure']
     # Check to see if first well already exists, if it does insert the img
     # rather than running wrmXpress again
     first_well_path = Path(volume, 'work', f'{platename}/{wells[0]}/img/{platename}_{wells[0]}.png')
@@ -234,10 +214,17 @@ def motility_segment_fecundity_preview(volume, platename, wells, selection):
 
         # Return the path and the figure and the open status of the alerts
         return f"```{first_well_path}```", fig, False, f'', False
+    if file_structure == 'imagexpress':
+        wrmxpress_command_split, output_preview_log_file, command_message, first_well = preamble_to_run_wrmXpress_preview(
+            platename=platename, volume=volume, wells=wells
+        )
+    elif file_structure == 'avi':
 
-    wrmxpress_command_split, output_preview_log_file, command_message, first_well = preamble_to_run_wrmXpress_preview(
-        platename=platename, volume=volume, wells=wells
-    )
+        # modify this to work for avi files
+        wrmxpress_command_split, output_preview_log_file, command_message, first_well = preamble_to_run_wrmXpress_preview(
+            platename=platename, volume=volume, wells=wells
+        )
+
     with open(output_preview_log_file, 'w') as file:
         process = subprocess.Popen(
             wrmxpress_command_split, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
@@ -274,7 +261,7 @@ def motility_segment_fecundity_preview(volume, platename, wells, selection):
                 # Return the command message, the figure, and the open status of the alerts
                 return command_message, fig, False, f'', False
 
-def cellprofile_wormsize_preview(wells, volume, platename, plate_base):
+def cellprofile_wormsize_preview(store):
     """
     The purpose of this function is to preview the analysis of the selected options from
     the configuration page, including worm size. This function will run wrmXpress and return
@@ -294,8 +281,13 @@ def cellprofile_wormsize_preview(wells, volume, platename, plate_base):
         - open_status : bool : Open status of the alerts
     ===============================================================================
     """
+    # Obtain the store data
+    volume = store['mount']
+    platename = store['platename']
+    wells = store["wells"]
+    plate_base = platename.split("_", 1)[0]
+    pipeline_selection = store['pipeline_selection']
     first_well = wells[0]
-    print(first_well)
     # Assumes IX-like file structure
     first_well_path = Path(volume, f'output/straightened_worms/{plate_base}_{first_well}.tiff')
 
@@ -334,7 +326,7 @@ def cellprofile_wormsize_preview(wells, volume, platename, plate_base):
                 # Return the command message, the figure, and the open status of the alerts
                 return command_message, fig, False, f'', False
 
-def cellprofile_wormsize_intensity_cellpose_preview(wells, volume, platename, plate_base):
+def cellprofile_wormsize_intensity_cellpose_preview(store):
     """
     The purpose of this function is to preview the analysis of the selected options from
     the configuration page, including worm size and intensity using CellPose. This function
@@ -354,6 +346,13 @@ def cellprofile_wormsize_intensity_cellpose_preview(wells, volume, platename, pl
         - open_status : bool : Open status of the alerts
     ===============================================================================
     """
+    # Obtain the store data
+    volume = store['mount']
+    platename = store['platename']
+    wells = store["wells"]
+    plate_base = platename.split("_", 1)[0]
+    pipeline_selection = store['pipeline_selection']
+    
     output_folder = Path(volume, 'input', platename)
     output_preview_log_file = Path(output_folder, f'{platename}_preview.log')
 
@@ -398,7 +397,7 @@ def cellprofile_wormsize_intensity_cellpose_preview(wells, volume, platename, pl
                 # Return the command message, the figure, and the open status of the alerts
                 return command_message, fig, False, f'', False
             
-def cellprofile_mf_celltox_preview(wells, volume, platename, plate_base):
+def cellprofile_mf_celltox_preview(store):
     """
     The purpose of this function is to preview the analysis of the selected options from
     the configuration page, including motility, fecundity, and celltox. This function
@@ -418,6 +417,13 @@ def cellprofile_mf_celltox_preview(wells, volume, platename, plate_base):
         - open_status : bool : Open status of the alerts
     =============================================================================== 
     """
+    # Obtain the store data
+    volume = store['mount']
+    platename = store['platename']
+    wells = store["wells"]
+    plate_base = platename.split("_", 1)[0]
+    pipeline_selection = store['pipeline_selection']
+    
     output_folder = Path(volume, 'input', platename)
     output_preview_log_file = Path(output_folder, f'{platename}_preview.log')
 
@@ -464,7 +470,7 @@ def cellprofile_mf_celltox_preview(wells, volume, platename, plate_base):
                 # Return the command message, the figure, and the open status of the alerts
                 return command_message, fig, False, f'', False
 
-def cellprofile_feeding_preview(wells, volume, platename, plate_base):
+def cellprofile_feeding_preview(store):
     """
     The purpose of this function is to preview the analysis of the selected options from
     the configuration page, including feeding. This function will run wrmXpress and return
@@ -484,6 +490,13 @@ def cellprofile_feeding_preview(wells, volume, platename, plate_base):
         - open_status : bool : Open status of the alerts
     ===============================================================================
     """
+    # Obtain the store data
+    volume = store['mount']
+    platename = store['platename']
+    wells = store["wells"]
+    plate_base = platename.split("_", 1)[0]
+    pipeline_selection = store['pipeline_selection']
+
     output_folder = Path(volume, 'input', platename)
     output_preview_log_file = Path(output_folder, f'{platename}_preview.log')
 
@@ -528,3 +541,150 @@ def cellprofile_feeding_preview(wells, volume, platename, plate_base):
 
                 # Return the command message, the figure, and the open status of the alerts
                 return command_message, fig, False, f'', False
+
+def tracking_wrmXpress_preview(
+        store
+):
+    """
+    This function is used to preview the analysis of the selected options from
+    the configuration page, including motility, segment, and fecundity. This function
+    will run wrmXpress and return the path to the image, the figure, and the open status
+    if the first well has not already been analyzed.
+    ===============================================================================
+    Arguments:
+        - volume : str : Path to the volume
+        - platename : str : Name of the plate
+        - wells : list : List of well names
+        - selection : str : Selection
+    ===============================================================================
+    Returns:
+        - path : str : Path to the image
+        - fig : matplotlib.figure.Figure : A figure
+        - open_status : bool : Open status of the alerts
+        - command_message : str : A command message
+        - open_status : bool : Open status of the alerts
+    ===============================================================================
+    """
+    # Obtain the store data
+    volume = store['mount']
+    platename = store['platename']
+    wells = store["wells"]
+    plate_base = platename.split("_", 1)[0]
+    pipeline_selection = store['pipeline_selection']
+    selection = ['motility', 'segment']
+
+    # check to see if the first well has already been analyzed
+    first_well_path = Path(volume, 'work', f'{platename}/{wells[0]}/img/{platename}_{wells[0]}_tracks.png')
+
+    # Check if the first well path exists
+    if os.path.exists(first_well_path):
+        # Open the image and create a figure
+        fig = create_figure_from_filepath(first_well_path)
+
+        # Return the path and the figure and the open status of the alerts
+        return f"```{first_well_path}```", fig, False, f'', False
+    
+    # if the first well does not exist, run wrmXpress
+    wrmxpress_command_split, output_folder, output_file, command_message, wells, volume, platename, wells_analyzed, tracking_well = preamble_to_run_wrmXpress_preview_tracking(
+        volume, platename, wells
+    )
+
+    while not os.path.exists(output_folder):
+        time.sleep(1)
+    with open(output_file, "w") as file:
+        process = subprocess.Popen(
+            wrmxpress_command_split, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+
+        # Create an empty list to store the docker output
+        docker_output = []
+
+        for line in iter(process.stdout.readline, b''):
+            # Add the line to docker_output for further processing
+            docker_output.append(line)
+            file.write(line)
+            file.flush()
+            if 'Generating w1 thumbnails' in line:
+                first_well_path = Path(volume, 'work', f'{platename}/{wells[0]}/img/{platename}_{wells[0]}_tracks.png')
+
+                while not os.path.exists(first_well_path):
+                    time.sleep(1)
+
+                # create figure from file path
+                fig_1 = create_figure_from_filepath(first_well_path)
+                docker_output_formatted = ''.join(docker_output)
+
+                print('wrmXpress is finished')
+                docker_output.append('wrmXpress is finished')
+                docker_output_formatted = ''.join(docker_output)
+                return command_message, fig_1, False, f'', False
+
+def preamble_to_run_wrmXpress_preview_tracking(volume, platename, wells):
+    """
+    The purpose of this function is to prepare the wrmXpress command, output folder, output file, 
+    command message, wells, volume, platename, motility, segment, cellprofiler, and cellprofilepipeline.
+    ===============================================================================
+    Arguments:
+        - store : dict : A dictionary containing the store
+    ===============================================================================
+    Returns:
+        - wrmxpress_command_split : list : List of wrmXpress commands
+        - output_folder : str : Path to the output folder
+        - output_file : str : Path to the output file
+        - command_message : str : A command message
+        - wells : list : List of well names
+        - volume : str : Path to the volume
+        - platename : str : Name of the plate
+        - wells_analyzed : list : List of wells analyzed
+        - tracking_well : list : List of tracking wells
+    ===============================================================================
+
+    """
+    print('Running wrmXpress.')
+    # necessary file paths
+    img_dir = Path(volume, platename)
+    input_dir = Path(volume, 'input')
+    platename_input_dir = Path(input_dir, platename)
+    full_yaml = Path(volume, platename + '.yml')
+
+    update_yaml_file(
+            full_yaml,
+            full_yaml,
+            {'wells': ['All']}
+        )
+
+        # clean and create directories
+    clean_and_create_directories(
+            input_path=Path(volume, 'input', platename), 
+            work_path=Path(volume, 'work', platename),
+            output_path=Path(volume, 'output')
+        )
+    htd_file = Path(img_dir, f'{platename}.HTD')
+    if not os.path.exists(htd_file):
+        copy_files_to_input_directory(
+                platename_input_dir=platename_input_dir,
+                htd_file= None,
+                img_dir=img_dir,
+                wells=wells[0],
+                plate_base=None,
+                platename=platename
+            )
+    elif os.path.exists(htd_file):
+        htd_file = Path(img_dir, f'{platename}.HTD')
+        copy_files_to_input_directory(
+                platename_input_dir=platename_input_dir,
+                htd_file= htd_file,
+                img_dir=img_dir,
+                wells=wells,
+                plate_base=None,
+                platename=platename
+            )
+        # Command message
+    command_message = f"```python wrmXpress/wrapper.py {platename}.yml {platename}```"
+
+    wrmxpress_command = f'python -u wrmXpress/wrapper.py {volume}/{platename}.yml {platename}'
+    wrmxpress_command_split = shlex.split(wrmxpress_command)
+    output_folder = Path(volume, 'work', platename)
+    output_file = Path(volume, 'work', platename, f"{platename}_preview.log")  # Specify the name and location of the output file
+    wells_analyzed = []
+    tracking_well = []
+    return wrmxpress_command_split, output_folder, output_file, command_message, wells, volume, platename, wells_analyzed, tracking_well

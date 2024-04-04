@@ -384,5 +384,60 @@ def get_options_analysis(nclicks, store):
         # check to see if the button has been clicked (nclicks)
         if nclicks is not None:
             return selection_dict
+    elif pipeline_selection == "wormsize_intensity_cellpose":
+                
+        # create the options
+        selection_dict = {'plate': 'plate', 'straightened_worms': 'straightened_worms'}
+        
+         # check to see if the button has been clicked (nclicks)
+        if nclicks is not None:
+            return selection_dict
+    elif pipeline_selection == 'mf_celltox':
+                
+            # create the options
+            selection_dict = {'plate': 'plate'}
+            
+            # check to see if the button has been clicked (nclicks)
+            if nclicks is not None:
+                return selection_dict
+    elif pipeline_selection == 'wormsize':
+        # create the options
+        selection_dict = {'plate': 'plate', 'straightened_worms': 'straightened_worms'}
+        
+         # check to see if the button has been clicked (nclicks)
+        if nclicks is not None:
+            return selection_dict
+    elif pipeline_selection == 'feeding':
+       # obtain the wavelength options
+        volume = store['mount']
+        platename = store['platename']
+        thumbs_file_path = Path(volume, 'output/thumbs/')
+        
+        # create the options
+        selection_dict = {
+            'plate': 'plate',
+            'straightened_worms': 'straightened_worms',
+        }
+
+        # New code to add: list all matching files and extract unique identifiers
+        pattern = f"{platename}*.png"
+        # Using glob to match the pattern
+        all_files = list(thumbs_file_path.glob(pattern))
+        # Extracting unique identifiers from filenames (e.g., _w1, _w2, etc.)
+        wavelengths = set()
+        for file_path in all_files:
+            parts = file_path.name.split('_')
+            if len(parts) > 1 and parts[-1].startswith('w') and parts[-1].endswith('.png'):
+                wavelengths.add(parts[-1].replace('.png', ''))
+
+        # Adding these wavelengths to the selection dictionary
+        for wave in sorted(wavelengths):
+            selection_key = f'wavelength_{wave}'  # Format the key as you see fit
+            selection_dict[selection_key] = wave
+
+        # Assuming nclicks is some condition you've checked elsewhere
+        nclicks = 1
+        if nclicks is not None:
+            return selection_dict
     else:   
         return {'plate': 'plate'}

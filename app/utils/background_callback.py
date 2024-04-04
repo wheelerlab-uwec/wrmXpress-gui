@@ -606,61 +606,55 @@ def cellprofile_wormsize_run(output_folder, output_file, wrmxpress_command_split
         - command_message : str : A command message
     ===============================================================================
     """
-    # Ensure the output folder exists
     while not os.path.exists(output_folder):
         time.sleep(1)
-    
-    # Open the output file and begin the subprocess
+        
     with open(output_file, "w") as file:
-        process = subprocess.Popen(wrmxpress_command_split, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+        process = subprocess.Popen(
+            wrmxpress_command_split, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True
+        )
         docker_output = []
         wells_analyzed = []
         wells_to_be_analyzed = len(wells)
-
-        # Read and process output from the subprocess
+        progress = 0
+        total_progress = wells_to_be_analyzed
+        
         for line in iter(process.stdout.readline, b''):
             docker_output.append(line)
             file.write(line)
             file.flush()
-
-            # Load the CSV file to find out which well is being analyzed
-            csv_file_path = Path(volume, 'input', f'image_paths_wormsizze.csv')
-            while not os.path.exists(csv_file_path):
-                time.sleep(1)
             
-            read_csv = pd.read_csv(csv_file_path)
-            well_column = read_csv['Metadata_Well']  # Find the well column
-            
-            if 'Execution halted' in line:
+            if 'Generating w1 thumbnails' in line:
                 output_path = Path(volume, 'output', 'thumbs', platename + '.png')
                 while not os.path.exists(output_path):
                     time.sleep(1)
-
-                # Create a figure for the output
-                fig_1 = create_figure_from_filepath(output_path)
                 
+                fig_1 = create_figure_from_filepath(output_path)
                 print('wrmXpress has finished.')
                 docker_output.append('wrmXpress has finished.')
-                docker_output_formatted = ''.join(docker_output) 
-                return fig_1, False, False, '', f'```{docker_output_formatted}```'
-
-            # Check for the 'Image #' pattern to update progress
+                docker_output_formatted = ''.join(docker_output)
+                return fig_1, False, False, f'', f'```{docker_output_formatted}```'
+            
             elif 'Image #' in line:
+                csv_file_path = Path(volume, 'input', f'image_paths_wormsize_intensity_cellpose.csv')
+                while not os.path.exists(csv_file_path):
+                    time.sleep(1)
+                
+                read_csv = pd.read_csv(csv_file_path)
+                well_column = read_csv['Metadata_Well']
+                
                 image_number_pattern = re.search(r'Image # (\d+)', line)
                 if image_number_pattern:
                     image_number = int(image_number_pattern.group(1))
-                    well_id = well_column.iloc[image_number - 1]  # Adjust for zero indexing
-
-                    # Construct the image path
+                    well_id = well_column.iloc[image_number - 1]
                     img_path = Path(volume, f'input/{platename}/TimePoint_1/{plate_base}_{well_id}.TIF')
-                    if img_path.exists():
-                        # Load and display the image
-                        fig = create_figure_from_filepath(img_path)
-                        docker_output_formatted = ''.join(docker_output) 
-                        
-                        # Update progress
-                        set_progress((str(image_number), str(wells_to_be_analyzed), fig, f'```{img_path}```', f'```{docker_output_formatted}```'))
 
+                    if img_path.exists():
+                        fig = create_figure_from_filepath(img_path)
+                        progress += 1
+                        docker_output_formatted = ''.join(docker_output)
+                        set_progress(((image_number), str(total_progress), fig, f'```{img_path}```', f'```{docker_output_formatted}```'))
+            
 def cellprofile_wormsize_intesity_cellpose_run(
     output_folder, output_file, wrmxpress_command_split,
     wells, volume, platename, plate_base, set_progress
