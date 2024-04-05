@@ -21,6 +21,10 @@ module_selection = dbc.AccordionItem(
         html.Br(),
         dbc.Row([
             dbc.Col([
+                dbc.Row([
+                    dcc.Markdown(children = [' '],
+                                 id = 'module-selection-text'),
+                ]),
                 dbc.RadioItems(
                     id="pipeline-selection",
                     inputClassName="btn-check",
@@ -69,12 +73,13 @@ module_selection = dbc.AccordionItem(
                     persistence=True,
                     persistence_type='memory'
             ),
-            html.Br(),
-            dcc.Markdown(
-                id = 'configure-preview-dropdown-text',
-            ),
             ], width=6),
             dbc.Col([
+                dbc.Row([
+                    dcc.Markdown(
+                id = 'configure-preview-dropdown-text',
+            ),
+                ]),
                 dbc.Alert(
                     id='configure-img-view-alert',
                     color='light',

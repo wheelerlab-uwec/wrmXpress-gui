@@ -87,6 +87,8 @@ def update_analysis_preview_imgage(selection, nclicks, store):
             # assumes IX-like file structure
             if selection == 'plate':
                 selection = ''
+            elif selection == "segment":
+                selection = "_binary"
             else:
                 selection = f'_{selection}'
 
@@ -98,7 +100,7 @@ def update_analysis_preview_imgage(selection, nclicks, store):
             if os.path.exists(img_path):
 
                 # checking the selection and changing the scale accordingly
-                if selection == 'motility':
+                if selection == '_motility':
                     scale = 'inferno'
                 else:
                     scale = 'gray'

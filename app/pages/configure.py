@@ -677,8 +677,7 @@ def update_figure_based_on_selection(module_initial, image):
     
     elif module_initial == 'mf_celltox':
         options = {
-            "plate": "plate",
-            "straightened_worms": "straightened_worms"
+            "plate": "plate"
         }
         if image not in options:
             image = 'plate'
@@ -693,34 +692,23 @@ def update_figure_based_on_selection(module_initial, image):
             # create figure from file path 
             fig = create_figure_from_url(raw_image_url)
             return fig, options, configure_preview_dropdown_text
-            
-        elif image == 'straightened_worms':
-            # GitHub permalink
-            github_url = "https://github.com/wheelerlab-uwec/wrmXpress-gui/blob/c6fead59f56e4312f0a3d3e228dd0af7e335875b/assets/configure_assets/mf_celltox/A01/img/20210917-p15-NJW_913_A01.TIF"
-
-            # Transform the GitHub permalink into a raw content URL
-            raw_image_url = github_url.replace('github.com', 'raw.githubusercontent.com').replace('/blob', '')
-
-            # create figure from file path 
-            fig = create_figure_from_url(raw_image_url)
-            return fig, options, configure_preview_dropdown_text
     
         else:
             print('No mf_celltox image found')
     
     elif module_initial == 'feeding':
         options = {
-            "plate": "plate",
+            # "plate": "plate",
             'w1': 'w1',
             'w2': 'w2',
             'w3': 'w3',
         }
         if image not in options:
-            image = 'plate'
+            image = 'w1'
         
         if image == 'plate':
             # GitHub permalink
-            github_url = "https://github.com/wheelerlab-uwec/wrmXpress-gui/blob/c6fead59f56e4312f0a3d3e228dd0af7e335875b/assets/configure_assets/feeding/A01/img/20210823-p01-KJG-A01.tiff"
+            github_url = "https://github.com/wheelerlab-uwec/wrmXpress-gui/blob/90a19b9585011c8f7a149a6b9bad41c16aef90ee/assets/configure_assets/feeding/A01/img/20210823-p01-KJG-A01.tiff"
 
             # Transform the GitHub permalink into a raw content URL
             raw_image_url = github_url.replace('github.com', 'raw.githubusercontent.com').replace('/blob', '')
