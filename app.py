@@ -9,12 +9,10 @@ import dash_bootstrap_components as dbc
 from dash import Dash, html, dcc, DiskcacheManager
 from dash.dependencies import Input, Output, State
 
-
 # Importing Components
 from app.utils.styling import CONTENT_STYLE, SIDEBAR_STYLE
 from app.components.header import header
 from app.utils.background_callback import callback
-
 
 # Diskcache
 import diskcache
