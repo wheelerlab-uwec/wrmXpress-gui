@@ -103,9 +103,6 @@ module_selection = dbc.AccordionItem(
     title="Pipeline Selection",
 )
 
-
-
-
 """
         # Create separate tabs for video/image analysis
         dcc.Tabs(
