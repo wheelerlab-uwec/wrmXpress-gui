@@ -709,7 +709,7 @@ def update_figure_based_on_selection(module_initial, image):
         
         if image == 'straightened_worms':
             # GitHub permalink
-            github_url = "https://github.com/wheelerlab-uwec/wrmXpress-gui/blob/90a19b9585011c8f7a149a6b9bad41c16aef90ee/assets/configure_assets/feeding/A01/img/20210823-p01-KJG-A01.tiff"
+            github_url = "https://github.com/wheelerlab-uwec/wrmXpress-gui/blob/a7038e4d591d2a30ca153d48baf8d484479b6007/assets/configure_assets/feeding/A01/img/20210823-p01-KJG-A01.png"
 
             # Transform the GitHub permalink into a raw content URL
             raw_image_url = github_url.replace('github.com', 'raw.githubusercontent.com').replace('/blob', '')

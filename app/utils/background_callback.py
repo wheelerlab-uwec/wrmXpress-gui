@@ -70,7 +70,7 @@ def callback(set_progress, n_clicks, store):
     """
     # Check if store is empty
     if not store:
-        return None, True, True, "No configuration found. Please go to the configuration page to set up the analysis.", "No configuration found. Please go to the configuration page to set up the analysis."
+        return {}, True, True, "No configuration found. Please go to the configuration page to set up the analysis.", "No configuration found. Please go to the configuration page to set up the analysis."
 
     # obtain the necessary data from the store
     pipeline_selection = store["pipeline_selection"]
@@ -93,7 +93,7 @@ def callback(set_progress, n_clicks, store):
 
             return cellprofile_wormsize_intesity_cellpose_run(store, set_progress)
         
-        elif pipeline_selection == "wormsize":
+        elif pipeline_selection == "mf_celltox":
 
             return cellprofile_mf_celltox_run(store, set_progress)  
 
@@ -570,6 +570,7 @@ def cellprofile_wormsize_run(
     volume = new_store['volume']
     platename = new_store['platename']
     plate_base = platename.split("_", 1)[0]
+    pipeline_selection = store['pipeline_selection']
 
     while not os.path.exists(output_folder):
         time.sleep(1)
@@ -603,15 +604,17 @@ def cellprofile_wormsize_run(
                 return fig_1, False, False, f'', f'```{docker_output_formatted}```'
             
             elif 'Image #' in line:
-                csv_file_path = Path(volume, 'input', f'image_paths_wormsize_intensity_cellpose.csv')
+                csv_file_path = Path(volume, 'input', f'image_paths_{pipeline_selection}.csv')
                 while not os.path.exists(csv_file_path):
                     time.sleep(1)
                 
                 read_csv = pd.read_csv(csv_file_path)
                 well_column = read_csv['Metadata_Well']
+
                 
                 image_number_pattern = re.search(r'Image # (\d+)', line)
                 if image_number_pattern:
+                    image_number_pattern
                     image_number = int(image_number_pattern.group(1))
                     well_id = well_column.iloc[image_number - 1]
                     img_path = Path(volume, f'input/{platename}/TimePoint_1/{plate_base}_{well_id}.TIF')
@@ -621,7 +624,7 @@ def cellprofile_wormsize_run(
                         progress += 1
                         docker_output_formatted = ''.join(docker_output)
                         set_progress(((image_number), str(total_progress), fig, f'```{img_path}```', f'```{docker_output_formatted}```'))
-            
+
 def cellprofile_wormsize_intesity_cellpose_run(
         store, 
         set_progress
@@ -660,6 +663,7 @@ def cellprofile_wormsize_intesity_cellpose_run(
     volume = new_store['volume']
     platename = new_store['platename']
     plate_base = platename.split("_", 1)[0]
+    pipeline_selection = store['pipeline_selection']
 
     while not os.path.exists(output_folder):
         time.sleep(1)
@@ -693,7 +697,7 @@ def cellprofile_wormsize_intesity_cellpose_run(
                 return fig_1, False, False, f'', f'```{docker_output_formatted}```'
             
             elif 'Image #' in line:
-                csv_file_path = Path(volume, 'input', f'image_paths_wormsize_intensity_cellpose.csv')
+                csv_file_path = Path(volume, 'input', f'image_paths_{pipeline_selection}.csv')
                 while not os.path.exists(csv_file_path):
                     time.sleep(1)
                 
@@ -771,6 +775,7 @@ def cellprofile_mf_celltox_run(
     volume = new_store['volume']
     platename = new_store['platename']
     plate_base = platename.split("_", 1)[0]
+    pipeline_selection = store['pipeline_selection']
 
     while not os.path.exists(output_folder):
         time.sleep(1)
@@ -787,7 +792,7 @@ def cellprofile_mf_celltox_run(
             file.write(line)
             file.flush()
 
-            csv_file_path = Path(volume, 'input', f'image_paths_mf_celltox.csv')
+            csv_file_path = Path(volume, 'input', f'image_paths_{pipeline_selection}.csv')
             while not os.path.exists(csv_file_path):
                 time.sleep(1)
 
@@ -809,8 +814,12 @@ def cellprofile_mf_celltox_run(
             elif 'Image #' in line:
                 image_number_pattern = re.search(r'Image # (\d+)', line)
                 if image_number_pattern:
+
                     image_number = int(image_number_pattern.group(1))
-                    well_id = well_column.iloc[image_number - 1]
+                    try:
+                        well_id = well_column.iloc[image_number - 1]
+                    except IndexError:
+                        well_id = well_column.iloc[0]
 
                     img_path = Path(volume, f'input/{platename}/TimePoint_1/{plate_base}_{well_id}_s1.TIF')
                     if img_path.exists():
@@ -858,6 +867,7 @@ def cellprofile_feeding_run(
     volume = new_store['volume']
     platename = new_store['platename']
     plate_base = platename.split("_", 1)[0]
+    pipeline_selection = store['pipeline_selection']
 
     while not os.path.exists(output_folder):
         time.sleep(1)
@@ -874,7 +884,7 @@ def cellprofile_feeding_run(
             file.write(line)
             file.flush()
 
-            csv_file_path = Path(volume, 'input', f'image_paths_feeding.csv')
+            csv_file_path = Path(volume, 'input', f'image_paths_{pipeline_selection}.csv')
             while not os.path.exists(csv_file_path):
                 time.sleep(1)
 

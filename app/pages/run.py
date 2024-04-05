@@ -7,19 +7,17 @@
 from dash import callback
 from dash.dependencies import Input, Output, State
 from pathlib import Path
-import numpy as np
-import plotly.express as px
-from PIL import Image
 import os
 import dash
 from dash.long_callback import DiskcacheLongCallbackManager
 
 # importing utils
-from app.utils.callback_functions import send_ctrl_c
+from app.utils.callback_functions import send_ctrl_c, create_figure_from_filepath
 from app.components.run_layout import run_layout
 
 # Diskcache
 import diskcache
+
 cache = diskcache.Cache("./cache")
 long_callback_manager = DiskcacheLongCallbackManager(cache)
 
@@ -100,43 +98,39 @@ def load_analysis_img(selection, n_clicks, store):
     # get the store from the data
     volume = store['mount']
     platename = store['platename']
+    plate_base = platename.split("_", 1)[0]
+    wells = store['wells']
 
+    img_path = None
+    scale = 'gray'
     # check to see if selection option exists in output thumbs folder
     if n_clicks:
+        
+        if selection == 'straightened_worms':
+            img_path = Path(volume, f'output/strightened_worms/{plate_base}_{wells[0]}.tiff')
+            scale = 'inferno'
 
-        # check to see if selection is plate
-        if selection == 'plate':
+        elif selection == 'plate':
+            selection = ''
+        
+        elif selection == 'segment':
+            selection = '_binary'
+        
+        else:
+            selection = f'_{selection}'
+        
+        if img_path is None:
+            img_path = Path(volume, f'output/thumbs/{platename}{selection}.png')
 
-            # obtaining the output plate path
-            output_plate_path = Path(volume, f'output/thumbs/{platename}.png')
+        # check to see if the img exists
+        if os.path.exists(img_path):
+            fig = create_figure_from_filepath(img_path, scale)
 
-            # creating the image
-            img = np.array(Image.open(output_plate_path))
-            fig = px.imshow(img, color_continuous_scale="gray")
-            fig.update_layout(coloraxis_showscale=False)
-            fig.update_xaxes(showticklabels=False)
-            fig.update_yaxes(showticklabels=False)
+            return fig, f'```{img_path}```', False, True
+        
+        else:
+            return None, None, False, False
 
-            # return the figure and the output thumbs path
-            return fig, f'```{output_plate_path}```', False, True
-
-        # check to see if selection option exists in output thumbs folder
-        output_thumbs_path = Path(
-            volume, f'output/thumbs/{platename}_{selection}.png'
-        )
-
-        # check to see if the output thumbs path exists
-        if os.path.exists(output_thumbs_path):
-
-            # creating the image
-            img = np.array(Image.open(output_thumbs_path))
-            fig = px.imshow(img, color_continuous_scale="gray")
-            fig.update_layout(coloraxis_showscale=False)
-            fig.update_xaxes(showticklabels=False)
-            fig.update_yaxes(showticklabels=False)
-
-            # return the figure and the output thumbs path
-            return fig, f'```{output_thumbs_path}```', False, True
     else:
         return None, None, True, False
 
@@ -163,7 +157,7 @@ def get_options_analysis(nclicks, store):
 
     # check to see if store exists
     if not store:
-        return []
+        return {}
 
     # get the store from the data
     pipeline_selection = store['pipeline_selection']
@@ -175,6 +169,7 @@ def get_options_analysis(nclicks, store):
         # check to see if the button has been clicked (nclicks)
         if nclicks is not None:
             return selection_dict  # return the option dictionary
+        
     elif pipeline_selection == 'fecundity':
             
         # create the options
@@ -183,6 +178,7 @@ def get_options_analysis(nclicks, store):
         # check to see if the button has been clicked (nclicks)
         if nclicks is not None:
             return selection_dict
+        
     elif pipeline_selection == 'tracking':
             
         # create the options
@@ -191,6 +187,7 @@ def get_options_analysis(nclicks, store):
         # check to see if the button has been clicked (nclicks)
         if nclicks is not None:
             return selection_dict
+        
     elif pipeline_selection == "wormsize_intensity_cellpose":
                 
         # create the options
