@@ -14,9 +14,8 @@ import subprocess
 import time
 import shlex
 import re
-import glob
 
-from app.utils.callback_functions import eval_bool, create_figure_from_filepath
+from app.utils.callback_functions import create_figure_from_filepath
 from app.utils.callback_functions import update_yaml_file, clean_and_create_directories, copy_files_to_input_directory
 
 ########################################################################
@@ -75,99 +74,36 @@ def callback(set_progress, n_clicks, store):
 
     # obtain the necessary data from the store
     pipeline_selection = store["pipeline_selection"]
+
     # Check if the submit button has been clicked
     if n_clicks:
         if pipeline_selection == 'tracking':
-            [
-                wrmxpress_command_split, 
-                output_folder, 
-                output_file, 
-                command_message, 
-                wells, 
-                volume,
-                platename, 
-                wells_analyzed, 
-                tracking_well
-            ] = preamble_to_run_wrmXpress_tracking(store)
-
-            return tracking_wrmXpress_run(
-                output_folder,
-                output_file,
-                wrmxpress_command_split,
-                volume,
-                platename,
-                wells,
-                wells_analyzed,
-                tracking_well,
-                set_progress
-            )
+            
+            return tracking_wrmXpress_run(store, set_progress)
         
-        else:
+        elif pipeline_selection == 'motility':
 
-            [wrmxpress_command_split,
-                output_folder, 
-                output_file, 
-                command_message, 
-                wells, 
-                volume, 
-                platename, 
-                plate_base] = preamble_to_run_wrmXpress_non_tracking(store)
-            
-            if pipeline_selection == 'motility':
-                return motility_or_segment_run(output_folder=output_folder, 
-                                       output_file=output_file, 
-                                       wrmxpress_command_split=wrmxpress_command_split, 
-                                       set_progress=set_progress, 
-                                       volume=volume, 
-                                       platename=platename, 
-                                       wells=wells, 
-                                       plate_base=plate_base)
-            
-            elif pipeline_selection == 'fecundity':
-                return fecundity_run(output_folder=output_folder, 
-                                       output_file=output_file, 
-                                       wrmxpress_command_split=wrmxpress_command_split, 
-                                       set_progress=set_progress, 
-                                       volume=volume, 
-                                       platename=platename, 
-                                       wells=wells, 
-                                       plate_base=plate_base)
-            
-            elif pipeline_selection == 'wormsize_intensity_cellpose':
-                return cellprofile_wormsize_intesity_cellpose_run(
-                    output_folder=output_folder,
-                    output_file=output_file,
-                    wrmxpress_command_split=wrmxpress_command_split,
-                    wells = wells,
-                    volume=volume,
-                    platename=platename,
-                    plate_base=plate_base,
-                    set_progress=set_progress
-                )
-            
-            elif pipeline_selection == 'mf_celltox':
-                return cellprofile_mf_celltox_run(
-                    output_folder, 
-                    output_file, 
-                    wrmxpress_command_split,
-                    wells, 
-                    volume, 
-                    platename, 
-                    plate_base, 
-                    set_progress
-                ) 
-            
-            elif pipeline_selection == 'feeding':
-                return cellprofile_feeding_run(
-                    output_folder, output_file, wrmxpress_command_split,
-                    wells, volume, platename, plate_base, set_progress
-                    
-                )
-            
-            elif pipeline_selection == 'wormsize':  
-                return cellprofile_wormsize_run(output_folder, output_file, wrmxpress_command_split,
-                             wells, volume, platename, plate_base, set_progress
-                             )
+            return motility_or_segment_run(store, set_progress)
+        
+        elif pipeline_selection == 'fecundity':
+                
+                return fecundity_run(store, set_progress)
+        
+        elif pipeline_selection == "wormsize_intensity_cellpose":
+
+            return cellprofile_wormsize_intesity_cellpose_run(store, set_progress)
+        
+        elif pipeline_selection == "wormsize":
+
+            return cellprofile_mf_celltox_run(store, set_progress)  
+
+        elif pipeline_selection == 'feeding':
+
+            return cellprofile_feeding_run(store, set_progress)   
+
+        elif pipeline_selection == 'wormsize':
+
+            return cellprofile_wormsize_run(store, set_progress)       
 
 ########################################################################
 ####                                                                ####
@@ -175,32 +111,11 @@ def callback(set_progress, n_clicks, store):
 ####                                                                ####
 ########################################################################
 
-def preamble_to_run_wrmXpress_tracking(store):
-    """
-    The purpose of this function is to prepare the wrmXpress command, output folder, output file, 
-    command message, wells, volume, platename, motility, segment, cellprofiler, and cellprofilepipeline.
-    ===============================================================================
-    Arguments:
-        - store : dict : A dictionary containing the store
-    ===============================================================================
-    Returns:
-        - wrmxpress_command_split : list : List of wrmXpress commands
-        - output_folder : str : Path to the output folder
-        - output_file : str : Path to the output file
-        - command_message : str : A command message
-        - wells : list : List of well names
-        - volume : str : Path to the volume
-        - platename : str : Name of the plate
-        - wells_analyzed : list : List of wells analyzed
-        - tracking_well : list : List of tracking wells
-    ===============================================================================
-
-    """
+def preamble_run_wrmXpress_avi_selection(store):
     volume = store['mount']
     platename = store['platename']
     wells = store["wells"]
-    file_structure = store['file_structure']
-    print('Running wrmXpress.')
+
     # necessary file paths
     img_dir = Path(volume, platename)
     input_dir = Path(volume, 'input')
@@ -219,8 +134,8 @@ def preamble_to_run_wrmXpress_tracking(store):
             work_path=Path(volume, 'work', platename),
             output_path=Path(volume, 'output')
         )
-    if file_structure == 'avi':
-        copy_files_to_input_directory(
+    
+    copy_files_to_input_directory(
                 platename_input_dir=platename_input_dir,
                 htd_file= None,
                 img_dir=img_dir,
@@ -228,17 +143,8 @@ def preamble_to_run_wrmXpress_tracking(store):
                 plate_base=None,
                 platename=platename
             )
-    elif file_structure == 'imagexpress':
-        htd_file = Path(img_dir, f'{platename}.HTD')
-        copy_files_to_input_directory(
-                platename_input_dir=platename_input_dir,
-                htd_file= htd_file,
-                img_dir=img_dir,
-                wells=wells,
-                plate_base=None,
-                platename=platename
-            )
-        # Command message
+    
+    # Command message
     command_message = f"```python wrmXpress/wrapper.py {platename}.yml {platename}```"
 
     wrmxpress_command = f'python -u wrmXpress/wrapper.py {volume}/{platename}.yml {platename}'
@@ -247,17 +153,80 @@ def preamble_to_run_wrmXpress_tracking(store):
     output_file = Path(volume, 'work', platename, f"{platename}_run.log")  # Specify the name and location of the output file
     wells_analyzed = []
     tracking_well = []
-    return wrmxpress_command_split, output_folder, output_file, command_message, wells, volume, platename, wells_analyzed, tracking_well
+
+    new_store = {
+        'wrmxpress_command_split': wrmxpress_command_split,
+        'output_folder': output_folder,
+        'output_file': output_file,
+        'command_message': command_message,
+        'wells': wells,
+        'volume': volume,
+        'platename': platename,
+        'wells_analyzed': wells_analyzed,
+        'tracking_well': tracking_well
+    }
+    return new_store
+
+def preamble_run_wrmXpress_imagexpress_selection(store):
+    volume = store['mount']
+    platename = store['platename']
+    wells = store["wells"]
+    plate_base = platename.split("_", 1)[0]
+
+    # necessary file paths
+    img_dir = Path(volume, platename)
+    input_dir = Path(volume, 'input')
+    platename_input_dir = Path(input_dir, platename)
+    full_yaml = Path(volume, platename + '.yml')
+
+    update_yaml_file(
+            full_yaml,
+            full_yaml,
+            {'wells': ['All']}
+        )
+
+        # clean and create directories
+    clean_and_create_directories(
+            input_path=Path(volume, 'input', platename), 
+            work_path=Path(volume, 'work', platename),
+            output_path=Path(volume, 'output')
+        )
+    
+    htd_file = Path(img_dir, f'{plate_base}.HTD')
+
+    copy_files_to_input_directory(
+                platename_input_dir=platename_input_dir,
+                htd_file= htd_file,
+                img_dir=img_dir,
+                wells=wells,
+                plate_base=plate_base,
+                platename=platename
+    )
+    # Command message
+    command_message = f"```python wrmXpress/wrapper.py {platename}.yml {platename}```"
+
+    wrmxpress_command = f'python -u wrmXpress/wrapper.py {volume}/{platename}.yml {platename}'
+    wrmxpress_command_split = shlex.split(wrmxpress_command)
+    output_folder = Path(volume, 'work', platename)
+    output_file = Path(volume, 'work', platename, f"{platename}_run.log")  # Specify the name and location of the output file
+    wells_analyzed = []
+    tracking_well = []
+
+    new_store = {
+        'wrmxpress_command_split': wrmxpress_command_split,
+        'output_folder': output_folder,
+        'output_file': output_file,
+        'command_message': command_message,
+        'wells': wells,
+        'volume': volume,
+        'platename': platename,
+        'wells_analyzed': wells_analyzed,
+        'tracking_well': tracking_well
+    }
+    return new_store
 
 def tracking_wrmXpress_run(
-    output_folder,
-    output_file,
-    wrmxpress_command_split,
-    volume,
-    platename,
-    wells,
-    wells_analyzed,
-    tracking_well,
+    store,
     set_progress
     ):
     """
@@ -280,11 +249,30 @@ def tracking_wrmXpress_run(
         - command_message : str : A command message
     ===============================================================================
     """
+    file_structure = store['file_structure']
+
+    if file_structure == 'avi':
+        new_store = preamble_run_wrmXpress_avi_selection(store)
+
+    elif file_structure == 'imagexpress':
+        new_store = preamble_run_wrmXpress_imagexpress_selection(store)
+    
+    wrmxpress_command_split = new_store['wrmxpress_command_split']
+    output_folder = new_store['output_folder']
+    output_file = new_store['output_file']
+    wells = new_store['wells']
+    volume = new_store['volume']
+    platename = new_store['platename']
+    wells_analyzed = new_store['wells_analyzed']
+    tracking_well = new_store['tracking_well']
+    
     while not os.path.exists(output_folder):
         time.sleep(1)
     with open(output_file, "w") as file:
         process = subprocess.Popen(
             wrmxpress_command_split, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+
+        print('Running wrmXpress.')
 
         # Create an empty list to store the docker output
         docker_output = []
@@ -308,6 +296,7 @@ def tracking_wrmXpress_run(
                 docker_output.append('wrmXpress is finished')
                 docker_output_formatted = ''.join(docker_output)
                 return fig_1, False, False, f'', f'```{docker_output_formatted}```'
+            
             elif 'Reconfiguring' in line:
                 # find the well that is being analyzed
                 current_well = line.split('.')[0].split('_')[-1]
@@ -348,76 +337,8 @@ def tracking_wrmXpress_run(
 
                 set_progress((str(len(tracking_well)+ len(wells_analyzed)), str(2*len(wells)), fig, f'```{current_well_path}```' ,f'```{docker_output_formatted}```'))
 
-def preamble_to_run_wrmXpress_non_tracking(store):
-    """
-    The purpose of this function is to prepare the wrmXpress command, output folder, output file,
-    command message, wells, volume, platename, motility, segment, cellprofiler, and cellprofilepipeline.
-    ===============================================================================
-    Arguments:
-        - store : dict : A dictionary containing the store
-    ===============================================================================
-    Returns:
-        - wrmxpress_command_split : list : List of wrmXpress commands
-        - output_folder : str : Path to the output folder
-        - output_file : str : Path to the output file
-        - command_message : str : A command message
-        - wells : list : List of well names
-        - volume : str : Path to the volume
-        - platename : str : Name of the plate
-    ===============================================================================
-    """
-    volume = store['mount']
-    platename = store['platename']
-    wells = store["wells"]
-    print('Running wrmXpress.')
-
-    # necessary file paths
-    img_dir = Path(volume, platename)
-    input_dir = Path(volume, 'input')
-    platename_input_dir = Path(input_dir, platename)
-    plate_base = platename.split("_", 1)[0]
-    htd_file = Path(img_dir, f'{plate_base}.HTD')
-    full_yaml = Path(volume, platename + '.yml')
-
-    update_yaml_file(
-            full_yaml,
-            full_yaml,
-            {'wells': ['All']}
-        )
-
-        # clean and create directories
-    clean_and_create_directories(
-            input_path=Path(volume, 'input', platename), 
-            work_path=Path(volume, 'work', platename),
-            output_path=Path(volume, 'output')
-        )
-
-    copy_files_to_input_directory(
-            platename_input_dir=platename_input_dir,
-            htd_file=htd_file,
-            img_dir=img_dir,
-            plate_base=plate_base,
-            wells=wells,
-            platename=platename
-        )
-
-        # Command message
-    command_message = f"```python wrmXpress/wrapper.py {platename}.yml {platename}```"
-
-    wrmxpress_command = f'python -u wrmXpress/wrapper.py {volume}/{platename}.yml {platename}'
-    wrmxpress_command_split = shlex.split(wrmxpress_command)
-    output_folder = Path(volume, 'work', platename)
-    output_file = Path(volume, 'work', platename, f"{platename}_run.log")  # Specify the name and location of the output file
-    return wrmxpress_command_split, output_folder, output_file, command_message, wells, volume, platename, plate_base
-
 def motility_or_segment_run(
-        output_folder,
-        output_file,
-        wrmxpress_command_split,
-        wells,
-        volume,
-        platename,
-        plate_base,
+        store,
         set_progress
 ):
     """
@@ -439,12 +360,30 @@ def motility_or_segment_run(
         - command_message : str : A command message
     ===============================================================================
     """
+    file_structure = store['file_structure']
+
+    if file_structure == 'avi':
+        new_store = preamble_run_wrmXpress_avi_selection(store)
+    
+    elif file_structure == 'imagexpress':
+        new_store = preamble_run_wrmXpress_imagexpress_selection(store)
+    
+    wrmxpress_command_split = new_store['wrmxpress_command_split']
+    output_folder = new_store['output_folder']
+    output_file = new_store['output_file']
+    wells = new_store['wells']
+    volume = new_store['volume']
+    platename = new_store['platename']
+    plate_base = platename.split("_", 1)[0]
+
     while not os.path.exists(output_folder):
                 time.sleep(1)
     with open(output_file, "w") as file:
             
         process = subprocess.Popen(
                     wrmxpress_command_split, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+        
+        print('Running wrmXpress.')
 
         # Create an empty list to store the docker output
         docker_output = []
@@ -456,12 +395,26 @@ def motility_or_segment_run(
             docker_output.append(line)
             file.write(line)
             file.flush()
+
             # Break the loop if 'Generating' is in the line
-            if "Generating" in line:
-                        break
+            if "Generating w1 thumbnails" in line:
+                # get the platename (default) file in output dir that have .png extension
+                output_path = Path(volume, 'output', 'thumbs', platename + '.png')
+                while not os.path.exists(output_path):
+                            time.sleep(1)
+
+                # create a figure for the output
+                fig_1 = create_figure_from_filepath(output_path) 
+                        
+                print('wrmXpress has finished.')
+                docker_output.append('wrmXpress has finished.')
+                docker_output_formatted = ''.join(docker_output)         
+                            
+                # Return the figure, False, False, and an empty string
+                return fig_1, False, False, f'', f'```{docker_output_formatted}```'
 
             # Process the line if 'Running' is in the line
-            if "Running" in line:
+            elif "Running" in line:
                 well_running = line.split(" ")[-1]
                 if well_running not in wells_analyzed:
                     # Remove the '\n' from the well_running
@@ -480,32 +433,9 @@ def motility_or_segment_run(
                                 f'```{img_path}```',
                                 f'```{docker_output_formatted}```'
                             ))
-                
-
-        # get the platename (default) file in output dir that have .png extension
-        output_path = Path(volume, 'output', 'thumbs', platename + '.png')
-        while not os.path.exists(output_path):
-                    time.sleep(1)
-
-        # create a figure for the output
-        fig_1 = create_figure_from_filepath(output_path) 
-                
-        print('wrmXpress has finished.')
-        docker_output.append('wrmXpress has finished.')
-        docker_output_formatted = ''.join(docker_output) 
-                
-                    
-        # Return the figure, False, False, and an empty string
-        return fig_1, False, False, f'', f'```{docker_output_formatted}```'
 
 def fecundity_run(
-        output_folder,
-        output_file,
-        wrmxpress_command_split,
-        wells,
-        volume,
-        platename,
-        plate_base,
+        store,
         set_progress
 ):
     """
@@ -527,11 +457,30 @@ def fecundity_run(
         - command_message : str : A command message
     ===============================================================================
     """
+    file_structure = store['file_structure']
+
+    if file_structure == 'avi':
+        new_store = preamble_run_wrmXpress_avi_selection(store)
+    
+    elif file_structure == 'imagexpress':
+        new_store = preamble_run_wrmXpress_imagexpress_selection(store)
+    
+    wrmxpress_command_split = new_store['wrmxpress_command_split']
+    output_folder = new_store['output_folder']
+    output_file = new_store['output_file']
+    wells = new_store['wells']
+    volume = new_store['volume']
+    platename = new_store['platename']
+    plate_base = platename.split("_", 1)[0]
+
     while not os.path.exists(output_folder):
         time.sleep(1)
     
     with open(output_file, "w") as file:
         process = subprocess.Popen(wrmxpress_command_split, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+
+        print('Running wrmXpress.')
+
         docker_output = []
         wells_analyzed = []
         wells_to_be_analyzed = len(wells)
@@ -541,10 +490,21 @@ def fecundity_run(
             file.write(line)
             file.flush()
 
-            if "Generating" in line:
-                break
+            if "Generating w1 thumbnails" in line:
 
-            if "Running" in line:
+                output_path = Path(volume, 'output', 'thumbs', platename + '.png')
+                while not os.path.exists(output_path):
+                    time.sleep(1)
+
+                fig_1 = create_figure_from_filepath(output_path)
+                        
+                print('wrmXpress has finished.')
+                docker_output.append('wrmXpress has finished.')
+                docker_output_formatted = ''.join(docker_output)
+                        
+                return fig_1, False, False, '', f'```{docker_output_formatted}```'
+
+            elif "Running" in line:
                 well_running = line.split(" ")[-1].strip()  # Use strip() to remove '\n'
                 if well_running not in wells_analyzed:
                     wells_analyzed.append(well_running)
@@ -571,22 +531,11 @@ def fecundity_run(
                         f'```{img_path}```',
                         f'```{docker_output_formatted}```'
                     ))
-
-        output_path = Path(volume, 'output', 'thumbs', platename + '.png')
-        while not os.path.exists(output_path):
-            time.sleep(1)
-
-        fig_1 = create_figure_from_filepath(output_path)
-                
-        print('wrmXpress has finished.')
-        docker_output.append('wrmXpress has finished.')
-        docker_output_formatted = ''.join(docker_output)
-                
-        return fig_1, False, False, '', f'```{docker_output_formatted}```'
     
-def cellprofile_wormsize_run(output_folder, output_file, wrmxpress_command_split,
-                             wells, volume, platename, plate_base, set_progress
-                             ):
+def cellprofile_wormsize_run(
+        store, 
+        set_progress
+):
     """
     The purpose of this function is to run wrmXpress for worm size and return the figure, open status, and command message.
     ===============================================================================
@@ -606,6 +555,22 @@ def cellprofile_wormsize_run(output_folder, output_file, wrmxpress_command_split
         - command_message : str : A command message
     ===============================================================================
     """
+    file_structure = store['file_structure']
+
+    if file_structure == 'avi':
+        new_store = preamble_run_wrmXpress_avi_selection(store)
+    
+    elif file_structure == 'imagexpress':
+        new_store = preamble_run_wrmXpress_imagexpress_selection(store)
+    
+    wrmxpress_command_split = new_store['wrmxpress_command_split']
+    output_folder = new_store['output_folder']
+    output_file = new_store['output_file']
+    wells = new_store['wells']
+    volume = new_store['volume']
+    platename = new_store['platename']
+    plate_base = platename.split("_", 1)[0]
+
     while not os.path.exists(output_folder):
         time.sleep(1)
         
@@ -614,7 +579,9 @@ def cellprofile_wormsize_run(output_folder, output_file, wrmxpress_command_split
             wrmxpress_command_split, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True
         )
         docker_output = []
-        wells_analyzed = []
+
+        print('Running wrmXpress.')
+
         wells_to_be_analyzed = len(wells)
         progress = 0
         total_progress = wells_to_be_analyzed
@@ -656,8 +623,8 @@ def cellprofile_wormsize_run(output_folder, output_file, wrmxpress_command_split
                         set_progress(((image_number), str(total_progress), fig, f'```{img_path}```', f'```{docker_output_formatted}```'))
             
 def cellprofile_wormsize_intesity_cellpose_run(
-    output_folder, output_file, wrmxpress_command_split,
-    wells, volume, platename, plate_base, set_progress
+        store, 
+        set_progress
 ):
     """
     The purpose of this function is to run wrmXpress for worm size and intensity using CellPose and return the figure, open status, and command message.
@@ -678,6 +645,22 @@ def cellprofile_wormsize_intesity_cellpose_run(
         - command_message : str : A command message
     ===============================================================================
     """
+    file_structure = store['file_structure']
+
+    if file_structure == 'avi':
+        new_store = preamble_run_wrmXpress_avi_selection(store)
+    
+    elif file_structure == 'imagexpress':
+        new_store = preamble_run_wrmXpress_imagexpress_selection(store)
+    
+    wrmxpress_command_split = new_store['wrmxpress_command_split']
+    output_folder = new_store['output_folder']
+    output_file = new_store['output_file']
+    wells = new_store['wells']
+    volume = new_store['volume']
+    platename = new_store['platename']
+    plate_base = platename.split("_", 1)[0]
+
     while not os.path.exists(output_folder):
         time.sleep(1)
         
@@ -685,8 +668,10 @@ def cellprofile_wormsize_intesity_cellpose_run(
         process = subprocess.Popen(
             wrmxpress_command_split, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True
         )
+
+        print('Running wrmXpress.')
+
         docker_output = []
-        wells_analyzed = []
         wells_to_be_analyzed = len(wells)
         progress = 0
         total_progress = 2 * wells_to_be_analyzed
@@ -747,9 +732,10 @@ def cellprofile_wormsize_intesity_cellpose_run(
                         progress += 1
                         set_progress((str(progress), str(total_progress), fig, f'```{img_path}```', f'```{docker_output_formatted}```'))
 
-def cellprofile_mf_celltox_run(output_folder, output_file, wrmxpress_command_split,
-                           wells, volume, platename, plate_base, set_progress
-                           ):
+def cellprofile_mf_celltox_run(
+        store,
+        set_progress
+):
     """
     The purpose of this function is to run wrmXpress for motility, fecundity, and celltox and return the figure, open status, and command message.
     ===============================================================================
@@ -770,6 +756,22 @@ def cellprofile_mf_celltox_run(output_folder, output_file, wrmxpress_command_spl
         - command_message : str : A command message
     ===============================================================================
     """
+    file_structure = store['file_structure']
+
+    if file_structure == 'avi':
+        new_store = preamble_run_wrmXpress_avi_selection(store)
+    
+    elif file_structure == 'imagexpress':
+        new_store = preamble_run_wrmXpress_imagexpress_selection(store)
+    
+    wrmxpress_command_split = new_store['wrmxpress_command_split']
+    output_folder = new_store['output_folder']
+    output_file = new_store['output_file']
+    wells = new_store['wells']
+    volume = new_store['volume']
+    platename = new_store['platename']
+    plate_base = platename.split("_", 1)[0]
+
     while not os.path.exists(output_folder):
         time.sleep(1)
     
@@ -777,8 +779,8 @@ def cellprofile_mf_celltox_run(output_folder, output_file, wrmxpress_command_spl
         process = subprocess.Popen(wrmxpress_command_split, stdout=subprocess.PIPE,
                                    stderr=subprocess.STDOUT, text=True)
         docker_output = []
-        wells_analyzed = []
-        wells_to_be_analyzed = len(wells)
+
+        print('Running wrmXpress.')
 
         for line in iter(process.stdout.readline, b''):
             docker_output.append(line)
@@ -817,9 +819,8 @@ def cellprofile_mf_celltox_run(output_folder, output_file, wrmxpress_command_spl
                         set_progress((str(image_number), str(len(wells)), fig, f'```{img_path}```', f'```{docker_output_formatted}```'))
 
 def cellprofile_feeding_run(
-    output_folder, output_file, wrmxpress_command_split,
-    wells, volume, platename, plate_base, set_progress
-    
+    store,
+    set_progress
 ):
     """
     The purpose of this function is to run wrmXpress for feeding and return the figure, open status, and command message.
@@ -841,6 +842,23 @@ def cellprofile_feeding_run(
         - command_message : str : A command message
     ===============================================================================
     """
+
+    file_structure = store['file_structure']
+
+    if file_structure == 'avi':
+        new_store = preamble_run_wrmXpress_avi_selection(store)
+
+    elif file_structure == 'imagexpress':
+        new_store = preamble_run_wrmXpress_imagexpress_selection(store)
+    
+    wrmxpress_command_split = new_store['wrmxpress_command_split']
+    output_folder = new_store['output_folder']
+    output_file = new_store['output_file']
+    wells = new_store['wells']
+    volume = new_store['volume']
+    platename = new_store['platename']
+    plate_base = platename.split("_", 1)[0]
+
     while not os.path.exists(output_folder):
         time.sleep(1)
     
@@ -848,8 +866,8 @@ def cellprofile_feeding_run(
         process = subprocess.Popen(
             wrmxpress_command_split, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
         docker_output = []
-        wells_analyzed = []
-        wells_to_be_analyzed = len(wells)
+
+        print('Running wrmXpress.')
 
         for line in iter(process.stdout.readline, b''):
             docker_output.append(line)
@@ -885,3 +903,148 @@ def cellprofile_feeding_run(
                         fig = create_figure_from_filepath(img_path)
                         docker_output_formatted = ''.join(docker_output) 
                         set_progress((str(image_number), str(len(wells)), fig, f'```{img_path}```', f'```{docker_output_formatted}```'))
+
+########################################################################
+####                                                                ####
+####                   old/unused functions                         ####
+####                                                                ####
+########################################################################
+
+""" 
+def preamble_to_run_wrmXpress_tracking(store):
+    '''
+    The purpose of this function is to prepare the wrmXpress command, output folder, output file, 
+    command message, wells, volume, platename, motility, segment, cellprofiler, and cellprofilepipeline.
+    ===============================================================================
+    Arguments:
+        - store : dict : A dictionary containing the store
+    ===============================================================================
+    Returns:
+        - wrmxpress_command_split : list : List of wrmXpress commands
+        - output_folder : str : Path to the output folder
+        - output_file : str : Path to the output file
+        - command_message : str : A command message
+        - wells : list : List of well names
+        - volume : str : Path to the volume
+        - platename : str : Name of the plate
+        - wells_analyzed : list : List of wells analyzed
+        - tracking_well : list : List of tracking wells
+    ===============================================================================
+
+    '''
+    volume = store['mount']
+    platename = store['platename']
+    wells = store["wells"]
+    file_structure = store['file_structure']
+    print('Running wrmXpress.')
+    # necessary file paths
+    img_dir = Path(volume, platename)
+    input_dir = Path(volume, 'input')
+    platename_input_dir = Path(input_dir, platename)
+    full_yaml = Path(volume, platename + '.yml')
+
+    update_yaml_file(
+            full_yaml,
+            full_yaml,
+            {'wells': ['All']}
+        )
+
+        # clean and create directories
+    clean_and_create_directories(
+            input_path=Path(volume, 'input', platename), 
+            work_path=Path(volume, 'work', platename),
+            output_path=Path(volume, 'output')
+        )
+    if file_structure == 'avi':
+        copy_files_to_input_directory(
+                platename_input_dir=platename_input_dir,
+                htd_file= None,
+                img_dir=img_dir,
+                wells=wells,
+                plate_base=None,
+                platename=platename
+            )
+    elif file_structure == 'imagexpress':
+        htd_file = Path(img_dir, f'{platename}.HTD')
+        copy_files_to_input_directory(
+                platename_input_dir=platename_input_dir,
+                htd_file= htd_file,
+                img_dir=img_dir,
+                wells=wells,
+                plate_base=None,
+                platename=platename
+            )
+        # Command message
+    command_message = f"```python wrmXpress/wrapper.py {platename}.yml {platename}```"
+
+    wrmxpress_command = f'python -u wrmXpress/wrapper.py {volume}/{platename}.yml {platename}'
+    wrmxpress_command_split = shlex.split(wrmxpress_command)
+    output_folder = Path(volume, 'work', platename)
+    output_file = Path(volume, 'work', platename, f"{platename}_run.log")  # Specify the name and location of the output file
+    wells_analyzed = []
+    tracking_well = []
+    return wrmxpress_command_split, output_folder, output_file, command_message, wells, volume, platename, wells_analyzed, tracking_well
+
+def preamble_to_run_wrmXpress_non_tracking(store):
+    '''
+    The purpose of this function is to prepare the wrmXpress command, output folder, output file,
+    command message, wells, volume, platename, motility, segment, cellprofiler, and cellprofilepipeline.
+    ===============================================================================
+    Arguments:
+        - store : dict : A dictionary containing the store
+    ===============================================================================
+    Returns:
+        - wrmxpress_command_split : list : List of wrmXpress commands
+        - output_folder : str : Path to the output folder
+        - output_file : str : Path to the output file
+        - command_message : str : A command message
+        - wells : list : List of well names
+        - volume : str : Path to the volume
+        - platename : str : Name of the plate
+    ===============================================================================
+    '''
+    volume = store['mount']
+    platename = store['platename']
+    wells = store["wells"]
+    print('Running wrmXpress.')
+
+    # necessary file paths
+    img_dir = Path(volume, platename)
+    input_dir = Path(volume, 'input')
+    platename_input_dir = Path(input_dir, platename)
+    plate_base = platename.split("_", 1)[0]
+    htd_file = Path(img_dir, f'{plate_base}.HTD')
+    full_yaml = Path(volume, platename + '.yml')
+
+    update_yaml_file(
+            full_yaml,
+            full_yaml,
+            {'wells': ['All']}
+        )
+
+        # clean and create directories
+    clean_and_create_directories(
+            input_path=Path(volume, 'input', platename), 
+            work_path=Path(volume, 'work', platename),
+            output_path=Path(volume, 'output')
+        )
+
+    copy_files_to_input_directory(
+            platename_input_dir=platename_input_dir,
+            htd_file=htd_file,
+            img_dir=img_dir,
+            plate_base=plate_base,
+            wells=wells,
+            platename=platename
+        )
+
+        # Command message
+    command_message = f"```python wrmXpress/wrapper.py {platename}.yml {platename}```"
+
+    wrmxpress_command = f'python -u wrmXpress/wrapper.py {volume}/{platename}.yml {platename}'
+    wrmxpress_command_split = shlex.split(wrmxpress_command)
+    output_folder = Path(volume, 'work', platename)
+    output_file = Path(volume, 'work', platename, f"{platename}_run.log")  # Specify the name and location of the output file
+    return wrmxpress_command_split, output_folder, output_file, command_message, wells, volume, platename, plate_base
+
+"""

@@ -4,28 +4,15 @@
 ####                                                                ####
 ########################################################################
 
-import pandas as pd
 from pathlib import Path
 import os
-import signal
-import shutil
-import numpy as np
-from PIL import Image
-import plotly.express as px
-import yaml
-import plotly.express as px
-import glob
-import tifffile as tiff
-from skimage import exposure
-import pandas as pd
 from pathlib import Path
 import os
 import subprocess
 import time
 import shlex
-import re
 
-from app.utils.callback_functions import create_df_from_inputs, update_yaml_file, clean_and_create_directories
+from app.utils.callback_functions import update_yaml_file, clean_and_create_directories
 from app.utils.callback_functions import copy_files_to_input_directory, create_figure_from_filepath
 
 ########################################################################

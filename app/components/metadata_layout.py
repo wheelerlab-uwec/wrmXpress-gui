@@ -5,12 +5,7 @@
 ########################################################################
 
 import dash_bootstrap_components as dbc
-import dash
-from dash.dependencies import Input, Output, State
-from dash import dcc, html, callback, dash_table
-import pandas as pd
-from pathlib import Path
-import os
+from dash import dcc, html
 
 # components
 from app.components.metadata_components import metadata_checklist

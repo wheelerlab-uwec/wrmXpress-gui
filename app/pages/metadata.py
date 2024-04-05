@@ -3,8 +3,6 @@
 ####                             Imports                            ####
 ####                                                                ####
 ########################################################################
-
-import dash_bootstrap_components as dbc
 import dash
 from dash.dependencies import Input, Output, State
 from dash import dcc, html, callback, dash_table

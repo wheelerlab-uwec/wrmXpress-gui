@@ -275,7 +275,14 @@ def clean_and_create_directories(input_path,
         else:
             output_path.mkdir(parents=True, exist_ok=True)
 
-def copy_files_to_input_directory(platename_input_dir, htd_file, img_dir, plate_base, wells, platename, file_types=None):
+def copy_files_to_input_directory(
+        platename_input_dir, 
+        htd_file, 
+        img_dir, 
+        plate_base, 
+        wells, 
+        platename, 
+        file_types=None):
     """
     The purpose of this function is to copy the input files to the input directory.
     ===============================================================================

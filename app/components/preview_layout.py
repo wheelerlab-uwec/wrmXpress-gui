@@ -5,7 +5,6 @@
 ########################################################################
 
 import dash_bootstrap_components as dbc
-import dash
 from dash import dcc, html
 from app.utils.styling import layout
 
