@@ -10,6 +10,7 @@ from dash import dcc, html, callback
 from dash.dependencies import Input, Output, State
 import time
 from pathlib import Path
+import os
 
 # importing utils
 from app.utils.styling import layout
@@ -262,34 +263,177 @@ def update_analysis_preview_imgage(selection, nclicks, store):
     if not store:
         return None, True, False, True, True
 
+    # Get the store data
+    volume = store['mount']
+    platename = store['platename']
+    wells = store["wells"]
+    plate_base = platename.split("_", 1)[0]
+    pipeline_selection = store['pipeline_selection']
+
     if nclicks:  # If the button has been clicked
 
-        # Get the store data
-        volume = store['mount']
-        platename = store['platename']
-        wells = store["wells"]
-
-        # assumes IX-like file structure
-        img_path = Path(
-            f'{volume}/work/{platename}/{wells[0]}/img/{platename}_{wells[0]}_{selection}.png'
-        )
-
-        # Check if the image exists
-        if os.path.exists(img_path):
-
-            # checking the selection and changing the scale accordingly
-            if selection == 'motility':
-                scale = 'inferno'
+        if pipeline_selection == 'motility':
+            # assumes IX-like file structure
+            if selection == 'plate':
+                selection = ''
             else:
-                scale = 'gray'
+                selection = f'_{selection}'
 
-            # Open the image and create a figure
-            fig = create_figure_from_filepath(img_path)
+            img_path = Path(
+                f'{volume}/work/{platename}/{wells[0]}/img/{platename}_{wells[0]}{selection}.png'
+            )
 
-            # Return the figure and the open status of the alerts
-            return fig, False, True, False, ''
+            # Check if the image exists
+            if os.path.exists(img_path):
+
+                # checking the selection and changing the scale accordingly
+                if selection == 'motility':
+                    scale = 'inferno'
+                else:
+                    scale = 'gray'
+
+                # Open the image and create a figure
+                fig = create_figure_from_filepath(img_path, scale=scale)
+
+                # Return the figure and the open status of the alerts
+                return fig, False, True, False, ''
+        elif pipeline_selection == 'fecundity':
+            # assumes IX-like file structure
+            if selection == 'plate':
+                selection = ''
+            else:
+                selection = f'_{selection}'
+                
+            img_path = Path(
+                f'{volume}/work/{platename}/{wells[0]}/img/{platename}_{wells[0]}{selection}.png'
+            )
+
+            # Check if the image exists
+            if os.path.exists(img_path):
+
+                # Open the image and create a figure
+                fig = create_figure_from_filepath(img_path)
+
+                # Return the figure and the open status of the alerts
+                return fig, False, True, False, ''
+        elif pipeline_selection == 'tracking':
+            # assumes IX-like file structure
+            if selection == 'plate':
+                selection = ''
+            else:
+                selection = f'_{selection}'
+                
+            img_path = Path(
+                f'{volume}/work/{platename}/{wells[0]}/img/{platename}_{wells[0]}{selection}.png'
+            )
+
+            # Check if the image exists
+            if os.path.exists(img_path):
+
+                # Open the image and create a figure
+                fig = create_figure_from_filepath(img_path)
+
+                # Return the figure and the open status of the alerts
+                return fig, False, True, False, ''
+        elif pipeline_selection == "wormsize_intensity_cellpose":
+            # assumes IX-like file structure
+            if selection == 'plate':
+
+                img_path = Path(
+                    f'{volume}/work/{platename}/{wells[0]}/img/{platename}_{wells[0]}{selection}.png'
+                )
+
+            elif selection == 'straightened_worms':
+
+                img_path = Path(
+                    f'{volume}/output/straightened_worms/{plate_base}_{wells[0]}.tiff'
+                )
+
+            elif selection == 'cp_masks':
+                img_path = Path(
+                    f'{volume}/input/{platename}/TimePoint_1/{plate_base}_{wells[0]}_cp_masks.png'
+                )
+
+            # Check if the image exists
+            if os.path.exists(img_path):
+
+
+                # Open the image and create a figure
+                fig = create_figure_from_filepath(img_path)
+
+                # Return the figure and the open status of the alerts
+                return fig, False, True, False, ''
+        elif pipeline_selection == 'mf_celltox':
+            # assumes IX-like file structure
+            if selection == 'plate':
+
+                img_path = Path(
+                    f'{volume}/work/{platename}/{wells[0]}/img/{platename}_{wells[0]}{selection}.png'
+                )
+
+            # Check if the image exists
+            if os.path.exists(img_path):
+
+
+                # Open the image and create a figure
+                fig = create_figure_from_filepath(img_path)
+
+                # Return the figure and the open status of the alerts
+                return fig, False, True, False, ''       
+        elif pipeline_selection == 'wormsize':
+            # assumes IX-like file structure
+            if selection == 'plate':
+
+                img_path = Path(
+                    f'{volume}/work/{platename}/{wells[0]}/img/{platename}_{wells[0]}{selection}.png'
+                )
+
+            elif selection == 'straightened_worms':
+
+                img_path = Path(
+                    f'{volume}/output/straightened_worms/{plate_base}_{wells[0]}.tiff'
+                )
+
+            # Check if the image exists
+            if os.path.exists(img_path):
+
+
+                # Open the image and create a figure
+                fig = create_figure_from_filepath(img_path)
+
+                # Return the figure and the open status of the alerts
+                return fig, False, True, False, ''     
+        elif pipeline_selection == 'feeding':
+            # assumes IX-like file structure
+            if selection == 'plate':
+
+                img_path = Path(
+                    f'{volume}/work/{platename}/{wells[0]}/img/{platename}_{wells[0]}{selection}.png'
+                )
+
+            elif selection == 'straightened_worms':
+
+                img_path = Path(
+                    f'{volume}/output/straightened_worms/{plate_base}_{wells[0]}.tiff'
+                )
+
+            elif selection.startswith('wavelength_'):
+
+                img_path = Path(
+                    f'{volume}/output/thumbs/{platename}_{wells[0]}_{selection}.png'
+                )
+
+            # Check if the image exists
+            if os.path.exists(img_path):
+
+
+                # Open the image and create a figure
+                fig = create_figure_from_filepath(img_path)
+
+                # Return the figure and the open status of the alerts
+                return fig, False, True, False, ''
         else:
-            return None, True, False, False, False
+            return None, True, False, False, False    
     return None, True, False,  False, False
 
 @callback(
@@ -330,7 +474,8 @@ def update_preview_image(n_clicks, store):
                 # Open the image and create a figure
                 fig = create_figure_from_filepath(img_path)
                 return f'```{img_path}```', fig  # Return the path and the figure
-            else:
+            
+            else: # checking for other file extensions
                 img_path_s1 = Path(
                     volume, f'{platename}/TimePoint_1/{plate_base}_{first_well}_s1.TIF'
                 )
@@ -345,7 +490,8 @@ def update_preview_image(n_clicks, store):
                     # Open the image and create a figure
                     fig = create_figure_from_filepath(img_path_w1)
                     return f'```{img_path_w1}```', fig
-        elif file_structure == 'avi':
+                
+        elif file_structure == 'avi': 
             # assumes AVI-like file structure
             img_path = Path(
                 volume, 'input', f'{platename}/TimePoint_1/{platename}_{first_well}.TIF'
@@ -356,19 +502,16 @@ def update_preview_image(n_clicks, store):
                 # Open the image and create a figure
                 fig = create_figure_from_filepath(img_path)
                 return f'```{img_path}```', fig
-    n_clicks = 0
 
 @callback(
-    Output('preview-dropdown', 'options'),
-
-    # update the option dropdown when the previous load is clicked
+    Output('preview-dropdown', 'options'), # update the option dropdown when the previous load is clicked
     Input('submit-val', 'n_clicks'),
     State('store', 'data'),
     prevent_initial_call=True
 )
-def get_options(nclicks, store):
+def get_options_preview(nclicks, store):
     """
-    This function gets the options for the analysis.
+    This function gets the options for the preview of the analysis.
     =========================================================================================
     Arguments:
         - nclicks : int : The number of clicks
@@ -377,21 +520,113 @@ def get_options(nclicks, store):
     Returns:
         - options : list : The options
     """
-
     # check to see if store exists
     if not store:
-        return []
-
+        return {}
     # get the store from the data
     pipeline_selection = store['pipeline_selection']
     if pipeline_selection == 'motility':
 
         # create the options
-        selection_dict = {'motility': 'motility', 'segment': 'binary', 'plate': 'plate'}
-        
+        selection_dict = {
+            'motility': 'motility', 
+            'segment': 'binary', 
+            'blur':'blur', 
+            'edge':'edge', 
+            'plate': 'plate'
+        }
+
         # check to see if the button has been clicked (nclicks)
         if nclicks is not None:
             return selection_dict  # return the option dictionary
+    elif pipeline_selection == 'fecundity':
+            
+        # create the options
+        selection_dict = {
+            'binary': 'binary', 
+            'blur': 'blur',
+            'edge':'edge', 
+            'plate': 'plate'
+        }
+    
+        # check to see if the button has been clicked (nclicks)
+        if nclicks is not None:
+            return selection_dict
+    elif pipeline_selection == 'tracking':
+            
+        # create the options
+        selection_dict = {
+            'tracks': 'tracks', 
+            'plate': 'plate'
+        }
+        
+        # check to see if the button has been clicked (nclicks)
+        if nclicks is not None:
+            return selection_dict
+    elif pipeline_selection == "wormsize_intensity_cellpose":
+                
+        # create the options
+        selection_dict = {
+            'plate': 'plate', 
+            'straightened_worms': 'straightened_worms',
+            "cp_masks": "cp_masks"
+        }
+        
+         # check to see if the button has been clicked (nclicks)
+        if nclicks is not None:
+            return selection_dict
+    elif pipeline_selection == 'mf_celltox':
+                
+            # create the options
+            selection_dict = {
+                'plate': 'plate'
+            }
+            
+            # check to see if the button has been clicked (nclicks)
+            if nclicks is not None:
+                return selection_dict
+    elif pipeline_selection == 'wormsize':
+        # create the options
+        selection_dict = {
+            'plate': 'plate', 
+            'straightened_worms': 'straightened_worms'
+        }
+        
+         # check to see if the button has been clicked (nclicks)
+        if nclicks is not None:
+            return selection_dict
+    elif pipeline_selection == 'feeding':
+       # obtain the wavelength options
+        volume = store['mount']
+        platename = store['platename']
+        thumbs_file_path = Path(volume, 'output/thumbs/')
+        
+        # create the options
+        selection_dict = {
+            'plate': 'plate',
+            'straightened_worms': 'straightened_worms',
+        }
+
+        # New code to add: list all matching files and extract unique identifiers
+        pattern = f"{platename}*.png"
+        # Using glob to match the pattern
+        all_files = list(thumbs_file_path.glob(pattern))
+        # Extracting unique identifiers from filenames (e.g., _w1, _w2, etc.)
+        wavelengths = set()
+        for file_path in all_files:
+            parts = file_path.name.split('_')
+            if len(parts) > 1 and parts[-1].startswith('w') and parts[-1].endswith('.png'):
+                wavelengths.add(parts[-1].replace('.png', ''))
+
+        # Adding these wavelengths to the selection dictionary
+        for wave in sorted(wavelengths):
+            selection_key = f'wavelength_{wave}'  # Format the key as you see fit
+            selection_dict[selection_key] = wave
+
+        # Assuming nclicks is some condition you've checked elsewhere
+        nclicks = 1
+        if nclicks is not None:
+            return selection_dict
     else:   
         return {'plate': 'plate'}
 

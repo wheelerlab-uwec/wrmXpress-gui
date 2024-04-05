@@ -19,10 +19,7 @@ import tifffile as tiff
 from skimage import exposure
 import pandas as pd
 from pathlib import Path
-import requests
-from io import BytesIO
 from skimage import exposure
-import urllib.request
 
 ########################################################################
 ####                                                                ####

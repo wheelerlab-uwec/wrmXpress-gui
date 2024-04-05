@@ -71,24 +71,16 @@ def preview_callback_functions(
             return tracking_wrmXpress_preview(store)
         
         elif pipeline_selection == 'wormsize':
-            return cellprofile_wormsize_preview(
-                store
-            )
+            return cellprofile_wormsize_preview(store)
         
         elif pipeline_selection == 'wormsize_intensity_cellpose':
-            return cellprofile_wormsize_intensity_cellpose_preview(
-                store
-            )
+            return cellprofile_wormsize_intensity_cellpose_preview(store)
         
         elif pipeline_selection == 'mf_celltox':
-            return cellprofile_mf_celltox_preview(
-                store
-            )
+            return cellprofile_mf_celltox_preview(store)
         
         elif pipeline_selection == 'feeding':
-            return cellprofile_feeding_preview(
-                store
-            )
+            return cellprofile_feeding_preview(store)
             
 ########################################################################
 ####                                                                ####
@@ -97,9 +89,7 @@ def preview_callback_functions(
 ########################################################################
 
 def preamble_to_run_wrmXpress_preview(
-       platename,
-       volume, 
-       wells 
+       store
 ):
     """
     This function prepares the wrmXpress command, output preview log file, command message, and first well.
@@ -117,7 +107,12 @@ def preamble_to_run_wrmXpress_preview(
     ===============================================================================
     
     """
-     # defining the yaml file path (same as the filepath from configure.py)
+    # Obtain the store data
+    volume = store['mount']
+    platename = store['platename']
+    wells = store["wells"]
+
+    # defining the yaml file path (same as the filepath from configure.py)
     preview_yaml_platename = '.' + platename + '.yml'
     preview_yaml_platenmaefull_yaml = Path(volume, preview_yaml_platename)
     full_yaml = Path(volume, platename + '.yml')
@@ -133,11 +128,6 @@ def preamble_to_run_wrmXpress_preview(
     else:
             first_well = wells[0]
 
-
-        # Checking if input folder exists, and if not, create it,
-        # then subsequently copy the images into this folder
-        # Input and platename input folder paths
-        # necessary file paths
     img_dir = Path(volume, platename)
     input_dir = Path(volume, 'input')
     platename_input_dir = Path(input_dir, platename)
@@ -166,7 +156,14 @@ def preamble_to_run_wrmXpress_preview(
     wrmxpress_command = f'python wrmXpress/wrapper.py {volume}/.{platename}.yml {platename}'
     wrmxpress_command_split = shlex.split(wrmxpress_command)
     output_preview_log_file = Path(volume, 'input', platename, f'{platename}_preview.log')
-    return wrmxpress_command_split, output_preview_log_file, command_message, first_well
+
+    new_store = {
+        'wrmxpress_command_split': wrmxpress_command_split,
+        'output_preview_log_file': output_preview_log_file,
+        'command_message': command_message,
+        'first_well': first_well
+    }
+    return new_store
 
 def motility_segment_fecundity_preview(store):
     """
@@ -193,8 +190,6 @@ def motility_segment_fecundity_preview(store):
     volume = store['mount']
     platename = store['platename']
     wells = store["wells"]
-    plate_base = platename.split("_", 1)[0]
-    pipeline_selection = store['pipeline_selection']
     selection = ['motility', 'segment']
     file_structure = store['file_structure']
     # Check to see if first well already exists, if it does insert the img
@@ -203,27 +198,29 @@ def motility_segment_fecundity_preview(store):
 
     # Check if the first well path exists
     if os.path.exists(first_well_path):
-        # Checking the selection and changing the scale accordingly
-        if selection == 'motility':
-            scale = 'inferno'
-        else:
-            scale = 'gray'
 
         # Open the image and create a figure
-        fig = create_figure_from_filepath(first_well_path, scale=scale)
+        fig = create_figure_from_filepath(first_well_path)
 
         # Return the path and the figure and the open status of the alerts
         return f"```{first_well_path}```", fig, False, f'', False
+    
     if file_structure == 'imagexpress':
-        wrmxpress_command_split, output_preview_log_file, command_message, first_well = preamble_to_run_wrmXpress_preview(
-            platename=platename, volume=volume, wells=wells
+
+        new_store = preamble_to_run_wrmXpress_preview(
+            store 
         )
     elif file_structure == 'avi':
 
-        # modify this to work for avi files
-        wrmxpress_command_split, output_preview_log_file, command_message, first_well = preamble_to_run_wrmXpress_preview(
-            platename=platename, volume=volume, wells=wells
+        # if the first well does not exist, run wrmXpress
+        new_store = preamble_to_run_wrmXpress_preview_tracking(
+            store # need to change function to accept this argument
         )
+
+    wrmxpress_command_split = new_store['wrmxpress_command_split']
+    output_preview_log_file = new_store['output_preview_log_file']
+    command_message = new_store['command_message']
+    first_well = new_store['first_well']
 
     with open(output_preview_log_file, 'w') as file:
         process = subprocess.Popen(
@@ -248,14 +245,8 @@ def motility_segment_fecundity_preview(store):
             while not os.path.exists(img_path):
                 time.sleep(1)
 
-            # Checking the selection and changing the scale accordingly
-            if selection == 'motility':
-                scale = 'inferno'
-            else:
-                scale = 'gray'
-
             # Open the image and create a figure
-            fig = create_figure_from_filepath(img_path, scale=scale)
+            fig = create_figure_from_filepath(img_path)
             
             if 'Generating w1 thumbnails' in line:
                 # Return the command message, the figure, and the open status of the alerts
@@ -286,7 +277,6 @@ def cellprofile_wormsize_preview(store):
     platename = store['platename']
     wells = store["wells"]
     plate_base = platename.split("_", 1)[0]
-    pipeline_selection = store['pipeline_selection']
     first_well = wells[0]
     # Assumes IX-like file structure
     first_well_path = Path(volume, f'output/straightened_worms/{plate_base}_{first_well}.tiff')
@@ -299,18 +289,20 @@ def cellprofile_wormsize_preview(store):
         # Return the path and the figure and the open status of the alerts
         return f"```{first_well_path}```", fig, False, f'', False
 
-    wrmxpress_command_split, output_preview_log_file, command_message, first_well = preamble_to_run_wrmXpress_preview(
-        platename=platename,
-        volume=volume,
-        wells=wells
+    new_store = preamble_to_run_wrmXpress_preview(
+        store
     )
+
+    wrmxpress_command_split = new_store['wrmxpress_command_split']
+    output_preview_log_file = new_store['output_preview_log_file']
+    command_message = new_store['command_message']
+    first_well = new_store['first_well']
+
     with open(output_preview_log_file, 'w') as file:
         process = subprocess.Popen(
             wrmxpress_command_split, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+        
         docker_output = []
-
-        while not os.path.exists(Path(volume, 'input')):
-            time.sleep(1)
 
         for line in iter(process.stdout.readline, b''):
             docker_output.append(line)
@@ -351,10 +343,7 @@ def cellprofile_wormsize_intensity_cellpose_preview(store):
     platename = store['platename']
     wells = store["wells"]
     plate_base = platename.split("_", 1)[0]
-    pipeline_selection = store['pipeline_selection']
     
-    output_folder = Path(volume, 'input', platename)
-    output_preview_log_file = Path(output_folder, f'{platename}_preview.log')
 
     # Assumes the first well in the list is the one to check
     first_well = wells[0]
@@ -369,14 +358,20 @@ def cellprofile_wormsize_intensity_cellpose_preview(store):
         # Return the path and the figure and the open status of the alerts
         return f"```{first_well_path}```", fig, False, f'', False
 
-    wrmxpress_command_split, output_preview_log_file, command_message, first_well = preamble_to_run_wrmXpress_preview(
-        platename=platename,
-        volume=volume,
-        wells=wells
+    new_store = preamble_to_run_wrmXpress_preview(
+        store
     )
+
+    wrmxpress_command_split = new_store['wrmxpress_command_split']
+    output_preview_log_file = new_store['output_preview_log_file']
+    command_message = new_store['command_message']
+    first_well = new_store['first_well']
+
     with open(output_preview_log_file, 'w') as file:
+
         process = subprocess.Popen(
             wrmxpress_command_split, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+        
         docker_output = []
 
         for line in iter(process.stdout.readline, b''):
@@ -384,16 +379,15 @@ def cellprofile_wormsize_intensity_cellpose_preview(store):
             file.write(line)
             file.flush()
 
-            img_path = Path(volume, f'output/straightened_worms/{plate_base}_{first_well}.tiff')
-
-            # Wait for the image to be created
-            while not os.path.exists(img_path):
-                time.sleep(1)
-
-            # Open the image and create a figure
-            fig = create_figure_from_filepath(img_path)
-
             if 'Generating w1 thumbnails' in line:
+                img_path = Path(volume, f'output/straightened_worms/{plate_base}_{first_well}.tiff')
+
+                # check to make sure the file path exists
+                while not os.path.exists(img_path):
+                    time.sleep(1)
+                    
+                # Open the image and create a figure
+                fig = create_figure_from_filepath(img_path)
                 # Return the command message, the figure, and the open status of the alerts
                 return command_message, fig, False, f'', False
             
@@ -421,17 +415,13 @@ def cellprofile_mf_celltox_preview(store):
     volume = store['mount']
     platename = store['platename']
     wells = store["wells"]
-    plate_base = platename.split("_", 1)[0]
-    pipeline_selection = store['pipeline_selection']
-    
-    output_folder = Path(volume, 'input', platename)
-    output_preview_log_file = Path(output_folder, f'{platename}_preview.log')
 
     first_well = wells[0]  # Assuming first_well is defined here as the first item in wells
 
     # Check to see if first well already exists, if it does insert the img
     # rather than running wrmXpress again
     first_well_path = Path(volume, 'work', platename, first_well, 'img', f'{platename}_{first_well}.png')
+
     if os.path.exists(first_well_path):
         # Open the image and create a figure
         fig = create_figure_from_filepath(first_well_path)
@@ -439,18 +429,21 @@ def cellprofile_mf_celltox_preview(store):
         # Return the path and the figure and the open status of the alerts
         return f"```{first_well_path}```", fig, False, f'', False
 
-    wrmxpress_command_split, output_preview_log_file, command_message, first_well = preamble_to_run_wrmXpress_preview(
-        platename=platename,
-        volume=volume,
-        wells=wells
+    new_store = preamble_to_run_wrmXpress_preview(
+        store
     )
+
+    wrmxpress_command_split = new_store['wrmxpress_command_split']
+    output_preview_log_file = new_store['output_preview_log_file']
+    command_message = new_store['command_message']
+    first_well = new_store['first_well']
+
     with open(output_preview_log_file, 'w') as file:
+
         process = subprocess.Popen(
             wrmxpress_command_split, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+        
         docker_output = []
-
-        while not os.path.exists(output_folder):
-            time.sleep(1)
 
         for line in iter(process.stdout.readline, b''):
             docker_output.append(line)
@@ -495,16 +488,13 @@ def cellprofile_feeding_preview(store):
     platename = store['platename']
     wells = store["wells"]
     plate_base = platename.split("_", 1)[0]
-    pipeline_selection = store['pipeline_selection']
-
-    output_folder = Path(volume, 'input', platename)
-    output_preview_log_file = Path(output_folder, f'{platename}_preview.log')
 
     first_well = wells[0]  # Assuming first_well is the first item in wells list
 
     # Check to see if first well already exists, if it does insert the img
     # rather than running wrmXpress again
     first_well_path = Path(volume, f'output/straightened_worms/{plate_base}-{first_well}.tiff')
+
     if os.path.exists(first_well_path):
         # Open the image and create a figure
         fig = create_figure_from_filepath(first_well_path)
@@ -512,19 +502,21 @@ def cellprofile_feeding_preview(store):
         # Return the path and the figure and the open status of the alerts
         return f"```{first_well_path}```", fig, False, f'', False
 
-    wrmxpress_command_split, output_preview_log_file, command_message, first_well = preamble_to_run_wrmXpress_preview(
-        platename=platename,
-        volume=volume,
-        wells=wells
+    new_store = preamble_to_run_wrmXpress_preview(
+        store
     )
 
+    wrmxpress_command_split = new_store['wrmxpress_command_split']
+    output_preview_log_file = new_store['output_preview_log_file']
+    command_message = new_store['command_message']
+    first_well = new_store['first_well']
+
     with open(output_preview_log_file, 'w') as file:
+
         process = subprocess.Popen(
             wrmxpress_command_split, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+        
         docker_output = []
-
-        while not os.path.exists(output_folder):
-            time.sleep(1)
 
         for line in iter(process.stdout.readline, b''):
             docker_output.append(line)
@@ -569,9 +561,7 @@ def tracking_wrmXpress_preview(
     volume = store['mount']
     platename = store['platename']
     wells = store["wells"]
-    plate_base = platename.split("_", 1)[0]
-    pipeline_selection = store['pipeline_selection']
-    selection = ['motility', 'segment']
+    file_structure = store['file_structure']
 
     # check to see if the first well has already been analyzed
     first_well_path = Path(volume, 'work', f'{platename}/{wells[0]}/img/{platename}_{wells[0]}_tracks.png')
@@ -584,14 +574,23 @@ def tracking_wrmXpress_preview(
         # Return the path and the figure and the open status of the alerts
         return f"```{first_well_path}```", fig, False, f'', False
     
-    # if the first well does not exist, run wrmXpress
-    wrmxpress_command_split, output_folder, output_file, command_message, wells, volume, platename, wells_analyzed, tracking_well = preamble_to_run_wrmXpress_preview_tracking(
-        volume, platename, wells
-    )
+    if file_structure == 'imagexpress':
+        new_store = preamble_to_run_wrmXpress_preview(
+            store=store
+        )
 
-    while not os.path.exists(output_folder):
-        time.sleep(1)
-    with open(output_file, "w") as file:
+    elif file_structure == 'avi':
+        # if the first well does not exist, run wrmXpress
+        new_store = preamble_to_run_wrmXpress_preview_tracking(
+            store=store
+        )
+    
+    wrmxpress_command_split = new_store['wrmxpress_command_split']
+    output_preview_log_file = new_store['output_preview_log_file']
+    command_message = new_store['command_message']
+    first_well = new_store['first_well']
+
+    with open(output_preview_log_file, "w") as file:
         process = subprocess.Popen(
             wrmxpress_command_split, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
 
@@ -604,21 +603,19 @@ def tracking_wrmXpress_preview(
             file.write(line)
             file.flush()
             if 'Generating w1 thumbnails' in line:
-                first_well_path = Path(volume, 'work', f'{platename}/{wells[0]}/img/{platename}_{wells[0]}_tracks.png')
+                first_well_path = Path(volume, 'work', f'{platename}/{wells[0]}/img/{platename}_{first_well}_tracks.png')
 
                 while not os.path.exists(first_well_path):
                     time.sleep(1)
 
                 # create figure from file path
                 fig_1 = create_figure_from_filepath(first_well_path)
-                docker_output_formatted = ''.join(docker_output)
 
                 print('wrmXpress is finished')
                 docker_output.append('wrmXpress is finished')
-                docker_output_formatted = ''.join(docker_output)
                 return command_message, fig_1, False, f'', False
 
-def preamble_to_run_wrmXpress_preview_tracking(volume, platename, wells):
+def preamble_to_run_wrmXpress_preview_tracking(store):
     """
     The purpose of this function is to prepare the wrmXpress command, output folder, output file, 
     command message, wells, volume, platename, motility, segment, cellprofiler, and cellprofilepipeline.
@@ -639,37 +636,49 @@ def preamble_to_run_wrmXpress_preview_tracking(volume, platename, wells):
     ===============================================================================
 
     """
-    print('Running wrmXpress.')
+    # Obtain the store data
+    volume = store['mount']
+    platename = store['platename']
+    wells = store["wells"]
+
     # necessary file paths
     img_dir = Path(volume, platename)
     input_dir = Path(volume, 'input')
     platename_input_dir = Path(input_dir, platename)
+    
+     # defining the yaml file path (same as the filepath from configure.py)
+    preview_yaml_platename = '.' + platename + '.yml'
+    preview_yaml_platenmaefull_yaml = Path(volume, preview_yaml_platename)
     full_yaml = Path(volume, platename + '.yml')
 
+    if wells == 'All':
+            first_well = "A01"
+    else:
+            first_well = wells[0]
+
     update_yaml_file(
-            full_yaml,
-            full_yaml,
-            {'wells': ['All']}
-        )
+                full_yaml, 
+                preview_yaml_platenmaefull_yaml,
+                {'wells': ['All']}
+            )
 
         # clean and create directories
     clean_and_create_directories(
             input_path=Path(volume, 'input', platename), 
-            work_path=Path(volume, 'work', platename),
-            output_path=Path(volume, 'output')
+            work_path=Path(volume, 'work', platename)
         )
+    
     htd_file = Path(img_dir, f'{platename}.HTD')
     if not os.path.exists(htd_file):
         copy_files_to_input_directory(
                 platename_input_dir=platename_input_dir,
                 htd_file= None,
                 img_dir=img_dir,
-                wells=wells[0],
+                wells=first_well,
                 plate_base=None,
                 platename=platename
             )
     elif os.path.exists(htd_file):
-        htd_file = Path(img_dir, f'{platename}.HTD')
         copy_files_to_input_directory(
                 platename_input_dir=platename_input_dir,
                 htd_file= htd_file,
@@ -678,13 +687,19 @@ def preamble_to_run_wrmXpress_preview_tracking(volume, platename, wells):
                 plate_base=None,
                 platename=platename
             )
-        # Command message
+    
+    # Command message
     command_message = f"```python wrmXpress/wrapper.py {platename}.yml {platename}```"
 
-    wrmxpress_command = f'python -u wrmXpress/wrapper.py {volume}/{platename}.yml {platename}'
+    wrmxpress_command = f'python wrmXpress/wrapper.py {volume}/.{platename}.yml {platename}'
     wrmxpress_command_split = shlex.split(wrmxpress_command)
-    output_folder = Path(volume, 'work', platename)
-    output_file = Path(volume, 'work', platename, f"{platename}_preview.log")  # Specify the name and location of the output file
-    wells_analyzed = []
-    tracking_well = []
-    return wrmxpress_command_split, output_folder, output_file, command_message, wells, volume, platename, wells_analyzed, tracking_well
+    output_preview_log_file = Path(volume, 'input', platename, f'{platename}_preview.log')
+
+    new_store = {
+        'wrmxpress_command_split': wrmxpress_command_split,
+        'output_preview_log_file': output_preview_log_file,
+        'command_message': command_message,
+        'first_well': first_well
+    }
+
+    return new_store
