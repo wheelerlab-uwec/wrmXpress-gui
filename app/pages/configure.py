@@ -702,11 +702,12 @@ def update_figure_based_on_selection(module_initial, image):
             'w1': 'w1',
             'w2': 'w2',
             'w3': 'w3',
+            'straightened_worms': 'straightened_worms'
         }
         if image not in options:
             image = 'w1'
         
-        if image == 'plate':
+        if image == 'straightened_worms':
             # GitHub permalink
             github_url = "https://github.com/wheelerlab-uwec/wrmXpress-gui/blob/90a19b9585011c8f7a149a6b9bad41c16aef90ee/assets/configure_assets/feeding/A01/img/20210823-p01-KJG-A01.tiff"
 
