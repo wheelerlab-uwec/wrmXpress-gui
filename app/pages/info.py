@@ -6,11 +6,7 @@
 
 import dash
 
-dash.register_page(
-    __name__, 
-    order=0, 
-    path='/'
-    )
+dash.register_page(__name__, order=0, path="/")
 
 from app.components.info_layout import info_layout
 

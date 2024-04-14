@@ -37,10 +37,8 @@ layout = run_layout
 ####                                                                ####
 ########################################################################
 
-@callback(
-    Output("cancel-analysis", 'n_clicks'),
-    Input("cancel-analysis", 'n_clicks')
-)
+
+@callback(Output("cancel-analysis", "n_clicks"), Input("cancel-analysis", "n_clicks"))
 def cancel_analysis(n_clicks):
     """
     This function cancels the analysis by typing "Control" + "C" in the terminal.
@@ -54,21 +52,25 @@ def cancel_analysis(n_clicks):
     if n_clicks:
 
         # Replace `1234` with the actual PID
-        send_ctrl_c(1234)
-        print('Control + C', 'wrmxpress analysis cancelled')
+        send_ctrl_c(  # Send Control + C to the process with PID 1234
+            1234  # see app/utils/callback_functions.py for more details
+        )
+
+        print("Control + C", "wrmxpress analysis cancelled")
 
     return n_clicks
 
+
 @callback(
     [
-        Output('analysis-postview', 'figure'),
-        Output('analysis-postview-message', 'children'),
-        Output('first-view-of-analysis-alert', 'is_open'),
-        Output('additional-view-of-analysis-alert', 'is_open')
+        Output("analysis-postview", "figure"),
+        Output("analysis-postview-message", "children"),
+        Output("first-view-of-analysis-alert", "is_open"),
+        Output("additional-view-of-analysis-alert", "is_open"),
     ],
-    State('analysis-dropdown', 'value'),
-    Input('load-analysis-img', 'n_clicks'),
-    State('store', 'data'),
+    State("analysis-dropdown", "value"),
+    Input("load-analysis-img", "n_clicks"),
+    State("store", "data"),
     allow_duplicate=True,
     prevent_initial_call=True,
 )
@@ -96,52 +98,54 @@ def load_analysis_img(selection, n_clicks, store):
         return None, None, False, False
 
     # get the store from the data
-    volume = store['mount']
-    platename = store['platename']
+    volume = store["mount"]
+    platename = store["platename"]
     plate_base = platename.split("_", 1)[0]
-    wells = store['wells']
+    wells = store["wells"]
 
     img_path = None
-    scale = 'gray'
+    scale = "gray"
     # check to see if selection option exists in output thumbs folder
     if n_clicks:
-        
-        if selection == 'straightened_worms':
-            img_path = Path(volume, f'output/strightened_worms/{plate_base}_{wells[0]}.tiff')
-            scale = 'inferno'
 
-        elif selection == 'plate':
-            selection = ''
-        
-        elif selection == 'segment':
-            selection = '_binary'
-        
+        if selection == "straightened_worms":
+            img_path = Path(
+                volume, f"output/strightened_worms/{plate_base}_{wells[0]}.tiff"
+            )
+            scale = "inferno"
+
+        elif selection == "plate":
+            selection = ""
+
+        elif selection == "segment":
+            selection = "_binary"
+
         else:
-            selection = f'_{selection}'
-        
+            selection = f"_{selection}"
+
         if img_path is None:
-            img_path = Path(volume, f'output/thumbs/{platename}{selection}.png')
+            img_path = Path(volume, f"output/thumbs/{platename}{selection}.png")
 
         # check to see if the img exists
         if os.path.exists(img_path):
             fig = create_figure_from_filepath(img_path, scale)
 
-            return fig, f'```{img_path}```', False, True
-        
+            return fig, f"```{img_path}```", False, True
+
         else:
             return None, None, False, False
 
     else:
         return None, None, True, False
 
-@callback(
-    Output('analysis-dropdown', 'options'),
 
+@callback(
+    Output("analysis-dropdown", "options"),
     # update the option dropdown when the run analysis is clicked
-    Input('submit-analysis', 'n_clicks'),
-    State('store', 'data'),
+    Input("submit-analysis", "n_clicks"),
+    State("store", "data"),
     prevent_initial_call=True,
-    allow_duplicate=True
+    allow_duplicate=True,
 )
 def get_options_analysis(nclicks, store):
     """
@@ -160,67 +164,70 @@ def get_options_analysis(nclicks, store):
         return {}
 
     # get the store from the data
-    pipeline_selection = store['pipeline_selection']
-    if pipeline_selection == 'motility':
+    pipeline_selection = store["pipeline_selection"]
+    if pipeline_selection == "motility":
 
         # create the options
-        selection_dict = {'motility': 'motility', 'segment': 'binary', 'plate': 'plate'}
+        selection_dict = {"motility": "motility", "segment": "binary", "plate": "plate"}
 
         # check to see if the button has been clicked (nclicks)
         if nclicks is not None:
             return selection_dict  # return the option dictionary
-        
-    elif pipeline_selection == 'fecundity':
-            
+
+    elif pipeline_selection == "fecundity":
+
         # create the options
-        selection_dict = {'binary': 'binary', 'plate': 'plate'}
-    
+        selection_dict = {"binary": "binary", "plate": "plate"}
+
         # check to see if the button has been clicked (nclicks)
         if nclicks is not None:
             return selection_dict
-        
-    elif pipeline_selection == 'tracking':
-            
+
+    elif pipeline_selection == "tracking":
+
         # create the options
-        selection_dict = {'tracks': 'tracks', 'plate': 'plate'}
-        
+        selection_dict = {"tracks": "tracks", "plate": "plate"}
+
         # check to see if the button has been clicked (nclicks)
         if nclicks is not None:
             return selection_dict
-        
+
     elif pipeline_selection == "wormsize_intensity_cellpose":
-                
+
         # create the options
-        selection_dict = {'plate': 'plate', 'straightened_worms': 'straightened_worms'}
-        
-         # check to see if the button has been clicked (nclicks)
+        selection_dict = {"plate": "plate", "straightened_worms": "straightened_worms"}
+
+        # check to see if the button has been clicked (nclicks)
         if nclicks is not None:
             return selection_dict
-    elif pipeline_selection == 'mf_celltox':
-                
-            # create the options
-            selection_dict = {'plate': 'plate'}
-            
-            # check to see if the button has been clicked (nclicks)
-            if nclicks is not None:
-                return selection_dict
-    elif pipeline_selection == 'wormsize':
+
+    elif pipeline_selection == "mf_celltox":
+
         # create the options
-        selection_dict = {'plate': 'plate', 'straightened_worms': 'straightened_worms'}
-        
-         # check to see if the button has been clicked (nclicks)
+        selection_dict = {"plate": "plate"}
+
+        # check to see if the button has been clicked (nclicks)
         if nclicks is not None:
             return selection_dict
-    elif pipeline_selection == 'feeding':
-       # obtain the wavelength options
-        volume = store['mount']
-        platename = store['platename']
-        thumbs_file_path = Path(volume, 'output/thumbs/')
-        
+
+    elif pipeline_selection == "wormsize":
+        # create the options
+        selection_dict = {"plate": "plate", "straightened_worms": "straightened_worms"}
+
+        # check to see if the button has been clicked (nclicks)
+        if nclicks is not None:
+            return selection_dict
+
+    elif pipeline_selection == "feeding":
+        # obtain the wavelength options
+        volume = store["mount"]
+        platename = store["platename"]
+        thumbs_file_path = Path(volume, "output/thumbs/")
+
         # create the options
         selection_dict = {
-            'plate': 'plate',
-            'straightened_worms': 'straightened_worms',
+            "plate": "plate",
+            "straightened_worms": "straightened_worms",
         }
 
         # New code to add: list all matching files and extract unique identifiers
@@ -230,18 +237,23 @@ def get_options_analysis(nclicks, store):
         # Extracting unique identifiers from filenames (e.g., _w1, _w2, etc.)
         wavelengths = set()
         for file_path in all_files:
-            parts = file_path.name.split('_')
-            if len(parts) > 1 and parts[-1].startswith('w') and parts[-1].endswith('.png'):
-                wavelengths.add(parts[-1].replace('.png', ''))
+            parts = file_path.name.split("_")
+            if (
+                len(parts) > 1
+                and parts[-1].startswith("w")
+                and parts[-1].endswith(".png")
+            ):
+                wavelengths.add(parts[-1].replace(".png", ""))
 
         # Adding these wavelengths to the selection dictionary
         for wave in sorted(wavelengths):
-            selection_key = f'wavelength_{wave}'  # Format the key as you see fit
+            selection_key = f"wavelength_{wave}"  # Format the key as you see fit
             selection_dict[selection_key] = wave
 
         # Assuming nclicks is some condition you've checked elsewhere
         nclicks = 1
         if nclicks is not None:
             return selection_dict
-    else:   
-        return {'plate': 'plate'}
+
+    else:
+        return {"plate": "plate"}

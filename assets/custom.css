@@ -107,3 +107,15 @@ html .div-with-scroll::-webkit-scrollbar-thumb {
 .fixed-button {
     height: 40px;
 }
+
+.left-and-right-grid-container {
+    display: grid;
+    grid-template-rows: 40px 40px auto;
+    grid-row-gap: 5px;
+}
+
+.aligning-preview-page-content {
+    display: grid;
+    grid-template-rows: 80px 80px 60px 60px 420px auto;
+    grid-row-gap: 10px;
+}
