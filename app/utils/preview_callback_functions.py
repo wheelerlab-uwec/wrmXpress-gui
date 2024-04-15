@@ -143,7 +143,7 @@ def preamble_preview_imgxpress_selection(store):
     )
     wrmxpress_command_split = shlex.split(wrmxpress_command)
     output_preview_log_file = Path(
-        volume, "input", platename, f"{platename}_preview.log"
+        volume, "work", platename, f"{platename}_preview.log"
     )
 
     new_store = {
@@ -232,7 +232,7 @@ def preamble_preview_avi_selection(store):
     )
     wrmxpress_command_split = shlex.split(wrmxpress_command)
     output_preview_log_file = Path(
-        volume, "input", platename, f"{platename}_preview.log"
+        volume, "work", platename, f"{platename}_preview.log"
     )
 
     new_store = {

@@ -77,19 +77,20 @@ html .div-with-scroll::-webkit-scrollbar-thumb {
 }
 
 .accordion-button:not(.collapsed) {
-    font-size: 2rem;
+    font-size: 1.5rem;
     /* Adjust the size as needed to match h1 */
     /* font-weight: bold;
     /* h1 is usually bold */
 }
 
 .accordion-button {
-    font-size: 1rem;
+    font-size: 1.5rem;
     /* Adjust as needed */
 }
 
+
 .custom-accordion-title {
-    font-size: 1em;
+    font-size: 1.5rem;
     /* Adjust the size as needed */
 }
 
