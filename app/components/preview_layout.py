@@ -93,11 +93,11 @@ preview_layout = dbc.ModalBody(
                                                         ],
                                                     ),
                                                 ),
-                                            ]
+                                            ],
+                                            className="aligning-preview-page-content",
                                         ),
                                         # Style of the card
                                         style={"height": "100%", "width": "99%"},
-                                        className="aligning-preview-page-content",
                                     ),
                                     width={"size": 6},
                                 ),
@@ -134,6 +134,10 @@ preview_layout = dbc.ModalBody(
                                                                 ),
                                                             ),
                                                         ],
+                                                        style={
+                                                            "margin-bottom": "10px",
+                                                            "margin-top": "10px",
+                                                        },
                                                     ),
                                                     style={
                                                         "text-align": "center",
@@ -203,10 +207,10 @@ preview_layout = dbc.ModalBody(
                                                         ),
                                                     ],
                                                 ),
-                                            ]
+                                            ],
+                                            className="aligning-preview-page-content",
                                         ),
                                         style={"height": "100%", "width": "99%"},
-                                        className="aligning-preview-page-content",
                                     ),
                                     width={"size": 6},
                                 ),

@@ -116,6 +116,12 @@ html .div-with-scroll::-webkit-scrollbar-thumb {
 
 .aligning-preview-page-content {
     display: grid;
-    grid-template-rows: 80px 80px 60px 60px 420px auto;
+    grid-template-rows: 80px 60px 10px 60px 500px auto;
+    grid-row-gap: 10px;
+}
+
+.aligning-run-page-content {
+    display: grid;
+    grid-template-rows: 80px 60px 10px 60px 500px auto;
     grid-row-gap: 10px;
 }
