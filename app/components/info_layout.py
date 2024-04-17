@@ -18,7 +18,6 @@ info_layout = [
         # Header of Information & Usage
         "Information"
     ),
-
     # Introduction to wrmXpress
     html.P(
         "wrmXpress is a unified framework for the analysis of diverse phenotypic imaging data in "
@@ -27,8 +26,9 @@ info_layout = [
         "analyses. For large scale high-throughput experiments, we recommend running wrmXpress on a "
         "high-performance or high-throughput computer cluster."
     ),
-
     # Header of Usage
+    html.H3("Usage"),
+    html.P(
     html.H3(
         "GUI Usage"
     ),
@@ -38,7 +38,6 @@ info_layout = [
         "**Configure** will allow you to select relevant experimental and imaging parameters, as "
         "well as select the pipeline that you wish to run."
     ),
-
     # Content of usage seperated into cards
     # dbc.Row(
     #     [
@@ -88,12 +87,11 @@ info_layout = [
     #     ]),
     html.Br(),
     # Developers section of information page
-    html.H3(
-        "The Developers"
-    ),
+    html.H3("The Developers"),
     dcc.Markdown(
         # Content of developers
-        "wrmXpress is entirely open-source. The code for the back-end is maintained by the [Zamanian Lab](https://www.zamanianlab.org/) at the University of Wisconsin-Madison and can be found [here](https://github.com/zamanianlab/wrmXpress). The code for the front-end is maintained by the [Wheeler Lab](https://wheelerlab.bio/) at the University of Wisconsin-Eau Claire and can be found [here](https://github.com/wheelerlab-uwec/wrmXpress-gui)."),
+        "wrmXpress is entirely open-source. The code for the back-end is maintained by the [Zamanian Lab](https://www.zamanianlab.org/) at the University of Wisconsin-Madison and can be found [here](https://github.com/zamanianlab/wrmXpress). The code for the front-end is maintained by the [Wheeler Lab](https://wheelerlab.bio/) at the University of Wisconsin-Eau Claire and can be found [here](https://github.com/wheelerlab-uwec/wrmXpress-gui)."
+    ),
     html.Br(),
     dbc.Row(
         [
@@ -101,36 +99,36 @@ info_layout = [
                 [
                     html.A(
                         html.Img(
-                            src='https://assets.super.so/6d48c8d3-6e72-45c3-a5b9-04514883421e/images/9da71b53-e8f2-4234-9e55-e50d302f5c46/Lab_logo.svg',
-                            style={'width': '30%'}
+                            src="https://assets.super.so/6d48c8d3-6e72-45c3-a5b9-04514883421e/images/9da71b53-e8f2-4234-9e55-e50d302f5c46/Lab_logo.svg",
+                            style={"width": "30%"},
                         ),
-                        href='https://wheelerlab.bio/',
-                        target='_blank'  # Opens the link in a new tab
+                        href="https://wheelerlab.bio/",
+                        target="_blank",  # Opens the link in a new tab
                     ),
                     html.A(
                         html.Img(
-                            src='https://lib02.uwec.edu/Omeka/files/original/37b67b60cca3c3ad308515aab27a66afe6c75b2f.gif',
-                            style={'width': '30%'}
+                            src="https://lib02.uwec.edu/Omeka/files/original/37b67b60cca3c3ad308515aab27a66afe6c75b2f.gif",
+                            style={"width": "30%"},
                         ),
-                        href='https://www.uwec.edu/',
-                        target='_blank'  # Opens the link in a new tab
-                    )
+                        href="https://www.uwec.edu/",
+                        target="_blank",  # Opens the link in a new tab
+                    ),
                 ],
-                style={'textAlign': 'center'}
+                style={"textAlign": "center"},
             ),
             dbc.Col(
                 [
                     html.A(
                         html.Img(
-                            src='https://upload.wikimedia.org/wikipedia/commons/4/45/Seal_of_the_University_of_Wisconsin.svg',
-                            style={'width': '30%'}
+                            src="https://upload.wikimedia.org/wikipedia/commons/4/45/Seal_of_the_University_of_Wisconsin.svg",
+                            style={"width": "30%"},
                         ),
-                        href='https://www.wisc.edu/',
-                        target='_blank'  # Opens the link in a new tab
+                        href="https://www.wisc.edu/",
+                        target="_blank",  # Opens the link in a new tab
                     )
                 ],
-                style={'textAlign': 'center'}
-            )
+                style={"textAlign": "center"},
+            ),
         ]
-    )
+    ),
 ]

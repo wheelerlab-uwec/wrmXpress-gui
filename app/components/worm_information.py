@@ -27,11 +27,11 @@ worm_information = dbc.AccordionItem(
             options=[
                 {"label": html.I("Brugia malayi"), "value": "Bma"},
                 {"label": html.I("Caenorhabditis elegans"), "value": "Cel"},
-                {"label": html.I("Schistosoma mansoni"), "value": "Sma"}
+                {"label": html.I("Schistosoma mansoni"), "value": "Sma"},
             ],
             value="Bma",
             persistence=True,
-            persistence_type='memory'
+            persistence_type="memory",
         ),
         html.H6("Stages:"),
         # Radio button items for stage information
@@ -48,9 +48,9 @@ worm_information = dbc.AccordionItem(
             ],
             value="Mf",
             persistence=True,
-            persistence_type='memory'
+            persistence_type="memory",
         ),
     ],
     id="worm-information",
-    title="Worm Information"
+    title="Worm Information",
 )
