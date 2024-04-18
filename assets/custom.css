@@ -123,6 +123,6 @@ html .div-with-scroll::-webkit-scrollbar-thumb {
 
 .aligning-run-page-content {
     display: grid;
-    grid-template-rows: 80px 60px 10px 60px 500px auto;
+    grid-template-rows: 80px 60px 10px 100px 500px auto;
     grid-row-gap: 10px;
 }

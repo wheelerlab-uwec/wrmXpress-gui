@@ -220,14 +220,14 @@ preview_layout = dbc.ModalBody(
                             # Alert for resolving error issue preview
                             id="resolving-error-issue-preview",
                             is_open=False,
-                            color="success",
+                            color="alert",
                             duration=6000,
                         ),
                         dbc.Alert(
                             # Alert for no store data
                             id="view-docker-logs",
                             is_open=False,
-                            color="success",
+                            color="alert",
                             duration=30000,
                         ),
                         dbc.Alert(

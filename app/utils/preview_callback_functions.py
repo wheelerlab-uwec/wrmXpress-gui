@@ -266,79 +266,94 @@ def motility_segment_fecundity_preview(store):
         - open_status : bool : Open status of the alerts
     ===============================================================================
     """
-    # Obtain the store data
-    volume = store["mount"]
-    platename = store["platename"]
-    wells = store["wells"]
-    file_structure = store["file_structure"]
-    # Check to see if first well already exists, if it does insert the img
-    # rather than running wrmXpress again
-    first_well_path = Path(
-        volume, "work", f"{platename}/{wells[0]}/img/{platename}_{wells[0]}.png"
-    )
-
-    # Check if the first well path exists
-    if os.path.exists(first_well_path):
-
-        # Open the image and create a figure
-        fig = create_figure_from_filepath(first_well_path)
-
-        # Return the path and the figure and the open status of the alerts
-        return f"```{first_well_path}```", fig, False, f"", False
-
-    if file_structure == "imagexpress":
-
-        new_store = preamble_preview_imgxpress_selection(store)
-    elif file_structure == "avi":
-
-        # if the first well does not exist, run wrmXpress
-        new_store = preamble_preview_avi_selection(
-            store  # need to change function to accept this argument
+    try:
+        # Obtain the store data
+        volume = store["mount"]
+        platename = store["platename"]
+        wells = store["wells"]
+        file_structure = store["file_structure"]
+        # Check to see if first well already exists, if it does insert the img
+        # rather than running wrmXpress again
+        first_well_path = Path(
+            volume, "work", f"{platename}/{wells[0]}/img/{platename}_{wells[0]}.png"
         )
 
-    wrmxpress_command_split = new_store["wrmxpress_command_split"]
-    output_preview_log_file = new_store["output_preview_log_file"]
-    command_message = new_store["command_message"]
-    first_well = new_store["first_well"]
+        # Check if the first well path exists
+        if os.path.exists(first_well_path):
 
-    with open(output_preview_log_file, "w") as file:
-        process = subprocess.Popen(
-            wrmxpress_command_split,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-            text=True,
-        )
-        docker_output = []
+            # Open the image and create a figure
+            fig = create_figure_from_filepath(first_well_path)
 
-        print("Running wrmXpress.")
-        docker_output.append("Running wrmXpress.")
+            # Return the path and the figure and the open status of the alerts
+            return f"```{first_well_path}```", fig, False, f"", False
 
-        while not os.path.exists(Path(volume, "input")):
-            time.sleep(1)
+        if file_structure == "imagexpress":
 
-        for line in iter(process.stdout.readline, b""):
-            docker_output.append(line)
-            file.write(line)
-            file.flush()
+            new_store = preamble_preview_imgxpress_selection(store)
+        elif file_structure == "avi":
 
-            # Assumes IX-like file structure
-            img_path = Path(
-                volume,
-                "work",
-                f"{platename}/{first_well}/img/{platename}_{first_well}.png",
+            # if the first well does not exist, run wrmXpress
+            new_store = preamble_preview_avi_selection(
+                store  # need to change function to accept this argument
             )
 
-            if "Generating w1 thumbnails" in line:
+        wrmxpress_command_split = new_store["wrmxpress_command_split"]
+        output_preview_log_file = new_store["output_preview_log_file"]
+        command_message = new_store["command_message"]
+        first_well = new_store["first_well"]
 
-                # Wait for the image to be created
-                while not os.path.exists(img_path):
-                    time.sleep(1)
+        with open(output_preview_log_file, "w") as file:
+            process = subprocess.Popen(
+                wrmxpress_command_split,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                text=True,
+            )
+            docker_output = []
+
+            print("Running wrmXpress.")
+            docker_output.append("Running wrmXpress.")
+
+            while not os.path.exists(Path(volume, "input")):
+                time.sleep(1)
+
+            for line in iter(process.stdout.readline, ""):
+                docker_output.append(line)
+                file.write(line)
+                file.flush()
+
+            process.communicate()
+            if process.returncode == 0:
+                # Assumes IX-like file structure
+                img_path = Path(
+                    volume,
+                    "work",
+                    f"{platename}/{first_well}/img/{platename}_{first_well}.png",
+                )
 
                 # Open the image and create a figure
                 fig = create_figure_from_filepath(img_path)
                 print("wrmXpress is finished")
                 # Return the command message, the figure, and the open status of the alerts
                 return command_message, fig, False, f"", False
+
+            else:
+                return (
+                    command_message,
+                    None,
+                    True,
+                    f"wrmXpress has failed, please check the {output_preview_log_file} for more information.",
+                    True,
+                )
+    except Exception as e:
+        error_message = f"An error occurred: {str(e)}"
+        return (
+            error_message,
+            None,
+            True,
+            "An error has occurred. Please see the log file for more information.",
+            True,
+        )
 
 
 def cellprofile_wormsize_preview(store):
@@ -361,63 +376,78 @@ def cellprofile_wormsize_preview(store):
         - open_status : bool : Open status of the alerts
     ===============================================================================
     """
-    # Obtain the store data
-    volume = store["mount"]
-    platename = store["platename"]
-    wells = store["wells"]
-    plate_base = platename.split("_", 1)[0]
-    first_well = wells[0]
-    # Assumes IX-like file structure
-    first_well_path = Path(
-        volume, f"output/straightened_worms/{plate_base}_{first_well}.tiff"
-    )
-
-    # Check if the first well path exists
-    if os.path.exists(first_well_path):
-        # Open the image and create a figure
-        fig = create_figure_from_filepath(first_well_path)
-
-        # Return the path and the figure and the open status of the alerts
-        return f"```{first_well_path}```", fig, False, f"", False
-
-    new_store = preamble_preview_imgxpress_selection(store)
-
-    wrmxpress_command_split = new_store["wrmxpress_command_split"]
-    output_preview_log_file = new_store["output_preview_log_file"]
-    command_message = new_store["command_message"]
-    first_well = new_store["first_well"]
-
-    with open(output_preview_log_file, "w") as file:
-        process = subprocess.Popen(
-            wrmxpress_command_split,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-            text=True,
+    try:
+        # Obtain the store data
+        volume = store["mount"]
+        platename = store["platename"]
+        wells = store["wells"]
+        plate_base = platename.split("_", 1)[0]
+        first_well = wells[0]
+        # Assumes IX-like file structure
+        first_well_path = Path(
+            volume, f"output/straightened_worms/{plate_base}_{first_well}.tiff"
         )
-        print("Running wrmXpress.")
-        docker_output = []
 
-        for line in iter(process.stdout.readline, b""):
-            docker_output.append(line)
-            file.write(line)
-            file.flush()
+        # Check if the first well path exists
+        if os.path.exists(first_well_path):
+            # Open the image and create a figure
+            fig = create_figure_from_filepath(first_well_path)
 
-            if "Generating w1 thumbnails" in line:
-                # Assumes IX-like file structure
+            # Return the path and the figure and the open status of the alerts
+            return f"```{first_well_path}```", fig, False, f"", False
+
+        new_store = preamble_preview_imgxpress_selection(store)
+
+        wrmxpress_command_split = new_store["wrmxpress_command_split"]
+        output_preview_log_file = new_store["output_preview_log_file"]
+        command_message = new_store["command_message"]
+        first_well = new_store["first_well"]
+
+        with open(output_preview_log_file, "w") as file:
+            process = subprocess.Popen(
+                wrmxpress_command_split,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                text=True,
+            )
+            print("Running wrmXpress.")
+            docker_output = []
+
+            for line in iter(process.stdout.readline, ""):
+                docker_output.append(line)
+                file.write(line)
+                file.flush()
+
+            process.wait()
+
+            if process.returncode == 0:
+
                 file_path = Path(
                     volume, f"output/straightened_worms/{plate_base}_{first_well}.tiff"
                 )
-
-                if not os.path.exists(file_path):
-                    time.sleep(1)
-
                 # Open the image and create a figure
                 fig = create_figure_from_filepath(file_path)
-
                 print("wrmXpress is finished")
-
                 # Return the command message, the figure, and the open status of the alerts
                 return command_message, fig, False, f"", False
+
+            else:
+                return (
+                    command_message,
+                    None,
+                    True,
+                    f"wrmXpress has failed, please check the {output_preview_log_file} for more information.",
+                    True,
+                )
+    except Exception as e:
+        error_message = f"An error occurred: {str(e)}"
+        return (
+            error_message,
+            None,
+            True,
+            "An error has occurred. Please see the log file for more information.",
+            True,
+        )
 
 
 def cellprofile_wormsize_intensity_cellpose_preview(store):
@@ -440,68 +470,83 @@ def cellprofile_wormsize_intensity_cellpose_preview(store):
         - open_status : bool : Open status of the alerts
     ===============================================================================
     """
-    # Obtain the store data
-    volume = store["mount"]
-    platename = store["platename"]
-    wells = store["wells"]
-    plate_base = platename.split("_", 1)[0]
+    try:
+        # Obtain the store data
+        volume = store["mount"]
+        platename = store["platename"]
+        wells = store["wells"]
+        plate_base = platename.split("_", 1)[0]
 
-    # Assumes the first well in the list is the one to check
-    first_well = wells[0]
+        # Assumes the first well in the list is the one to check
+        first_well = wells[0]
 
-    # Check to see if first well already exists, if it does insert the img
-    # rather than running wrmXpress again
-    first_well_path = Path(
-        volume, f"output/straightened_worms/{plate_base}_{first_well}.tiff"
-    )
-    if os.path.exists(first_well_path):
-        # Open the image and create a figure
-        fig = create_figure_from_filepath(first_well_path)
-
-        # Return the path and the figure and the open status of the alerts
-        return f"```{first_well_path}```", fig, False, f"", False
-
-    new_store = preamble_preview_imgxpress_selection(store)
-
-    wrmxpress_command_split = new_store["wrmxpress_command_split"]
-    output_preview_log_file = new_store["output_preview_log_file"]
-    command_message = new_store["command_message"]
-    first_well = new_store["first_well"]
-
-    with open(output_preview_log_file, "w") as file:
-
-        process = subprocess.Popen(
-            wrmxpress_command_split,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-            text=True,
+        # Check to see if first well already exists, if it does insert the img
+        # rather than running wrmXpress again
+        first_well_path = Path(
+            volume, f"output/straightened_worms/{plate_base}_{first_well}.tiff"
         )
+        if os.path.exists(first_well_path):
+            # Open the image and create a figure
+            fig = create_figure_from_filepath(first_well_path)
 
-        print("Running wrmXpress.")
+            # Return the path and the figure and the open status of the alerts
+            return f"```{first_well_path}```", fig, False, f"", False
 
-        docker_output = []
+        new_store = preamble_preview_imgxpress_selection(store)
 
-        for line in iter(process.stdout.readline, b""):
-            docker_output.append(line)
-            file.write(line)
-            file.flush()
+        wrmxpress_command_split = new_store["wrmxpress_command_split"]
+        output_preview_log_file = new_store["output_preview_log_file"]
+        command_message = new_store["command_message"]
+        first_well = new_store["first_well"]
 
-            if "Generating w1 thumbnails" in line:
+        with open(output_preview_log_file, "w") as file:
+
+            process = subprocess.Popen(
+                wrmxpress_command_split,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                text=True,
+            )
+
+            print("Running wrmXpress.")
+
+            docker_output = []
+
+            for line in iter(process.stdout.readline, ""):
+                docker_output.append(line)
+                file.write(line)
+                file.flush()
+
+            process.wait()
+
+            if process.returncode == 0:
+
                 img_path = Path(
                     volume, f"output/straightened_worms/{plate_base}_{first_well}.tiff"
                 )
-
-                # check to make sure the file path exists
-                while not os.path.exists(img_path):
-                    time.sleep(1)
-
                 # Open the image and create a figure
                 fig = create_figure_from_filepath(img_path)
-
                 print("wrmXpress is finished")
-
                 # Return the command message, the figure, and the open status of the alerts
                 return command_message, fig, False, f"", False
+            else:
+                return (
+                    command_message,
+                    None,
+                    True,
+                    f"wrmXpress has failed, please check the {output_preview_log_file} for more information.",
+                    True,
+                )
+
+    except Exception as e:
+        error_message = f"An error occurred: {str(e)}"
+        return (
+            error_message,
+            None,
+            True,
+            "An error has occurred. Please see the log file for more information.",
+            True,
+        )
 
 
 def cellprofile_mf_celltox_preview(store):
@@ -524,74 +569,94 @@ def cellprofile_mf_celltox_preview(store):
         - open_status : bool : Open status of the alerts
     ===============================================================================
     """
-    # Obtain the store data
-    volume = store["mount"]
-    platename = store["platename"]
-    wells = store["wells"]
+    try:
+        # Obtain the store data
+        volume = store["mount"]
+        platename = store["platename"]
+        wells = store["wells"]
 
-    first_well = wells[
-        0
-    ]  # Assuming first_well is defined here as the first item in wells
+        first_well = wells[
+            0
+        ]  # Assuming first_well is defined here as the first item in wells
 
-    # Check to see if first well already exists, if it does insert the img
-    # rather than running wrmXpress again
-    first_well_path = Path(
-        volume, "work", platename, first_well, "img", f"{platename}_{first_well}.png"
-    )
-
-    if os.path.exists(first_well_path):
-        # Open the image and create a figure
-        fig = create_figure_from_filepath(first_well_path)
-
-        # Return the path and the figure and the open status of the alerts
-        return f"```{first_well_path}```", fig, False, f"", False
-
-    new_store = preamble_preview_imgxpress_selection(store)
-
-    wrmxpress_command_split = new_store["wrmxpress_command_split"]
-    output_preview_log_file = new_store["output_preview_log_file"]
-    command_message = new_store["command_message"]
-    first_well = new_store["first_well"]
-
-    with open(output_preview_log_file, "w") as file:
-
-        process = subprocess.Popen(
-            wrmxpress_command_split,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-            text=True,
+        # Check to see if first well already exists, if it does insert the img
+        # rather than running wrmXpress again
+        first_well_path = Path(
+            volume,
+            "work",
+            platename,
+            first_well,
+            "img",
+            f"{platename}_{first_well}.png",
         )
 
-        print("Running wrmXpress.")
+        if os.path.exists(first_well_path):
+            # Open the image and create a figure
+            fig = create_figure_from_filepath(first_well_path)
 
-        docker_output = []
+            # Return the path and the figure and the open status of the alerts
+            return f"```{first_well_path}```", fig, False, f"", False
 
-        for line in iter(process.stdout.readline, b""):
-            docker_output.append(line)
-            file.write(line)
-            file.flush()
+        new_store = preamble_preview_imgxpress_selection(store)
 
-            img_path = Path(
-                volume,
-                "work",
-                platename,
-                first_well,
-                "img",
-                f"{platename}_{first_well}.png",
+        wrmxpress_command_split = new_store["wrmxpress_command_split"]
+        output_preview_log_file = new_store["output_preview_log_file"]
+        command_message = new_store["command_message"]
+        first_well = new_store["first_well"]
+
+        with open(output_preview_log_file, "w") as file:
+
+            process = subprocess.Popen(
+                wrmxpress_command_split,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                text=True,
             )
 
-            if "Generating w1 thumbnails" in line:
-                # Wait for the image to be created
-                while not os.path.exists(img_path):
-                    time.sleep(1)
+            print("Running wrmXpress.")
+
+            docker_output = []
+
+            for line in iter(process.stdout.readline, ""):
+                docker_output.append(line)
+                file.write(line)
+                file.flush()
+
+            process.wait()
+
+            if process.returncode == 0:
+
+                img_path = Path(
+                    volume,
+                    "work",
+                    platename,
+                    first_well,
+                    "img",
+                    f"{platename}_{first_well}.png",
+                )
 
                 # Open the image and create a figure
                 fig = create_figure_from_filepath(img_path)
-
                 print("wrmXpress is finished")
-
                 # Return the command message, the figure, and the open status of the alerts
                 return command_message, fig, False, f"", False
+            else:
+                return (
+                    command_message,
+                    None,
+                    True,
+                    f"wrmXpress has failed, please check the {output_preview_log_file} for more information.",
+                    True,
+                )
+    except Exception as e:
+        error_message = f"An error occurred: {str(e)}"
+        return (
+            error_message,
+            None,
+            True,
+            "An error has occurred. Please see the log file for more information.",
+            True,
+        )
 
 
 def cellprofile_feeding_preview(store):
@@ -614,64 +679,80 @@ def cellprofile_feeding_preview(store):
         - open_status : bool : Open status of the alerts
     ===============================================================================
     """
-    # Obtain the store data
-    volume = store["mount"]
-    platename = store["platename"]
-    wells = store["wells"]
-    plate_base = platename.split("_", 1)[0]
+    try:
+        # Obtain the store data
+        volume = store["mount"]
+        platename = store["platename"]
+        wells = store["wells"]
+        plate_base = platename.split("_", 1)[0]
 
-    first_well = wells[0]  # Assuming first_well is the first item in wells list
+        first_well = wells[0]  # Assuming first_well is the first item in wells list
 
-    # Check to see if first well already exists, if it does insert the img
-    # rather than running wrmXpress again
-    first_well_path = Path(
-        volume, f"output/straightened_worms/{plate_base}-{first_well}.tiff"
-    )
-
-    if os.path.exists(first_well_path):
-        # Open the image and create a figure
-        fig = create_figure_from_filepath(first_well_path)
-
-        # Return the path and the figure and the open status of the alerts
-        return f"```{first_well_path}```", fig, False, f"", False
-
-    new_store = preamble_preview_imgxpress_selection(store)
-
-    wrmxpress_command_split = new_store["wrmxpress_command_split"]
-    output_preview_log_file = new_store["output_preview_log_file"]
-    command_message = new_store["command_message"]
-    first_well = new_store["first_well"]
-
-    with open(output_preview_log_file, "w") as file:
-
-        process = subprocess.Popen(
-            wrmxpress_command_split,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-            text=True,
+        # Check to see if first well already exists, if it does insert the img
+        # rather than running wrmXpress again
+        first_well_path = Path(
+            volume, f"output/straightened_worms/{plate_base}-{first_well}.tiff"
         )
 
-        print("Running wrmXpress.")
+        if os.path.exists(first_well_path):
+            # Open the image and create a figure
+            fig = create_figure_from_filepath(first_well_path)
 
-        docker_output = []
+            # Return the path and the figure and the open status of the alerts
+            return f"```{first_well_path}```", fig, False, f"", False
 
-        for line in iter(process.stdout.readline, b""):
-            docker_output.append(line)
-            file.write(line)
-            file.flush()
+        new_store = preamble_preview_imgxpress_selection(store)
 
-            if "Generating w1 thumbnails" in line:
-                # Wait for the image to be created
-                while not os.path.exists(first_well_path):
-                    time.sleep(1)
+        wrmxpress_command_split = new_store["wrmxpress_command_split"]
+        output_preview_log_file = new_store["output_preview_log_file"]
+        command_message = new_store["command_message"]
+        first_well = new_store["first_well"]
+
+        with open(output_preview_log_file, "w") as file:
+
+            process = subprocess.Popen(
+                wrmxpress_command_split,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                text=True,
+            )
+
+            print("Running wrmXpress.")
+
+            docker_output = []
+
+            for line in iter(process.stdout.readline, ""):
+                docker_output.append(line)
+                file.write(line)
+                file.flush()
+
+            process.wait()
+
+            if process.returncode == 0:
 
                 # Open the image and create a figure
                 fig = create_figure_from_filepath(first_well_path)
-
                 print("wrmXpress is finished")
-
                 # Return the command message, the figure, and the open status of the alerts
                 return command_message, fig, False, f"", False
+
+            else:
+                return (
+                    command_message,
+                    None,
+                    True,
+                    f"wrmXpress has failed, please check the {output_preview_log_file} for more information.",
+                    True,
+                )
+    except Exception as e:
+        error_message = f"An error occurred: {str(e)}"
+        return (
+            error_message,
+            None,
+            True,
+            "An error has occurred. Please see the log file for more information.",
+            True,
+        )
 
 
 def tracking_wrmXpress_preview(store):
@@ -695,68 +776,88 @@ def tracking_wrmXpress_preview(store):
         - open_status : bool : Open status of the alerts
     ===============================================================================
     """
-    # Obtain the store data
-    volume = store["mount"]
-    platename = store["platename"]
-    wells = store["wells"]
-    file_structure = store["file_structure"]
+    try:
+        # Obtain the store data
+        volume = store["mount"]
+        platename = store["platename"]
+        wells = store["wells"]
+        file_structure = store["file_structure"]
 
-    # check to see if the first well has already been analyzed
-    first_well_path = Path(
-        volume, "work", f"{platename}/{wells[0]}/img/{platename}_{wells[0]}_tracks.png"
-    )
-
-    # Check if the first well path exists
-    if os.path.exists(first_well_path):
-        # Open the image and create a figure
-        fig = create_figure_from_filepath(first_well_path)
-
-        # Return the path and the figure and the open status of the alerts
-        return f"```{first_well_path}```", fig, False, f"", False
-
-    if file_structure == "imagexpress":
-        new_store = preamble_preview_imgxpress_selection(store=store)
-
-    elif file_structure == "avi":
-        # if the first well does not exist, run wrmXpress
-        new_store = preamble_preview_avi_selection(store=store)
-
-    wrmxpress_command_split = new_store["wrmxpress_command_split"]
-    output_preview_log_file = new_store["output_preview_log_file"]
-    command_message = new_store["command_message"]
-    first_well = new_store["first_well"]
-
-    with open(output_preview_log_file, "w") as file:
-        process = subprocess.Popen(
-            wrmxpress_command_split,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-            text=True,
+        # check to see if the first well has already been analyzed
+        first_well_path = Path(
+            volume,
+            "work",
+            f"{platename}/{wells[0]}/img/{platename}_{wells[0]}_tracks.png",
         )
 
-        print("Running wrmXpress.")
+        # Check if the first well path exists
+        if os.path.exists(first_well_path):
+            # Open the image and create a figure
+            fig = create_figure_from_filepath(first_well_path)
 
-        # Create an empty list to store the docker output
-        docker_output = []
+            # Return the path and the figure and the open status of the alerts
+            return f"```{first_well_path}```", fig, False, f"", False
 
-        for line in iter(process.stdout.readline, b""):
-            # Add the line to docker_output for further processing
-            docker_output.append(line)
-            file.write(line)
-            file.flush()
-            if "Generating w1 thumbnails" in line:
+        if file_structure == "imagexpress":
+            new_store = preamble_preview_imgxpress_selection(store=store)
+
+        elif file_structure == "avi":
+            # if the first well does not exist, run wrmXpress
+            new_store = preamble_preview_avi_selection(store=store)
+
+        wrmxpress_command_split = new_store["wrmxpress_command_split"]
+        output_preview_log_file = new_store["output_preview_log_file"]
+        command_message = new_store["command_message"]
+        first_well = new_store["first_well"]
+
+        with open(output_preview_log_file, "w") as file:
+            process = subprocess.Popen(
+                wrmxpress_command_split,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                text=True,
+            )
+
+            print("Running wrmXpress.")
+
+            # Create an empty list to store the docker output
+            docker_output = []
+
+            for line in iter(process.stdout.readline, ""):
+                # Add the line to docker_output for further processing
+                docker_output.append(line)
+                file.write(line)
+                file.flush()
+
+            process.wait()
+
+            if process.returncode == 0:
+
                 first_well_path = Path(
                     volume,
                     "work",
                     f"{platename}/{wells[0]}/img/{platename}_{first_well}_tracks.png",
                 )
 
-                while not os.path.exists(first_well_path):
-                    time.sleep(1)
-
                 # create figure from file path
                 fig_1 = create_figure_from_filepath(first_well_path)
-
                 print("wrmXpress is finished")
-
                 return command_message, fig_1, False, f"", False
+
+            else:
+                return (
+                    command_message,
+                    None,
+                    True,
+                    f"wrmXpress has failed, please check the {output_preview_log_file} for more information.",
+                    True,
+                )
+    except Exception as e:
+        error_message = f"An error occurred: {str(e)}"
+        return (
+            error_message,
+            None,
+            True,
+            "An error has occurred. Please see the log file for more information.",
+            True,
+        )
