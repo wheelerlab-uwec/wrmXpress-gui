@@ -112,18 +112,21 @@ def load_analysis_img(selection, n_clicks, store):
             img_path = Path(
                 volume, f"output/strightened_worms/{plate_base}_{wells[0]}.tiff"
             )
-            scale = "inferno"
 
+        elif selection == "motility":
+            selection = "_motility"
+            scale = "inferno"
+            img_path = Path(volume, f"output/thumbs/{platename}{selection}.png")
         elif selection == "plate":
             selection = ""
+            img_path = Path(volume, f"output/thumbs/{platename}{selection}.png")
 
         elif selection == "segment":
             selection = "_binary"
+            img_path = Path(volume, f"output/thumbs/{platename}{selection}.png")
 
         else:
             selection = f"_{selection}"
-
-        if img_path is None:
             img_path = Path(volume, f"output/thumbs/{platename}{selection}.png")
 
         # check to see if the img exists
