@@ -231,6 +231,9 @@ def update_analysis_preview_imgage(selection, nclicks, store):
 
             elif selection.startswith("wavelength_"):
 
+                print("selection", selection)
+                selection = selection.split("_", 1)[-1]
+
                 img_path = Path(
                     f"{volume}/output/thumbs/{platename}_{wells[0]}_{selection}.png"
                 )
