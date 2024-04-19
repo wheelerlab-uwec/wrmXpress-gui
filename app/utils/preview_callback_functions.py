@@ -123,6 +123,7 @@ def preamble_preview_imgxpress_selection(store):
     clean_and_create_directories(
         input_path=Path(volume, "input", platename),
         work_path=Path(volume, "work", platename),
+        output_path=Path(volume, "output"),
     )
 
     # Copy files to input directory
@@ -204,25 +205,14 @@ def preamble_preview_avi_selection(store):
         work_path=Path(volume, "work", platename),
     )
 
-    htd_file = Path(img_dir, f"{platename}.HTD")
-    if not os.path.exists(htd_file):
-        copy_files_to_input_directory(
-            platename_input_dir=platename_input_dir,
-            htd_file=None,
-            img_dir=img_dir,
-            wells=first_well,
-            plate_base=None,
-            platename=platename,
-        )
-    elif os.path.exists(htd_file):
-        copy_files_to_input_directory(
-            platename_input_dir=platename_input_dir,
-            htd_file=htd_file,
-            img_dir=img_dir,
-            wells=wells,
-            plate_base=None,
-            platename=platename,
-        )
+    copy_files_to_input_directory(
+        platename_input_dir=platename_input_dir,
+        htd_file=None,
+        img_dir=img_dir,
+        wells=first_well,
+        plate_base=None,
+        platename=platename,
+    )
 
     # Command message
     command_message = f"```python wrmXpress/wrapper.py {platename}.yml {platename}```"

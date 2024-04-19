@@ -1247,8 +1247,13 @@ def process_tracking_wells(
     additional_wells=[],
     multiplier=1,
 ):
-    # find the well that is being analyzed
-    current_well = line.split(" ")[-1].split(".")[0]
+    if "Tracking well" in line:
+        # find the well that is being analyzed
+        current_well = line.split(" ")[-1].split(".")[0]
+    elif "Running well" in line:
+        # find the well that is being analyzed
+        current_well = line.split(" ")[-1].strip()
+
     # add the well to the list of wells analyzed if it is not already there
     if current_well not in tracking_well:
         tracking_well.append(current_well)

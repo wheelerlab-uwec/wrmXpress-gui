@@ -150,11 +150,12 @@ def update_analysis_preview_imgage(selection, nclicks, store):
                 # Return the figure and the open status of the alerts
                 return fig, False, True, False, ""
         elif pipeline_selection == "wormsize_intensity_cellpose":
+
             # assumes IX-like file structure
             if selection == "plate":
 
                 img_path = Path(
-                    f"{volume}/work/{platename}/{wells[0]}/img/{platename}_{wells[0]}{selection}.png"
+                    f"{volume}/work/{platename}/{wells[0]}/img/{platename}_{wells[0]}.png"
                 )
 
             elif selection == "straightened_worms":
@@ -181,7 +182,7 @@ def update_analysis_preview_imgage(selection, nclicks, store):
             if selection == "plate":
 
                 img_path = Path(
-                    f"{volume}/work/{platename}/{wells[0]}/img/{platename}_{wells[0]}{selection}.png"
+                    f"{volume}/work/{platename}/{wells[0]}/img/{platename}_{wells[0]}.png"
                 )
 
             # Check if the image exists
@@ -197,7 +198,7 @@ def update_analysis_preview_imgage(selection, nclicks, store):
             if selection == "plate":
 
                 img_path = Path(
-                    f"{volume}/work/{platename}/{wells[0]}/img/{platename}_{wells[0]}{selection}.png"
+                    f"{volume}/work/{platename}/{wells[0]}/img/{platename}_{wells[0]}.png"
                 )
 
             elif selection == "straightened_worms":
@@ -219,7 +220,7 @@ def update_analysis_preview_imgage(selection, nclicks, store):
             if selection == "plate":
 
                 img_path = Path(
-                    f"{volume}/work/{platename}/{wells[0]}/img/{platename}_{wells[0]}{selection}.png"
+                    f"{volume}/work/{platename}/{wells[0]}/img/{platename}_{wells[0]}.png"
                 )
 
             elif selection == "straightened_worms":
@@ -405,18 +406,18 @@ def get_options_preview(nclicks, store):
         # obtain the wavelength options
         volume = store["mount"]
         platename = store["platename"]
-        thumbs_file_path = Path(volume, "output/thumbs/")
+        plate_base = platename.split("_", 1)[0]
+        input_file_path = Path(volume, f"{platename}/TimePoint_1/")
 
         # create the options
         selection_dict = {
-            "plate": "plate",
             "straightened_worms": "straightened_worms",
         }
 
         # New code to add: list all matching files and extract unique identifiers
-        pattern = f"{platename}*.png"
+        pattern = f"{plate_base}*.TIF"
         # Using glob to match the pattern
-        all_files = list(thumbs_file_path.glob(pattern))
+        all_files = list(input_file_path.glob(pattern))
         # Extracting unique identifiers from filenames (e.g., _w1, _w2, etc.)
         wavelengths = set()
         for file_path in all_files:
@@ -424,9 +425,9 @@ def get_options_preview(nclicks, store):
             if (
                 len(parts) > 1
                 and parts[-1].startswith("w")
-                and parts[-1].endswith(".png")
+                and parts[-1].endswith(".TIF")
             ):
-                wavelengths.add(parts[-1].replace(".png", ""))
+                wavelengths.add(parts[-1].replace(".TIF", ""))
 
         # Adding these wavelengths to the selection dictionary
         for wave in sorted(wavelengths):
