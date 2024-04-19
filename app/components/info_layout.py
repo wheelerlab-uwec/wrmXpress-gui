@@ -28,10 +28,8 @@ info_layout = [
     ),
     # Header of Usage
     html.H3("Usage"),
-    html.P(
-    html.H3(
-        "GUI Usage"
-    ),
+    html.P(),
+    html.H3("GUI Usage"),
     dcc.Markdown(
         # Content of usage
         "To configure and run analyses, use the navigation column at left-hand side of the screen. \n"
@@ -52,7 +50,6 @@ info_layout = [
     #                                 className="card-title" # Defines the style of the card title
     #                             ),
     #                             dcc.Markdown(
-
     #                                 # Remote card content
     #                                 "wrmXpress was originally designed to be invoked remotely, using a high-performance or high-throughput computer. There are many ways to go about this, but we recommend encapsulating the entire process in a Docker container. The container should include the Python libraries required by wrmXpress (see the [Zamanian Lab's Dockerfile/conda environment](https://github.com/zamanianlab/Docker/tree/main/chtc-wrmxpress) for an example), the cloned [wrmXpress repository](https://github.com/zamanianlab/wrmXpress), the input data in a directory called `input/`, and a YAML file that configures the analysis. A user can use this graphical user interface (GUI) to produce the YAML by selecting the options and modules and clicking Save YAML.",
     #                                 className="card-text" # Defines the style of the card text
@@ -70,7 +67,7 @@ info_layout = [
     #                          [
     #                              # Locally Card
     #                              html.H5(
-    #                                  "Locally", 
+    #                                  "Locally",
     #                                  className="card-title" # Defines the style of the card title
     #                              ),
     #                              # Local card content

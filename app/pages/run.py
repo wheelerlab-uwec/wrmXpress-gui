@@ -109,14 +109,29 @@ def load_analysis_img(selection, n_clicks, store):
     if n_clicks:
 
         if selection == "straightened_worms":
-            img_path = Path(
-                volume, f"output/strightened_worms/{plate_base}_{wells[0]}.tiff"
-            )
+
+            path_to_straightened_worms = Path(volume, "output/straightened_worms/")
+            pattern = f"{plate_base}*{wells[0]}*.tiff"
+            all_files = list(path_to_straightened_worms.glob(pattern))
+            # Filter files to find those corresponding to the first well in the list
+            straightened_worm_files = []
+            for file_path in all_files:
+                if file_path.name.startswith(
+                    f"{plate_base}_{wells[0]}"
+                ) or file_path.name.startswith(f"{plate_base}-{wells[0]}"):
+                    straightened_worm_files.append(file_path)
+            if straightened_worm_files:
+                img_path = straightened_worm_files[0]  # Use the first matching file
+
+        elif selection.startswith("wavelength_"):
+            selection = selection.split("_", 1)[1]
+            img_path = Path(volume, f"output/thumbs/{platename}_{selection}.png")
 
         elif selection == "motility":
             selection = "_motility"
             scale = "inferno"
             img_path = Path(volume, f"output/thumbs/{platename}{selection}.png")
+
         elif selection == "plate":
             selection = ""
             img_path = Path(volume, f"output/thumbs/{platename}{selection}.png")
@@ -225,18 +240,18 @@ def get_options_analysis(nclicks, store):
         # obtain the wavelength options
         volume = store["mount"]
         platename = store["platename"]
-        thumbs_file_path = Path(volume, "output/thumbs/")
+        plate_base = platename.split("_", 1)[0]
+        input_file_path = Path(volume, f"{platename}/TimePoint_1/")
 
         # create the options
         selection_dict = {
-            "plate": "plate",
             "straightened_worms": "straightened_worms",
         }
 
         # New code to add: list all matching files and extract unique identifiers
-        pattern = f"{platename}*.png"
+        pattern = f"{plate_base}*.TIF"
         # Using glob to match the pattern
-        all_files = list(thumbs_file_path.glob(pattern))
+        all_files = list(input_file_path.glob(pattern))
         # Extracting unique identifiers from filenames (e.g., _w1, _w2, etc.)
         wavelengths = set()
         for file_path in all_files:
@@ -244,9 +259,9 @@ def get_options_analysis(nclicks, store):
             if (
                 len(parts) > 1
                 and parts[-1].startswith("w")
-                and parts[-1].endswith(".png")
+                and parts[-1].endswith(".TIF")
             ):
-                wavelengths.add(parts[-1].replace(".png", ""))
+                wavelengths.add(parts[-1].replace(".TIF", ""))
 
         # Adding these wavelengths to the selection dictionary
         for wave in sorted(wavelengths):

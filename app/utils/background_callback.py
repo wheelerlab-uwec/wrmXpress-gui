@@ -1376,7 +1376,7 @@ def process_info_and_percent(
             set_progress(
                 (
                     str(info_well_analyzed),
-                    str(multiplier * info_total_wells),
+                    str(multiplier * int(info_total_wells)),
                     fig,
                     f"```{img_path}```",
                     f"```{docker_output_formatted}```",
