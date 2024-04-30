@@ -4,7 +4,6 @@
 ####                                                                ####
 ########################################################################
 
-import dash_bootstrap_components as dbc
 import dash
 from dash import callback, html
 from dash.dependencies import Input, Output, State
@@ -17,11 +16,9 @@ from app.utils.callback_functions import prep_yaml
 import os
 
 # Importing Components and functions
-from app.components.instrument_settings import instrument_settings
-from app.components.worm_information import worm_information
-from app.components.module_selection import module_selection
-from app.components.run_time_settings import run_time_settings
-from app.utils.callback_functions import eval_bool
+from app.utils.callback_functions import create_figure_from_url
+
+from app.components.configure_layout import configure_layout
 
 # Registering this page
 dash.register_page(__name__)
@@ -32,45 +29,7 @@ dash.register_page(__name__)
 ####                                                                ####
 ########################################################################
 
-layout = dbc.Container([
-    dbc.Accordion(
-        [
-            # Order of the Accordian item in which they appear in the app
-            instrument_settings,  # Instrument settings, see instrument_settings.py
-            worm_information,  # Worm information, see worm_information.py
-            module_selection,  # Module selection, see module_selection.py
-            run_time_settings,  # Run time settings, see run_time_settings.py
-        ],
-        start_collapsed=False,  # Start with the accordian open
-        always_open=True,  # Always open the accordian
-    ),
-    html.Hr(),
-    dbc.Alert(
-        id='resolving-error-issue-configure',
-        is_open=False,  # Alert is not open by default
-        color='danger',  # Alert color is red
-        duration=10000  # Alert will close after 10 seconds
-    ),
-    html.Br(),
-    # Button to finalize configuration
-    dbc.Row(
-        [
-            dbc.Col(
-                dbc.Button(
-                    "Finalize configuration",  # Button text
-                    id="finalize-configure-button",
-                    className="flex",  # Button class is flex
-                    color='primary'  # Default button color is (wrmXpress) blue
-                ),
-                width="auto"  # Button width is auto
-            ),
-        ],
-        justify="center"  # Center the button
-    ),
-],
-    # Adjust the white space between tab and accordian elements
-    style={"paddingTop": "80px"}
-)
+layout = configure_layout
 
 ########################################################################
 ####                                                                ####
@@ -81,13 +40,10 @@ layout = dbc.Container([
 
 @callback(
     [
-        Output('multi-well-options-row', 'style'),
-        Output('additional-options-row', 'style')
+        Output("multi-well-options-row", "style"),
+        Output("additional-options-row", "style"),
     ],
-    [
-        Input('imaging-mode', 'value'),
-        Input('file-structure', 'value')
-    ]
+    [Input("imaging-mode", "value"), Input("file-structure", "value")],
 )
 # appearing selections upon meeting certain critera
 def update_options_visibility(imaging_mode, file_structure):
@@ -102,16 +58,16 @@ def update_options_visibility(imaging_mode, file_structure):
         - multi_well_options_style : dict : The style for the multi-well options
         - additional_options_style : dict : The style for the additional options
     """
-    multi_well_options_style = {'display': 'none'}
-    additional_options_style = {'display': 'none'}
+    multi_well_options_style = {"display": "none"}
+    additional_options_style = {"display": "none"}
 
-    if imaging_mode == 'multi-well':  # if multi-well is selected
+    if imaging_mode == "multi-well":  # if multi-well is selected
         # display the multi-well options
-        multi_well_options_style = {'display': 'flex'}
+        multi_well_options_style = {"display": "flex"}
 
-        if file_structure == 'avi':  # if avi is selected
+        if file_structure == "avi":  # if avi is selected
             # display the additional options
-            additional_options_style = {'display': 'flex'}
+            additional_options_style = {"display": "flex"}
 
     return multi_well_options_style, additional_options_style  # return the styles
 
@@ -121,28 +77,27 @@ def update_options_visibility(imaging_mode, file_structure):
     Output("store", "data"),
     Input("total-well-cols", "value"),
     Input("total-num-rows", "value"),
-    Input('mounted-volume', 'value'),
-    Input('plate-name', 'value'),
-    Input('well-selection-list', 'children'),
-    Input('motility-run', 'value'),
-    Input('segment-run', 'value'),
-    Input('well-selection-list', 'children'),
-    Input('imaging-mode', 'value'),
-    Input("file-structure", 'value'),
-    Input("circ-or-square-img-masking", 'value')
+    Input("mounted-volume", "value"),
+    Input("plate-name", "value"),
+    Input("well-selection-list", "children"),
+    Input("well-selection-list", "children"),
+    Input("imaging-mode", "value"),
+    Input("file-structure", "value"),
+    Input("pipeline-selection", "value"),
+    # Input("circ-or-square-img-masking", 'value'), # Image masking
 )
-def rows_cols(
+# storing values of inputs to be used in different pages
+def store_values(
     cols,
     rows,
     mounter,
     platename,
     well_selection,
-    motility,
-    segment,
     wells,
     imgaging_mode,
     file_sturcture,
-    img_masking
+    pipeline_selection,
+    # img_masking, # Image masking
 ):
     """
     This function will store the values of the inputs to be used in different pages.
@@ -153,38 +108,32 @@ def rows_cols(
         - mounter : str : The mounted volume
         - platename : str : The plate name
         - well_selection : list : The list of wells selected
-        - motility : str : The motility run
-        - segment : str : The segment run
         - wells : list : The list of wells
         - imgaging_mode : str : The imaging mode
         - file_sturcture : str : The file structure
-        - img_masking : str : The image masking
+        - pipeline_selection : str : The pipeline selection
     =======================================================================================================
     Returns:
         - dict : The values of the inputs to be used in different pages
     """
     # storing and returning the values of the inputs to be used in different pages
     return {
-        'cols': cols,
-        'rows': rows,
-        'mount': mounter,
-        'platename': platename,
-        'wells': well_selection,
-        'motility': motility,
-        'segment': segment,
-        'wells': wells,
-        'img_mode': imgaging_mode,
-        'file_structure': file_sturcture,
-        'img_masking': img_masking
+        "cols": cols,
+        "rows": rows,
+        "mount": mounter,
+        "platename": platename,
+        "wells": well_selection,
+        "wells": wells,
+        "img_mode": imgaging_mode,
+        "file_structure": file_sturcture,
+        "pipeline_selection": pipeline_selection,
+        #'img_masking': img_masking, # Image masking
     }
 
 
 @callback(
-    Output("well-selection-table", 'children'),
-    [
-        Input("total-num-rows", "value"),
-        Input("total-well-cols", "value")
-    ]
+    Output("well-selection-table", "children"),
+    [Input("total-num-rows", "value"), Input("total-well-cols", "value")],
 )
 # creating a selection table based on the dimensions of rows and columns selected
 def update_table(rows, cols):
@@ -211,23 +160,22 @@ def update_table(rows, cols):
 
     # create a table from the dataframe
     well_selection = dash_table.DataTable(
-        data=df.reset_index().to_dict('records'),
-        columns=[{'name': 'Row', 'id': 'index', 'editable': False}] +
-        [{'name': col, 'id': col} for col in df.columns],
+        data=df.reset_index().to_dict("records"),
+        columns=[{"name": "Row", "id": "index", "editable": False}]
+        + [{"name": col, "id": col} for col in df.columns],
         editable=True,  # table is editable
-        style_table={'overflowX': 'auto'},  # table style
-        style_cell={'textAlign': 'center'},  # cell style
-        id='dynamic-table-container-well-selection-table'
+        style_table={"overflowX": "auto"},  # table style
+        style_cell={"textAlign": "center"},  # cell style
+        id="dynamic-table-container-well-selection-table",
     )
     return well_selection  # return the table
 
-# Populate list of wells to be analyzed
-
 
 @callback(
-    Output('well-selection-list', 'children'),
-    Input('dynamic-table-container-well-selection-table', 'data')
+    Output("well-selection-list", "children"),
+    Input("dynamic-table-container-well-selection-table", "data"),
 )
+# updating the list of wells to be analyzed
 def update_wells(table_contents):  # list of cells from selection table
     """
     This function will populate the list of wells to be analyzed.
@@ -255,34 +203,27 @@ def update_wells(table_contents):  # list of cells from selection table
 
 @callback(
     [
-        Output('finalize-configure-button', 'color'),
-        Output("resolving-error-issue-configure", 'is_open'),
-        Output('resolving-error-issue-configure', 'children'),
-        Output("resolving-error-issue-configure", 'color'),
+        Output("finalize-configure-button", "color"),
+        Output("resolving-error-issue-configure", "is_open"),
+        Output("resolving-error-issue-configure", "children"),
+        Output("resolving-error-issue-configure", "color"),
     ],
-    Input('finalize-configure-button', 'n_clicks'),
-    State('imaging-mode', 'value'),
-    State('file-structure', 'value'),
-    State('multi-well-rows', 'value'),
-    State('multi-well-cols', 'value'),
-    State('multi-well-detection', 'value'),
-    State('species', 'value'),
-    State('stages', 'value'),
-    State('motility-run', 'value'),
-    State('conversion-run', 'value'),
-    State('conversion-scale-video', 'value'),
-    State('conversion-rescale-multiplier', 'value'),
-    State('segment-run', 'value'),
-    State('segmentation-wavelength', 'value'),
-    State('cell-profiler-run', 'value'),
-    State('cell-profiler-pipeline', 'value'),
-    State('diagnostics-dx', 'value'),
-    State('plate-name', 'value'),
-    State('mounted-volume', 'value'),
-    State('well-selection-list', 'children'),
+    Input("finalize-configure-button", "n_clicks"),
+    State("imaging-mode", "value"),
+    State("file-structure", "value"),
+    State("multi-well-rows", "value"),
+    State("multi-well-cols", "value"),
+    State("multi-well-detection", "value"),
+    State("species", "value"),
+    State("stages", "value"),
+    State("plate-name", "value"),
+    State("mounted-volume", "value"),
+    State("well-selection-list", "children"),
+    State("pipeline-selection", "value"),
     prevent_initial_call=True,
-    allow_duplicate=True
+    allow_duplicate=True,
 )
+# saving the yaml file from the sections in the configuration page
 def run_analysis(  # function to save the yaml file from the sections in the configuration page
     nclicks,
     imagingmode,
@@ -292,18 +233,10 @@ def run_analysis(  # function to save the yaml file from the sections in the con
     multiwelldetection,
     species,
     stages,
-    motilityrun,
-    conversionrun,
-    conversionscalevideo,
-    conversionrescalemultiplier,
-    segmentrun,
-    wavelength,
-    cellprofilerrun,
-    cellprofilerpipeline,
-    diagnosticdx,
     platename,
     volume,
     wells,
+    pipeline,
 ):
     """
     This function will save the yaml file from the sections in the configuration page.
@@ -317,25 +250,17 @@ def run_analysis(  # function to save the yaml file from the sections in the con
         - multiwelldetection : str : The multi-well detection
         - species : str : The species
         - stages : str : The stages
-        - motilityrun : str : The motility run
-        - conversionrun : str : The conversion run
-        - conversionscalevideo : str : The conversion scale video
-        - conversionrescalemultiplier : str : The conversion rescale multiplier
-        - segmentrun : str : The segment run
-        - wavelength : str : The wavelength
-        - cellprofilerrun : str : The cell profiler run
-        - cellprofilerpipeline : str : The cell profiler pipeline
-        - diagnosticdx : str : The diagnostics dx
         - platename : str : The plate name
         - volume : str : The volume
         - wells : list : The list of wells
+        - pipeline : str : The pipeline
     =======================================================================================================
     Returns:
         - str : The color of the finalize configuration button
             +- 'primary' : The color of the initial configuration button
             +- 'danger' : The color of the configuration button upon encountering an error
             +- 'success' : The color of the finalize configuration button upon successful configuration
-        - bool : The open state of the alert 
+        - bool : The open state of the alert
             +- False : The alert is not open
             +- True : The alert is open
         - str : The children of the alert
@@ -353,23 +278,31 @@ def run_analysis(  # function to save the yaml file from the sections in the con
         try:
             # initializing the first error message
             error_messages = [
-                "While finalizing the configuration, the following errors were found:"]
+                "While finalizing the configuration, the following errors were found:"
+            ]
             error_occured = False  # initializing the error flag
 
             # checks volume and plate names to ensure they are adequately named
-            check_cases = [None, '', ' ']
+            check_cases = [None, "", " "]
+            if imagingmode == "multi-well":
+                if (
+                    multiwellrows == None
+                    or multiwellrows == ""
+                    or multiwellcols == None
+                    or multiwellcols == ""
+                ):
+                    error_occured = True
+                    error_messages.append(
+                        "The number of rows and columns for the multi-well plate is missing."
+                    )
 
             # checks to ensure that plate name and volume contains characters
             if platename in check_cases:
                 error_occured = True
-                error_messages.append(
-                    "Plate/Folder name is missing."  # error message
-                )
+                error_messages.append("Plate/Folder name is missing.")  # error message
             if volume in check_cases:
                 error_occured = True
-                error_messages.append(
-                    "Volume path is missing."  # error message
-                )
+                error_messages.append("Volume path is missing.")  # error message
 
             # ensures that plate name and volume contains characters
             if volume not in check_cases and platename not in check_cases:
@@ -380,11 +313,12 @@ def run_analysis(  # function to save the yaml file from the sections in the con
 
                     # ensures plate name does not contain spaces or slashes
                     has_invalid_chars = any(
-                        letter == ' ' or letter == '/' for letter in platename_parts)
+                        letter == " " or letter == "/" for letter in platename_parts
+                    )
                     if has_invalid_chars == True:
                         error_occured = True
                         error_messages.append(
-                            'Plate/Folder name contains invalid characters. A valid platename only contains letters, numbers, underscores ( _ ), and dashs ( - ).'
+                            "Plate/Folder name contains invalid characters. A valid platename only contains letters, numbers, underscores ( _ ), and dashs ( - )."
                         )
 
                 # splits volume into a list of characters
@@ -398,107 +332,119 @@ def run_analysis(  # function to save the yaml file from the sections in the con
                     if volume_parts_end in check_cases:
                         error_occured = True
                         error_messages.append(
-                            'Volume path contains invalid characters. A valid path only contains letters, numbers, underscores ( _ ), dashes ( - ), and slashes ( / ).')
+                            "Volume path contains invalid characters. A valid path only contains letters, numbers, underscores ( _ ), dashes ( - ), and slashes ( / )."
+                        )
 
                     # ensures volume does not contain spaces
                     has_invalid_characters = any(
-                        letter == ' ' for letter in volume_parts)
+                        letter == " " for letter in volume_parts
+                    )
                     if has_invalid_characters == True:
                         error_occured = True
                         error_messages.append(
-                            'Volume path contains invalid characters. A valid path only contains letters, numbers, underscores ( _ ), dashes ( - ), and slashes ( / ).')
+                            "Volume path contains invalid characters. A valid path only contains letters, numbers, underscores ( _ ), dashes ( - ), and slashes ( / )."
+                        )
 
                 # check to see if volume, plate, and input directories exist
                 # obtain and full plate name path
                 platename_path = Path(volume, platename)
+                plate_base = platename.split("_", 1)[0]
 
                 # ensure all of these file paths exist (volume, input path, and plate name path)
                 if not os.path.exists(volume):
                     error_occured = True
-                    error_messages.append(
-                        'The volume path does not exist.'
-                    )
+                    error_messages.append("The volume path does not exist.")
 
                 # check to see if the plate name path exists
                 if not os.path.exists(platename_path):
                     error_occured = True
+                    error_messages.append("No Plate/Folder in the volume.")
+
+                # check to see if imagexpress mode is selected
+                # if so, ensure that an .htd file exists
+                if filestructure == "imagexpress":
+                    HTD_file = Path(platename_path, f"{plate_base}.HTD")
+                    htd_file = Path(platename_path, f"{plate_base}.htd")
+                    if not os.path.exists(htd_file) or not os.path.exists(HTD_file):
+                        error_occured = True
+                        error_messages.append("No .HTD file found in the Plate/Folder.")
+                if filestructure == "avi":
+                    avi_folder_path = Path(volume, platename)
+                    avi_pattern = f"{platename}_"
+                    matched_files_avi = list(
+                        avi_folder_path.glob(avi_pattern + "*.avi")
+                    )
+                    if not matched_files_avi:
+                        error_occured = True
+                        error_messages.append("No AVI files found in the Plate/Folder.")
+
+                # check to see if avi mode is selected for fecundity, and any
+                # of the cellprofiler modules, if it is thow an error
+                if filestructure == "avi" and pipeline in [
+                    "fecundity",
+                    "wormsize_intensity_cellpose",
+                    "mf_celltox",
+                    "feeding",
+                    "wormsize",
+                ]:
+                    error_occured = True
                     error_messages.append(
-                        "No Plate/Folder in the volume."
+                        "AVI mode is not supported for the selected pipeline."
                     )
 
-                # check to see if the wells selected exist
                 plate_base = platename.split("_", 1)[0]
-                well_fail = False
-                index = 0
-                # iterate through the wells that have been selected
-                while not well_fail and index < len(wells):
-                    well = wells[index]  # obtain the well
-                    img_path = Path(
-                        volume, f'{platename}/TimePoint_1/{plate_base}_{well}.TIF'
-                    )
 
-                    # check to see if the image path exists
-                    if not os.path.exists(img_path):
+                # Directory containing the TIFF files
+                folder_path = Path(volume, f"{platename}/TimePoint_1")
+                avi_folder_path = Path(volume, platename)
+                # Iterate through the wells that have been selected
+                for well in wells:
+                    # Construct a pattern to match files for the current well, ignoring suffixes
+                    pattern = f"{plate_base}_{well}"
+                    avi_pattern = f"{platename}_{well}"
+
+                    # Find all files in the directory that match the well pattern
+                    matched_files_TIF = list(folder_path.glob(pattern + "*.TIF"))
+                    matched_files_tif = list(folder_path.glob(pattern + "*.tif"))
+                    matched_files_avi = list(
+                        avi_folder_path.glob(avi_pattern + "*.avi")
+                    )
+                    matched_files = (
+                        matched_files_tif + matched_files_avi + matched_files_TIF
+                    )
+                    # If no files match the current well, set error flags
+                    if not matched_files:
                         error_occured = True
                         error_messages.append(
-                            'You have selected more wells than you have images. This may result in unexpected errors or results.'
+                            f"No images found for well {well}. This may result in unexpected errors or results."
                         )
-                        well_fail = True  # set well fail to true if the image path does not exist
-                    index += 1  # increment the index
-
-                # check if video module is selected with only one time point
-                if eval_bool(cellprofilerrun) == True:
-
-                    # obtain the time point path
-                    timept = Path(
-                        volume,
-                        f'{platename}/TimePoint_2'
-                    )
-
-                    # check to see if the time point exists
-                    if os.path.exists(timept):
-                        error_occured = True
-                        error_messages.append(
-                            'You have selected a Cell Profiler pipeline while having multiple time points.'
-                        )
-
-            # check for conflicting modules
-            if eval_bool(cellprofilerrun) == True and eval_bool(segmentrun):
-                error_occured = True
-                error_messages.append(
-                    'Cannot run Cellprofiler and Segment together.'
-                )
-
-            if eval_bool(cellprofilerrun) == True and eval_bool(motilityrun):
-                error_occured = True
-                error_messages.append(
-                    'Cannot run Cellprofiler and Motility together.'
-                )
-
+                if pipeline is None:
+                    error_occured = True
+                    error_messages.append("No pipeline selected.")
             # check to see if there was an error message
             if error_occured == True:
 
                 # formats the first line of the error message
                 error_messages[0] = html.H4(
-                    f'{error_messages[0]}',
-                    className='alert-heading'
+                    f"{error_messages[0]}", className="alert-heading"
                 )
 
                 # format the content of the error messages
                 for i in range(1, len(error_messages)):
                     error_messages[i] = html.P(
-                        f'{i}. {error_messages[i]}',
-                        className="mb-0"
+                        f"{i}. {error_messages[i]}", className="mb-0"
                     )
 
                 # return the error messages
-                return 'danger', True, error_messages, 'danger'
+                return "danger", True, error_messages, "danger"
 
         # additional error messages that we have not accounted for
         except ValueError:
-            return 'danger', True, 'A ValueError occurred', 'danger'
+            return "danger", True, "A ValueError occurred", "danger"
         except Exception as e:
-            return 'danger', True, f'An unexpected error occurred: {str(e)}', 'danger'
+            return "danger", True, f"An unexpected error occurred: {str(e)}", "danger"
+
+        diagnosticdx = "True"  # set diagnosticdx to True
 
         # if no error messages are found, write the configuration to a YAML file
         config = prep_yaml(
@@ -509,24 +455,372 @@ def run_analysis(  # function to save the yaml file from the sections in the con
             multiwelldetection,
             species,
             stages,
-            motilityrun,
-            conversionrun,
-            conversionscalevideo,
-            conversionrescalemultiplier,
-            segmentrun,
-            wavelength,
-            cellprofilerrun,
-            cellprofilerpipeline,
-            diagnosticdx,
-            wells
+            wells,
+            volume,
+            pipeline,
         )
 
-        output_file = Path(volume, platename + '.yml')
+        output_file = Path(volume, platename + ".yml")
 
         # dump preview data to YAML file
-        with open(output_file, 'w') as yaml_file:
-            yaml.dump(config, yaml_file,
-                      default_flow_style=False)
+        with open(output_file, "w") as yaml_file:
+            yaml.dump(config, yaml_file, default_flow_style=False)
 
         # return success message
-        return 'success', True, f'Configuration written to {output_file}', 'success'
+        return "success", True, f"Configuration written to {output_file}", "success"
+
+
+@callback(
+    Output(
+        "configure-input-preview", "figure"
+    ),  # Targeting the figure of the non-working graph
+    Output("configure-preview-dropdown", "options"),  # Targeting the dropdown options
+    Output(
+        "configure-preview-dropdown-text", "children"
+    ),  # Targeting the dropdown text
+    [
+        Input("pipeline-selection", "value")
+    ],  # Assuming this is how the user selects the pipeline
+    Input("configure-preview-dropdown", "value"),
+    prevent_initial_call=True,  # Preventing callback from running before any action is taken
+)
+# updating the image preview based on the selected pipeline
+def update_figure_based_on_selection(module_initial, image):
+    """
+    This function will load the image module for the selected pipeline.
+    =======================================================================================================
+    Arguments:
+        - module : str : The selected module
+        - store : dict : The stored values
+    =======================================================================================================
+    Returns:
+        - fig : The image module for the selected pipeline
+    """
+    configure_preview_dropdown_text = "This is a preview of the selected module image"
+    # obtain the volume and plate name from the stored values
+    options = {"plate": "plate"}
+    # identify which module is selected
+    if module_initial == "motility":
+        options = {
+            "plate": "plate",
+            "binary": "binary",
+            "blur": "blur",
+            "edge": "edge",
+            "motility": "motility",
+        }
+        if image not in options:
+            image = "plate"
+
+        if image == "plate":
+            # obtain the motility image
+            motility_img = "https://raw.githubusercontent.com/wheelerlab-uwec/wrmXpress-gui/7007c5ced2b1c9d20a0e60ad1af606951ab1c3a2/assets/configure_assets/motility/A01/img/20210819-p01-NJW_753_A01.png"
+            # motility_img = "/Users/zc/Library/CloudStorage/OneDrive-UW-EauClaire/Academics/Wheeler_Lab/wrmXpress-gui/assets/configure_assets/motility/A01/img/20210819-p01-NJW_753_A01.png"
+
+            fig = create_figure_from_url(motility_img)
+            return fig, options, configure_preview_dropdown_text
+        elif image == "binary":
+            # obtain the motility image
+            binary_img = "https://raw.githubusercontent.com/wheelerlab-uwec/wrmXpress-gui/7007c5ced2b1c9d20a0e60ad1af606951ab1c3a2/assets/configure_assets/motility/A01/img/20210819-p01-NJW_753_A01_binary.png"
+
+            # create figure from file path
+            fig = create_figure_from_url(binary_img)
+            return fig, options, configure_preview_dropdown_text
+
+        elif image == "blur":
+            blur_img = "https://raw.githubusercontent.com/wheelerlab-uwec/wrmXpress-gui/7007c5ced2b1c9d20a0e60ad1af606951ab1c3a2/assets/configure_assets/motility/A01/img/20210819-p01-NJW_753_A01_blur.png"
+
+            # create figure from file path
+            fig = create_figure_from_url(blur_img)
+            return fig, options, configure_preview_dropdown_text
+
+        elif image == "edge":
+            edge_img = "https://raw.githubusercontent.com/wheelerlab-uwec/wrmXpress-gui/7007c5ced2b1c9d20a0e60ad1af606951ab1c3a2/assets/configure_assets/motility/A01/img/20210819-p01-NJW_753_A01_edge.png"
+
+            # create figure from file path
+            fig = create_figure_from_url(edge_img)
+            return fig, options, configure_preview_dropdown_text
+
+        elif image == "motility":
+            # GitHub permalink
+            github_url = "https://github.com/wheelerlab-uwec/wrmXpress-gui/blob/c67b5b06f4f6084cd0f9575750798ca2469fb39c/assets/configure_assets/motility/A01/img/20210819-p01-NJW_753_A01_motility.png"
+
+            # Transform the GitHub permalink into a raw content URL
+            raw_image_url = github_url.replace(
+                "github.com", "raw.githubusercontent.com"
+            ).replace("/blob", "")
+
+            # create figure from file path
+            fig = create_figure_from_url(raw_image_url, scale="inferno")
+            return fig, options, configure_preview_dropdown_text
+        else:
+            print("No motility image found")
+
+    elif module_initial == "fecundity":
+        options = {
+            "plate": "plate",
+            "binary": "binary",
+            "blur": "blur",
+            "edge": "edge",
+        }
+        if image not in options:
+            image = "plate"
+
+        if image == "plate":
+            # GitHub permalink
+            github_url = "https://github.com/wheelerlab-uwec/wrmXpress-gui/blob/c6fead59f56e4312f0a3d3e228dd0af7e335875b/assets/configure_assets/fecundity/A01/img/20210906-p01-NJW_857_A01.png"
+
+            # Transform the GitHub permalink into a raw content URL
+            raw_image_url = github_url.replace(
+                "github.com", "raw.githubusercontent.com"
+            ).replace("/blob", "")
+
+            # create figure from file path
+            fig = create_figure_from_url(raw_image_url)
+            return fig, options, configure_preview_dropdown_text
+
+        elif image == "binary":
+            # obtain the motility image
+            fecundity_img = "https://github.com/wheelerlab-uwec/wrmXpress-gui/blob/c6fead59f56e4312f0a3d3e228dd0af7e335875b/assets/configure_assets/fecundity/A01/img/20210906-p01-NJW_857_A01_binary.png"
+
+            # Transform the GitHub permalink into a raw content URL
+            raw_image_url = fecundity_img.replace(
+                "github.com", "raw.githubusercontent.com"
+            ).replace("/blob", "")
+
+            # create figure from file path
+            fig = create_figure_from_url(raw_image_url)
+            return fig, options, configure_preview_dropdown_text
+
+        elif image == "blur":
+            fecundity_img = "https://github.com/wheelerlab-uwec/wrmXpress-gui/blob/c6fead59f56e4312f0a3d3e228dd0af7e335875b/assets/configure_assets/fecundity/A01/img/20210906-p01-NJW_857_A01_blur.png"
+
+            # Transform the GitHub permalink into a raw content URL
+            raw_image_url = fecundity_img.replace(
+                "github.com", "raw.githubusercontent.com"
+            ).replace("/blob", "")
+
+            # create figure from file path
+            fig = create_figure_from_url(raw_image_url)
+            return fig, options, configure_preview_dropdown_text
+
+        elif image == "edge":
+            fecundity_img = "https://github.com/wheelerlab-uwec/wrmXpress-gui/blob/c6fead59f56e4312f0a3d3e228dd0af7e335875b/assets/configure_assets/fecundity/A01/img/20210906-p01-NJW_857_A01_edge.png"
+
+            # Transform the GitHub permalink into a raw content URL
+            raw_image_url = fecundity_img.replace(
+                "github.com", "raw.githubusercontent.com"
+            ).replace("/blob", "")
+
+            # create figure from file path
+            fig = create_figure_from_url(raw_image_url)
+            return fig, options, configure_preview_dropdown_text
+        else:
+            print("No fecundity image found")
+
+    elif module_initial == "tracking":
+        options = {
+            "plate": "plate",
+            "tracks": "tracks",
+        }
+        if image not in options:
+            image = "plate"
+
+        if image == "plate":
+            # GitHub permalink
+            github_url = "https://github.com/wheelerlab-uwec/wrmXpress-gui/blob/c6fead59f56e4312f0a3d3e228dd0af7e335875b/assets/configure_assets/tracking/A01/img/20240222-p01-RVH_A01.png"
+
+            # Transform the GitHub permalink into a raw content URL
+            raw_image_url = github_url.replace(
+                "github.com", "raw.githubusercontent.com"
+            ).replace("/blob", "")
+
+            # create figure from file path
+            fig = create_figure_from_url(raw_image_url)
+            return fig, options, configure_preview_dropdown_text
+
+        elif image == "tracks":
+            # GitHub permalink
+            github_url = "https://github.com/wheelerlab-uwec/wrmXpress-gui/blob/c6fead59f56e4312f0a3d3e228dd0af7e335875b/assets/configure_assets/tracking/A01/img/20240222-p01-RVH_A01_tracks.png"
+
+            # Transform the GitHub permalink into a raw content URL
+            raw_image_url = github_url.replace(
+                "github.com", "raw.githubusercontent.com"
+            ).replace("/blob", "")
+
+            # create figure from file path
+            fig = create_figure_from_url(raw_image_url)
+            return fig, options, configure_preview_dropdown_text
+
+        else:
+            print("No tracking image found")
+
+    elif module_initial == "wormsize_intensity_cellpose":
+        options = {
+            "plate": "plate",
+            "straightened_worms": "straightened_worms",
+            "cp_masks": "cp_masks",
+        }
+        if image not in options:
+            image = "plate"
+
+        if image == "plate":
+            # GitHub permalink
+            github_url = "https://github.com/wheelerlab-uwec/wrmXpress-gui/blob/c6fead59f56e4312f0a3d3e228dd0af7e335875b/assets/configure_assets/wormsize_intensity_cellpose/A01/img/20220408-p01-MGC_1351_A01.png"
+
+            # Transform the GitHub permalink into a raw content URL
+            raw_image_url = github_url.replace(
+                "github.com", "raw.githubusercontent.com"
+            ).replace("/blob", "")
+
+            # create figure from file path
+            fig = create_figure_from_url(raw_image_url)
+            return fig, options, configure_preview_dropdown_text
+
+        elif image == "straightened_worms":
+            # GitHub permalink
+            github_url = "https://github.com/wheelerlab-uwec/wrmXpress-gui/blob/c6fead59f56e4312f0a3d3e228dd0af7e335875b/assets/configure_assets/wormsize_intensity_cellpose/A01/img/20220408-p01-MGC_A01.tiff"
+
+            # Transform the GitHub permalink into a raw content URL
+            raw_image_url = github_url.replace(
+                "github.com", "raw.githubusercontent.com"
+            ).replace("/blob", "")
+
+            # create figure from file path
+            fig = create_figure_from_url(raw_image_url)
+            return fig, options, configure_preview_dropdown_text
+
+        elif image == "cp_masks":
+            # GitHub permalink
+            github_url = "https://github.com/wheelerlab-uwec/wrmXpress-gui/blob/c6fead59f56e4312f0a3d3e228dd0af7e335875b/assets/configure_assets/wormsize_intensity_cellpose/A01/img/20220408-p01-MGC_A01_cp_masks.png"
+
+            # Transform the GitHub permalink into a raw content URL
+            raw_image_url = github_url.replace(
+                "github.com", "raw.githubusercontent.com"
+            ).replace("/blob", "")
+
+            # create figure from file path
+            fig = create_figure_from_url(raw_image_url)
+            return fig, options, configure_preview_dropdown_text
+
+        else:
+            print("No wormsize_intensity_cellpose image found")
+
+    elif module_initial == "mf_celltox":
+        options = {"plate": "plate"}
+        if image not in options:
+            image = "plate"
+
+        if image == "plate":
+            # GitHub permalink
+            github_url = "https://github.com/wheelerlab-uwec/wrmXpress-gui/blob/c6fead59f56e4312f0a3d3e228dd0af7e335875b/assets/configure_assets/mf_celltox/A01/img/20210917-p15-NJW_913_A01.png"
+
+            # Transform the GitHub permalink into a raw content URL
+            raw_image_url = github_url.replace(
+                "github.com", "raw.githubusercontent.com"
+            ).replace("/blob", "")
+
+            # create figure from file path
+            fig = create_figure_from_url(raw_image_url)
+            return fig, options, configure_preview_dropdown_text
+
+        else:
+            print("No mf_celltox image found")
+
+    elif module_initial == "feeding":
+        options = {
+            # "plate": "plate",
+            "w1": "w1",
+            "w2": "w2",
+            "w3": "w3",
+            "straightened_worms": "straightened_worms",
+        }
+        if image not in options:
+            image = "w1"
+
+        if image == "straightened_worms":
+            # GitHub permalink
+            github_url = "https://github.com/wheelerlab-uwec/wrmXpress-gui/blob/a7038e4d591d2a30ca153d48baf8d484479b6007/assets/configure_assets/feeding/A01/img/20210823-p01-KJG-A01.png"
+
+            # Transform the GitHub permalink into a raw content URL
+            raw_image_url = github_url.replace(
+                "github.com", "raw.githubusercontent.com"
+            ).replace("/blob", "")
+
+            # create figure from file path
+            fig = create_figure_from_url(raw_image_url)
+            return fig, options, configure_preview_dropdown_text
+
+        elif image == "w1":
+            # GitHub permalink
+            github_url = "https://github.com/wheelerlab-uwec/wrmXpress-gui/blob/c6fead59f56e4312f0a3d3e228dd0af7e335875b/assets/configure_assets/feeding/A01/img/20210823-p01-KJG_795_A01_w1.png"
+
+            # Transform the GitHub permalink into a raw content URL
+            raw_image_url = github_url.replace(
+                "github.com", "raw.githubusercontent.com"
+            ).replace("/blob", "")
+
+            # create figure from file path
+            fig = create_figure_from_url(raw_image_url)
+            return fig, options, configure_preview_dropdown_text
+
+        elif image == "w2":
+            github_url = "https://github.com/wheelerlab-uwec/wrmXpress-gui/blob/c6fead59f56e4312f0a3d3e228dd0af7e335875b/assets/configure_assets/feeding/A01/img/20210823-p01-KJG_795_A01_w2.png"
+
+            # Transform the GitHub permalink into a raw content URL
+            raw_image_url = github_url.replace(
+                "github.com", "raw.githubusercontent.com"
+            ).replace("/blob", "")
+
+            # create figure from file path
+            fig = create_figure_from_url(raw_image_url)
+            return fig, options, configure_preview_dropdown_text
+
+        elif image == "w3":
+            github_url = "https://github.com/wheelerlab-uwec/wrmXpress-gui/blob/c6fead59f56e4312f0a3d3e228dd0af7e335875b/assets/configure_assets/feeding/A01/img/20210823-p01-KJG_795_A01_w3.png"
+
+            # Transform the GitHub permalink into a raw content URL
+            raw_image_url = github_url.replace(
+                "github.com", "raw.githubusercontent.com"
+            ).replace("/blob", "")
+
+            # create figure from file path
+            fig = create_figure_from_url(raw_image_url)
+            return fig, options, configure_preview_dropdown_text
+
+        else:
+            print("No feeding image found")
+
+    elif module_initial == "wormsize":
+        options = {
+            "plate": "plate",
+            "straightened_worms": "straightened_worms",
+        }
+        if image not in options:
+            image = "plate"
+
+        if image == "plate":
+            github_url = "https://github.com/wheelerlab-uwec/wrmXpress-gui/blob/c6fead59f56e4312f0a3d3e228dd0af7e335875b/assets/configure_assets/wormsize/A01/img/20220408-p01-MGC_1351_A01.png"
+
+            # Transform the GitHub permalink into a raw content URL
+            raw_image_url = github_url.replace(
+                "github.com", "raw.githubusercontent.com"
+            ).replace("/blob", "")
+
+            # create figure from file path
+            fig = create_figure_from_url(raw_image_url)
+            return fig, options, configure_preview_dropdown_text
+
+        elif image == "straightened_worms":
+            github_url = "https://github.com/wheelerlab-uwec/wrmXpress-gui/blob/c6fead59f56e4312f0a3d3e228dd0af7e335875b/assets/configure_assets/wormsize/A01/img/20220408-p01-MGC_A01.tiff"
+
+            # Transform the GitHub permalink into a raw content URL
+            raw_image_url = github_url.replace(
+                "github.com", "raw.githubusercontent.com"
+            ).replace("/blob", "")
+
+            # create figure from file path
+            fig = create_figure_from_url(raw_image_url)
+            return fig, options, configure_preview_dropdown_text
+
+        else:
+            print("No wormsize image found")

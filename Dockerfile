@@ -1,22 +1,41 @@
-# Use the official Miniconda base image
-FROM continuumio/miniconda3
+# Use the official micromamba base image
+FROM --platform=linux/amd64 mambaorg/micromamba:jammy
 
-# Install a few opencv dependencies
-RUN apt-get update
-RUN apt-get install -y libgl1
+# install mysql server and java
+USER 0
+RUN apt update && apt install -y --no-install-recommends \
+    make gcc build-essential libgtk-3-dev wget git vim \
+    mysql-server libmysqlclient-dev \
+    openjdk-11-jdk-headless && \
+    rm -r /var/lib/apt/lists/*
 
-# Copy the environment.yml file to the container
-COPY environment_minimal.yml .
+# install wxPython from wheel (pip tries to build wheel, which takes forever)
+# RUN pip install https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-20.04/wxPython-4.2.1-cp39-cp39-linux_x86_64.whl
 
-# Create a Conda environment from the environment.yml file
-RUN conda env create --name wrmxpress_gui_minimal -f environment_minimal.yml
+# copy the environment.yml file to the container
+COPY --chown=$MAMBA_USER:$MAMBA_USER mm_wrmxpress_gui.yml /tmp/env.yml
 
-# Copy files to the image
+# fix lockfile problems: https://stackoverflow.com/questions/76778360/micromamba-install-gets-stuck-when-run-in-docker-container-on-arm-mac
+RUN micromamba config set extract_threads 1
+
+# install dependencies
+RUN micromamba install --yes --file /tmp/env.yml && \
+    micromamba clean --all --yes
+
+ARG MAMBA_DOCKERFILE_ACTIVATE=1  
+
+# clone wrmxpress
+ARG CACHEBUST=1
+RUN echo ${CACHEBUST} && git clone --branch gui-backend https://github.com/zamanianlab/wrmXpress.git
+
+# copy gui files
 RUN mkdir app
+RUN mkdir assets
 COPY app/ app/
 COPY app.py .
+COPY assets/ assets/
 
 EXPOSE 9000
 
 # The code to run when container is started:
-ENTRYPOINT ["conda", "run", "-n", "wrmxpress_gui_minimal", "python", "app.py"]
+ENTRYPOINT ["/usr/local/bin/_entrypoint.sh", "python", "app.py"]
