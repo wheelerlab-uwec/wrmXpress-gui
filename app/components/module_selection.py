@@ -6,6 +6,8 @@
 
 import dash_bootstrap_components as dbc
 from dash import dcc, html
+from app.utils.styling import layout
+
 
 ########################################################################
 ####                                                                ####
@@ -15,6 +17,121 @@ from dash import dcc, html
 
 module_selection = dbc.AccordionItem(
     [
+        html.H5("wrmXpress Pipeline:"),
+        html.Br(),
+        dbc.Row(
+            [
+                dbc.Col(
+                    [
+                        dbc.Row(
+                            [
+                                dcc.Markdown(
+                                    children=[" "], id="module-selection-text"
+                                ),
+                            ]
+                        ),
+                        dbc.Row([]),
+                        dbc.RadioItems(
+                            id="pipeline-selection",
+                            inputClassName="btn-check",
+                            labelClassName="btn btn-outline-primary d-block",
+                            labelCheckedClassName="active",
+                            options=[
+                                {"label": "Motility", "value": "motility"},
+                                {"label": "Fecundity", "value": "fecundity"},
+                                {"label": "Tracking", "value": "tracking"},
+                                {
+                                    "label": [
+                                        html.I("C. elegans"),
+                                        " size and intensity (Cellpose)",
+                                    ],
+                                    "value": "wormsize_intensity_cellpose",
+                                },
+                                {
+                                    "label": "Microfilariae viability",
+                                    "value": "mf_celltox",
+                                },
+                                {
+                                    "label": [html.I("C. elegans"), " feeding"],
+                                    "value": "feeding",
+                                },
+                                {
+                                    "label": [html.I("C. elegans"), " size"],
+                                    "value": "wormsize",
+                                },
+                            ],
+                            value="False",
+                            persistence=True,
+                            persistence_type="memory",
+                        ),
+                        html.Br(),
+                    ],
+                    width=6,
+                    className="left-and-right-grid-container",
+                ),
+                dbc.Col(
+                    [
+                        dcc.Dropdown(
+                            id="configure-preview-dropdown",  # Dropdown for preview
+                            options={"plate": "plate"},
+                            style={
+                                "width": "75%",
+                                "margin-left": "auto",
+                                "margin-right": "auto",
+                            },
+                            value="plate",
+                            persistence=True,
+                            persistence_type="memory",
+                        ),
+                        dbc.Row(
+                            [
+                                dcc.Markdown(
+                                    id="configure-preview-dropdown-text",
+                                ),
+                            ]
+                        ),
+                        dbc.Alert(
+                            id="configure-img-view-alert",
+                            color="light",
+                            is_open=True,
+                            children=[
+                                dcc.Loading(
+                                    id="configure-loading-1",
+                                    children=[
+                                        html.Div(
+                                            [
+                                                dcc.Graph(
+                                                    id="configure-input-preview",
+                                                    figure={
+                                                        "layout": layout
+                                                    },  # Make sure 'layout' is correctly defined
+                                                    className="h-100 w-70",
+                                                    style={"overflow": "hidden"},
+                                                )
+                                            ]
+                                        ),
+                                    ],
+                                    type="cube",
+                                    color="#3b4d61",
+                                ),
+                            ],
+                            style={
+                                "display": "flex",
+                                "width": "100%",
+                            },
+                        ),
+                    ],
+                    width=6,
+                    className="left-and-right-grid-container",
+                ),
+            ],
+        ),
+    ],
+    id="module-selection",
+    title="Pipeline Selection",
+)
+
+"""
         # Create separate tabs for video/image analysis
         dcc.Tabs(
             id="module-tabs",
@@ -301,10 +418,4 @@ module_selection = dbc.AccordionItem(
                             persistence_type='memory'
                         )
                     ]
-                )
-            ]
-        ),
-    ],
-    id="module-selection",
-    title="Module Selection"
-)
+                )"""

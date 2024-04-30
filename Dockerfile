@@ -30,9 +30,10 @@ RUN echo ${CACHEBUST} && git clone --branch gui-backend https://github.com/zaman
 
 # copy gui files
 RUN mkdir app
+RUN mkdir assets
 COPY app/ app/
 COPY app.py .
-COPY assets/ .
+COPY assets/ assets/
 
 EXPOSE 9000
 

@@ -13,13 +13,11 @@ from dash import html
 ####                                                                ####
 ########################################################################
 
-# Worm Information accordian items
+# Worm Information accordion items
 worm_information = dbc.AccordionItem(
     [
-        html.H6(
-            "Species:"
-        ),
-        # Radio button items for species
+        html.H6("Species:"),
+        # Radio button items for species with italicized labels
         dbc.RadioItems(
             id="species",
             className="btn-group",
@@ -27,17 +25,15 @@ worm_information = dbc.AccordionItem(
             labelClassName="btn btn-outline-primary",
             labelCheckedClassName="active",
             options=[
-                {"label": "Brugia malayi", "value": "Bma"},
-                {"label": "Caenorhabditis elegans", "value": "Cel"},
-                {"label": "Schistosoma mansoni", "value": "Sma"}
+                {"label": html.I("Brugia malayi"), "value": "Bma"},
+                {"label": html.I("Caenorhabditis elegans"), "value": "Cel"},
+                {"label": html.I("Schistosoma mansoni"), "value": "Sma"},
             ],
             value="Bma",
             persistence=True,
-            persistence_type='memory'
+            persistence_type="memory",
         ),
-        html.H6(
-            "Stages:"
-        ),
+        html.H6("Stages:"),
         # Radio button items for stage information
         dbc.RadioItems(
             id="stages",
@@ -52,9 +48,9 @@ worm_information = dbc.AccordionItem(
             ],
             value="Mf",
             persistence=True,
-            persistence_type='memory'
+            persistence_type="memory",
         ),
     ],
     id="worm-information",
-    title="Worm Information"
+    title="Worm Information",
 )
