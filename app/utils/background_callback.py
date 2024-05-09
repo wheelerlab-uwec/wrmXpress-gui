@@ -59,6 +59,23 @@ def callback(set_progress, n_clicks, store):
                 "No configuration found. Please go to the configuration page to set up the analysis.",
             )
 
+        # check if the store elements are empty
+        if (
+            store["mount"] is None
+            or store["platename"] is None
+            or store["wells"] is None
+            or store["pipeline_selection"] is None
+            or store["file_structure"] is None
+            or store["tracking_well"] is None
+        ):
+            return (
+                {},
+                True,
+                True,
+                "No configuration found. Please fill out all the fields in the configuration page.",
+                "No configuration found. Please fill out all the fields in the configuration page.",
+            )
+
         # obtain the necessary data from the store
         pipeline_selection = store["pipeline_selection"]
 

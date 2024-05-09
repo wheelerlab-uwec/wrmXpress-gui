@@ -102,11 +102,9 @@ module_selection = dbc.AccordionItem(
                                             [
                                                 dcc.Graph(
                                                     id="configure-input-preview",
-                                                    figure={
-                                                        "layout": layout
-                                                    },  # Make sure 'layout' is correctly defined
-                                                    className="h-100 w-70",
-                                                    style={"overflow": "hidden"},
+                                                    figure={"layout": layout},
+                                                    style={"width": "99%"},
+                                                    responsive=True,
                                                 )
                                             ]
                                         ),
@@ -115,10 +113,6 @@ module_selection = dbc.AccordionItem(
                                     color="#3b4d61",
                                 ),
                             ],
-                            style={
-                                "display": "flex",
-                                "width": "100%",
-                            },
                         ),
                     ],
                     width=6,

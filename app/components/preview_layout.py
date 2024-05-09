@@ -82,7 +82,10 @@ preview_layout = dbc.ModalBody(
                                                                                 figure={
                                                                                     "layout": layout
                                                                                 },
-                                                                                className="h-100 w-100",
+                                                                                style={
+                                                                                    "width": "99%"
+                                                                                },
+                                                                                responsive=True,
                                                                             )
                                                                         ]
                                                                     ),
@@ -169,7 +172,10 @@ preview_layout = dbc.ModalBody(
                                                                             figure={
                                                                                 "layout": layout
                                                                             },
-                                                                            className="h-100 w-100",
+                                                                            style={
+                                                                                "width": "99%"
+                                                                            },
+                                                                            responsive=True,
                                                                         ),
                                                                     ]
                                                                 )
@@ -197,7 +203,10 @@ preview_layout = dbc.ModalBody(
                                                                             figure={
                                                                                 "layout": layout
                                                                             },
-                                                                            className="h-100 w-100",
+                                                                            style={
+                                                                                "width": "99%"
+                                                                            },
+                                                                            responsive=True,
                                                                         ),
                                                                     ]
                                                                 )
@@ -216,28 +225,42 @@ preview_layout = dbc.ModalBody(
                                 ),
                             ]
                         ),
-                        dbc.Alert(
-                            # Alert for resolving error issue preview
-                            id="resolving-error-issue-preview",
-                            is_open=False,
-                            color="alert",
-                            duration=6000,
-                        ),
-                        dbc.Alert(
-                            # Alert for no store data
-                            id="view-docker-logs",
-                            is_open=False,
-                            color="alert",
-                            duration=30000,
-                        ),
-                        dbc.Alert(
-                            id="no-store-data-alert",
-                            color="danger",  # Color of the alert (red)
-                            is_open=False,  # Whether the alert is open
-                            children=[
-                                # Default Alert message
-                                "No configuration found. Please go to the configuration page to set up the analysis."
+                        html.Div(
+                            [
+                                dbc.Alert(
+                                    # Alert for resolving error issue preview
+                                    id="resolving-error-issue-preview",
+                                    is_open=False,
+                                    color="alert",
+                                    duration=6000,
+                                ),
+                                dbc.Alert(
+                                    # Alert for no store data
+                                    id="view-docker-logs",
+                                    is_open=False,
+                                    color="alert",
+                                    duration=6000,
+                                ),
+                                dbc.Alert(
+                                    id="no-store-data-alert",
+                                    color="danger",  # Color of the alert (red)
+                                    is_open=False,  # Whether the alert is open
+                                    children=[
+                                        # Default Alert message
+                                        "No configuration found. Please go to the configuration page to set up the analysis."
+                                    ],
+                                ),
+                                dbc.Alert(
+                                    id="no-store-data-alert-2",
+                                    color="danger",  # Color of the alert (red)
+                                    is_open=False,  # Whether the alert is open
+                                    children=[
+                                        # Default Alert message
+                                        "No configuration found. Please go to the configuration page to set up the analysis."
+                                    ],
+                                ),
                             ],
+                            style={"margin-top": "10px"},
                         ),
                     ]
                 )

@@ -50,6 +50,8 @@ def preview_callback_functions(store):
     """
     pipeline_selection = store["pipeline_selection"]
 
+    # check to see
+
     if pipeline_selection == "motility":
         return motility_segment_fecundity_preview(store)
 

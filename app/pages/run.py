@@ -102,6 +102,10 @@ def load_analysis_img(selection, n_clicks, store):
     platename = store["platename"]
     plate_base = platename.split("_", 1)[0]
     wells = store["wells"]
+    store_elements = [volume, platename, plate_base, wells]
+
+    if store_elements is None:
+        return None, None, False, False
 
     img_path = None
     scale = "gray"
@@ -183,6 +187,10 @@ def get_options_analysis(nclicks, store):
 
     # get the store from the data
     pipeline_selection = store["pipeline_selection"]
+
+    if pipeline_selection is None:
+        return {}
+
     if pipeline_selection == "motility":
 
         # create the options

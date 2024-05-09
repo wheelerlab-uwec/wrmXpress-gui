@@ -211,7 +211,10 @@ run_layout = dbc.ModalBody(
                                                                     figure={
                                                                         "layout": layout
                                                                     },
-                                                                    className="h-100 w-100",
+                                                                    style={
+                                                                        "width": "99%"
+                                                                    },
+                                                                    responsive=True,
                                                                 ),
                                                             ],
                                                         ),

@@ -46,6 +46,7 @@ layout = preview_layout
     State("preview-dropdown", "value"),
     Input("preview-change-img-button", "n_clicks"),
     State("store", "data"),
+    prevent_initial_call=True,
 )
 def update_analysis_preview_imgage(selection, nclicks, store):
     """
@@ -64,7 +65,7 @@ def update_analysis_preview_imgage(selection, nclicks, store):
         - is_open : bool : Whether the (post analysis first well) alert is open
             +- True : The alert is open
             +- False : The alert is closed
-        - is_open : bool : Whether the (no store )alert is open
+        - is_open : bool : Whether the (no store) alert is open
             +- True : The alert is open
             +- False : The alert is closed
         - disabled : bool : Whether the button is disabled
@@ -252,6 +253,7 @@ def update_analysis_preview_imgage(selection, nclicks, store):
 @callback(
     Output("input-path-output", "children"),
     Output("input-preview", "figure"),
+    Output("no-store-data-alert-2", "is_open"),
     Input("submit-val", "n_clicks"),
     State("store", "data"),
     prevent_initial_call=True,
@@ -268,53 +270,81 @@ def update_preview_image(n_clicks, store):
         - str : The path to the image
         - fig : plotly.graph_objs._figure.Figure : The figure to be displayed
     """
-    # Obtaining the store data
-    wells = store["wells"]  # Get the wells
-    first_well = wells[0].replace(", ", "")  # Get the first well
-    platename = store["platename"]  # Get the platename
-    plate_base = platename.split("_", 1)[0]  # Get the plate base
-    volume = store["mount"]  # Get the volume
-    file_structure = store["file_structure"]  # Get the file structure
-
-    # Check if the button has been clicked
-    if n_clicks >= 1:
-        if file_structure == "imagexpress":
-            # assumes IX-like file structure
-            img_path = Path(
-                volume, f"{platename}/TimePoint_1/{plate_base}_{first_well}.TIF"
+    if store is None:
+        return (
+            "```Please ensure that you have properly configured information.```",
+            None,
+            True,
+        )
+    try:
+        # Obtaining the store data
+        wells = store["wells"]  # Get the wells
+        first_well = wells[0].replace(", ", "")  # Get the first well
+        platename = store["platename"]  # Get the platename
+        if platename is None:
+            return (
+                "```Please ensure that you have properly configured information.```",
+                None,
+                True,
             )
-            if os.path.exists(img_path):
-                # Open the image and create a figure
-                fig = create_figure_from_filepath(img_path)
-                return f"```{img_path}```", fig  # Return the path and the figure
+        plate_base = platename.split("_", 1)[0]  # Get the plate base
+        volume = store["mount"]  # Get the volume
+        file_structure = store["file_structure"]  # Get the file structure
 
-            else:  # checking for other file extensions
-                img_path_s1 = Path(
-                    volume, f"{platename}/TimePoint_1/{plate_base}_{first_well}_s1.TIF"
+        # Check if the button has been clicked
+        if n_clicks >= 1:
+            if file_structure == "imagexpress":
+                # assumes IX-like file structure
+                img_path = Path(
+                    volume, f"{platename}/TimePoint_1/{plate_base}_{first_well}.TIF"
                 )
-                img_path_w1 = Path(
-                    volume, f"{platename}/TimePoint_1/{plate_base}_{first_well}_w1.TIF"
-                )
-                if os.path.exists(img_path_s1):
+                if os.path.exists(img_path):
                     # Open the image and create a figure
-                    fig = create_figure_from_filepath(img_path_s1)
-                    return f"```{img_path_s1}```", fig
-                elif os.path.exists(img_path_w1):
-                    # Open the image and create a figure
-                    fig = create_figure_from_filepath(img_path_w1)
-                    return f"```{img_path_w1}```", fig
+                    fig = create_figure_from_filepath(img_path)
+                    return (
+                        f"```{img_path}```",
+                        fig,
+                        True,
+                    )  # Return the path and the figure
 
-        elif file_structure == "avi":
-            # assumes AVI-like file structure
-            img_path = Path(
-                volume, "input", f"{platename}/TimePoint_1/{platename}_{first_well}.TIF"
-            )
-            while not os.path.exists(img_path):
-                time.sleep(1)
-            if os.path.exists(img_path):
-                # Open the image and create a figure
-                fig = create_figure_from_filepath(img_path)
-                return f"```{img_path}```", fig
+                else:  # checking for other file extensions
+                    img_path_s1 = Path(
+                        volume,
+                        f"{platename}/TimePoint_1/{plate_base}_{first_well}_s1.TIF",
+                    )
+                    img_path_w1 = Path(
+                        volume,
+                        f"{platename}/TimePoint_1/{plate_base}_{first_well}_w1.TIF",
+                    )
+                    if os.path.exists(img_path_s1):
+                        # Open the image and create a figure
+                        fig = create_figure_from_filepath(img_path_s1)
+                        return f"```{img_path_s1}```", fig, True
+                    elif os.path.exists(img_path_w1):
+                        # Open the image and create a figure
+                        fig = create_figure_from_filepath(img_path_w1)
+                        return f"```{img_path_w1}```", fig, True
+
+            elif file_structure == "avi":
+                # assumes AVI-like file structure
+                img_path = Path(
+                    volume,
+                    "input",
+                    f"{platename}/TimePoint_1/{platename}_{first_well}.TIF",
+                )
+                while not os.path.exists(img_path):
+                    time.sleep(1)
+                if os.path.exists(img_path):
+                    # Open the image and create a figure
+                    fig = create_figure_from_filepath(img_path)
+                    return f"```{img_path}```", fig, True
+
+    except Exception as e:
+        return (
+            f"```Please ensure that you have properly configured information in the configure page, we do not have any information regarding {e}```",
+            None,
+            True,
+        )
 
 
 @callback(
@@ -341,6 +371,16 @@ def get_options_preview(nclicks, store):
         return {}
     # get the store from the data
     pipeline_selection = store["pipeline_selection"]
+
+    # check to see if the pipeline selection is none
+    if [
+        pipeline_selection is None
+        or store["mount"] is None
+        or store["platename"] is None
+        or store["wells"] is None
+    ]:
+        return {}
+
     if pipeline_selection == "motility":
 
         # create the options
@@ -478,4 +518,38 @@ def run_analysis(
     # Check if the button has been clicked
     if nclicks:
 
-        return preview_callback_functions(store)
+        # Check if store is empty
+        if not store:
+            return (
+                "```Please ensure that you have properly configured information.```",
+                None,
+                True,
+                "```Please ensure that you have properly configured information.```",
+                True,
+            )
+
+        # check to see if the store elements are none
+        if [
+            store["mount"] is None
+            or store["platename"] is None
+            or store["wells"] is None
+        ]:
+            return (
+                "```Please ensure that you have properly configured information.```",
+                None,
+                True,
+                "```Please ensure that you have properly configured information.```",
+                True,
+            )
+        try:
+
+            return preview_callback_functions(store)
+
+        except Exception as e:
+            return (
+                "```An error occurred while trying to run the analysis. Please check the error message below.```",
+                None,
+                True,
+                f"```{e}```",
+                True,
+            )
