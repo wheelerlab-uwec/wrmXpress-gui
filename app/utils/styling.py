@@ -46,5 +46,5 @@ layout = go.Layout(
     yaxis=dict(
         autorange=True, showgrid=False, ticks="", zeroline=False, showticklabels=False
     ),
-    width=600,
+    # width=800,
 )

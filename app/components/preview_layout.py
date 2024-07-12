@@ -42,7 +42,7 @@ preview_layout = dbc.ModalBody(
                                                 ),
                                                 html.Div(
                                                     dbc.Button(
-                                                        "Preview Analysis",  # Button to preview analysis
+                                                        "Preview analysis",  # Button to preview analysis
                                                         id="submit-val",
                                                         color="primary",  # Color of the button (wrmXpress) blue
                                                         n_clicks=0,  # Number of times the button has been clicked
@@ -56,7 +56,7 @@ preview_layout = dbc.ModalBody(
                                                 ),
                                                 html.Div(
                                                     html.H6(
-                                                        "Path:",  # Header of path
+                                                        "Raw image:",  # Header of path
                                                         className="card-subtitle",
                                                     ),
                                                 ),
@@ -120,13 +120,15 @@ preview_layout = dbc.ModalBody(
                                                             dbc.Col(
                                                                 dcc.Dropdown(
                                                                     id="preview-dropdown",  # Dropdown for preview
-                                                                    placeholder="Select image to preview...",  # Placeholder for the dropdown
-                                                                    style={},
+                                                                    placeholder="Select diagnostic image to preview...",  # Placeholder for the dropdown
+                                                                    style={
+                                                                        "textAlign": "left"
+                                                                    },
                                                                 ),
                                                             ),
                                                             dbc.Col(
                                                                 dbc.Button(
-                                                                    "Load Image",  # Button to load image
+                                                                    "Load image",  # Button to load image
                                                                     id="preview-change-img-button",
                                                                     color="primary",  # Color of the button (wrmXpress) blue
                                                                     disabled=True,  # Whether the button is disabled
@@ -145,7 +147,7 @@ preview_layout = dbc.ModalBody(
                                                     },
                                                 ),
                                                 html.H6(
-                                                    "Command:",  # Header of command
+                                                    "Path to diagnostic image:",
                                                     className="card-subtitle",
                                                 ),
                                                 dcc.Markdown(
