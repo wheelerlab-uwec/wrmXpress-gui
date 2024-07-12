@@ -102,7 +102,10 @@ preview_layout = dbc.ModalBody(
                                             [
                                                 html.H4(
                                                     "Analysis Preview",
-                                                    style={"text-align": "center"},
+                                                    style={
+                                                        "text-align": "center",
+                                                        "margin-bottom": "20px",
+                                                    },
                                                 ),
                                             ],
                                             style={"height": "20%"},
@@ -127,7 +130,10 @@ preview_layout = dbc.ModalBody(
                                                     ),
                                                     width={"offset": 4, "size": 4},
                                                 ),
-                                            ]
+                                            ],
+                                            style={
+                                                "margin-bottom": "6px",
+                                            },
                                         ),
                                         dbc.Row(
                                             [

@@ -425,7 +425,7 @@ def run_analysis(  # function to save the yaml file from the sections in the con
             if error_occured == True:
 
                 # formats the first line of the error message
-                error_messages[0] = html.H4(
+                error_messages[0] = html.H5(
                     f"{error_messages[0]}", className="alert-heading"
                 )
 
