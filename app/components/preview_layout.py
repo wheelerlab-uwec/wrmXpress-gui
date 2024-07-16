@@ -118,7 +118,7 @@ preview_layout = dbc.ModalBody(
                                                         placeholder="Select diagnostic image to preview...",  # Placeholder for the dropdown
                                                         style={"textAlign": "left"},
                                                     ),
-                                                    width=4,
+                                                    width=8,
                                                 ),
                                                 dbc.Col(
                                                     dbc.Button(
@@ -128,7 +128,7 @@ preview_layout = dbc.ModalBody(
                                                         disabled=True,  # Whether the button is disabled
                                                         n_clicks=0,  # Number of times the button has been clicked
                                                     ),
-                                                    width={"offset": 4, "size": 4},
+                                                    width=4,
                                                 ),
                                             ],
                                             style={
@@ -137,7 +137,7 @@ preview_layout = dbc.ModalBody(
                                         ),
                                         dbc.Row(
                                             [
-                                                html.P("Path to diagnostic image:"),
+                                                html.P("Command:"),
                                                 dcc.Markdown(
                                                     id="analysis-preview-message"
                                                 ),
@@ -205,6 +205,7 @@ preview_layout = dbc.ModalBody(
                                     ]
                                 )
                             ),
+                            width=6,
                         ),
                     ],
                     className="h-90",
@@ -219,13 +220,6 @@ preview_layout = dbc.ModalBody(
                             duration=6000,
                         ),
                         dbc.Alert(
-                            # Alert for no store data
-                            id="view-docker-logs",
-                            is_open=False,
-                            color="alert",
-                            duration=30000,
-                        ),
-                        dbc.Alert(
                             id="no-store-data-alert",
                             color="danger",  # Color of the alert (red)
                             is_open=False,  # Whether the alert is open
@@ -236,6 +230,7 @@ preview_layout = dbc.ModalBody(
                         ),
                     ],
                     className="h-10",
+                    style={"margin-top": "10px"},
                 ),
             ],
             style={"height": "100vh"},

@@ -1440,7 +1440,7 @@ def handle_thumbnail_generation(volume, platename, docker_output, output_file):
 
 def handle_failure(docker_output, output_file):
     error_message = (
-        f"wrmXpress has failed, please check the {output_file} for more information."
+        f"wrmXpress has failed, please check the {output_file} for more information. Then clear the `work` directory and try again."
     )
     docker_output_formatted = "".join(docker_output)
     return (

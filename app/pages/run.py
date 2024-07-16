@@ -62,17 +62,17 @@ def cancel_analysis(n_clicks):
 
 
 @callback(
-    [
-        Output("analysis-postview", "figure"),
-        Output("analysis-postview-message", "children"),
-        Output("first-view-of-analysis-alert", "is_open"),
-        Output("additional-view-of-analysis-alert", "is_open"),
-    ],
+    Output("analysis-postview", "figure"),
+    Output("analysis-postview-message", "children"),
+    Output("first-view-of-analysis-alert", "is_open"),
+    Output("additional-view-of-analysis-alert", "is_open"),
+    Output("run-page-no-store-alert", "is_open"),
+    Output("submit-analysis", "disabled"),
     State("analysis-dropdown", "value"),
     Input("load-analysis-img", "n_clicks"),
     State("store", "data"),
     allow_duplicate=True,
-    prevent_initial_call=True,
+    # prevent_initial_call=True,
 )
 def load_analysis_img(selection, n_clicks, store):
     """
@@ -95,7 +95,7 @@ def load_analysis_img(selection, n_clicks, store):
     """
     # check to see if store exists
     if not store:
-        return None, None, False, False
+        return None, None, True, False, True, True
 
     # get the store from the data
     volume = store["mount"]
@@ -132,7 +132,7 @@ def load_analysis_img(selection, n_clicks, store):
             scale = "inferno"
             img_path = Path(volume, f"output/thumbs/{platename}{selection}.png")
 
-        elif selection == "plate":
+        elif selection == "raw":
             selection = ""
             img_path = Path(volume, f"output/thumbs/{platename}{selection}.png")
 
@@ -148,13 +148,13 @@ def load_analysis_img(selection, n_clicks, store):
         if os.path.exists(img_path):
             fig = create_figure_from_filepath(img_path, scale)
 
-            return fig, f"```{img_path}```", False, True
+            return fig, f"```{img_path}```", False, True, False, False
 
         else:
-            return None, None, False, False
+            return None, None, False, False, False, False
 
     else:
-        return None, None, True, False
+        return None, None, True, False, False, False
 
 
 @callback(
@@ -186,7 +186,7 @@ def get_options_analysis(nclicks, store):
     if pipeline_selection == "motility":
 
         # create the options
-        selection_dict = {"motility": "motility", "segment": "binary", "plate": "plate"}
+        selection_dict = {"motility": "motility", "segment": "binary", "raw": "raw"}
 
         # check to see if the button has been clicked (nclicks)
         if nclicks is not None:
@@ -195,7 +195,7 @@ def get_options_analysis(nclicks, store):
     elif pipeline_selection == "fecundity":
 
         # create the options
-        selection_dict = {"binary": "binary", "plate": "plate"}
+        selection_dict = {"binary": "binary", "raw": "raw"}
 
         # check to see if the button has been clicked (nclicks)
         if nclicks is not None:
@@ -204,7 +204,7 @@ def get_options_analysis(nclicks, store):
     elif pipeline_selection == "tracking":
 
         # create the options
-        selection_dict = {"tracks": "tracks", "plate": "plate"}
+        selection_dict = {"tracks": "tracks", "raw": "raw"}
 
         # check to see if the button has been clicked (nclicks)
         if nclicks is not None:
@@ -213,7 +213,7 @@ def get_options_analysis(nclicks, store):
     elif pipeline_selection == "wormsize_intensity_cellpose":
 
         # create the options
-        selection_dict = {"plate": "plate", "straightened_worms": "straightened_worms"}
+        selection_dict = {"raw": "raw", "straightened_worms": "straightened_worms"}
 
         # check to see if the button has been clicked (nclicks)
         if nclicks is not None:
@@ -222,7 +222,7 @@ def get_options_analysis(nclicks, store):
     elif pipeline_selection == "mf_celltox":
 
         # create the options
-        selection_dict = {"plate": "plate"}
+        selection_dict = {"raw": "raw"}
 
         # check to see if the button has been clicked (nclicks)
         if nclicks is not None:
@@ -230,7 +230,7 @@ def get_options_analysis(nclicks, store):
 
     elif pipeline_selection == "wormsize":
         # create the options
-        selection_dict = {"plate": "plate", "straightened_worms": "straightened_worms"}
+        selection_dict = {"raw": "raw", "straightened_worms": "straightened_worms"}
 
         # check to see if the button has been clicked (nclicks)
         if nclicks is not None:
@@ -274,4 +274,4 @@ def get_options_analysis(nclicks, store):
             return selection_dict
 
     else:
-        return {"plate": "plate"}
+        return {"raw": "raw"}

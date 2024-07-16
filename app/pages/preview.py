@@ -86,7 +86,7 @@ def update_analysis_preview_imgage(selection, nclicks, store):
 
         if pipeline_selection == "motility":
             # assumes IX-like file structure
-            if selection == "plate":
+            if selection == "raw":
                 selection = ""
             elif selection == "segment":
                 selection = "_binary"
@@ -113,7 +113,7 @@ def update_analysis_preview_imgage(selection, nclicks, store):
                 return fig, False, True, False, ""
         elif pipeline_selection == "fecundity":
             # assumes IX-like file structure
-            if selection == "plate":
+            if selection == "raw":
                 selection = ""
             else:
                 selection = f"_{selection}"
@@ -132,7 +132,7 @@ def update_analysis_preview_imgage(selection, nclicks, store):
                 return fig, False, True, False, ""
         elif pipeline_selection == "tracking":
             # assumes IX-like file structure
-            if selection == "plate":
+            if selection == "raw":
                 selection = ""
             else:
                 selection = f"_{selection}"
@@ -152,7 +152,7 @@ def update_analysis_preview_imgage(selection, nclicks, store):
         elif pipeline_selection == "wormsize_intensity_cellpose":
 
             # assumes IX-like file structure
-            if selection == "plate":
+            if selection == "raw":
 
                 img_path = Path(
                     f"{volume}/work/{platename}/{wells[0]}/img/{platename}_{wells[0]}.png"
@@ -179,7 +179,7 @@ def update_analysis_preview_imgage(selection, nclicks, store):
                 return fig, False, True, False, ""
         elif pipeline_selection == "mf_celltox":
             # assumes IX-like file structure
-            if selection == "plate":
+            if selection == "raw":
 
                 img_path = Path(
                     f"{volume}/work/{platename}/{wells[0]}/img/{platename}_{wells[0]}.png"
@@ -195,7 +195,7 @@ def update_analysis_preview_imgage(selection, nclicks, store):
                 return fig, False, True, False, ""
         elif pipeline_selection == "wormsize":
             # assumes IX-like file structure
-            if selection == "plate":
+            if selection == "raw":
 
                 img_path = Path(
                     f"{volume}/work/{platename}/{wells[0]}/img/{platename}_{wells[0]}.png"
@@ -217,7 +217,7 @@ def update_analysis_preview_imgage(selection, nclicks, store):
                 return fig, False, True, False, ""
         elif pipeline_selection == "feeding":
             # assumes IX-like file structure
-            if selection == "plate":
+            if selection == "raw":
 
                 img_path = Path(
                     f"{volume}/work/{platename}/{wells[0]}/img/{platename}_{wells[0]}.png"
@@ -349,7 +349,7 @@ def get_options_preview(nclicks, store):
             "segment": "binary",
             "blur": "blur",
             "edge": "edge",
-            "plate": "plate",
+            "raw": "raw",
         }
 
         # check to see if the button has been clicked (nclicks)
@@ -362,7 +362,7 @@ def get_options_preview(nclicks, store):
             "binary": "binary",
             "blur": "blur",
             "edge": "edge",
-            "plate": "plate",
+            "raw": "raw",
         }
 
         # check to see if the button has been clicked (nclicks)
@@ -371,7 +371,7 @@ def get_options_preview(nclicks, store):
     elif pipeline_selection == "tracking":
 
         # create the options
-        selection_dict = {"tracks": "tracks", "plate": "plate"}
+        selection_dict = {"tracks": "tracks", "raw": "raw"}
 
         # check to see if the button has been clicked (nclicks)
         if nclicks is not None:
@@ -380,7 +380,7 @@ def get_options_preview(nclicks, store):
 
         # create the options
         selection_dict = {
-            "plate": "plate",
+            "raw": "raw",
             "straightened_worms": "straightened_worms",
             "cp_masks": "cp_masks",
         }
@@ -391,14 +391,14 @@ def get_options_preview(nclicks, store):
     elif pipeline_selection == "mf_celltox":
 
         # create the options
-        selection_dict = {"plate": "plate"}
+        selection_dict = {"raw": "raw"}
 
         # check to see if the button has been clicked (nclicks)
         if nclicks is not None:
             return selection_dict
     elif pipeline_selection == "wormsize":
         # create the options
-        selection_dict = {"plate": "plate", "straightened_worms": "straightened_worms"}
+        selection_dict = {"raw": "raw", "straightened_worms": "straightened_worms"}
 
         # check to see if the button has been clicked (nclicks)
         if nclicks is not None:
@@ -440,7 +440,7 @@ def get_options_preview(nclicks, store):
         if nclicks is not None:
             return selection_dict
     else:
-        return {"plate": "plate"}
+        return {"raw": "raw"}
 
 
 @callback(
