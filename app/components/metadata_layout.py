@@ -109,29 +109,45 @@ metadata_layout = dbc.Container(
                                         dbc.Col(
                                             [
                                                 dbc.Button(
-                                                    "Select All",  # Select All button
+                                                    "Select all",  # Select All button
                                                     id="select-all-metadata-tables",
                                                     className="me-2",
                                                     color="primary",
                                                 ),
                                             ],
-                                            width=3,
+                                            width=True,
                                         ),
                                         dbc.Col(
                                             [
                                                 dbc.Button(
-                                                    "Deselect All",  # Deselect All button
+                                                    "Deselect all",  # Deselect All button
                                                     id="deselect-all-metadata-tables",
                                                     className="me-2",
                                                     color="primary",
                                                 ),
                                             ],
-                                            width=3,
+                                            width={"size": True, "offset": 0},
                                         ),
                                     ]
                                 ),
+                                html.Br(),
+                                dbc.Row(
+                                    [
+                                        dbc.Col(
+                                            dbc.Button(
+                                                "Update tables",  # Finalize Tables button
+                                                id="finalize-metadata-table-button",
+                                                className="flex",
+                                                # Color of the button (wrmXpress) blue
+                                                color="primary",
+                                            ),
+                                            width=True,  # Width of the column
+                                        ),
+                                    ],
+                                    justify="center",  # Justify the button to the center
+                                ),
                             ],
-                            width=3,
+                            width=4,
                         ),
                         html.Br(),
                         dbc.Col(
@@ -146,26 +162,11 @@ metadata_layout = dbc.Container(
                                     ]
                                 ),
                             ],
-                            width=9,
+                            width=8,
                         ),
                     ]
                 ),
                 html.Hr(),
-                dbc.Row(
-                    [
-                        dbc.Col(
-                            dbc.Button(
-                                "Finalize Tables",  # Finalize Tables button
-                                id="finalize-metadata-table-button",
-                                className="flex",
-                                # Color of the button (wrmXpress) blue
-                                color="primary",
-                            ),
-                            width="auto",  # Width of the column
-                        ),
-                    ],
-                    justify="center",  # Justify the button to the center
-                ),
                 html.Br(),
                 html.Br(),
                 html.Br(),

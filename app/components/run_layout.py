@@ -33,7 +33,7 @@ run_layout = dbc.ModalBody(
                                                     [
                                                         html.H4(
                                                             # Header of Configuration Summary
-                                                            "Configuration summary",
+                                                            "Configuration Summary",
                                                             className="text-center",
                                                         ),
                                                     ]
@@ -45,7 +45,7 @@ run_layout = dbc.ModalBody(
                                                                 dbc.Col(
                                                                     dbc.Button(
                                                                         # Begin Analysis
-                                                                        "Begin Analysis",
+                                                                        "Begin analysis",
                                                                         id="submit-analysis",
                                                                         className="d-grid gap-2 col-8 mx-auto",
                                                                         # Defines the color of the button (wrmxpress) blue
@@ -57,7 +57,7 @@ run_layout = dbc.ModalBody(
                                                                 dbc.Col(
                                                                     dbc.Button(
                                                                         # Cancel Analysis
-                                                                        "Cancel Analysis",
+                                                                        "Cancel analysis",
                                                                         id="cancel-analysis",
                                                                         className="d-grid gap-2 col-8 mx-auto",
                                                                         # Defines the color of the button (wrmxpress) red
@@ -146,7 +146,7 @@ run_layout = dbc.ModalBody(
                                                     [
                                                         html.H4(
                                                             # Header for Run Diagnosis
-                                                            "Run diagnosis",
+                                                            "Run Diagnosis",
                                                             className="text-center",
                                                         ),
                                                     ]
@@ -167,7 +167,7 @@ run_layout = dbc.ModalBody(
                                                                     dbc.Button(
                                                                         # Load Image button
                                                                         id="load-analysis-img",
-                                                                        children="Load Image",
+                                                                        children="Load image",
                                                                         disabled=True,
                                                                     ),
                                                                     width=4,
