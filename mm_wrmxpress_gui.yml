@@ -34,6 +34,7 @@ dependencies:
   - scipy==1.9.0
   - h5py~=3.6.0,<4
   - bioconda::prokaryote==2.4.4
+  - bioconda::centrosome
   - pyarrow
   - pyzmq~=22.3
   - scikit-learn>=0.20,<1
