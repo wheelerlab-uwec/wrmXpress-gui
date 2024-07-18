@@ -22,24 +22,22 @@ A Dash GUI for wrmXpress
 
 ***Prerequisites*** - Install [Docker Desktop](https://www.docker.com/products/docker-desktop/)
 
-1. Create a folder that contains all the input images. This folder is where temporary working files/images will be stored, where output data will be written, and will be mounted as a volume in the Docker container.
+1. Create a working directory that contains all the input images. This folder is where temporary working files/images will be stored, where output data will be written, and will be mounted as a volume in the Docker container.
+   + In the example below, this directory is `Users/njwheeler/mount`
+
 2. Start the Docker engine and open up the Dashboard.
-3. Use the search bar to find and pull the latest images from DockerHub:
-   + `wheelern/wrmxpress_gui`
-   + `zamanianlab/wrmxpress`
-  
-   Choose the most recent tags. The compressed images are >1.5 GB and >7 GB respectively, so they will take a few minutes to pull.
+3. Use the search bar to find and pull the latest `wheelern/wrmxpress_gui` image from DockerHub:
+   + Choose the most recent tag. The compressed image is >9 GB, so it will take a few minutes to pull.
 
     <img src="readme_img/dd1.png" alt="step 2" width="500" />
 
-4. In the Images pane and Local tab, click the Run symbol.
+4. In the Images pane, click the Run symbol.
 
     <img src="readme_img/dd2.png" alt="step 3" width="500" />
 
 5. Under Optional settings, make the following changes:
    + Under Ports, set the Host port to 9000
-   + Under Volumes, set the Host and Container paths to be the path to the working directory created in step #1 (in the example below, the Host path is `/Users/njwheeler/mount`)
-   + Add a new volume by clicking the + syumbol and set the Host and Container paths to `/var/run/docker.sock`
+   + Under Volumes, set the Host path to be the path to the working directory created in step #1. Set the Container path to be `/home/`
 
     <img src="readme_img/dd3.png" alt="step 3" width="500" />
 
@@ -52,3 +50,9 @@ A Dash GUI for wrmXpress
 8. Follow the guidance in the GUI to prepare and run your analysis.
 
     <img src="readme_img/dd5.png" alt="step 5" width="500" />
+
+## Video walkthrough
+<!-- [![Watch the video](readme_img/thumb.jpg)](https://vimeo.com/986779390?share=copy)
+ -->
+ 
+<video src="https://vimeo.com/986779390?share=copy" width=500>
