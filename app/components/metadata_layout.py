@@ -180,7 +180,8 @@ metadata_layout = dbc.Container(
                             n_clicks=0,  # Number of clicks
                         ),
                         width="auto",
-                    )
+                    ),
+                    justify="center",  # Center the button
                 ),
                 html.Br(),
                 dbc.Alert(

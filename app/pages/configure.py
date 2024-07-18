@@ -511,7 +511,7 @@ def update_figure_based_on_selection(module_initial):
         return (
             fig,
             {"width": "40%"},
-            "The motility pipeline exports tracks as a diagnostic and saves a single value per track as output.",
+            "The tracking pipeline exports tracks as a diagnostic and saves a single value per track as output.",
         )
 
     elif module_initial == "wormsize_intensity_cellpose":
