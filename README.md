@@ -119,15 +119,13 @@ When using the wrmXrpress backend on a remote machine, please cite:
 
 When using the GUI, please site the backend (above) as well as this repository:
 
-    @misc{Caterer2024,
+    @software{Caterer2024,
       author = {Caterer, Zachary and Horejsi, Rachel and Weber, Carly and Mathisen, Blake and 
       Nelson, Chase and Bagatta, Maggie and Coughlin, Ireland and Wettstein, Megan and 
       Zamanian, Mostafa and Wheeler, Nicolas J.},
       title = {A graphical user interface for wrmXpress democratizes phenotypic screening of 
       parasitic worms},
-      year = {2024},
-      publisher = {GitHub},
-      journal = {GitHub repository},
-      howpublished = {\url{https://github.com/wheelerlab-uwec/wrmXpress-gui}},
-      release = {v1.0.0}
+      date = {2024-07-18},
+      url = {https://github.com/wheelerlab-uwec/wrmXpress-gui},
+      version = {v1.0.0}
     }
