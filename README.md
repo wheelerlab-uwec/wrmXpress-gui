@@ -52,7 +52,7 @@ A Dash GUI for wrmXpress
     <img src="readme_img/dd5.png" alt="step 5" width="500" />
 
 ## Video walkthrough
-<!-- [![Watch the video](readme_img/thumb.jpg)](https://vimeo.com/986779390?share=copy)
- -->
- 
-<video src="https://vimeo.com/986779390?share=copy" width=500>
+<a href="https://vimeo.com/986779390?share=copy" target="_blank"><img src="readme_img/thumb.jpg" 
+alt="wrmXpress Tutorial" width="500"/></a>
+
+*Will open a new tab*
