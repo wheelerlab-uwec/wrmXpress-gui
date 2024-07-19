@@ -43,6 +43,9 @@ layout = preview_layout
     Output("post-analysis-first-well-img-view-alert", "is_open"),
     Output("no-store-data-alert", "is_open"),
     Output("submit-val", "disabled"),
+    Output("analysis-preview-message-alert", "is_open"),
+    Output("analysis-preview-dx-alert-message", "is_open"),
+    Output("analysis-preview-dx-message", "children"),
     State("preview-dropdown", "value"),
     Input("preview-change-img-button", "n_clicks"),
     State("store", "data"),
@@ -73,19 +76,25 @@ def update_analysis_preview_imgage(selection, nclicks, store):
     """
     # Check if store is empty
     if not store:
-        return None, True, False, True, True
+        return (
+            None,
+            True,
+            False,
+            True,
+            True,
+            True,
+            False,
+            None,
+        )
 
-    # Get the store data
     volume = store["mount"]
     platename = store["platename"]
     wells = store["wells"]
     plate_base = platename.split("_", 1)[0]
     pipeline_selection = store["pipeline_selection"]
 
-    if nclicks:  # If the button has been clicked
-
+    if nclicks:
         if pipeline_selection == "motility":
-            # assumes IX-like file structure
             if selection == "raw":
                 selection = ""
             elif selection == "segment":
@@ -96,23 +105,7 @@ def update_analysis_preview_imgage(selection, nclicks, store):
             img_path = Path(
                 f"{volume}/work/{platename}/{wells[0]}/img/{platename}_{wells[0]}{selection}.png"
             )
-
-            # Check if the image exists
-            if os.path.exists(img_path):
-
-                # checking the selection and changing the scale accordingly
-                if selection == "_motility":
-                    scale = "inferno"
-                else:
-                    scale = "gray"
-
-                # Open the image and create a figure
-                fig = create_figure_from_filepath(img_path, scale=scale)
-
-                # Return the figure and the open status of the alerts
-                return fig, False, True, False, ""
         elif pipeline_selection == "fecundity":
-            # assumes IX-like file structure
             if selection == "raw":
                 selection = ""
             else:
@@ -121,17 +114,7 @@ def update_analysis_preview_imgage(selection, nclicks, store):
             img_path = Path(
                 f"{volume}/work/{platename}/{wells[0]}/img/{platename}_{wells[0]}{selection}.png"
             )
-
-            # Check if the image exists
-            if os.path.exists(img_path):
-
-                # Open the image and create a figure
-                fig = create_figure_from_filepath(img_path)
-
-                # Return the figure and the open status of the alerts
-                return fig, False, True, False, ""
         elif pipeline_selection == "tracking":
-            # assumes IX-like file structure
             if selection == "raw":
                 selection = ""
             else:
@@ -140,113 +123,66 @@ def update_analysis_preview_imgage(selection, nclicks, store):
             img_path = Path(
                 f"{volume}/work/{platename}/{wells[0]}/img/{platename}_{wells[0]}{selection}.png"
             )
-
-            # Check if the image exists
-            if os.path.exists(img_path):
-
-                # Open the image and create a figure
-                fig = create_figure_from_filepath(img_path)
-
-                # Return the figure and the open status of the alerts
-                return fig, False, True, False, ""
         elif pipeline_selection == "wormsize_intensity_cellpose":
-
-            # assumes IX-like file structure
             if selection == "raw":
-
                 img_path = Path(
                     f"{volume}/work/{platename}/{wells[0]}/img/{platename}_{wells[0]}.png"
                 )
-
             elif selection == "straightened_worms":
-
                 img_path = Path(
                     f"{volume}/output/straightened_worms/{plate_base}_{wells[0]}.tiff"
                 )
-
             elif selection == "cp_masks":
                 img_path = Path(
                     f"{volume}/input/{platename}/TimePoint_1/{plate_base}_{wells[0]}_cp_masks.png"
                 )
-
-            # Check if the image exists
-            if os.path.exists(img_path):
-
-                # Open the image and create a figure
-                fig = create_figure_from_filepath(img_path)
-
-                # Return the figure and the open status of the alerts
-                return fig, False, True, False, ""
         elif pipeline_selection == "mf_celltox":
-            # assumes IX-like file structure
             if selection == "raw":
-
                 img_path = Path(
                     f"{volume}/work/{platename}/{wells[0]}/img/{platename}_{wells[0]}.png"
                 )
-
-            # Check if the image exists
-            if os.path.exists(img_path):
-
-                # Open the image and create a figure
-                fig = create_figure_from_filepath(img_path)
-
-                # Return the figure and the open status of the alerts
-                return fig, False, True, False, ""
         elif pipeline_selection == "wormsize":
-            # assumes IX-like file structure
             if selection == "raw":
-
                 img_path = Path(
                     f"{volume}/work/{platename}/{wells[0]}/img/{platename}_{wells[0]}.png"
                 )
-
             elif selection == "straightened_worms":
-
                 img_path = Path(
                     f"{volume}/output/straightened_worms/{plate_base}_{wells[0]}.tiff"
                 )
-
-            # Check if the image exists
-            if os.path.exists(img_path):
-
-                # Open the image and create a figure
-                fig = create_figure_from_filepath(img_path)
-
-                # Return the figure and the open status of the alerts
-                return fig, False, True, False, ""
         elif pipeline_selection == "feeding":
-            # assumes IX-like file structure
             if selection == "raw":
-
                 img_path = Path(
                     f"{volume}/work/{platename}/{wells[0]}/img/{platename}_{wells[0]}.png"
                 )
-
             elif selection == "straightened_worms":
-
                 img_path = Path(
                     f"{volume}/output/straightened_worms/{plate_base}_{wells[0]}.tiff"
                 )
-
             elif selection.startswith("wavelength_"):
-
                 selection = selection.split("_", 1)[-1]
                 img_path = Path(
                     f"{volume}/work/{platename}/{wells[0]}/img/{platename}_{wells[0]}_{selection}.png"
                 )
-
-            # Check if the image exists
-            if os.path.exists(img_path):
-
-                # Open the image and create a figure
-                fig = create_figure_from_filepath(img_path)
-
-                # Return the figure and the open status of the alerts
-                return fig, False, True, False, ""
         else:
-            return None, True, False, False, False
-    return None, True, False, False, False
+            return None, True, False, False, False, True, False, None
+
+        print(f"Generated image path: {img_path}")  # Debugging output
+
+        if os.path.exists(img_path):
+            scale = "inferno" if selection == "_motility" else "gray"
+            fig = create_figure_from_filepath(img_path, scale=scale)
+            return (
+                fig,
+                False,
+                True,
+                False,
+                "",
+                False,
+                True,
+                f"```{img_path}```",
+            )
+    return None, True, False, False, False, True, False, None
 
 
 @callback(

@@ -8,7 +8,7 @@ import dash_bootstrap_components as dbc
 from dash import dcc, html
 
 # importing utils
-from app.utils.styling import layout
+from app.utils.styling import layout, clear_alert_style
 
 ########################################################################
 ####                                                                ####
@@ -142,19 +142,43 @@ run_layout = dbc.ModalBody(
                                         ),
                                         dbc.Row(
                                             [
-                                                html.H6(
-                                                    # File
-                                                    "File:",
-                                                    className="card-subtitle",
-                                                    style={"margin-top": "7px"},
+                                                dbc.Row(
+                                                    [
+                                                        html.H6(
+                                                            # File
+                                                            "File:",
+                                                            className="card-subtitle",
+                                                            style={"margin-top": "7px"},
+                                                        )
+                                                    ]
                                                 ),
-                                                dcc.Markdown(
-                                                    # Progress message for progress file paths
-                                                    id="progress-message-run-page-for-analysis"
-                                                ),
-                                                dcc.Markdown(
-                                                    # Message for analysis
-                                                    id="analysis-postview-message"
+                                                dbc.Row(
+                                                    [
+                                                        dbc.Alert(
+                                                            # Alert for running file paths
+                                                            id="run-page-file-paths-alert",
+                                                            style=clear_alert_style,
+                                                            is_open=True,
+                                                            children=[
+                                                                dcc.Markdown(
+                                                                    # Progress message for progress file paths
+                                                                    id="progress-message-run-page-for-analysis"
+                                                                ),
+                                                            ],
+                                                        ),
+                                                        dbc.Alert(
+                                                            # Alert for file paths when updating dx image
+                                                            id="run-page-file-paths-alert-update",
+                                                            style=clear_alert_style,
+                                                            is_open=False,
+                                                            children=[
+                                                                dcc.Markdown(
+                                                                    # Message for analysis
+                                                                    id="analysis-postview-message"
+                                                                ),
+                                                            ],
+                                                        ),
+                                                    ]
                                                 ),
                                             ]
                                         ),

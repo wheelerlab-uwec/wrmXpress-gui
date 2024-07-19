@@ -48,3 +48,10 @@ layout = go.Layout(
     ),
     # width=800,
 )
+
+# Clear alert style
+clear_alert_style = {
+    "backgroundColor": "transparent",
+    "border": "none",
+    "color": "#000",  # Optional: Set the text color
+}
