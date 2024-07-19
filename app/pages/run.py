@@ -68,6 +68,8 @@ def cancel_analysis(n_clicks):
     Output("additional-view-of-analysis-alert", "is_open"),
     Output("run-page-no-store-alert", "is_open"),
     Output("submit-analysis", "disabled"),
+    Output("run-page-file-paths-alert", "is_open"),
+    Output("run-page-file-paths-alert-update", "is_open"),
     State("analysis-dropdown", "value"),
     Input("load-analysis-img", "n_clicks"),
     State("store", "data"),
@@ -86,75 +88,84 @@ def load_analysis_img(selection, n_clicks, store):
     Returns:
         - fig : plotly.graph_objs._figure.Figure : The figure
         - f'```{output_thumbs_path}```' : str : The output thumbs path
-        - is_open : bool : weather the (first-view-of-analysis) alert is open or not
+        - is_open : bool : whether the (first-view-of-analysis) alert is open or not
             +- True : if the alert is open
             +- False : if the alert is not open
-        - is_open : bool : weather the (additional view of analysis) alert is open or not
+        - is_open : bool : whether the (additional view of analysis) alert is open or not
             +- True : if the alert is open
             +- False : if the alert is not open
     """
-    # check to see if store exists
+    # Check to see if store exists
     if not store:
-        return None, None, True, False, True, True
+        return {}, "", True, False, True, True, True, False
 
-    # get the store from the data
-    volume = store["mount"]
-    platename = store["platename"]
-    plate_base = platename.split("_", 1)[0]
-    wells = store["wells"]
+    try:
+        # Get the store data
+        volume = store["mount"]
+        platename = store["platename"]
 
-    img_path = None
-    scale = "gray"
-    # check to see if selection option exists in output thumbs folder
-    if n_clicks:
+        # Handle NoneType for platename
+        if platename is None:
+            return {}, "", True, False, True, True, True, False
 
-        if selection == "straightened_worms":
+        plate_base = platename.split("_", 1)[0]
+        wells = store["wells"]
 
-            path_to_straightened_worms = Path(volume, "output/straightened_worms/")
-            pattern = f"{plate_base}*{wells[0]}*.tiff"
-            all_files = list(path_to_straightened_worms.glob(pattern))
-            # Filter files to find those corresponding to the first well in the list
-            straightened_worm_files = []
-            for file_path in all_files:
-                if file_path.name.startswith(
-                    f"{plate_base}_{wells[0]}"
-                ) or file_path.name.startswith(f"{plate_base}-{wells[0]}"):
-                    straightened_worm_files.append(file_path)
-            if straightened_worm_files:
-                img_path = straightened_worm_files[0]  # Use the first matching file
+        img_path = None
+        scale = "gray"
+        # check to see if selection option exists in output thumbs folder
+        if n_clicks:
 
-        elif selection.startswith("wavelength_"):
-            selection = selection.split("_", 1)[1]
-            img_path = Path(volume, f"output/thumbs/{platename}_{selection}.png")
+            if selection == "straightened_worms":
 
-        elif selection == "motility":
-            selection = "_motility"
-            scale = "inferno"
-            img_path = Path(volume, f"output/thumbs/{platename}{selection}.png")
+                path_to_straightened_worms = Path(volume, "output/straightened_worms/")
+                pattern = f"{plate_base}*{wells[0]}*.tiff"
+                all_files = list(path_to_straightened_worms.glob(pattern))
+                # Filter files to find those corresponding to the first well in the list
+                straightened_worm_files = []
+                for file_path in all_files:
+                    if file_path.name.startswith(
+                        f"{plate_base}_{wells[0]}"
+                    ) or file_path.name.startswith(f"{plate_base}-{wells[0]}"):
+                        straightened_worm_files.append(file_path)
+                if straightened_worm_files:
+                    img_path = straightened_worm_files[0]  # Use the first matching file
 
-        elif selection == "raw":
-            selection = ""
-            img_path = Path(volume, f"output/thumbs/{platename}{selection}.png")
+            elif selection.startswith("wavelength_"):
+                selection = selection.split("_", 1)[1]
+                img_path = Path(volume, f"output/thumbs/{platename}_{selection}.png")
 
-        elif selection == "segment":
-            selection = "_binary"
-            img_path = Path(volume, f"output/thumbs/{platename}{selection}.png")
+            elif selection == "motility":
+                selection = "_motility"
+                scale = "inferno"
+                img_path = Path(volume, f"output/thumbs/{platename}{selection}.png")
+
+            elif selection == "raw":
+                selection = ""
+                img_path = Path(volume, f"output/thumbs/{platename}{selection}.png")
+
+            elif selection == "segment":
+                selection = "_binary"
+                img_path = Path(volume, f"output/thumbs/{platename}{selection}.png")
+
+            else:
+                selection = f"_{selection}"
+                img_path = Path(volume, f"output/thumbs/{platename}{selection}.png")
+
+            # check to see if the img exists
+            if os.path.exists(img_path):
+                fig = create_figure_from_filepath(img_path, scale)
+
+                return fig, f"```{img_path}```", False, True, False, False, False, True
+
+            else:
+                return None, None, False, False, False, False, True, False
 
         else:
-            selection = f"_{selection}"
-            img_path = Path(volume, f"output/thumbs/{platename}{selection}.png")
+            return None, None, True, False, False, False, True, False
 
-        # check to see if the img exists
-        if os.path.exists(img_path):
-            fig = create_figure_from_filepath(img_path, scale)
-
-            return fig, f"```{img_path}```", False, True, False, False
-
-        else:
-            return None, None, False, False, False, False
-
-    else:
-        return None, None, True, False, False, False
+    except KeyError:
+        return None, None, True, False, True, True, True, False
 
 
 @callback(

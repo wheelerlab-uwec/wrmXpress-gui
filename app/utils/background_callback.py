@@ -57,6 +57,7 @@ def callback(set_progress, n_clicks, store):
                 True,
                 "No configuration found. Please go to the configuration page to set up the analysis.",
                 "No configuration found. Please go to the configuration page to set up the analysis.",
+                None,
             )
 
         # obtain the necessary data from the store
@@ -103,6 +104,7 @@ def callback(set_progress, n_clicks, store):
             True,
             "An error has occurred. Please see the log file for more information.",
             f"```{error_message}```",
+            None,
         )
 
 
@@ -310,6 +312,7 @@ def tracking_wrmXpress_run(store, set_progress):
             True,
             "An error has occurred. Please see the log file for more information.",
             f"```{error_message}```",
+            None,
         )
 
 
@@ -356,6 +359,7 @@ def motility_or_segment_run(store, set_progress):
             True,
             "An error has occurred. Please see the log file for more information.",
             f"```{error_message}```",
+            None,
         )
 
 
@@ -457,6 +461,7 @@ def fecundity_run(store, set_progress):
             True,
             "An error has occurred. Please see the log file for more information.",
             f"```{error_message}```",
+            None,
         )
 
 
@@ -559,6 +564,7 @@ def cellprofile_wormsize_run(store, set_progress):
             True,
             "An error has occurred. Please see the log file for more information.",
             f"```{error_message}```",
+            None,
         )
 
 
@@ -678,6 +684,7 @@ def cellprofile_wormsize_intesity_cellpose_run(store, set_progress):
             True,
             "An error has occurred. Please see the log file for more information.",
             f"```{error_message}```",
+            None,
         )
 
 
@@ -787,6 +794,7 @@ def cellprofile_mf_celltox_run(store, set_progress):
             True,
             "An error has occurred. Please see the log file for more information.",
             f"```{error_message}```",
+            None,
         )
 
 
@@ -895,6 +903,7 @@ def cellprofile_feeding_run(store, set_progress):
             True,
             "An error has occurred. Please see the log file for more information.",
             f"```{error_message}```",
+            None,
         )
 
 
@@ -1424,7 +1433,14 @@ def handle_thumbnail_generation(volume, platename, docker_output, output_file):
         fig_1 = create_figure_from_filepath(output_path)
         docker_output.append("Thumbnail generation completed successfully.")
         docker_output_formatted = "".join(docker_output)
-        return fig_1, False, False, "", f"```{docker_output_formatted}```"
+        return (
+            fig_1,
+            False,
+            False,
+            "",
+            f"```{docker_output_formatted}```",
+            f"```{output_path}```",
+        )
     else:
 
         error_message = f"Thumbnail generation failed, please check the {output_file}."
@@ -1435,13 +1451,12 @@ def handle_thumbnail_generation(volume, platename, docker_output, output_file):
             True,
             f"{error_message}",
             f"```{docker_output_formatted}```",
+            None,
         )
 
 
 def handle_failure(docker_output, output_file):
-    error_message = (
-        f"wrmXpress has failed, please check the {output_file} for more information. Then clear the `work` directory and try again."
-    )
+    error_message = f"wrmXpress has failed, please check the {output_file} for more information. Then clear the `work` directory and try again."
     docker_output_formatted = "".join(docker_output)
     return (
         None,
@@ -1449,6 +1464,7 @@ def handle_failure(docker_output, output_file):
         True,
         f"{error_message}",
         f"```{docker_output_formatted}```",
+        None,
     )
 
 

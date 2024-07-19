@@ -97,6 +97,7 @@ app.layout = html.Div(
         Output("run-page-alert", "is_open"),
         Output("run-page-alert", "children"),
         Output("progress-message-run-page-markdown", "children"),
+        Output("progress-message-run-page-for-analysis", "children"),
     ],
     inputs=[
         Input("submit-analysis", "n_clicks"),
@@ -112,11 +113,6 @@ app.layout = html.Div(
         ),
         (
             Output("progress-bar-run-page", "style"),
-            {"visibility": "visible"},
-            {"visibility": "hidden"},
-        ),
-        (
-            Output("progress-message-run-page-for-analysis", "style"),
             {"visibility": "visible"},
             {"visibility": "hidden"},
         ),
@@ -169,6 +165,7 @@ def background_callback(set_progress, n_clicks, store):
             True,
             "An error has occurred. Please see the log file for more information.",
             f"```{error_message}```",
+            None,
         )
 
 
