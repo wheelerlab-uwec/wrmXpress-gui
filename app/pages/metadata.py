@@ -196,6 +196,16 @@ def save_the_metadata_tables_to_csv(n_clicks, metadata_tabs, store):
             True,
         )
 
+    # check if the store values are none
+    if store["mount"] is None or store["platename"] is None:
+        return (
+            "primary",
+            True,
+            "No configuration found. Please go to the configuration page to set up the analysis.",
+            "danger",
+            True,
+        )
+
     if (
         n_clicks
     ):  # If the button has been clicked and store values from the configuration page are available

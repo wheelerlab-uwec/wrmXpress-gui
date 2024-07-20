@@ -23,6 +23,10 @@ long_callback_manager = DiskcacheLongCallbackManager(cache)
 
 dash.register_page(__name__, long_callback_manager=long_callback_manager)
 
+# Assuming we have a fixed height for the headers and buttons in CSS
+fixed_header_class = "fixed-header"
+fixed_button_class = "fixed-button"
+
 ########################################################################
 ####                                                                ####
 ####                              Layout                            ####

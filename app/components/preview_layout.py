@@ -32,9 +32,12 @@ preview_layout = dbc.ModalBody(
                                             [
                                                 html.H4(
                                                     "Input Preview",
-                                                    style={"text-align": "center"},
+                                                    style={
+                                                        "text-align": "center",
+                                                    },
                                                 ),
-                                            ]
+                                            ],
+                                            style={"height": "10%"},
                                         ),
                                         dbc.Row(
                                             [
@@ -52,6 +55,10 @@ preview_layout = dbc.ModalBody(
                                                     ),
                                                 )
                                             ],
+                                            style={
+                                                "margin-bottom": "6px",
+                                                "height": "10%",
+                                            },
                                         ),
                                         dbc.Row(
                                             [
@@ -74,7 +81,11 @@ preview_layout = dbc.ModalBody(
                                                         ),
                                                     ]
                                                 ),
-                                            ]
+                                            ],
+                                            style={
+                                                "margin-bottom": "6px",
+                                                "height": "10%",
+                                            },
                                         ),
                                         dbc.Row(
                                             [
@@ -107,7 +118,8 @@ preview_layout = dbc.ModalBody(
                                             ]
                                         ),
                                     ],
-                                )
+                                ),
+                                style={"height": "99%"},
                             ),
                             width=6,
                         ),
@@ -125,7 +137,7 @@ preview_layout = dbc.ModalBody(
                                                     },
                                                 ),
                                             ],
-                                            style={"height": "20%"},
+                                            style={"height": "10%"},
                                         ),
                                         dbc.Row(
                                             [
@@ -133,7 +145,12 @@ preview_layout = dbc.ModalBody(
                                                     dcc.Dropdown(
                                                         id="preview-dropdown",  # Dropdown for preview
                                                         placeholder="Select diagnostic image to preview...",  # Placeholder for the dropdown
-                                                        style={"textAlign": "left"},
+                                                        style={
+                                                            "textAlign": "left",
+                                                            "margin-bottom": "10px",
+                                                            "margin-top": "10px",
+                                                            "text-align": "center",
+                                                        },
                                                     ),
                                                     width=8,
                                                 ),
@@ -144,12 +161,18 @@ preview_layout = dbc.ModalBody(
                                                         color="primary",  # Color of the button (wrmXpress) blue
                                                         disabled=True,  # Whether the button is disabled
                                                         n_clicks=0,  # Number of times the button has been clicked
+                                                        style={
+                                                            "margin-bottom": "10px",
+                                                            "margin-top": "10px",
+                                                            "text-align": "center",
+                                                        },
                                                     ),
                                                     width=4,
                                                 ),
                                             ],
                                             style={
                                                 "margin-bottom": "6px",
+                                                "height": "10%",
                                             },
                                         ),
                                         dbc.Row(
@@ -185,7 +208,11 @@ preview_layout = dbc.ModalBody(
                                                         ),
                                                     ],
                                                 ),
-                                            ]
+                                            ],
+                                            style={
+                                                "margin-bottom": "6px",
+                                                "height": "10%",
+                                            },
                                         ),
                                         dbc.Row(
                                             [
@@ -247,7 +274,8 @@ preview_layout = dbc.ModalBody(
                                             ]
                                         ),
                                     ]
-                                )
+                                ),
+                                style={"height": "99%"},
                             ),
                             width=6,
                         ),
@@ -277,6 +305,7 @@ preview_layout = dbc.ModalBody(
                     style={"margin-top": "10px"},
                 ),
             ],
+            fluid=True,
             style={"height": "100vh"},
         )
     ]

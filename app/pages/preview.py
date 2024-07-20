@@ -15,6 +15,10 @@ import os
 from app.utils.callback_functions import create_figure_from_filepath
 from app.utils.preview_callback_functions import preview_callback_functions
 from app.components.preview_layout import preview_layout
+from app.components.test_scripts.preview_page_test import (
+    error_test,
+    error_check_test_true,
+)
 
 dash.register_page(__name__)
 
@@ -50,7 +54,7 @@ layout = preview_layout
     Input("preview-change-img-button", "n_clicks"),
     State("store", "data"),
 )
-def update_analysis_preview_imgage(selection, nclicks, store):
+def update_analysis_preview_image(selection, nclicks, store):
     """
     This function updates the analysis preview image based on the selection
     =======================================================================
@@ -74,6 +78,10 @@ def update_analysis_preview_imgage(selection, nclicks, store):
             +- True : The button is disabled
             +- False : The button is enabled
     """
+
+    if store == error_test:
+        return error_check_test_true()
+
     # Check if store is empty
     if not store:
         return (
@@ -87,102 +95,122 @@ def update_analysis_preview_imgage(selection, nclicks, store):
             None,
         )
 
-    volume = store["mount"]
-    platename = store["platename"]
-    wells = store["wells"]
-    plate_base = platename.split("_", 1)[0]
-    pipeline_selection = store["pipeline_selection"]
+    # check if store has the essential elements
+    if store["platename"] == None or store["mount"] == None:
+        return (
+            None,
+            True,
+            False,
+            True,
+            True,
+            True,
+            False,
+            None,
+        )
 
-    if nclicks:
-        if pipeline_selection == "motility":
-            if selection == "raw":
-                selection = ""
-            elif selection == "segment":
-                selection = "_binary"
+    try:
+        volume = store["mount"]
+        platename = store["platename"]
+        wells = store["wells"]
+
+        try:
+            plate_base = platename.split("_", 1)[0]
+
+        except Exception as e:
+            return None, True, False, False, False, True, False, f"```{str(e)}```"
+
+        pipeline_selection = store["pipeline_selection"]
+
+        if nclicks:
+            if pipeline_selection == "motility":
+                if selection == "raw":
+                    selection = ""
+                elif selection == "segment":
+                    selection = "_binary"
+                else:
+                    selection = f"_{selection}"
+
+                img_path = Path(
+                    f"{volume}/work/{platename}/{wells[0]}/img/{platename}_{wells[0]}{selection}.png"
+                )
+            elif pipeline_selection == "fecundity":
+                if selection == "raw":
+                    selection = ""
+                else:
+                    selection = f"_{selection}"
+
+                img_path = Path(
+                    f"{volume}/work/{platename}/{wells[0]}/img/{platename}_{wells[0]}{selection}.png"
+                )
+            elif pipeline_selection == "tracking":
+                if selection == "raw":
+                    selection = ""
+                else:
+                    selection = f"_{selection}"
+
+                img_path = Path(
+                    f"{volume}/work/{platename}/{wells[0]}/img/{platename}_{wells[0]}{selection}.png"
+                )
+            elif pipeline_selection == "wormsize_intensity_cellpose":
+                if selection == "raw":
+                    img_path = Path(
+                        f"{volume}/work/{platename}/{wells[0]}/img/{platename}_{wells[0]}.png"
+                    )
+                elif selection == "straightened_worms":
+                    img_path = Path(
+                        f"{volume}/output/straightened_worms/{plate_base}_{wells[0]}.tiff"
+                    )
+                elif selection == "cp_masks":
+                    img_path = Path(
+                        f"{volume}/input/{platename}/TimePoint_1/{plate_base}_{wells[0]}_cp_masks.png"
+                    )
+            elif pipeline_selection == "mf_celltox":
+                if selection == "raw":
+                    img_path = Path(
+                        f"{volume}/work/{platename}/{wells[0]}/img/{platename}_{wells[0]}.png"
+                    )
+            elif pipeline_selection == "wormsize":
+                if selection == "raw":
+                    img_path = Path(
+                        f"{volume}/work/{platename}/{wells[0]}/img/{platename}_{wells[0]}.png"
+                    )
+                elif selection == "straightened_worms":
+                    img_path = Path(
+                        f"{volume}/output/straightened_worms/{plate_base}_{wells[0]}.tiff"
+                    )
+            elif pipeline_selection == "feeding":
+                if selection == "raw":
+                    img_path = Path(
+                        f"{volume}/work/{platename}/{wells[0]}/img/{platename}_{wells[0]}.png"
+                    )
+                elif selection == "straightened_worms":
+                    img_path = Path(
+                        f"{volume}/output/straightened_worms/{plate_base}_{wells[0]}.tiff"
+                    )
+                elif selection.startswith("wavelength_"):
+                    selection = selection.split("_", 1)[-1]
+                    img_path = Path(
+                        f"{volume}/work/{platename}/{wells[0]}/img/{platename}_{wells[0]}_{selection}.png"
+                    )
             else:
-                selection = f"_{selection}"
+                return None, True, False, False, False, True, False, None
 
-            img_path = Path(
-                f"{volume}/work/{platename}/{wells[0]}/img/{platename}_{wells[0]}{selection}.png"
-            )
-        elif pipeline_selection == "fecundity":
-            if selection == "raw":
-                selection = ""
-            else:
-                selection = f"_{selection}"
-
-            img_path = Path(
-                f"{volume}/work/{platename}/{wells[0]}/img/{platename}_{wells[0]}{selection}.png"
-            )
-        elif pipeline_selection == "tracking":
-            if selection == "raw":
-                selection = ""
-            else:
-                selection = f"_{selection}"
-
-            img_path = Path(
-                f"{volume}/work/{platename}/{wells[0]}/img/{platename}_{wells[0]}{selection}.png"
-            )
-        elif pipeline_selection == "wormsize_intensity_cellpose":
-            if selection == "raw":
-                img_path = Path(
-                    f"{volume}/work/{platename}/{wells[0]}/img/{platename}_{wells[0]}.png"
+            if os.path.exists(img_path):
+                scale = "inferno" if selection == "_motility" else "gray"
+                fig = create_figure_from_filepath(img_path, scale=scale)
+                return (
+                    fig,
+                    False,
+                    True,
+                    False,
+                    "",
+                    False,
+                    True,
+                    f"```{img_path}```",
                 )
-            elif selection == "straightened_worms":
-                img_path = Path(
-                    f"{volume}/output/straightened_worms/{plate_base}_{wells[0]}.tiff"
-                )
-            elif selection == "cp_masks":
-                img_path = Path(
-                    f"{volume}/input/{platename}/TimePoint_1/{plate_base}_{wells[0]}_cp_masks.png"
-                )
-        elif pipeline_selection == "mf_celltox":
-            if selection == "raw":
-                img_path = Path(
-                    f"{volume}/work/{platename}/{wells[0]}/img/{platename}_{wells[0]}.png"
-                )
-        elif pipeline_selection == "wormsize":
-            if selection == "raw":
-                img_path = Path(
-                    f"{volume}/work/{platename}/{wells[0]}/img/{platename}_{wells[0]}.png"
-                )
-            elif selection == "straightened_worms":
-                img_path = Path(
-                    f"{volume}/output/straightened_worms/{plate_base}_{wells[0]}.tiff"
-                )
-        elif pipeline_selection == "feeding":
-            if selection == "raw":
-                img_path = Path(
-                    f"{volume}/work/{platename}/{wells[0]}/img/{platename}_{wells[0]}.png"
-                )
-            elif selection == "straightened_worms":
-                img_path = Path(
-                    f"{volume}/output/straightened_worms/{plate_base}_{wells[0]}.tiff"
-                )
-            elif selection.startswith("wavelength_"):
-                selection = selection.split("_", 1)[-1]
-                img_path = Path(
-                    f"{volume}/work/{platename}/{wells[0]}/img/{platename}_{wells[0]}_{selection}.png"
-                )
-        else:
-            return None, True, False, False, False, True, False, None
-
-        print(f"Generated image path: {img_path}")  # Debugging output
-
-        if os.path.exists(img_path):
-            scale = "inferno" if selection == "_motility" else "gray"
-            fig = create_figure_from_filepath(img_path, scale=scale)
-            return (
-                fig,
-                False,
-                True,
-                False,
-                "",
-                False,
-                True,
-                f"```{img_path}```",
-            )
-    return None, True, False, False, False, True, False, None
+        return None, True, False, False, False, True, False, None
+    except Exception as e:
+        return None, True, False, False, False, True, False, f"```{str(e)}```"
 
 
 @callback(
@@ -208,7 +236,12 @@ def update_preview_image(n_clicks, store):
     wells = store["wells"]  # Get the wells
     first_well = wells[0].replace(", ", "")  # Get the first well
     platename = store["platename"]  # Get the platename
-    plate_base = platename.split("_", 1)[0]  # Get the plate base
+
+    try:
+        plate_base = platename.split("_", 1)[0]  # Get the plate base
+    except Exception as e:
+        return "```Please finish setting up the configuration```", {}
+
     volume = store["mount"]  # Get the volume
     file_structure = store["file_structure"]  # Get the file structure
 
@@ -251,6 +284,9 @@ def update_preview_image(n_clicks, store):
                 # Open the image and create a figure
                 fig = create_figure_from_filepath(img_path)
                 return f"```{img_path}```", fig
+
+    # Default return if no conditions are met
+    return "", {}
 
 
 @callback(
@@ -411,7 +447,30 @@ def run_analysis(
             +- True : The button is disabled
             +- False : The button is enabled
     """
-    # Check if the button has been clicked
-    if nclicks:
+    try:
 
-        return preview_callback_functions(store)
+        # Check if the store is empty or has None values for essential elements
+        if not store:
+            return (
+                "",
+                {},
+                True,
+                "",
+                True,
+            )
+
+        if store["platename"] == None or store["mount"] == None:
+            return (
+                "",
+                {},
+                True,
+                "",
+                True,
+            )
+
+        # Check if the button has been clicked
+        if nclicks:
+
+            return preview_callback_functions(store)
+    except Exception as e:
+        return f"```{str(e)}```", {}, True, f"```{str(e)}```", True
