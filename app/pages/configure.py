@@ -5,19 +5,14 @@
 ########################################################################
 
 import dash
-from dash import callback, html
-from dash.dependencies import Input, Output, State
-from app.utils.callback_functions import create_df_from_inputs
-from dash import dash_table
+from dash import callback, html, Input, Output, State, dash_table
 import itertools
 import yaml
 from pathlib import Path
-from app.utils.callback_functions import prep_yaml
 import os
 
 # Importing Components and functions
-from app.utils.callback_functions import create_figure_from_url
-
+from app.utils.callback_functions import create_df_from_inputs, prep_yaml
 from app.components.configure_layout import configure_layout
 
 # Registering this page

@@ -5,8 +5,7 @@
 ########################################################################
 
 import dash
-from dash import callback
-from dash.dependencies import Input, Output, State
+from dash import callback, Input, Output, State
 import time
 from pathlib import Path
 import os
@@ -21,10 +20,6 @@ from app.components.test_scripts.preview_page_test import (
 )
 
 dash.register_page(__name__)
-
-# Assuming we have a fixed height for the headers and buttons in CSS
-fixed_header_class = "fixed-header"
-fixed_button_class = "fixed-button"
 
 ########################################################################
 ####                                                                ####
@@ -278,8 +273,12 @@ def update_preview_image(n_clicks, store):
             img_path = Path(
                 volume, "input", f"{platename}/TimePoint_1/{platename}_{first_well}.TIF"
             )
+
+            # Should try and figure out an alternative to this
+            # potential brick mechanism for the user
             while not os.path.exists(img_path):
                 time.sleep(1)
+
             if os.path.exists(img_path):
                 # Open the image and create a figure
                 fig = create_figure_from_filepath(img_path)
@@ -327,6 +326,7 @@ def get_options_preview(nclicks, store):
         # check to see if the button has been clicked (nclicks)
         if nclicks is not None:
             return selection_dict  # return the option dictionary
+
     elif pipeline_selection == "fecundity":
 
         # create the options
@@ -340,6 +340,7 @@ def get_options_preview(nclicks, store):
         # check to see if the button has been clicked (nclicks)
         if nclicks is not None:
             return selection_dict
+
     elif pipeline_selection == "tracking":
 
         # create the options
@@ -348,6 +349,7 @@ def get_options_preview(nclicks, store):
         # check to see if the button has been clicked (nclicks)
         if nclicks is not None:
             return selection_dict
+
     elif pipeline_selection == "wormsize_intensity_cellpose":
 
         # create the options
@@ -360,6 +362,7 @@ def get_options_preview(nclicks, store):
         # check to see if the button has been clicked (nclicks)
         if nclicks is not None:
             return selection_dict
+
     elif pipeline_selection == "mf_celltox":
 
         # create the options
@@ -368,6 +371,7 @@ def get_options_preview(nclicks, store):
         # check to see if the button has been clicked (nclicks)
         if nclicks is not None:
             return selection_dict
+
     elif pipeline_selection == "wormsize":
         # create the options
         selection_dict = {"raw": "raw", "straightened_worms": "straightened_worms"}
@@ -375,6 +379,7 @@ def get_options_preview(nclicks, store):
         # check to see if the button has been clicked (nclicks)
         if nclicks is not None:
             return selection_dict
+
     elif pipeline_selection == "feeding":
         # obtain the wavelength options
         volume = store["mount"]
@@ -393,6 +398,7 @@ def get_options_preview(nclicks, store):
         all_files = list(input_file_path.glob(pattern))
         # Extracting unique identifiers from filenames (e.g., _w1, _w2, etc.)
         wavelengths = set()
+
         for file_path in all_files:
             parts = file_path.name.split("_")
             if (

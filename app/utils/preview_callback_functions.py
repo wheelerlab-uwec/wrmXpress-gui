@@ -6,16 +6,15 @@
 
 from pathlib import Path
 import os
-from pathlib import Path
-import os
 import subprocess
 import time
 import shlex
 
-from app.utils.callback_functions import update_yaml_file, clean_and_create_directories
 from app.utils.callback_functions import (
     copy_files_to_input_directory,
     create_figure_from_filepath,
+    clean_and_create_directories,
+    update_yaml_file,
 )
 
 ########################################################################
@@ -304,6 +303,8 @@ def motility_segment_fecundity_preview(store):
             print("Running wrmXpress.")
             docker_output.append("Running wrmXpress.")
 
+            # Should try and figure out an alternative to this
+            # potential brick mechanism for the user
             while not os.path.exists(Path(volume, "input")):
                 time.sleep(1)
 
@@ -335,6 +336,7 @@ def motility_segment_fecundity_preview(store):
                     f"wrmXpress has failed, please check the {output_preview_log_file} for more information.",
                     True,
                 )
+
     except Exception as e:
         error_message = f"An error occurred: {str(e)}"
         return (
@@ -429,6 +431,7 @@ def cellprofile_wormsize_preview(store):
                     f"wrmXpress has failed, please check the {output_preview_log_file} for more information.",
                     True,
                 )
+
     except Exception as e:
         error_message = f"An error occurred: {str(e)}"
         return (
@@ -519,6 +522,7 @@ def cellprofile_wormsize_intensity_cellpose_preview(store):
                 print("wrmXpress is finished")
                 # Return the command message, the figure, and the open status of the alerts
                 return command_message, fig, False, f"", False
+
             else:
                 return (
                     command_message,
@@ -630,6 +634,7 @@ def cellprofile_mf_celltox_preview(store):
                 print("wrmXpress is finished")
                 # Return the command message, the figure, and the open status of the alerts
                 return command_message, fig, False, f"", False
+
             else:
                 return (
                     command_message,
@@ -638,6 +643,7 @@ def cellprofile_mf_celltox_preview(store):
                     f"wrmXpress has failed, please check the {output_preview_log_file} for more information.",
                     True,
                 )
+
     except Exception as e:
         error_message = f"An error occurred: {str(e)}"
         return (
@@ -842,6 +848,7 @@ def tracking_wrmXpress_preview(store):
                     f"wrmXpress has failed, please check the {output_preview_log_file} for more information.",
                     True,
                 )
+
     except Exception as e:
         error_message = f"An error occurred: {str(e)}"
         return (

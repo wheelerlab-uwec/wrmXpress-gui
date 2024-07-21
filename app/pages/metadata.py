@@ -4,8 +4,7 @@
 ####                                                                ####
 ########################################################################
 import dash
-from dash.dependencies import Input, Output, State
-from dash import dcc, html, callback, dash_table
+from dash import dcc, html, callback, dash_table, Input, Output, State
 import pandas as pd
 from pathlib import Path
 import os

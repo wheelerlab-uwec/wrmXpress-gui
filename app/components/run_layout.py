@@ -10,10 +10,6 @@ from dash import dcc, html
 # importing utils
 from app.utils.styling import layout, clear_alert_style
 
-# Assuming we have a fixed height for the headers and buttons in CSS
-fixed_header_class = "fixed-header"
-fixed_button_class = "fixed-button"
-
 ########################################################################
 ####                                                                ####
 ####                              Layout                            ####

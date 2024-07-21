@@ -4,8 +4,7 @@
 ####                                                                ####
 ########################################################################
 
-from dash import callback
-from dash.dependencies import Input, Output, State
+from dash import callback, Input, Output, State
 from pathlib import Path
 import os
 import dash
@@ -22,10 +21,6 @@ cache = diskcache.Cache("./cache")
 long_callback_manager = DiskcacheLongCallbackManager(cache)
 
 dash.register_page(__name__, long_callback_manager=long_callback_manager)
-
-# Assuming we have a fixed height for the headers and buttons in CSS
-fixed_header_class = "fixed-header"
-fixed_button_class = "fixed-button"
 
 ########################################################################
 ####                                                                ####
@@ -132,6 +127,7 @@ def load_analysis_img(selection, n_clicks, store):
                         f"{plate_base}_{wells[0]}"
                     ) or file_path.name.startswith(f"{plate_base}-{wells[0]}"):
                         straightened_worm_files.append(file_path)
+
                 if straightened_worm_files:
                     img_path = straightened_worm_files[0]  # Use the first matching file
 
