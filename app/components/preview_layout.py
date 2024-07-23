@@ -33,7 +33,10 @@ preview_layout = dbc.ModalBody(
                                                     },
                                                 ),
                                             ],
-                                            style={"height": "10%"},
+                                            style={
+                                                "margin-bottom": "10px",
+                                                "margin-top": "10px",
+                                            },
                                         ),
                                         dbc.Row(
                                             [
@@ -52,8 +55,8 @@ preview_layout = dbc.ModalBody(
                                                 )
                                             ],
                                             style={
-                                                "margin-bottom": "6px",
-                                                "height": "10%",
+                                                "margin-bottom": "10px",
+                                                "margin-top": "10px",
                                             },
                                         ),
                                         dbc.Row(
@@ -79,8 +82,8 @@ preview_layout = dbc.ModalBody(
                                                 ),
                                             ],
                                             style={
-                                                "margin-bottom": "6px",
-                                                "height": "10%",
+                                                "margin-bottom": "10px",
+                                                "margin-top": "10px",
                                             },
                                         ),
                                         dbc.Row(
@@ -108,10 +111,16 @@ preview_layout = dbc.ModalBody(
                                                             ],
                                                             type="cube",  # Type of loading element (cube)
                                                             color="#3b4d61",  # Color of the loading element (wrmXpress) blue
+                                                            style={"padding": "0px"},
                                                         ),
                                                     ],
+                                                    style={"padding": "0px"},
                                                 ),
-                                            ]
+                                            ],
+                                            style={
+                                                "margin-bottom": "10px",
+                                                "margin-top": "10px",
+                                            },
                                         ),
                                     ],
                                 ),
@@ -129,11 +138,13 @@ preview_layout = dbc.ModalBody(
                                                     "Analysis Preview",
                                                     style={
                                                         "text-align": "center",
-                                                        "margin-bottom": "20px",
                                                     },
                                                 ),
                                             ],
-                                            style={"height": "10%"},
+                                            style={
+                                                "margin-bottom": "10px",
+                                                "margin-top": "10px",
+                                            },
                                         ),
                                         dbc.Row(
                                             [
@@ -145,7 +156,7 @@ preview_layout = dbc.ModalBody(
                                                             "textAlign": "left",
                                                             "margin-bottom": "10px",
                                                             "margin-top": "10px",
-                                                            "text-align": "center",
+                                                            "text-align": "left",
                                                         },
                                                     ),
                                                     width=8,
@@ -167,8 +178,8 @@ preview_layout = dbc.ModalBody(
                                                 ),
                                             ],
                                             style={
-                                                "margin-bottom": "6px",
-                                                "height": "10%",
+                                                "margin-bottom": "10px",
+                                                "margin-top": "10px",
                                             },
                                         ),
                                         dbc.Row(
@@ -178,7 +189,7 @@ preview_layout = dbc.ModalBody(
                                                         html.P(
                                                             "Path to diagnostic image:"
                                                         ),
-                                                    ]
+                                                    ],
                                                 ),
                                                 dbc.Row(
                                                     [
@@ -206,8 +217,8 @@ preview_layout = dbc.ModalBody(
                                                 ),
                                             ],
                                             style={
-                                                "margin-bottom": "6px",
-                                                "height": "10%",
+                                                "margin-bottom": "10px",
+                                                "margin-top": "10px",
                                             },
                                         ),
                                         dbc.Row(
@@ -220,6 +231,7 @@ preview_layout = dbc.ModalBody(
                                                         dcc.Loading(
                                                             # Loading element for preview image
                                                             id="loading-2",
+                                                            style={"padding": "0px"},
                                                             children=[
                                                                 html.Div(
                                                                     [
@@ -230,14 +242,21 @@ preview_layout = dbc.ModalBody(
                                                                                 "layout": layout
                                                                             },
                                                                             className="h-100 w-100",
+                                                                            style={
+                                                                                "padding": "0px"
+                                                                            },
                                                                         ),
-                                                                    ]
+                                                                    ],
+                                                                    style={
+                                                                        "padding": "0px"
+                                                                    },
                                                                 )
                                                             ],
                                                             type="cube",  # Type of loading element (cube)
                                                             color="#3b4d61",  # Color of the loading element (wrmXpress) blue
                                                         ),
                                                     ],
+                                                    style={"padding": "0px"},
                                                 ),
                                                 dbc.Alert(
                                                     # Alert for post analysis first well image view
@@ -248,6 +267,7 @@ preview_layout = dbc.ModalBody(
                                                         dcc.Loading(
                                                             # Loading element for post analysis first well image
                                                             id="loading-2",
+                                                            style={"padding": "0px"},
                                                             children=[
                                                                 html.Div(
                                                                     [
@@ -258,16 +278,27 @@ preview_layout = dbc.ModalBody(
                                                                                 "layout": layout
                                                                             },
                                                                             className="h-100 w-100",
+                                                                            style={
+                                                                                "padding": "0px"
+                                                                            },
                                                                         ),
-                                                                    ]
+                                                                    ],
+                                                                    style={
+                                                                        "padding": "0px"
+                                                                    },
                                                                 )
                                                             ],
                                                             type="cube",  # Type of loading element (cube)
                                                             color="#3b4d61",  # Color of the loading element (wrmXpress) blue
                                                         ),
                                                     ],
+                                                    style={"padding": "0px"},
                                                 ),
-                                            ]
+                                            ],
+                                            style={
+                                                "margin-bottom": "10px",
+                                                "margin-top": "10px",
+                                            },
                                         ),
                                     ]
                                 ),
