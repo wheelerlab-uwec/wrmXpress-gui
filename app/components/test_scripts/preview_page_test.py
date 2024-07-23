@@ -107,7 +107,7 @@ def test_006_preview_page(dash_duo):
 
 error_test = {
     "cols": 420,
-    "rows": 69,
+    "rows": 42,
     "mount": "wheeler-lab",
     "platename": "wrmXpress_gui",
     "wells": [],
