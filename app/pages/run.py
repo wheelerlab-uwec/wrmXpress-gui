@@ -4,8 +4,7 @@
 ####                                                                ####
 ########################################################################
 
-from dash import callback
-from dash.dependencies import Input, Output, State
+from dash import callback, Input, Output, State
 from pathlib import Path
 import os
 import dash
@@ -128,6 +127,7 @@ def load_analysis_img(selection, n_clicks, store):
                         f"{plate_base}_{wells[0]}"
                     ) or file_path.name.startswith(f"{plate_base}-{wells[0]}"):
                         straightened_worm_files.append(file_path)
+
                 if straightened_worm_files:
                     img_path = straightened_worm_files[0]  # Use the first matching file
 

@@ -4,8 +4,7 @@
 ####                                                                ####
 ########################################################################
 import dash
-from dash.dependencies import Input, Output, State
-from dash import dcc, html, callback, dash_table
+from dash import dcc, html, callback, dash_table, Input, Output, State
 import pandas as pd
 from pathlib import Path
 import os
@@ -188,6 +187,16 @@ def save_the_metadata_tables_to_csv(n_clicks, metadata_tabs, store):
     """
     # If no store is available, return an error message and disable the button
     if not store:
+        return (
+            "primary",
+            True,
+            "No configuration found. Please go to the configuration page to set up the analysis.",
+            "danger",
+            True,
+        )
+
+    # check if the store values are none
+    if store["mount"] is None or store["platename"] is None:
         return (
             "primary",
             True,

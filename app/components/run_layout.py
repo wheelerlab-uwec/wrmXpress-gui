@@ -32,7 +32,11 @@ run_layout = dbc.ModalBody(
                                                     "Configuration Summary",
                                                     style={"text-align": "center"},
                                                 ),
-                                            ]
+                                            ],
+                                            style={
+                                                "margin-bottom": "10px",
+                                                "margin-top": "10px",
+                                            },
                                         ),
                                         dbc.Row(
                                             [
@@ -48,7 +52,11 @@ run_layout = dbc.ModalBody(
                                                             "text-align": "center",
                                                         },
                                                     ),
-                                                    width={"offset": 2},
+                                                    style={
+                                                        "width": "50%",
+                                                        "display": "flex",
+                                                        "justify-content": "center",  # Center horizontally
+                                                    },
                                                 ),
                                                 dbc.Col(
                                                     dbc.Button(
@@ -60,13 +68,20 @@ run_layout = dbc.ModalBody(
                                                         style={
                                                             "margin-bottom": "10px",
                                                             "margin-top": "10px",
-                                                            "margin-left": "-30px",
                                                             "text-align": "center",
                                                         },
                                                     ),
-                                                    width={"offset": 0},
+                                                    style={
+                                                        "width": "50%",
+                                                        "display": "flex",
+                                                        "justify-content": "center",  # Center horizontally
+                                                    },
                                                 ),
                                             ],
+                                            style={
+                                                "margin-bottom": "10px",
+                                                "margin-top": "10px",
+                                            },
                                         ),
                                         dbc.Row(
                                             dbc.Progress(
@@ -76,7 +91,16 @@ run_layout = dbc.ModalBody(
                                                 color="primary",
                                                 value=0,
                                                 animated=True,
+                                                style={
+                                                    "margin-bottom": "15px",
+                                                    "margin-top": "15px",
+                                                },
                                             ),
+                                            style={
+                                                "margin-bottom": "15px",
+                                                "margin-top": "15px",
+                                            },
+                                            className="align-items-center",  # This centers the progress bar vertically
                                         ),
                                         dbc.Row(
                                             [
@@ -95,15 +119,22 @@ run_layout = dbc.ModalBody(
                                                     ],
                                                     className="div-with-scroll",
                                                     style={
-                                                        "height": "490px",
+                                                        # "height": "490px",
                                                         "overflowY": "scroll",  # Always show vertical scrollbar
                                                         "margin-top": "10px",
+                                                        "margin-bottom": "10px",
+                                                        "max-height": "550px",
                                                     },
                                                 ),
-                                            ]
+                                            ],
+                                            style={
+                                                "margin-bottom": "10px",
+                                                "margin-top": "10px",
+                                            },
                                         ),
                                     ]
-                                )
+                                ),
+                                style={"height": "99%"},
                             ),
                             width=6,
                         ),
@@ -118,15 +149,27 @@ run_layout = dbc.ModalBody(
                                                     style={"text-align": "center"},
                                                 ),
                                             ],
+                                            style={
+                                                "margin-bottom": "10px",
+                                                "margin-top": "10px",
+                                            },
                                         ),
                                         dbc.Row(
                                             [
                                                 dbc.Col(
-                                                    dcc.Dropdown(
-                                                        # Dropdown for analysis
-                                                        id="analysis-dropdown",
-                                                        placeholder="Select diagnostic image to view...",
-                                                    ),
+                                                    [
+                                                        dcc.Dropdown(
+                                                            # Dropdown for analysis
+                                                            id="analysis-dropdown",
+                                                            placeholder="Select diagnostic image to view...",
+                                                            style={
+                                                                "textAlign": "left",
+                                                                "margin-bottom": "10px",
+                                                                "margin-top": "10px",
+                                                                "text-align": "left",
+                                                            },
+                                                        )
+                                                    ],
                                                     width=8,
                                                 ),
                                                 dbc.Col(
@@ -135,10 +178,19 @@ run_layout = dbc.ModalBody(
                                                         id="load-analysis-img",
                                                         children="Load image",
                                                         disabled=True,
+                                                        style={
+                                                            "margin-bottom": "10px",
+                                                            "margin-top": "10px",
+                                                            "text-align": "center",
+                                                        },
                                                     ),
                                                     width=4,
                                                 ),
-                                            ]
+                                            ],
+                                            style={
+                                                "margin-bottom": "10px",
+                                                "margin-top": "10px",
+                                            },
                                         ),
                                         dbc.Row(
                                             [
@@ -150,7 +202,12 @@ run_layout = dbc.ModalBody(
                                                             className="card-subtitle",
                                                             style={"margin-top": "7px"},
                                                         )
-                                                    ]
+                                                    ],
+                                                    # style={"width": "30%"},
+                                                    style={
+                                                        "margin-bottom": "10px",
+                                                        "margin-top": "10px",
+                                                    },
                                                 ),
                                                 dbc.Row(
                                                     [
@@ -178,9 +235,18 @@ run_layout = dbc.ModalBody(
                                                                 ),
                                                             ],
                                                         ),
-                                                    ]
+                                                    ],
+                                                    # style={"width": "70%"},
+                                                    style={
+                                                        "margin-bottom": "10px",
+                                                        "margin-top": "10px",
+                                                    },
                                                 ),
-                                            ]
+                                            ],
+                                            style={
+                                                "margin-bottom": "10px",
+                                                "margin-top": "10px",
+                                            },
                                         ),
                                         dbc.Row(
                                             [
@@ -189,19 +255,37 @@ run_layout = dbc.ModalBody(
                                                     color="light",
                                                     is_open=True,
                                                     children=[
-                                                        html.Div(
-                                                            [
-                                                                dcc.Graph(
-                                                                    # Image analysis preview
-                                                                    id="image-analysis-preview",
-                                                                    figure={
-                                                                        "layout": layout
+                                                        dcc.Loading(
+                                                            id="loading-img-run-analysis",
+                                                            type="cube",
+                                                            color="#3b4d61",  # Color of the loading element (wrmXpress) blue
+                                                            children=[
+                                                                html.Div(
+                                                                    [
+                                                                        dcc.Graph(
+                                                                            # Image analysis preview
+                                                                            id="image-analysis-preview",
+                                                                            figure={
+                                                                                "layout": layout
+                                                                            },
+                                                                            className="h-100 w-100",
+                                                                            style={
+                                                                                "padding": "0px"
+                                                                            },
+                                                                        ),
+                                                                    ],
+                                                                    style={
+                                                                        "padding": "0px"
                                                                     },
-                                                                    className="h-100 w-100",
                                                                 ),
-                                                            ]
-                                                        )
+                                                            ],
+                                                            style={
+                                                                "padding": "0px",
+                                                                "display": "none",
+                                                            },
+                                                        ),
                                                     ],
+                                                    style={"padding": "0px"},
                                                 ),
                                                 dbc.Alert(
                                                     # Alert for additional view of analysis
@@ -209,24 +293,49 @@ run_layout = dbc.ModalBody(
                                                     color="light",
                                                     is_open=True,
                                                     children=[
-                                                        html.Div(
-                                                            [
-                                                                dcc.Graph(
-                                                                    # Image analysis postview
-                                                                    id="analysis-postview",
-                                                                    figure={
-                                                                        "layout": layout
+                                                        dcc.Loading(
+                                                            id="loading-img-run-analysis-update",
+                                                            type="cube",
+                                                            loading_state={
+                                                                "is_loading": False
+                                                            },
+                                                            color="#3b4d61",  # Color of the loading element (wrmXpress) blue
+                                                            children=[
+                                                                html.Div(
+                                                                    [
+                                                                        dcc.Graph(
+                                                                            # Image analysis postview
+                                                                            id="analysis-postview",
+                                                                            figure={
+                                                                                "layout": layout
+                                                                            },
+                                                                            className="h-100 w-100",
+                                                                            style={
+                                                                                "padding": "0px"
+                                                                            },
+                                                                        ),
+                                                                    ],
+                                                                    style={
+                                                                        "padding": "0px"
                                                                     },
-                                                                    className="h-100 w-100",
-                                                                ),
-                                                            ]
-                                                        )
+                                                                )
+                                                            ],
+                                                            style={"padding": "0px"},
+                                                        ),
                                                     ],
+                                                    style={"padding": "0px"},
                                                 ),
-                                            ]
+                                            ],
+                                            # className="align-items-end",  # Align items to the bottom
+                                            # style={"height": "100%"},
+                                            style={
+                                                "margin-bottom": "10px",
+                                                "margin-top": "10px",
+                                            },
                                         ),
                                     ]
-                                )
+                                ),
+                                style={"height": "99%"},
                             ),
                             width=6,
                         ),
@@ -257,10 +366,14 @@ run_layout = dbc.ModalBody(
                         ),
                     ],
                     className="h-10",
-                    style={"margin-top": "10px"},
+                    style={
+                        "margin-bottom": "10px",
+                        "margin-top": "10px",
+                    },
                 ),
             ],
             fluid=True,
+            style={"height": "100vh"},
         )
     ]
 )

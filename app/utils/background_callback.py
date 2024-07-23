@@ -7,19 +7,16 @@
 import pandas as pd
 from pathlib import Path
 import os
-import pandas as pd
-from pathlib import Path
-import os
 import subprocess
 import time
 import shlex
 import re
 
-from app.utils.callback_functions import create_figure_from_filepath
 from app.utils.callback_functions import (
     update_yaml_file,
     clean_and_create_directories,
     copy_files_to_input_directory,
+    create_figure_from_filepath,
 )
 
 ########################################################################
@@ -404,6 +401,8 @@ def fecundity_run(store, set_progress):
         platename = new_store["platename"]
         plate_base = platename.split("_", 1)[0]
 
+        # Should try and figure out an alternative to this
+        # potential brick mechanism for the user
         while not os.path.exists(output_folder):
             time.sleep(1)
 
@@ -507,6 +506,8 @@ def cellprofile_wormsize_run(store, set_progress):
         plate_base = platename.split("_", 1)[0]
         pipeline_selection = store["pipeline_selection"]
 
+        # Should try and figure out an alternative to this
+        # potential brick mechanism for the user
         while not os.path.exists(output_folder):
             time.sleep(1)
 
@@ -610,6 +611,8 @@ def cellprofile_wormsize_intesity_cellpose_run(store, set_progress):
         plate_base = platename.split("_", 1)[0]
         pipeline_selection = store["pipeline_selection"]
 
+        # Should try and figure out an alternative to this
+        # potential brick mechanism for the user
         while not os.path.exists(output_folder):
             time.sleep(1)
 
@@ -730,6 +733,8 @@ def cellprofile_mf_celltox_run(store, set_progress):
         plate_base = platename.split("_", 1)[0]
         pipeline_selection = store["pipeline_selection"]
 
+        # Should try and figure out an alternative to this
+        # potential brick mechanism for the user
         while not os.path.exists(output_folder):
             time.sleep(1)
 
@@ -840,6 +845,8 @@ def cellprofile_feeding_run(store, set_progress):
         plate_base = platename.split("_", 1)[0]
         pipeline_selection = store["pipeline_selection"]
 
+        # Should try and figure out an alternative to this
+        # potential brick mechanism for the user
         while not os.path.exists(output_folder):
             time.sleep(1)
 
@@ -917,6 +924,8 @@ def run_wrmXpress_avi_selection_tracking(new_store, set_progress):
     wells_analyzed = new_store["wells_analyzed"]
     tracking_well = new_store["tracking_well"]
 
+    # Should try and figure out an alternative to this
+    # potential brick mechanism for the user
     while not os.path.exists(output_folder):
         time.sleep(1)
 
@@ -991,6 +1000,8 @@ def run_wrmXpress_imagexpress_selection_tracking(new_store, set_progress):
     platename = new_store["platename"]
     tracking_well = new_store["tracking_well"]
 
+    # Should try and figure out an alternative to this
+    # potential brick mechanism for the user
     while not os.path.exists(output_folder):
         time.sleep(1)
 
@@ -1041,6 +1052,8 @@ def run_wrmXpress_avi_selection_motility(new_store, set_progress):
     platename = new_store["platename"]
     plate_base = platename.split("_", 1)[0]
 
+    # Should try and figure out an alternative to this
+    # potential brick mechanism for the user
     while not os.path.exists(output_folder):
         time.sleep(1)
 
@@ -1109,6 +1122,8 @@ def run_wrmXpress_imagexpress_selection_motility(new_store, set_progress):
     platename = new_store["platename"]
     plate_base = platename.split("_", 1)[0]
 
+    # Should try and figure out an alternative to this
+    # potential brick mechanism for the user
     while not os.path.exists(output_folder):
         time.sleep(1)
 
@@ -1179,9 +1194,11 @@ def process_reconfiguring_wells(
         "TimePoint_1",
         f"{platename}_{reconfiguring_well[-1]}.TIF",
     )
-    # ensure file path exists
+    # Should try and figure out an alternative to this
+    # potential brick mechanism for the user
     while not os.path.exists(current_well_path):
         time.sleep(1)
+
     # create figure from file path
     fig = create_figure_from_filepath(current_well_path)
     docker_output_formatted = "".join(docker_output)
@@ -1275,7 +1292,9 @@ def process_tracking_wells(
         "TimePoint_1",
         f"{platename}_{tracking_well[-1]}.TIF",
     )
-    # ensure file path exists
+
+    # Should try and figure out an alternative to this
+    # potential brick mechanism for the user
     while not os.path.exists(current_well_path):
         time.sleep(1)
 
@@ -1311,11 +1330,16 @@ def process_img_number(
         additional_wells = wells
 
     csv_file_path = Path(volume, "input", f"image_paths_{pipeline_selection}.csv")
+
+    # Should try and figure out an alternative to this
+    # potential brick mechanism for the user
     while not os.path.exists(csv_file_path):
         time.sleep(1)
+
     read_csv = pd.read_csv(csv_file_path)
     well_column = read_csv["Metadata_Well"]
     image_number_pattern = re.search(r"Image # (\d+)", line)
+
     if image_number_pattern:
         image_number_pattern
         image_number = int(image_number_pattern.group(1))
@@ -1324,6 +1348,7 @@ def process_img_number(
             volume,
             f"{platename}/TimePoint_1/{plate_base}_{well_id}",
         )
+
         if well_id not in wells_analyzed:
             wells_analyzed.append(well_id)
 
@@ -1336,6 +1361,7 @@ def process_img_number(
             file_paths_sorted = sorted(file_paths, key=lambda x: x.stem)
             # Select the first file (with the lowest number) if multiple matches are found
             img_path = file_paths_sorted[0]
+
         else:
             # Fallback if no matching files are found
             img_path = well_base_path.with_suffix(
@@ -1371,13 +1397,16 @@ def process_info_and_percent(
     info_parts = line.split("/")
     info_well_analyzed = info_parts[0].split(" ")[-1]
     info_total_wells = info_parts[1].split(" ")[0]
+
     if info_well_analyzed == info_total_wells:
         current_well = wells[int(info_well_analyzed) - 1]
         img_path = Path(
             volume,
             f"input/{platename}/TimePoint_1/{plate_base}_{current_well}.TIF",
         )
+
         info_and_percent_wells.append(current_well)
+
         if os.path.exists(img_path):
             fig = create_figure_from_filepath(img_path)
             docker_output_formatted = "".join(docker_output)
@@ -1391,6 +1420,7 @@ def process_info_and_percent(
                     f"```{docker_output_formatted}```",
                 )
             )
+
     else:
         current_well = wells[int(info_well_analyzed)]
         img_path = Path(
@@ -1417,11 +1447,13 @@ def handle_thumbnail_generation(volume, platename, docker_output, output_file):
     file_paths = list(
         output_path_base.parent.rglob(output_path_base.name + "*[._][pP][nN][gG]")
     )
+
     # Sort the matching files to find the one with the lowest suffix number
     if file_paths:
         file_paths_sorted = sorted(file_paths, key=lambda x: x.stem)
         # Select the first file (with the lowest number) if multiple matches are found
         output_path = file_paths_sorted[0]
+
     else:
         # Fallback if no matching files are found
         output_path = output_path_base.with_suffix(
@@ -1441,6 +1473,7 @@ def handle_thumbnail_generation(volume, platename, docker_output, output_file):
             f"```{docker_output_formatted}```",
             f"```{output_path}```",
         )
+
     else:
 
         error_message = f"Thumbnail generation failed, please check the {output_file}."

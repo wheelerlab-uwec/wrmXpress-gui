@@ -13,12 +13,8 @@ import numpy as np
 from PIL import Image
 import plotly.express as px
 import yaml
-import plotly.express as px
 import glob
 import tifffile as tiff
-from skimage import exposure
-import pandas as pd
-from pathlib import Path
 from skimage import exposure
 
 ########################################################################
