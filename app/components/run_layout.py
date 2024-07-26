@@ -84,16 +84,20 @@ run_layout = dbc.ModalBody(
                                             },
                                         ),
                                         dbc.Row(
-                                            dbc.Progress(
-                                                # Progress bar for run page
-                                                id="progress-bar-run-page",
-                                                striped=True,
-                                                color="primary",
-                                                value=0,
-                                                animated=True,
+                                            dbc.Col(
+                                                dbc.Progress(
+                                                    id="progress-bar-run-page",
+                                                    striped=True,
+                                                    color="primary",
+                                                    value=0,
+                                                    animated=True,
+                                                    style={
+                                                        "margin-bottom": "15px",
+                                                        "margin-top": "15px",
+                                                    },
+                                                ),
                                                 style={
-                                                    "margin-bottom": "15px",
-                                                    "margin-top": "15px",
+                                                    "padding": "0",  # Remove padding from the column to ensure full-width alignment
                                                 },
                                             ),
                                             style={
@@ -268,9 +272,10 @@ run_layout = dbc.ModalBody(
                                                                             figure={
                                                                                 "layout": layout
                                                                             },
-                                                                            className="h-100 w-100",
                                                                             style={
-                                                                                "padding": "0px"
+                                                                                "padding": "0px",
+                                                                                "height": "100%",
+                                                                                "width": "100%",
                                                                             },
                                                                         ),
                                                                     ],
@@ -309,9 +314,10 @@ run_layout = dbc.ModalBody(
                                                                             figure={
                                                                                 "layout": layout
                                                                             },
-                                                                            className="h-100 w-100",
                                                                             style={
-                                                                                "padding": "0px"
+                                                                                "padding": "0px",
+                                                                                "height": "100%",
+                                                                                "width": "100%",
                                                                             },
                                                                         ),
                                                                     ],

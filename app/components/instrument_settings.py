@@ -29,7 +29,10 @@ instrument_settings = dbc.AccordionItem(
                                 ),
                                 dbc.Tooltip(
                                     # Tooltip element for information symbol, displays message when cursor over the symbol
-                                    "Select Single Well if each video or image only includes a single well. Select Multi Well if each video/image contains multiple wells that need to be split.",
+                                    html.P(
+                                        "Select Single Well if each video/image only includes a single well. Select Multi Well if each video/image contains multiple wells that need to be split.",
+                                        style={"text-align": "left"},
+                                    ),
                                     placement="bottom",
                                     target="imaging-mode-symbol",
                                 ),
@@ -93,9 +96,13 @@ instrument_settings = dbc.AccordionItem(
                             ),
                             dbc.Tooltip(
                                 # Tooltip element for information symbol, displays message when cursor over the symbol
-                                "Select ImageXpress if the data is saved in an IX-like structure. Select AVI if the data is a single video saved as an AVI.",
+                                html.P(
+                                    "Select ImageXpress if the data is saved in an IX-like structure (see Info). Select AVI if the data is a single video saved as an AVI.",
+                                    style={"text-align": "left"},
+                                ),
                                 placement="bottom",
                                 target="file-structure-symbol",
+                                style={"text-align": "left"},
                             ),
                             dbc.RadioItems(
                                 # Radio selection items for ImageXpress or AVI
@@ -128,12 +135,24 @@ instrument_settings = dbc.AccordionItem(
                                 )
                             ),
                             dbc.Tooltip(
-                                # Tooltip element for text "cropping items", displays message when cursor over the text
-                                "Select the method of cropping wells. \
-                            Auto: incorporates a Hough transform in an attempt to automatically identify circular wells.\
-                            Grid: Crops a grid based on the provided number of columns and rows.",
+                                [
+                                    # Tooltip element for text "cropping items", displays message when cursor over the text
+                                    html.P(
+                                        "Select the method of cropping wells.",
+                                        style={"text-align": "left"},
+                                    ),
+                                    html.P(
+                                        "Auto: incorporates a Hough transform in an attempt to automatically identify circular wells.",
+                                        style={"text-align": "left"},
+                                    ),
+                                    html.P(
+                                        "Grid: Crops a grid based on the provided number of columns and rows.",
+                                        style={"text-align": "left"},
+                                    ),
+                                ],
                                 placement="bottom",
                                 target="crop-options",
+                                style={"text-align": "left"},
                             ),
                             dbc.RadioItems(
                                 # Radio button selection of Auto or Grid
@@ -177,9 +196,13 @@ instrument_settings = dbc.AccordionItem(
                             id="tot-num-cols-and-rows-symbol",
                         ),
                         dbc.Tooltip(
-                            "Input the total number of rows and columns in the plate. If none provided, defaults to 12 columns and 8 rows",
+                            html.P(
+                                "Input the total number of rows and columns in the plate. If none provided, defaults to 12 columns and 8 rows",
+                                style={"text-align": "left"},
+                            ),
                             placement="bottom",
                             target="tot-num-cols-and-rows-symbol",
+                            style={"text-align": "left"},
                         ),
                     ],
                     width="auto",

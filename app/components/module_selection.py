@@ -47,7 +47,7 @@ module_selection = dbc.AccordionItem(
                                         "value": "wormsize",
                                     },
                                 ],
-                                value="False",
+                                value=None,
                                 persistence=True,
                                 persistence_type="memory",
                             ),

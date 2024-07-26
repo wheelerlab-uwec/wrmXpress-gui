@@ -22,29 +22,47 @@ run_time_settings = dbc.AccordionItem(
                 dbc.Row(
                     [
                         # Title for Imaging mode
-                        html.H5("Directories:", id="directories-mode-header"),
-                        dbc.Col(
+                        html.H5("Directories", id="directories-mode-header"),
+                        dbc.Tooltip(
                             [
-                                dbc.Tooltip(
-                                    # Tooltip element for information symbol, displays message when cursor over the symbol
-                                    "Select Single Well if each video or image only includes a single well. Select Multi Well if each video/image contains multiple wells that need to be split.",
-                                    placement="left",
-                                    target="volume-path-label",
+                                # Tooltip element for information symbol, displays message when cursor over the symbol
+                                html.P(
+                                    "Running in Docker: use `/home/`.",
+                                    style={"text-align": "left"},
                                 ),
-                            ]
+                                html.P(
+                                    "Running natively: use the path to the parent directory that contains a directory of images.",
+                                    style={"text-align": "left"},
+                                ),
+                            ],
+                            placement="left",
+                            target="mounted-info-icon",
                         ),
-                        dbc.Col(
+                        html.H6("Volume Path:", id="volume-path-label"),
+                        html.Div(
                             [
-                                html.H6("Volume Path:", id="volume-path-label"),
+                                html.I(
+                                    className="fa-solid fa-circle-info",  # Information symbol
+                                    id="mounted-info-icon",
+                                    style={
+                                        "margin-right": "20px"
+                                    },  # Add some space between icon and input
+                                ),
                                 dbc.Input(  # Input field for the mounted volume path
                                     id="mounted-volume",
                                     placeholder="Path",
                                     type="text",
                                     persistence=True,
                                     persistence_type="memory",
+                                    style={
+                                        "flex": "2"
+                                    },  # Make the input take remaining space
                                 ),
                             ],
-                            width="middle",
+                            style={
+                                "display": "flex",
+                                "align-items": "center",
+                            },
                         ),
                     ],
                     align="center",
@@ -52,36 +70,90 @@ run_time_settings = dbc.AccordionItem(
             ]
         ),
         html.Br(),  # Line break for spacing
-        html.H6("Plate/Folder name:"),  # Label for the plate/folder name input field
-        dbc.Input(  # Input field for the plate/folder name
-            id="plate-name",
-            placeholder="Name",
-            type="text",
-            persistence=True,
-            persistence_type="memory",
+        html.Div(
+            [
+                dbc.Row(
+                    [
+                        html.H6(
+                            "Plate/Folder name:"
+                        ),  # Label for the plate/folder name input field
+                        html.Div(
+                            [
+                                dbc.Tooltip(
+                                    html.P(
+                                        "Name of the folder that contains imaging data structured as shown in Info.",
+                                        style={"text-align": "left"},
+                                    ),
+                                    placement="left",
+                                    target="plate-info-icon",
+                                ),
+                                html.I(
+                                    className="fa-solid fa-circle-info",
+                                    id="plate-info-icon",
+                                    style={"margin-right": "20px"},
+                                ),
+                                dbc.Input(  # Input field for the plate/folder name
+                                    id="plate-name",
+                                    placeholder="Name",
+                                    type="text",
+                                    persistence=True,
+                                    persistence_type="memory",
+                                    style={"flex": "2"},
+                                ),
+                            ],
+                            style={
+                                "display": "flex",
+                                "align-items": "center",
+                            },
+                        ),
+                    ]
+                ),
+            ]
         ),
         html.Br(),  # Line break for spacing
         html.Div(
             [
                 dbc.Row(
-                    [  # Row for wells input with info symbol and tooltip
+                    [
                         dbc.Col(
                             [
-                                dbc.Tooltip(
-                                    # Tooltip for well table symbol explaining multi select
-                                    "To multi select, hold down shift and use arrows, or copy paste from csv or from a document.",
-                                    placement="left",
-                                    target="well-table-header",
-                                ),
                                 html.H4("Wells", id="well-table-header"),
                             ],
-                            width="auto",  # Width of the column
-                        ),  # Section header for wells
+                            width="auto",
+                        ),
                     ],
-                    align="center",  # Center align the row
+                    align="center",
                 ),
-                html.P(
-                    "Edit the following table such that well IDs are only present for wells to be analyzed."
+                html.Div(
+                    [
+                        dbc.Tooltip(
+                            html.P(
+                                "To select a range of wells, hold down Shift + ←↑→↓, or copy/paste from a spreadsheet.",
+                                style={"text-align": "left"},
+                            ),
+                            placement="left",
+                            target="well-info-icon",
+                        ),
+                        html.I(
+                            className="fa-solid fa-circle-info",
+                            id="well-info-icon",
+                            style={"margin-right": "20px"},
+                        ),
+                        html.H6(
+                            "Edit the following table such that well IDs are only present for wells to be analyzed.",
+                            style={
+                                "text-align": "left",
+                                "flex": "2",
+                                "display": "flex",
+                                "align-items": "center",
+                                "margin-top": "5px",
+                            },
+                        ),
+                    ],
+                    style={
+                        "display": "flex",
+                        "align-items": "center",  # Align items vertically centered
+                    },
                 ),
             ]
         ),

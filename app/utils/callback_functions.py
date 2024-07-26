@@ -361,9 +361,13 @@ def create_figure_from_filepath(img_path, scale="gray"):
 
     # Proceed with creating the figure using plotly
     fig = px.imshow(img, color_continuous_scale=scale)
-    fig.update_layout(coloraxis_showscale=False)
-    fig.update_xaxes(showticklabels=False)
-    fig.update_yaxes(showticklabels=False)
+    fig.update_layout(
+        coloraxis_showscale=False,
+        margin=dict(l=0, r=0, t=0, b=0),
+        xaxis=dict(showticklabels=False),
+        yaxis=dict(showticklabels=False),
+    )
+
     return fig
 
 
