@@ -78,7 +78,7 @@ run_time_settings = dbc.AccordionItem(
                             [
                                 dbc.Tooltip(
                                     html.P(
-                                        "To multi select, hold down shift and use arrows, or copy paste from csv or from a document.",
+                                        "To select a range of wells, hold down Shift + ←↑→↓, or copy/paste from a spreadsheet.",
                                         style={"text-align": "left"},
                                     ),
                                     placement="left",
