@@ -114,26 +114,46 @@ run_time_settings = dbc.AccordionItem(
         html.Div(
             [
                 dbc.Row(
-                    [  # Row for wells input with info symbol and tooltip
+                    [
                         dbc.Col(
                             [
-                                dbc.Tooltip(
-                                    html.P(
-                                        "To select a range of wells, hold down Shift + ←↑→↓, or copy/paste from a spreadsheet.",
-                                        style={"text-align": "left"},
-                                    ),
-                                    placement="left",
-                                    target="well-table-header",
-                                ),
                                 html.H4("Wells", id="well-table-header"),
                             ],
-                            width="auto",  # Width of the column
-                        ),  # Section header for wells
+                            width="auto",
+                        ),
                     ],
-                    align="center",  # Center align the row
+                    align="center",
                 ),
-                html.P(
-                    "Edit the following table such that well IDs are only present for wells to be analyzed."
+                html.Div(
+                    [
+                        dbc.Tooltip(
+                            html.P(
+                                "To select a range of wells, hold down Shift + ←↑→↓, or copy/paste from a spreadsheet.",
+                                style={"text-align": "left"},
+                            ),
+                            placement="left",
+                            target="well-info-icon",
+                        ),
+                        html.I(
+                            className="fa-solid fa-circle-info",
+                            id="well-info-icon",
+                            style={"margin-right": "20px"},
+                        ),
+                        html.H6(
+                            "Edit the following table such that well IDs are only present for wells to be analyzed.",
+                            style={
+                                "text-align": "left",
+                                "flex": "2",
+                                "display": "flex",
+                                "align-items": "center",
+                                "margin-top": "5px",
+                            },
+                        ),
+                    ],
+                    style={
+                        "display": "flex",
+                        "align-items": "center",  # Align items vertically centered
+                    },
                 ),
             ]
         ),
