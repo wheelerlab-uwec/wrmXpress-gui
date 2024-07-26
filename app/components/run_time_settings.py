@@ -27,7 +27,7 @@ run_time_settings = dbc.AccordionItem(
                             [
                                 dbc.Tooltip(
                                     # Tooltip element for information symbol, displays message when cursor over the symbol
-                                    "Select Single Well if each video or image only includes a single well. Select Multi Well if each video/image contains multiple wells that need to be split.",
+                                    "Docker, please us `/home/` as the root directory. Python, please use the file path of the root directory to the mounted volume.",
                                     placement="left",
                                     target="volume-path-label",
                                 ),

@@ -111,11 +111,11 @@ app.layout = html.Div(
             {"visibility": "visible"},
             {"visibility": "visible"},
         ),
-        # (
-        #     Output("progress-bar-run-page", "style"),
-        #     {"visibility": "visible"},
-        #     {"visibility": "visible"},
-        # ),
+        (
+            Output("progress-bar-run-page", "animated"),
+            True,
+            False,
+        ),
     ],
     cancel=[Input("cancel-analysis", "n_clicks")],
     progress=[

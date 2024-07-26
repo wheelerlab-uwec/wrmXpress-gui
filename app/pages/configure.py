@@ -266,6 +266,7 @@ def run_analysis(  # function to save the yaml file from the sections in the con
             +- 'success' : The color of the alert upon successful configuration
 
     """
+
     if nclicks:
 
         # try to catch any errors that may occur
@@ -279,6 +280,7 @@ def run_analysis(  # function to save the yaml file from the sections in the con
 
             # checks volume and plate names to ensure they are adequately named
             check_cases = [None, "", " "]
+
             if imagingmode == "multi-well":
                 if (
                     multiwellrows == None
@@ -413,9 +415,14 @@ def run_analysis(  # function to save the yaml file from the sections in the con
                         error_messages.append(
                             f"No images found for well {well}. This may result in unexpected errors or results."
                         )
-                if pipeline is None:
-                    error_occured = True
-                    error_messages.append("No pipeline selected.")
+            if pipeline is None:
+                error_occured = True
+                error_messages.append("No pipeline selected.")
+
+            if wells == []:
+                error_occured = True
+                error_messages.append("No wells selected.")
+
             # check to see if there was an error message
             if error_occured == True:
 
