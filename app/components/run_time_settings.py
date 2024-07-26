@@ -22,12 +22,21 @@ run_time_settings = dbc.AccordionItem(
                 dbc.Row(
                     [
                         # Title for Imaging mode
-                        html.H5("Directories:", id="directories-mode-header"),
+                        html.H5("Directories", id="directories-mode-header"),
                         dbc.Col(
                             [
                                 dbc.Tooltip(
-                                    # Tooltip element for information symbol, displays message when cursor over the symbol
-                                    "Docker, please us `/home/` as the root directory. Python, please use the file path of the root directory to the mounted volume.",
+                                    [
+                                        # Tooltip element for information symbol, displays message when cursor over the symbol
+                                        html.P(
+                                            "Running in Docker: use `/home/`.",
+                                            style={"text-align": "left"},
+                                        ),
+                                        html.P(
+                                            "Running natively: use the path to the parent directory that contains a directory of images.",
+                                            style={"text-align": "left"},
+                                        ),
+                                    ],
                                     placement="left",
                                     target="volume-path-label",
                                 ),
@@ -68,8 +77,10 @@ run_time_settings = dbc.AccordionItem(
                         dbc.Col(
                             [
                                 dbc.Tooltip(
-                                    # Tooltip for well table symbol explaining multi select
-                                    "To multi select, hold down shift and use arrows, or copy paste from csv or from a document.",
+                                    html.P(
+                                        "To multi select, hold down shift and use arrows, or copy paste from csv or from a document.",
+                                        style={"text-align": "left"},
+                                    ),
                                     placement="left",
                                     target="well-table-header",
                                 ),
