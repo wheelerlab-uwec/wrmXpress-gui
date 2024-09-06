@@ -6,12 +6,13 @@ theme: readthedocs
 
 nav:
   - Home: index.md
+  - Data organization: data_organization.md
   - Pipelines:
     - Motility: pipelines/motility.md
+    - Development: pipelines/development.md
     - Fecundity: pipelines/fecundity.md
     - Toxicity: pipelines/toxicity.md
     - Feeding: pipelines/feeding.md
-    - Development: pipelines/development.md
 
 plugins:
   - search
