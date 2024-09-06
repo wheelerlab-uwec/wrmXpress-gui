@@ -1,0 +1,24 @@
+site_name: wrmXpress-gui
+# site_url: https://example.com  # Customize with your project URL
+site_description: This is the documentation for the wrmXpress-gui package.
+
+theme: readthedocs
+
+nav:
+  - Home: index.md
+  - Pipelines:
+    - Motility: pipelines/motility.md
+    - Fecundity: pipelines/fecundity.md
+    - Toxicity: pipelines/toxicity.md
+    - Feeding: pipelines/feeding.md
+    - Development: pipelines/development.md
+
+plugins:
+  - search
+  - mkdocstrings
+
+markdown_extensions:
+  - admonition  # Enables 'Note' and 'Warning' blocks
+  - codehilite  # Enables syntax highlighting for code blocks
+  - toc         # Generates a table of contents for each page
+
