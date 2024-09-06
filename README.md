@@ -26,30 +26,30 @@ A Dash GUI for wrmXpress
 3. Use the search bar to find and pull the latest `wheelern/wrmxpress_gui` image from DockerHub:
    + Choose the most recent tag. The compressed image is >9 GB, so it will take a few minutes to pull.
 
-    <img src="readme_img/dd1.png" alt="step 2" width="500" />
+    <img src="docs/img/dd1.png" alt="step 2" width="500" />
 
 4. In the Images pane, click the Run symbol.
 
-    <img src="readme_img/dd2.png" alt="step 3" width="500" />
+    <img src="docs/img/dd2.png" alt="step 3" width="500" />
 
 5. Under Optional settings, make the following changes:
    + Under Ports, set the Host port to 9000
    + Under Volumes, set the Host path to be the path to the working directory created in step #1. Set the Container path to be `/home/`
 
-    <img src="readme_img/dd3.png" alt="step 3" width="500" />
+    <img src="docs/img/dd3.png" alt="step 3" width="500" />
 
 6. Click Run
 
 7. Click the link to 9000:9000 or navigate to `http://localhost:9000` to view the app.
 
-    <img src="readme_img/dd4.png" alt="step 4" width="500" />
+    <img src="docs/img/dd4.png" alt="step 4" width="500" />
 
 8. Follow the guidance in the GUI to prepare and run your analysis.
 
-    <img src="readme_img/dd5.png" alt="step 5" width="500" />
+    <img src="docs/img/dd5.png" alt="step 5" width="500" />
 
 ## Video walkthrough
-<a href="https://vimeo.com/986779390?share=copy" target="_blank"><img src="readme_img/thumb.jpg" 
+<a href="https://vimeo.com/986779390?share=copy" target="_blank"><img src="docs/img/thumb.jpg" 
 alt="wrmXpress Tutorial" width="500"/></a>
 
 *Will open a new tab*
