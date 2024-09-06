@@ -6,8 +6,12 @@ theme: readthedocs
 
 nav:
   - Home: index.md
-  - Usage: usage.md
-  - API Reference: api.md
+  - Pipelines:
+    - Motility: pipelines/motility.md
+    - Fecundity: pipelines/fecundity.md
+    - Toxicity: pipelines/toxicity.md
+    - Feeding: pipelines/feeding.md
+    - Development: pipelines/development.md
 
 plugins:
   - search
