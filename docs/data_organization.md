@@ -1,15 +1,27 @@
 # Data organization
 
-## TIF files
-
 The ImageXpress by Molecular Devices has an opinionated data structure, and wrmXpress assumes this structure.
 
 Each experiment should include a root directory with the plate name formated as `YYYYMMDD-p##-XYZ` where `p##` is a plate number and `XYZ` are the investigator's initials. The plate name may also include a random integer/index appended in the format `_###`.
 
-Inside of this plate directory should be separate directories for each time point formated as `TimePoint_#` and starting with `TimePoint_1`. If no additional time points were included in the experiment, then the only folder inside of the root directory should be `TimePoint_1`.
+Inside of plate folder, there are two options for organizing the images, either as an individual TIF image for each well stored in a directory of each time point (total number of images = # time points x # wells x # wavelengths) or as a single AVI video for each well (total number of videos = # wells).
 
-Time point folders will contain the raw images in `.TIF` format. Each image should be named `{plate name}_{well}.TIF`. If there was an index appended to the plate name, this should not be included in the image names. In the case of experiments with multiple
-wavelengths per well, `_w#` should be appended after the well ID.
+## TIF files
+
+Compatible with the following pipelines:
+
+- [Motility](pipelines/motility.md)
+- [Fecundity](pipelines/fecundity.md)
+- [Toxicity](pipelines/toxicity.md)
+- [Feeding](pipelines/feeding.md)
+- [Development](pipelines/development.md)
+- [Tracking](pipelines/tracking.md)
+
+Detailed data structure expectactions for each pipeline can be found in the relevant pipeline documentation.
+
+Inside of the plate directory should be separate directories for each time point formatted as `TimePoint_#` and starting with `TimePoint_1`. If no additional time points were included in the experiment, then the only folder inside of the root directory will be `TimePoint_1`.
+
+Time point folders will contain the raw images in `.TIF` format. Each image should be named `{plate name}_{well}.TIF` or `{plate name}_{well}_{wavelength}_{site}.TIF` for multiwavelength, multisite experiments. If there was an index appended to the plate name, this should not be included in the image names.
 
 Example of these data structures are shown below:
 
@@ -23,8 +35,13 @@ Example of these data structures are shown below:
 
 ## AVI files
 
-Some pipelines (i.e., motility, tracking) accept AVI video files instead TIF files within time point folders. In this case, the root plate folder should contain the AVI files in the format `{plate name}_{well}.AVI`, as below:
+Compatible with the following pipelines:
 
- <img src="../img/avi_structure.png" width="40%" hspace="10" align="top-left"/>
+- [Motility](pipelines/motility.md)
+- [Tracking](pipelines/tracking.md)
 
-In this case, the AVI file structure needs to be selected in Configure. During analysis, the files may be rearranged to include the time point/TIF structure described above. If so, it is recommended that subsequent analyses should  maintain the reorganized structure and select the ImageXpress file structure.
+Some pipelines accept AVI video files instead TIF files within time point folders. In this case, the root plate folder should contain the AVI files in the format `{plate name}_{well}.AVI`, as below:
+
+<img src="../img/avi_structure.png" width="40%" hspace="10" align="top-left"/>
+
+In this case, the AVI file structure needs to be selected in Configuration. During analysis, the files may be rearranged to include the time point/TIF structure described above. If so, it is recommended that subsequent analyses should  maintain the reorganized structure and adjust the Configuration selections accordingly.
