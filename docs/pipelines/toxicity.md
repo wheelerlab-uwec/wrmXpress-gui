@@ -12,19 +12,17 @@ All experiments should include a single wavelength. Multisite images should be s
 
 ### Validated species and stages
 
-- Filarial nematodes (i.e., *Brugia malayi* and *Dirofilaria immitis*)
-  - Microfiliariae
-  - L3s
-  - Adults (with varying success)
-- Schistosomes
-  - Adults
-  - Schistosomula
-  - Cercaria
-  - Miracidia (but we recommend using the [Tracking](tracking.md) pipeline instead)
-- *C. elegans*
-  - Larvae
-  - Young adults
-  - Gravid adults
+#### Filarial nematodes (i.e., *Brugia malayi* and *Dirofilaria immitis*)
+
+- Microfiliariae
+- L3s
+- Adults (with varying success)
+
+#### *Caenorhabditis elegans*
+
+- Larvae
+- Young adults
+- Gravid adults
 
 ### Example plates
 

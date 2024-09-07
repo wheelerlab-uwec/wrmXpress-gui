@@ -23,19 +23,24 @@ All experiments should include a single wavelength and single site.
 
 ### Validated species and stages
 
-- Filarial nematodes (i.e., *Brugia malayi* and *Dirofilaria immitis*)
-  - Microfiliariae
-  - L3s
-  - Adults
-- Schistosomes
-  - Adults
-  - Schistosomula
-  - Cercaria
-  - Miracidia (but we recommend using the [Tracking](tracking.md) pipeline instead)
-- *C. elegans*
-  - Larvae
-  - Young adults
-  - Gravid adults
+#### Filarial nematodes (i.e., *Brugia malayi* and *Dirofilaria immitis*)
+
+- Microfiliariae
+- L3s
+- Adults
+  
+#### Schistosomes
+
+- Adults
+- Schistosomula
+- Cercaria
+- Miracidia (but we recommend using the [Tracking](tracking.md) pipeline instead)
+  
+#### *Caenorhabditis elegans*
+
+- Larvae
+- Young adults
+- Gravid adults
 
 ### Example plates
 

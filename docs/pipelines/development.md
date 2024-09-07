@@ -12,11 +12,11 @@ All experiments should include a single wavelength. Multisite images should be s
 
 ### Validated species and stages
 
-- *C. elegans*
-    - Larvae
-    - Young adults
-    - Gravid adults
-    - Mixed stages
+#### *Caenorhabditis elegans*
+- Larvae
+- Young adults
+- Gravid adults
+- Mixed stages
 
 ### Example plates
 

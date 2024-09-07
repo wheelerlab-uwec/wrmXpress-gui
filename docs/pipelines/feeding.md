@@ -14,8 +14,7 @@ All experiments should include three wavelengths and single site.
 
 ### Validated species and stages
 
-- *C. elegans*
-  - Young adults
+- *Caenorhabditis elegans* young adults
 
 ### Example plates
 

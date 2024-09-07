@@ -18,8 +18,7 @@ All experiments should include a single wavelength and single site.
 
 ### Validated species and stages
 
-- Schistosomes
-  - Miracidia
+- Schistosome miracidia  
 
 ### Example plates
 
