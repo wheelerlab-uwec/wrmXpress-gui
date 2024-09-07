@@ -22,4 +22,5 @@ markdown_extensions:
   - admonition  # Enables 'Note' and 'Warning' blocks
   - codehilite  # Enables syntax highlighting for code blocks
   - toc         # Generates a table of contents for each page
+  - attr_list
 

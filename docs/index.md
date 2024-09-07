@@ -15,45 +15,43 @@ wrmXpress is a suite of tools to analyze images and videos of free-living and pa
 - [Toxicity](pipelines/toxicity.md)
 - [Feeding](pipelines/feeding.md)
 - [Development](pipelines/development.md)
+- [Tracking](pipelines/tracking.md)
 
-Some pipelines require specific experimental procedures to generate the proper data (i.e., the Feeding pipline requires images of worms that been fed fluorescent dyes), while other pipelines are generalizable across multiple worm species, stages, and imaging environments. Detailed documentation for each pipeline can be found at the corresponding links above.
+Some pipelines require specific experimental procedures to generate the proper data (i.e., the Feeding pipline requires images of worms that have been fed fluorescent dyes), while other pipelines are generalizable across multiple worm species, stages, and imaging environments. Detailed documentation for each pipeline can be found at the corresponding links above.
 
 # Usage
 
-For large high-throughput analyses, wrmXpress can be run using a command-line interface and is deployable to high-throughput or high-performance remote computer clusters. If running small to medium sized analses (i.e., less than 96 wells), wrmXpress can also be run using a graphical-user interface (GUI) on any computer operating system (Windows, MacOS, Linux) and Docker Desktop. This documentation is oriented toward users of the GUI and includes screenshots and videos of GUI configuration and usage.
+For large high-throughput analyses, wrmXpress can be run using a command-line interface and is deployable to high-throughput or high-performance remote computer clusters. If running small to medium sized analyses (i.e., 96 wells or less), wrmXpress can also be run using a graphical-user interface (GUI) on any computer operating system (Windows, MacOS, Linux) and Docker Desktop. This documentation is oriented toward users of the GUI and includes screenshots and videos of GUI configuration and usage.
 
 ## Installation of the GUI
 
 ***Prerequisites*** - Download and install [Docker Desktop](https://www.docker.com/products/docker-desktop/)
 
+The GUI is deployed via Docker Desktop and is run in any modern browser (i.e., Chrome, Firefox, Safari, etc.). Installation through Docker Desktop is simple and allows for pain-free updates, when desired.
+
 1. Create a working directory that contains all the input images. This folder is where temporary working files/images will be stored, where output data will be written, and will be mounted as a volume in the Docker container.
    - In the example below, this directory is `Users/njwheeler/mount`
 
-2. Start the Docker engine and open up the Dashboard.
-3. Use the search bar to find and pull the latest `wheelern/wrmxpress_gui` image from DockerHub:
-   - Choose the most recent tag. The compressed image is >9 GB, so it will take a few minutes to pull.
+2. Open Docker Desktop.
+3. Use the search bar to find and download ("pull") the latest `wheelern/wrmxpress_gui` image from DockerHub:
+   - Choose the most recent tag. The compressed image is >9 GB, so it will take a few minutes to download.
 
-    <img src="img/dd1.png" alt="step 2" width="500" />
+    ![Pulling the GUI image](img/pull.gif){: style="width:500px"}
 
 4. In the Images pane, click the Run symbol.
-
-    <img src="img/dd2.png" alt="step 3" width="500" />
-
 5. Under Optional settings, make the following changes:
    - Under Ports, set the Host port to 9000
    - Under Volumes, set the Host path to be the path to the working directory created in step #1. Set the Container path to be `/home/`
-
-    <img src="img/dd3.png" alt="step 3" width="500" />
-
 6. Click Run
+   - Click OK if on MacOS and a warning pops up.
+  
+    ![Running the GUI image](img/run.gif){: style="width:500px"}
 
-7. Click the link to 9000:9000 or navigate to `http://localhost:9000` to view the app.
+7. Once running, wait until log messages appear in the Docker Desktop console. After they do, click the link to 9000:9000 or navigate to `http://localhost:9000` to view the app.
 
-    <img src="img/dd4.png" alt="step 4" width="500" />
+    ![Starting the GUI image](img/start.gif){: style="width:500px"}
 
 8. Follow the guidance in the GUI to prepare and run your analysis.
-
-    <img src="img/dd5.png" alt="step 5" width="500" />
 
 # Quick start
 
