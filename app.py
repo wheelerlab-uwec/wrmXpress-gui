@@ -14,6 +14,7 @@ from dash.dependencies import Input, Output, State
 from app.utils.styling import CONTENT_STYLE, SIDEBAR_STYLE
 from app.components.header import header
 from app.utils.background_callback import callback
+from app.utils.callback_functions import zenodo_get
 
 # Diskcache
 import diskcache
@@ -62,7 +63,30 @@ sidebar = html.Div(
                     vertical=True,  # Style of the navigation
                 )
                 for page in dash.page_registry.values()  # Iterate through each page
-            ]
+            ],
+        ),
+        dbc.Row(
+            [
+                html.Div(
+                    [
+                        dbc.Nav(
+                            children=dbc.NavLink(
+                                "Fetch Example Data",
+                                id="fetch-data-link",  # Add an id to the NavLink
+                            ),
+                            pills=True,
+                            vertical=True,
+                        ),
+                        # Tooltip for the NavLink
+                        dbc.Tooltip(
+                            "Click to fetch example data from Zenodo and download it to your Downloads folder.",
+                            target="fetch-data-link",  # Associate tooltip with the NavLink ID
+                            placement="top",  # Position the tooltip (optional)
+                        ),
+                    ]
+                ),
+            ],
+            style={"position": "fixed", "bottom": 10},
         ),
     ],
     style=SIDEBAR_STYLE,  # Style of the sidebar, see styling.py
@@ -167,6 +191,18 @@ def background_callback(set_progress, n_clicks, store):
             f"```{error_message}```",
             None,
         )
+
+
+@app.callback(
+    Output("fetch-data-link", "children"),  # Update the link text as an example
+    Input("fetch-data-link", "n_clicks"),  # Listen for clicks on the NavLink
+)
+def fetch_data_on_click(n_clicks):
+    if n_clicks:
+        # Call your zenodo_get function
+        result = zenodo_get()
+        return result  # You can update the text of the link or other components
+    return "Fetch Example Data"  # Default text if not clicked yet
 
 
 ########################################################################
