@@ -13,6 +13,7 @@ nav:
     - Fecundity: pipelines/fecundity.md
     - Toxicity: pipelines/toxicity.md
     - Feeding: pipelines/feeding.md
+  - Github: https://github.com/wheelerlab-uwec/wrmXpress-gui
 
 plugins:
   - search
