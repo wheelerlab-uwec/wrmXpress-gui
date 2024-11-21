@@ -39,15 +39,19 @@ layout = configure_layout
         Output("additional-options-row", "style"),
         Output("multi-site-options-row", "style"),
         Output("mask-options-row", "style"),
+        Output("static-dx-rescale", "style"),
+        Output("video-dx-options", "style"),
     ],
     [
         Input("imaging-mode", "value"),
         Input("file-structure", "value"),
         Input("mask", "value"),
+        Input("static-dx", "value"),
+        Input("video-dx", "value"),
     ],
 )
 # appearing selections upon meeting certain critera
-def update_options_visibility(imaging_mode, file_structure, mask):
+def update_options_visibility(imaging_mode, file_structure, mask, static_dx, video_dx):
     """
     This function will display the multi-well options and additional options based on the imaging mode and file structure selected.
     =======================================================================================================
@@ -63,6 +67,8 @@ def update_options_visibility(imaging_mode, file_structure, mask):
     additional_options_style = {"display": "none"}
     multi_site_options_style = {"display": "none"}
     mask_options_style = {"display": "none"}
+    static_dx_options_style = {"display": "none"}
+    video_dx_options_style = {"display": "none"}
 
     if imaging_mode == "multi-well":  # if multi-well is selected
         # display the multi-well options
@@ -78,11 +84,19 @@ def update_options_visibility(imaging_mode, file_structure, mask):
     if mask == "circular" or mask == "square":
         mask_options_style = {"display": "flex"}
 
+    if static_dx:
+        static_dx_options_style = {"display": "flex"}
+
+    if video_dx:
+        video_dx_options_style = {"display": "flex"}
+
     return (
         multi_well_options_style,
         additional_options_style,
         multi_site_options_style,
         mask_options_style,
+        static_dx_options_style,
+        video_dx_options_style,
     )  # return the styles
 
 
@@ -239,6 +253,11 @@ def update_wells(table_contents):  # list of cells from selection table
     State("mounted-volume", "value"),
     State("well-selection-list", "children"),
     State("pipeline-selection", "value"),
+    State("static-dx", "value"),
+    State("static-dx-rescale", "value"),
+    State("video-dx", "value"),
+    State("video-dx-format", "value"),
+    State("video-dx-rescale", "value"),
     prevent_initial_call=True,
     allow_duplicate=True,
 )
@@ -261,6 +280,11 @@ def run_analysis(  # function to save the yaml file from the sections in the con
     volume,
     wells,
     pipeline,
+    staticdx,
+    staticdxrescale,
+    videodx,
+    videodxformat,
+    videodxrescale,
 ):
     """
     This function will save the yaml file from the sections in the configuration page.
@@ -499,6 +523,11 @@ def run_analysis(  # function to save the yaml file from the sections in the con
             wells,
             volume,
             pipeline,
+            staticdx,
+            staticdxrescale,
+            videodx,
+            videodxformat,
+            videodxrescale,
         )
 
         output_file = Path(volume, platename + ".yml")

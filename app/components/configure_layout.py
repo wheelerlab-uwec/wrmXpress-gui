@@ -12,6 +12,7 @@ from app.components.instrument_settings import instrument_settings
 from app.components.image_transformations import image_transformations
 from app.components.worm_information import worm_information
 from app.components.module_selection import module_selection
+from app.components.diagnostics import diagnostics
 from app.components.run_time_settings import run_time_settings
 
 ########################################################################
@@ -29,6 +30,7 @@ configure_layout = dbc.Container(
                 image_transformations,  # see image_transformations.py
                 worm_information,  # Worm information, see worm_information.py
                 module_selection,  # Module selection, see module_selection.py
+                diagnostics,
                 run_time_settings,  # Run time settings, see run_time_settings.py
             ],
             start_collapsed=False,  # Start with the accordian open

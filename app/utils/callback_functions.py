@@ -116,37 +116,12 @@ def prep_yaml(
     wellselection,
     volume,
     pipeline,
+    staticdx,
+    staticdxrescale,
+    videodx,
+    videodxformat,
+    videodxrescale,
 ):
-    """
-    This function prepares a dictionary for the YAML file.
-    ===============================================================================
-    Arguments:
-        - imagingmode : str : Imaging mode
-        - filestructure : str : File structure
-        - multiwellrows : int : Number of rows in multi-well plate
-        - multiwellcols : int : Number of columns in multi-well plate
-        - multiwelldetection : str : Multi-well detection
-        - xsites : int : Number of x-sites in multi-site image
-        - ysites : int : Number of y-sites in multi-site image
-        - stitchswitch : bool : whether to stitch the sites
-        - mask: str : Type of image mask
-        - maskdiameter : num : Diameter of mask
-        - species : str : Species
-        - stages : str : Stages
-        - motilityrun : str : Motility run
-        - conversionrun : str : Conversion run
-        - conversionscalevideo : str : Conversion scale video
-        - conversionrescalemultiplier : str : Conversion rescale multiplier
-        - segmentrun : str : Segment run
-        - wavelength : str : Wavelength
-        - cellprofilerrun : str : CellProfiler run
-        - cellprofilerpipeline : str : CellProfiler pipeline
-        - diagnosticdx : str : Diagnostic DX
-        - wellselection : str : Well selection
-    ===============================================================================
-    Returns:
-        - yaml_dict : dict : A dictionary for the YAML file
-    """
     # Check if wellselection is a list or a string
     if isinstance(wellselection, list):
         if len(wellselection) == 96:  # If all wells are selected
@@ -188,8 +163,6 @@ def prep_yaml(
     fecundity = module_selction_dict["fecundity"]
     trackingrun = module_selction_dict["trackingrun"]
     cellprofilerpipeline = module_selction_dict["cellprofilerpipeline"]
-    save_video = module_selction_dict["save_video"]
-    rescale_multiplier = module_selction_dict["rescale_multiplier"]
     wavelength = module_selction_dict["wavelength"]
 
     # Create a dictionary for the YAML file in the required format
@@ -206,13 +179,17 @@ def prep_yaml(
         "square_side": squarediameter,
         "species": [species],
         "stages": [stages],
-        "modules": {
-            "motility": {"run": eval_bool(motilityrun)},
-            "convert": {
-                "run": eval_bool(conversionrun),
-                "save_video": eval_bool(save_video),
-                "rescale_multiplier": float(rescale_multiplier),
+        "pipelines": {
+            "static-dx": {
+                "run": eval_bool(staticdx),
+                "rescale_multiplier": staticdxrescale,
             },
+            "video-dx": {
+                "run": eval_bool(videodx),
+                "format": videodxformat,
+                "rescale_multiplier": videodxrescale,
+            },
+            "motility": {"run": eval_bool(motilityrun)},
             "segment": {"run": eval_bool(segmentrun), "wavelength": [wavelength]},
             "cellprofiler": {
                 "run": eval_bool(cellprofilerrun),

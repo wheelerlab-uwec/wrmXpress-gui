@@ -210,6 +210,11 @@ def update_wells(table_contents):  # list of cells from selection table
     State("plate-name", "value"),
     State("mounted-volume", "value"),
     State("well-selection-list", "children"),
+    State("static-dx", "value"),
+    State("static-dx-rescale", "value"),
+    State("video-dx", "value"),
+    State("video-dx-format", "value"),
+    State("video-dx-rescale", "value"),
     prevent_initial_call=True,
 )
 def run_analysis(
@@ -236,6 +241,11 @@ def run_analysis(
     platename,
     volume,
     wells,
+    staticdx,
+    staticdxrescale,
+    videodx,
+    videodxformat,
+    videodxrescale,
 ):
     if nclicks:
 
@@ -265,6 +275,11 @@ def run_analysis(
             cellprofilerpipeline,
             diagnosticdx,
             wells,
+            staticdx,
+            staticdxrescale,
+            videodx,
+            videodxformat,
+            videodxrescale,
         )
 
         output_file = Path(volume, platename + ".yml")
