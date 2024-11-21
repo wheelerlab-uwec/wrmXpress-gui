@@ -177,5 +177,5 @@ def background_callback(set_progress, n_clicks, store):
 
 if __name__ == "__main__":
     # for dev/debugging
-    # app.run_server(debug=True, host="0.0.0.0", port=9000)
-    serve(app.server, host="0.0.0.0", port=9000, threads=16)
+    app.run_server(debug=True, host="0.0.0.0", port=9000)
+    # serve(app.server, host="0.0.0.0", port=9000, threads=16)

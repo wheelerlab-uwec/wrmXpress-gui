@@ -38,11 +38,16 @@ layout = configure_layout
         Output("multi-well-options-row", "style"),
         Output("additional-options-row", "style"),
         Output("multi-site-options-row", "style"),
+        Output("mask-options-row", "style"),
     ],
-    [Input("imaging-mode", "value"), Input("file-structure", "value")],
+    [
+        Input("imaging-mode", "value"),
+        Input("file-structure", "value"),
+        Input("mask", "value"),
+    ],
 )
 # appearing selections upon meeting certain critera
-def update_options_visibility(imaging_mode, file_structure):
+def update_options_visibility(imaging_mode, file_structure, mask):
     """
     This function will display the multi-well options and additional options based on the imaging mode and file structure selected.
     =======================================================================================================
@@ -57,6 +62,7 @@ def update_options_visibility(imaging_mode, file_structure):
     multi_well_options_style = {"display": "none"}
     additional_options_style = {"display": "none"}
     multi_site_options_style = {"display": "none"}
+    mask_options_style = {"display": "none"}
 
     if imaging_mode == "multi-well":  # if multi-well is selected
         # display the multi-well options
@@ -69,10 +75,14 @@ def update_options_visibility(imaging_mode, file_structure):
     elif imaging_mode == "multi-site":
         multi_site_options_style = {"display": "flex"}
 
+    if mask == "circular" or mask == "square":
+        mask_options_style = {"display": "flex"}
+
     return (
         multi_well_options_style,
         additional_options_style,
         multi_site_options_style,
+        mask_options_style,
     )  # return the styles
 
 
@@ -220,6 +230,9 @@ def update_wells(table_contents):  # list of cells from selection table
     State("multi-well-detection", "value"),
     State("x-sites", "value"),
     State("y-sites", "value"),
+    State("stitch-switch", "value"),
+    State("mask", "value"),
+    State("mask-diameter", "value"),
     State("species", "value"),
     State("stages", "value"),
     State("plate-name", "value"),
@@ -239,6 +252,9 @@ def run_analysis(  # function to save the yaml file from the sections in the con
     multiwelldetection,
     xsites,
     ysites,
+    stitchswitch,
+    mask,
+    maskdiameter,
     species,
     stages,
     platename,
@@ -256,6 +272,11 @@ def run_analysis(  # function to save the yaml file from the sections in the con
         - multiwellrows : int : The number of multi-well rows
         - multiwellcols : int : The number of multi-well columns
         - multiwelldetection : str : The multi-well detection
+        - xsites : int : The number of x-sites
+        - ysites : int : The number of y-sites
+        - stitch: bool: Whether to stich multi-site images
+        - mask: str : Type of image mask
+        - maskdiameter : num : Diameter of mask
         - species : str : The species
         - stages : str : The stages
         - platename : str : The plate name
@@ -470,6 +491,9 @@ def run_analysis(  # function to save the yaml file from the sections in the con
             multiwelldetection,
             xsites,
             ysites,
+            stitchswitch,
+            mask,
+            maskdiameter,
             species,
             stages,
             wells,

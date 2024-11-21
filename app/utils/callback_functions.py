@@ -108,6 +108,9 @@ def prep_yaml(
     multiwelldetection,
     xsites,
     ysites,
+    stitchswitch,
+    mask,
+    maskdiameter,
     species,
     stages,
     wellselection,
@@ -122,9 +125,12 @@ def prep_yaml(
         - filestructure : str : File structure
         - multiwellrows : int : Number of rows in multi-well plate
         - multiwellcols : int : Number of columns in multi-well plate
+        - multiwelldetection : str : Multi-well detection
         - xsites : int : Number of x-sites in multi-site image
         - ysites : int : Number of y-sites in multi-site image
-        - multiwelldetection : str : Multi-well detection
+        - stitchswitch : bool : whether to stitch the sites
+        - mask: str : Type of image mask
+        - maskdiameter : num : Diameter of mask
         - species : str : Species
         - stages : str : Stages
         - motilityrun : str : Motility run
@@ -163,6 +169,16 @@ def prep_yaml(
     if ysites is None:
         ysites = "NA"
 
+    if mask == "circular":
+        circlediameter = maskdiameter
+        squarediameter = "NA"
+    elif mask == "square":
+        circlediameter = "NA"
+        squarediameter = maskdiameter
+    elif mask == "NA":
+        circlediameter = "NA"
+        squarediameter = "NA"
+
     module_selction_dict = formatting_module_for_yaml(pipeline)
     motilityrun = module_selction_dict["motilityrun"]
     conversionrun = module_selction_dict["conversionrun"]
@@ -185,6 +201,9 @@ def prep_yaml(
         "multi-well-detection": [multiwelldetection],
         "x-sites": xsites,
         "y-sites": ysites,
+        "stitch": eval_bool(stitchswitch),
+        "circle_diameter": circlediameter,
+        "square_side": squarediameter,
         "species": [species],
         "stages": [stages],
         "modules": {
