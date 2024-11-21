@@ -106,6 +106,8 @@ def prep_yaml(
     multiwellrows,
     multiwellcols,
     multiwelldetection,
+    xsites,
+    ysites,
     species,
     stages,
     wellselection,
@@ -120,6 +122,8 @@ def prep_yaml(
         - filestructure : str : File structure
         - multiwellrows : int : Number of rows in multi-well plate
         - multiwellcols : int : Number of columns in multi-well plate
+        - xsites : int : Number of x-sites in multi-site image
+        - ysites : int : Number of y-sites in multi-site image
         - multiwelldetection : str : Multi-well detection
         - species : str : Species
         - stages : str : Stages
@@ -148,11 +152,16 @@ def prep_yaml(
         wellselection = [wellselection]
 
     if multiwellrows is None:  # If multiwellrows is None
-        multiwellrows = 0  # Set multiwellrows to 0
+        multiwellrows = 1  # Set multiwellrows to 0
     if multiwellcols is None:  # If multiwellcols is None
-        multiwellcols = 0  # Set multiwellcols to 0
+        multiwellcols = 1  # Set multiwellcols to 0
     # if conversionrescalemultiplier is None:  # If conversionrescalemultiplier is None
     #    conversionrescalemultiplier = 0  # Set conversionrescalemultiplier to 0
+
+    if xsites is None:
+        xsites = "NA"
+    if ysites is None:
+        ysites = "NA"
 
     module_selction_dict = formatting_module_for_yaml(pipeline)
     motilityrun = module_selction_dict["motilityrun"]
@@ -171,9 +180,11 @@ def prep_yaml(
     yaml_dict = {
         "imaging_mode": [imagingmode],
         "file_structure": [filestructure],
-        "multi-well-rows": int(multiwellrows),
-        "multi-well-cols": int(multiwellcols),
+        "multi-well-row": int(multiwellrows),
+        "multi-well-col": int(multiwellcols),
         "multi-well-detection": [multiwelldetection],
+        "x-sites": xsites,
+        "y-sites": ysites,
         "species": [species],
         "stages": [stages],
         "modules": {

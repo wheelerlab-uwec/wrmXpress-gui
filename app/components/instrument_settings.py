@@ -16,75 +16,6 @@ from dash import html
 instrument_settings = dbc.AccordionItem(
     [
         html.Div(
-            [
-                dbc.Row(
-                    [
-                        # Title for Imaging mode
-                        html.H6("Imaging mode:", id="imaging-mode-header"),
-                        dbc.Col(
-                            [
-                                html.I(
-                                    className="fa-solid fa-circle-info",  # Information Symbol
-                                    id="imaging-mode-symbol",
-                                ),
-                                dbc.Tooltip(
-                                    # Tooltip element for information symbol, displays message when cursor over the symbol
-                                    html.P(
-                                        "Select Single Well if each video/image only includes a single well. Select Multi Well if each video/image contains multiple wells that need to be split.",
-                                        style={"text-align": "left"},
-                                    ),
-                                    placement="bottom",
-                                    target="imaging-mode-symbol",
-                                ),
-                                dbc.RadioItems(
-                                    # Radio button selection for single well or multi well
-                                    id="imaging-mode",
-                                    className="btn-group",
-                                    inputClassName="btn-check",
-                                    labelClassName="btn btn-outline-primary",
-                                    labelCheckedClassName="active",
-                                    options=[
-                                        {
-                                            "label": "Single Well",
-                                            "value": "single-well",
-                                        },
-                                        {"label": "Multi Well", "value": "multi-well"},
-                                    ],
-                                    value="single-well",
-                                    persistence=True,
-                                    persistence_type="memory",
-                                ),
-                            ],
-                            width="auto",
-                        ),
-                        dbc.Col(
-                            [
-                                dbc.Input(
-                                    id="multi-well-rows",  # Input values for rows per image
-                                    placeholder="Rows per image",
-                                    type="number",
-                                    persistence=True,
-                                    persistence_type="memory",
-                                ),
-                                dbc.Input(
-                                    id="multi-well-cols",  # Input values for columns per image
-                                    placeholder="Columns per image",
-                                    type="number",
-                                    persistence=True,
-                                    persistence_type="memory",
-                                ),
-                            ],
-                            width="auto",
-                            id="multi-well-options-row",
-                            style={"display": "flex"},  # Initially hidden
-                        ),
-                    ],
-                    align="center",
-                )
-            ]
-        ),
-        html.Br(),
-        html.Div(
             dbc.Row(
                 [
                     html.H6("File structure:"),  # Title for File Structure
@@ -142,7 +73,7 @@ instrument_settings = dbc.AccordionItem(
                                         style={"text-align": "left"},
                                     ),
                                     html.P(
-                                        "Auto: incorporates a Hough transform in an attempt to automatically identify circular wells.",
+                                        "Auto: in development.",
                                         style={"text-align": "left"},
                                     ),
                                     html.P(
@@ -162,10 +93,10 @@ instrument_settings = dbc.AccordionItem(
                                 labelClassName="btn btn-outline-primary",
                                 labelCheckedClassName="active",
                                 options=[
-                                    {"label": "Auto", "value": "auto"},
+                                    # {"label": "Auto", "value": "auto"},
                                     {"label": "Grid", "value": "grid"},
                                 ],
-                                value="auto",
+                                value="grid",
                                 persistence=True,
                                 persistence_type="memory",
                             ),
@@ -177,6 +108,97 @@ instrument_settings = dbc.AccordionItem(
                 ],
                 align="center",
             )
+        ),
+        html.Br(),
+        html.Div(
+            [
+                dbc.Row(
+                    [
+                        # Title for Imaging mode
+                        html.H6("Imaging mode:", id="imaging-mode-header"),
+                        dbc.Col(
+                            [
+                                html.I(
+                                    className="fa-solid fa-circle-info",  # Information Symbol
+                                    id="imaging-mode-symbol",
+                                ),
+                                dbc.Tooltip(
+                                    # Tooltip element for information symbol, displays message when cursor over the symbol
+                                    html.P(
+                                        "Select Single Well if each video/image only includes a single well. Select Multi Well if each video/image contains multiple wells that need to be split. Select Multi Site if there is >1 site for each well.",
+                                        style={"text-align": "left"},
+                                    ),
+                                    placement="bottom",
+                                    target="imaging-mode-symbol",
+                                ),
+                                dbc.RadioItems(
+                                    # Radio button selection for single well or multi well
+                                    id="imaging-mode",
+                                    className="btn-group",
+                                    inputClassName="btn-check",
+                                    labelClassName="btn btn-outline-primary",
+                                    labelCheckedClassName="active",
+                                    options=[
+                                        {
+                                            "label": "Single Well",
+                                            "value": "single-well",
+                                        },
+                                        {"label": "Multi Well", "value": "multi-well"},
+                                        {"label": "Multi Site", "value": "multi-site"},
+                                    ],
+                                    value="single-well",
+                                    persistence=True,
+                                    persistence_type="memory",
+                                ),
+                            ],
+                            width="auto",
+                        ),
+                        dbc.Col(
+                            [
+                                dbc.Input(
+                                    id="multi-well-row",  # Input values for rows per image
+                                    placeholder="Rows per image",
+                                    type="number",
+                                    persistence=True,
+                                    persistence_type="memory",
+                                ),
+                                dbc.Input(
+                                    id="multi-well-col",  # Input values for columns per image
+                                    placeholder="Columns per image",
+                                    type="number",
+                                    persistence=True,
+                                    persistence_type="memory",
+                                ),
+                            ],
+                            width="auto",
+                            id="multi-well-options-row",
+                            style={"display": "flex"},  # Initially hidden
+                        ),
+                        dbc.Col(
+                            [
+                                dbc.Input(
+                                    id="x-sites",  # Input values for rows per image
+                                    placeholder="X-sites per image",
+                                    type="number",
+                                    persistence=True,
+                                    persistence_type="memory",
+                                ),
+                                dbc.Input(
+                                    id="y-sites",  # Input values for columns per image
+                                    placeholder="Y-sites per image",
+                                    type="number",
+                                    persistence=True,
+                                    persistence_type="memory",
+                                ),
+                            ],
+                            width="auto",
+                            id="multi-site-options-row",
+                            style={"display": "flex"},  # Initially hidden
+                        ),
+                    ],
+                    align="center",
+                )
+            ]
         ),
         html.Br(),
         dbc.Row(
@@ -210,7 +232,7 @@ instrument_settings = dbc.AccordionItem(
                 # Second Column: Input for Total Number of Columns
                 dbc.Col(
                     dbc.Input(
-                        id="total-well-cols",
+                        id="well-col",
                         placeholder="Columns = 12",
                         type="number",
                         persistence=True,
@@ -221,7 +243,7 @@ instrument_settings = dbc.AccordionItem(
                 # Third Column: Input for Total Number of Rows
                 dbc.Col(
                     dbc.Input(
-                        id="total-num-rows",
+                        id="well-row",
                         placeholder="Rows = 8",
                         type="number",
                         persistence=True,

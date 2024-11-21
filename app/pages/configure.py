@@ -37,6 +37,7 @@ layout = configure_layout
     [
         Output("multi-well-options-row", "style"),
         Output("additional-options-row", "style"),
+        Output("multi-site-options-row", "style"),
     ],
     [Input("imaging-mode", "value"), Input("file-structure", "value")],
 )
@@ -55,6 +56,7 @@ def update_options_visibility(imaging_mode, file_structure):
     """
     multi_well_options_style = {"display": "none"}
     additional_options_style = {"display": "none"}
+    multi_site_options_style = {"display": "none"}
 
     if imaging_mode == "multi-well":  # if multi-well is selected
         # display the multi-well options
@@ -64,14 +66,21 @@ def update_options_visibility(imaging_mode, file_structure):
             # display the additional options
             additional_options_style = {"display": "flex"}
 
-    return multi_well_options_style, additional_options_style  # return the styles
+    elif imaging_mode == "multi-site":
+        multi_site_options_style = {"display": "flex"}
+
+    return (
+        multi_well_options_style,
+        additional_options_style,
+        multi_site_options_style,
+    )  # return the styles
 
 
 @callback(
     # Storing values of inputs to be used in different pages
     Output("store", "data"),
-    Input("total-well-cols", "value"),
-    Input("total-num-rows", "value"),
+    Input("well-col", "value"),
+    Input("well-row", "value"),
     Input("mounted-volume", "value"),
     Input("plate-name", "value"),
     Input("well-selection-list", "children"),
@@ -128,7 +137,7 @@ def store_values(
 
 @callback(
     Output("well-selection-table", "children"),
-    [Input("total-num-rows", "value"), Input("total-well-cols", "value")],
+    [Input("well-row", "value"), Input("well-col", "value")],
 )
 # creating a selection table based on the dimensions of rows and columns selected
 def update_table(rows, cols):
@@ -206,9 +215,11 @@ def update_wells(table_contents):  # list of cells from selection table
     Input("finalize-configure-button", "n_clicks"),
     State("imaging-mode", "value"),
     State("file-structure", "value"),
-    State("multi-well-rows", "value"),
-    State("multi-well-cols", "value"),
+    State("multi-well-row", "value"),
+    State("multi-well-col", "value"),
     State("multi-well-detection", "value"),
+    State("x-sites", "value"),
+    State("y-sites", "value"),
     State("species", "value"),
     State("stages", "value"),
     State("plate-name", "value"),
@@ -226,6 +237,8 @@ def run_analysis(  # function to save the yaml file from the sections in the con
     multiwellrows,
     multiwellcols,
     multiwelldetection,
+    xsites,
+    ysites,
     species,
     stages,
     platename,
@@ -455,6 +468,8 @@ def run_analysis(  # function to save the yaml file from the sections in the con
             multiwellrows,
             multiwellcols,
             multiwelldetection,
+            xsites,
+            ysites,
             species,
             stages,
             wells,

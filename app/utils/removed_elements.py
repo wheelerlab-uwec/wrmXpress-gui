@@ -60,7 +60,7 @@ element_removed = dbc.Row(
                         persistence_type="memory",
                     ),
                     width="auto",
-                    id="multi-site-foramt-options-row",
+                    id="multi-site-format-options-row",
                 ),
             ],
             align="center",
