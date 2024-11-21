@@ -121,6 +121,14 @@ def prep_yaml(
     videodx,
     videodxformat,
     videodxrescale,
+    wavelength,
+    pyrscale,
+    levels,
+    winsize,
+    iterations,
+    poly_n,
+    poly_sigma,
+    flags,
 ):
     # Check if wellselection is a list or a string
     if isinstance(wellselection, list):
@@ -163,7 +171,6 @@ def prep_yaml(
     fecundity = module_selction_dict["fecundity"]
     trackingrun = module_selction_dict["trackingrun"]
     cellprofilerpipeline = module_selction_dict["cellprofilerpipeline"]
-    wavelength = module_selction_dict["wavelength"]
 
     # Create a dictionary for the YAML file in the required format
     yaml_dict = {
@@ -189,7 +196,18 @@ def prep_yaml(
                 "format": videodxformat,
                 "rescale_multiplier": videodxrescale,
             },
-            "motility": {"run": eval_bool(motilityrun)},
+            "optical_flow": {
+                "run": eval_bool(motilityrun),
+                "wavelengths": [wavelength],
+                "flow": "",
+                "pyrScale": pyrscale,
+                "levels": levels,
+                "winsize": winsize,
+                "iterations": iterations,
+                "poly_n": poly_n,
+                "poly_sigma": poly_sigma,
+                "flags": flags,
+            },
             "segment": {"run": eval_bool(segmentrun), "wavelength": [wavelength]},
             "cellprofiler": {
                 "run": eval_bool(cellprofilerrun),

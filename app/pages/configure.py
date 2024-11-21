@@ -10,6 +10,7 @@ import itertools
 import yaml
 from pathlib import Path
 import os
+import dash_bootstrap_components as dbc
 
 # Importing Components and functions
 from app.utils.callback_functions import create_df_from_inputs, prep_yaml
@@ -98,6 +99,141 @@ def update_options_visibility(imaging_mode, file_structure, mask, static_dx, vid
         static_dx_options_style,
         video_dx_options_style,
     )  # return the styles
+
+
+@callback(Output("pipeline-params", "children"), Input("pipeline-selection", "value"))
+def update_params_visibility(pipeline):
+
+    params_pane = None
+
+    if pipeline == "motility":
+        params_pane = html.Div(
+            [
+                dbc.Row(
+                    [
+                        dbc.Col(html.P("Wavelength:")),
+                        dbc.Col(
+                            dbc.Input(
+                                id="wavelengths",
+                                placeholder="Wavelength",
+                                type="text",
+                                persistence=True,
+                                persistence_type="memory",
+                                style={"display": "flex"},
+                            ),
+                        ),
+                    ]
+                ),
+                dbc.Row(
+                    [
+                        dbc.Col(html.P("pyrScale:")),
+                        dbc.Col(
+                            dbc.Input(
+                                id="pyrscale",
+                                placeholder="0.5",
+                                type="number",
+                                persistence=True,
+                                persistence_type="memory",
+                                style={"display": "flex"},
+                            ),
+                        ),
+                    ]
+                ),
+                dbc.Row(
+                    [
+                        dbc.Col(html.P("Levels:")),
+                        dbc.Col(
+                            dbc.Input(
+                                id="levels",
+                                placeholder="5",
+                                type="number",
+                                persistence=True,
+                                persistence_type="memory",
+                                style={"display": "flex"},
+                            ),
+                        ),
+                    ]
+                ),
+                dbc.Row(
+                    [
+                        dbc.Col(html.P("Window size:")),
+                        dbc.Col(
+                            dbc.Input(
+                                id="winsize",
+                                placeholder="20",
+                                type="number",
+                                persistence=True,
+                                persistence_type="memory",
+                                style={"display": "flex"},
+                            ),
+                        ),
+                    ]
+                ),
+                dbc.Row(
+                    [
+                        dbc.Col(html.P("Iterations:")),
+                        dbc.Col(
+                            dbc.Input(
+                                id="iterations",
+                                placeholder="7",
+                                type="number",
+                                persistence=True,
+                                persistence_type="memory",
+                                style={"display": "flex"},
+                            ),
+                        ),
+                    ]
+                ),
+                dbc.Row(
+                    [
+                        dbc.Col(html.P("Poly N:")),
+                        dbc.Col(
+                            dbc.Input(
+                                id="poly_n",
+                                placeholder="5",
+                                type="number",
+                                persistence=True,
+                                persistence_type="memory",
+                                style={"display": "flex"},
+                            ),
+                        ),
+                    ]
+                ),
+                dbc.Row(
+                    [
+                        dbc.Col(html.P("Poly Sigma:")),
+                        dbc.Col(
+                            dbc.Input(
+                                id="poly_sigma",
+                                placeholder="1.1",
+                                step=0.1,
+                                type="number",
+                                persistence=True,
+                                persistence_type="memory",
+                                style={"display": "flex"},
+                            ),
+                        ),
+                    ]
+                ),
+                dbc.Row(
+                    [
+                        dbc.Col(html.P("Flags:")),
+                        dbc.Col(
+                            dbc.Input(
+                                id="flags",
+                                placeholder="0",
+                                type="number",
+                                persistence=True,
+                                persistence_type="memory",
+                                style={"display": "flex"},
+                            ),
+                        ),
+                    ]
+                ),
+            ]
+        )
+
+    return params_pane
 
 
 @callback(
@@ -258,6 +394,14 @@ def update_wells(table_contents):  # list of cells from selection table
     State("video-dx", "value"),
     State("video-dx-format", "value"),
     State("video-dx-rescale", "value"),
+    State("wavelengths", "value"),
+    State("pyrscale", "value"),
+    State("levels", "value"),
+    State("winsize", "value"),
+    State("iterations", "value"),
+    State("poly_n", "value"),
+    State("poly_sigma", "value"),
+    State("flags", "value"),
     prevent_initial_call=True,
     allow_duplicate=True,
 )
@@ -285,45 +429,15 @@ def run_analysis(  # function to save the yaml file from the sections in the con
     videodx,
     videodxformat,
     videodxrescale,
+    wavelength,
+    pyrscale,
+    levels,
+    winsize,
+    iterations,
+    poly_n,
+    poly_sigma,
+    flags,
 ):
-    """
-    This function will save the yaml file from the sections in the configuration page.
-    =======================================================================================================
-    Arguments:
-        - nclicks : int : The number of clicks
-        - imagingmode : str : The imaging mode
-        - filestructure : str : The file structure
-        - multiwellrows : int : The number of multi-well rows
-        - multiwellcols : int : The number of multi-well columns
-        - multiwelldetection : str : The multi-well detection
-        - xsites : int : The number of x-sites
-        - ysites : int : The number of y-sites
-        - stitch: bool: Whether to stich multi-site images
-        - mask: str : Type of image mask
-        - maskdiameter : num : Diameter of mask
-        - species : str : The species
-        - stages : str : The stages
-        - platename : str : The plate name
-        - volume : str : The volume
-        - wells : list : The list of wells
-        - pipeline : str : The pipeline
-    =======================================================================================================
-    Returns:
-        - str : The color of the finalize configuration button
-            +- 'primary' : The color of the initial configuration button
-            +- 'danger' : The color of the configuration button upon encountering an error
-            +- 'success' : The color of the finalize configuration button upon successful configuration
-        - bool : The open state of the alert
-            +- False : The alert is not open
-            +- True : The alert is open
-        - str : The children of the alert
-            +- str : The error message
-            +- str : The success message
-        - str : The color of the alert
-            +- 'danger' : The color of the alert upon encountering an error
-            +- 'success' : The color of the alert upon successful configuration
-
-    """
 
     if nclicks:
 
@@ -528,6 +642,14 @@ def run_analysis(  # function to save the yaml file from the sections in the con
             videodx,
             videodxformat,
             videodxrescale,
+            wavelength,
+            pyrscale,
+            levels,
+            winsize,
+            iterations,
+            poly_n,
+            poly_sigma,
+            flags,
         )
 
         output_file = Path(volume, platename + ".yml")
