@@ -14,10 +14,6 @@ import os
 from app.utils.callback_functions import create_figure_from_filepath
 from app.utils.preview_callback_functions import preview_callback_functions
 from app.components.preview_layout import preview_layout
-from app.components.test_scripts.preview_page_test import (
-    error_test,
-    error_check_test_true,
-)
 
 dash.register_page(__name__)
 

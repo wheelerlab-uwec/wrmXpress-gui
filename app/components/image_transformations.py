@@ -34,7 +34,12 @@ image_transformations = dbc.AccordionItem(
                                 placement="bottom",
                                 target="mask-symbol",
                                 style={"text-align": "left"},
-                            ),
+                            )
+                        ],
+                        width="auto",
+                    ),
+                    dbc.Col(
+                        [
                             dbc.Select(
                                 id="mask",
                                 options=[
@@ -47,11 +52,7 @@ image_transformations = dbc.AccordionItem(
                                 persistence_type="memory",
                             ),
                         ],
-                        id="mask-options-row",
-                        width="4",
-                        style={
-                            "display": "flex",
-                        },
+                        width="auto"
                     ),
                     dbc.Col(
                         [

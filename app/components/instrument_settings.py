@@ -194,6 +194,8 @@ instrument_settings = dbc.AccordionItem(
                                     options=[{"label": "Stitch", "value": False}],
                                     id="stitch-switch",
                                     switch=True,
+                                    style={"margin-top": "10px", 
+                                           "margin-left": "10px"}, # adjust the position of the switch based on personal preference
                                 ),
                             ],
                             width="auto",
