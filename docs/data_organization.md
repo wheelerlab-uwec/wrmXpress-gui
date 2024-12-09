@@ -4,7 +4,7 @@ The ImageXpress by Molecular Devices has an opinionated data structure, and wrmX
 
 Each experiment should include a root directory with the plate name formated as `YYYYMMDD-p##-XYZ` where `p##` is a plate number and `XYZ` are the investigator's initials. The plate name may also include a random integer/index appended in the format `_###`.
 
-Inside of plate folder, there are two options for organizing the images, either as an individual TIF image for each well stored in a directory of each time point (total number of images = # time points x # wells x # wavelengths) or as a single AVI video for each well (total number of videos = # wells).
+Inside a plate folder, there are two options for organizing the images, either as an individual TIF image for each well stored in a directory of each time point (total number of images = # time points x # wells x # wavelengths) or as a single AVI video for each well (total number of videos = # wells).
 
 ## TIF files
 
