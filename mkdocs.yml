@@ -18,9 +18,9 @@ nav:
       - Feeding: pipelines/feeding.md
     - Run Diagnostics: dx.md
     - Run-Time Settings: run_time.md
-  - Metadata
-  - Preview
-  - Run
+  - Metadata: metadata.md
+  - Preview: preview.md
+  - Run: run.md
 plugins:
   - search
   - mkdocstrings
