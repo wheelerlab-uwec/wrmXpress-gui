@@ -14,9 +14,9 @@ wrmXpress can be used with a variety of data structures. Some pipelines require 
 
 Examples:
 
-![TIFF, Single Site](docs/img/instrument_settings/tiff-singlesite.png){: style="width:400px"}
-![TIFF, Single Site](docs/img/instrument_settings/tiff-singlesite2.png){: style="width:400px"}
-![TIFF, Single Site](docs/img/instrument_settings/tiff-singlesite3.png){: style="width:400px"}
+![TIFF, Single Site](img/tiff-singlesite.png){: style="width:400px"}
+![TIFF, Single Site](img/tiff-singlesite2.png){: style="width:400px"}
+![TIFF, Single Site](img/tiff-singlesite3.png){: style="width:400px"}
 
 ### ImageXpress + Multi Well
 
@@ -35,7 +35,7 @@ Examples:
   
 Examples:
 
-![TIFF, Multi Site](docs//img/instrument_settings/tiff-multisite.png){: style="width:400px"}
+![TIFF, Multi Site](img/tiff-multisite.png){: style="width:400px"}
 ***(Post-stitching)
 
 ### AVI + Single Well
@@ -56,5 +56,5 @@ Examples:
 
 Examples
 
-![AVI, Multi Site](docs/img/instrument_settings/avi-multiwell.png){: style="width:400px"}
-![AVI, Multi Site](docs/img/instrument_settings/avi-multiwell2.png){: style="width:400px"}
+![AVI, Multi Site](img/avi-multiwell.png){: style="width:400px"}
+![AVI, Multi Site](img/avi-multiwell2.png){: style="width:400px"}
