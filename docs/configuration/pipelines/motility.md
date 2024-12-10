@@ -50,7 +50,7 @@ All experiments should include a single wavelength and single site.
 
 ## Expected output
 
-A CSV file with at least three columns: Well, Total Motility, and Worm Area. Variation in the number of worms per well can be corrected for by diving the motility value by the area value. If using Metadata, there will be an additional column for each provided metadata CSV.
+A CSV file with at least three columns: Well, Total Motility, and Worm Area. Variation in the number of worms per well can be corrected for by dividing the motility value by the area value. If using Metadata, there will be an additional column for each provided metadata CSV.
 
 ## Configuration of the GUI
 
