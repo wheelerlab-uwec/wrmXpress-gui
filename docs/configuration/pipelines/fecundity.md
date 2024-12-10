@@ -7,11 +7,11 @@
 
 ## Expected input
 
-Fecundity data may be analyzed in the form of individual TIF images per frame (i.e., the TimePoint structure utilized by ImageXpress). [See the data organization page for more details.](../data_organization.md). The plate directory should have a single TimePoint with individual images for each well:
+Fecundity data may be analyzed in the form of individual TIF images per frame (i.e., the TimePoint structure utilized by ImageXpress).  See the [Data Organization](../data_organization.md) page for more details. The plate directory should have a single TimePoint with individual images for each well:
 
 Each well should include all the progeny from a single parent.
 
-All experiments should include a single wavelength. Multisite images should be stitched [see the stitching documentation]().
+All experiments should include a single wavelength. Multisite images should be stitched according the [ImageXpress + Multi Site instructions](../../instrument_settings/#imagexpress-multi-site).
 
 ### Validated species and stages
 

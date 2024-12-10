@@ -7,17 +7,21 @@
 
 ## Expected input
 
-Motility data may be analyzed in the form of individual TIF images per frame (i.e., the TimePoint structure utilized by ImageXpress) or in the form of raw, uncompressed AVI video containers. [See the data organization page for more details.](../data_organization.md). In the case of individual TIF images per frame, the directory structure should look like this:
+Motility data may be analyzed in the form of individual TIF images per frame (i.e., the TimePoint structure utilized by ImageXpress) or in the form of raw, uncompressed AVI video containers. See the [Data Organization](../data_organization.md) page for more details. In the case of individual TIF images per frame, the directory structure should look like this:
 
 ![Structure for individual TIF images](../img/tif_structure.png)
-
+/// caption
 In this experiment, the plate directory (`20210819-p01-NJW_753`) has 10 TimePoint directories. TimePoint directories have a single TIF image for each well.
+///
 
 In the case of AVIs, the directory structure should look like this:
 
-![Structure for individual AVI videos](../img/avi_structure.png)
-
+![Structure for individual AVI videos](../img/avi_structure.png){: style="width:70%"}
+/// caption
 In this experiment, the plate directory (`20240307-p01-RVH`) has 6 videos, 1 video for each well.
+///
+
+If the AVI includes multiple wells per videos, then the plate directory should include a single AVI with the same plate name.
 
 All experiments should include a single wavelength and single site.
 
@@ -54,7 +58,7 @@ A CSV file with at least three columns: Well, Total Motility, and Worm Area. Var
 
 ## Configuration of the GUI
 
-Motility in wrmXpress is measured using Farneback's optical flow algorithm, a dense flow method, implemented by [OpenCV](https://docs.opencv.org/4.6.0/dc/d6b/group__video__track.html#ga5d10ebbd59fe09c5f650289ec0ece5af). This is a departure from other tools, which use the Lucas-Kanade that focuses on keypoints. The function includes 6 parameters that can be adjusted. The following is taken directly from the OpenCV docs:
+Motility in wrmXpress is measured using Farneback's optical flow algorithm, a dense flow method, implemented by [OpenCV](https://docs.opencv.org/4.6.0/dc/d6b/group__video__track.html#ga5d10ebbd59fe09c5f650289ec0ece5af). This is a departure from other tools, which use the Lucas-Kanade algorithm that focuses on keypoints. The OpenCV function includes six parameters that can be adjusted. The following is taken directly from the OpenCV docs:
 
 1. `pyrScale` (Default = 0.5): The image scale (<1) to build pyramids for each image; pyr_scale=0.5 means a classical pyramid, where each next layer is twice smaller than the previous one. Past wrmXpress users have used 0.9 for adult *Brugia* and *Schistosoma* and 0.5 for all other worms.
 2. `levels` (Default = 3): The number of pyramid layers including the initial image; levels=1 means that no extra layers are created and only the original images are used. Past wrmXpress users have used 10 for adult *Brugia* and *Schistosoma* and 3 for all other worms.

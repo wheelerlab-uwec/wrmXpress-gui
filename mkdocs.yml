@@ -35,4 +35,5 @@ markdown_extensions:
   - toc         # Generates a table of contents for each page
   - attr_list
   - pymdownx.blocks.html
+  - pymdownx.blocks.caption
 
