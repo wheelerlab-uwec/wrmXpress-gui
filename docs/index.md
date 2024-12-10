@@ -6,7 +6,7 @@
 ![Docker Image Size (tag)](https://img.shields.io/docker/image-size/wheelern/wrmxpress_gui/latest)
 ![Docker Pulls](https://img.shields.io/docker/pulls/wheelern/wrmxpress_gui)
 
-wrmXpress is a suite of tools to analyze images and videos of free-living and parasitic flatworms and nematodes. It is designed to work out-of-the-box with data generated with a Molecular Devices ImageXpress high-content imager, but will work with any image type that is organized in an idiosyncratic manner ([Link to data organization instructions](data_organization.md)). Analytical pipelines featured in wrmXpress include:
+wrmXpress is a suite of tools to analyze images and videos of free-living and parasitic flatworms and nematodes. It is designed to work out-of-the-box with data generated with a Molecular Devices ImageXpress high-content imager, but will work with any image type that is organized in an idiosyncratic manner (described in [Data Organization](data_organization.md)). Analytical pipelines featured in wrmXpress include:
 
 - [Motility](pipelines/motility.md)
 - [Fecundity](pipelines/fecundity.md)
@@ -23,42 +23,46 @@ For large high-throughput analyses, wrmXpress can be run using a command-line in
 
 ### Installation of the GUI
 
-***Prerequisites*** - Download and install [Docker Desktop](https://www.docker.com/products/docker-desktop/)
+!!! note
+    Before starting, download and install [Docker Desktop](https://www.docker.com/products/docker-desktop/)
 
-The GUI is deployed via Docker Desktop and is run in any modern browser (i.e., Chrome, Firefox, Safari, etc.). Installation through Docker Desktop is simple and allows for pain-free updates, when desired.
+The GUI is deployed via Docker Desktop and is run in any modern browser (i.e., Chrome, Firefox, Safari, etc.). Installation through Docker Desktop is simple and allows for pain-free updates when desired.
 
-1. Create a working directory that contains all the input images. This folder is where temporary working files/images will be stored, where output data will be written, and will be mounted as a volume in the Docker container.
+1. Create a working directory on your computer that contains all the input images. This folder is where temporary working files/images will be stored, is where output data will be written, and will be mounted as a volume in the Docker container.
    - In the example below, this directory is `Users/njwheeler/mount`
 
 2. Open Docker Desktop.
 3. Use the search bar to find and download ("pull") the latest `wheelern/wrmxpress_gui` image from DockerHub:
    - Choose the most recent tag. The compressed image is >9 GB, so it will take a few minutes to download.
 
-    ![Pulling the GUI image](img/pull.gif){: style="width:500px"}
+    ![Pulling the GUI image](img/pull.gif){: style="width:100%"}
 
-4. In the Images pane, click the Run symbol.
+4. After downloading, in the Images pane of Docker Desktop, click the Run symbol.
 5. Under Optional settings, make the following changes:
    - Under Ports, set the Host port to 9000
    - Under Volumes, set the Host path to be the path to the working directory created in step #1. Set the Container path to be `/home/`
 6. Click Run
-   - Click OK if on MacOS and a warning pops up.
+   - Click OK if a warning pops up.
   
-    ![Running the GUI image](img/run.gif){: style="width:500px"}
+    ![Running the GUI image](img/run.gif){: style="width:100%"}
 
-7. Once running, wait until log messages appear in the Docker Desktop console. After they do, click the link to 9000:9000 or navigate to `http://localhost:9000` to view the app.
+7. Once running, click the link to 9000:9000 or navigate to `http://localhost:9000` to view the app.
 
-    ![Starting the GUI image](img/start.gif){: style="width:500px"}
+    ![Starting the GUI image](img/start.gif){: style="width:100%"}
 
-8. Follow the guidance in the GUI to prepare and run your analysis.
+    !!! warning
+        It may take 15-30 seconds for the GUI to start. Refresh the page if the GUI is not showing up in your browser.
+
+8. Follow the guidance in below to configure and run your analysis.
 
 ## Quick start
 
 To configure and run analyses, use the navigation column at left-hand side of the screen.
 
 1. **Configure** allows you to select relevant experimental and imaging parameters, as well as select the pipeline that you wish to run. Note that some selections will clash and be disallowed - you should see relevant warnings/errors if so.
-2. **Metadata** allows you to include well-based metadata. Each metadata type (i.e., concentration, treatment, time point, etc.) will be saved in a separate CSV with the same numbers of rows/columns selected in Configure.
+2. **Metadata** allows you to include well-based metadata. Each metadata type (i.e., concentration, treatment, time point, etc.) will be saved in a separate CSV with the same numbers of rows/columns selected in Configure - [Run-Time Settings](configuration/runtime.md).
 Custom metadata types can be added. Metadata will be merged with raw output after completing the analysis. Metadata is not required for a pipeline to run.
-3. **Preview** will allow you to preview the ouptput of the pipeline's analysis on well A01. Note that the preview step will fail if well A01 is empty.
+3. **Preview** will allow you to preview the output of the pipeline's analysis on well A01 (or on the first well selected).
 4. **Run** is where the final pipeline will be run on all of the selected wells. Logs are written dynamically to the screen but also to the working directory.
 
 ### Video walkthrough
@@ -67,11 +71,11 @@ Custom metadata types can be added. Metadata will be merged with raw output afte
 
 ## Developers
 
-wrmXpress is entirely open-source. The code for the back-end is maintained by the [Zamanian Lab](https://www.zamanianlab.org/) at the University of Wisconsin-Madison and can be found [here](https://github.com/zamanianlab/wrmXpress). The code for the front-end is maintained by the [Wheeler Lab](https://wheelerlab.bio/) at the University of Wisconsin-Eau Claire and can be found in this repository. To receive support for either the GUI or running wrmXpress remotely, please submit a GitHub Issue at the relevant linked repositories.
+wrmXpress is entirely open-source. The code for the back-end is maintained by the [Zamanian Lab](https://www.zamanianlab.org/) at the University of Wisconsin-Madison and can be found [here](https://github.com/zamanianlab/wrmXpress). The code for the front-end is maintained by the [Wheeler Lab](https://wheelerlab.bio/) at the University of Wisconsin-Eau Claire and can be found [here](https://github.com/wheelerlab-uwec/wrmXpress-gui). To receive support for either the GUI or running wrmXpress remotely, please submit a GitHub Issue at the relevant linked repositories.
 
 ## Citing wrmXpress
 
-When using the wrmXrpress backend on a remote machine, please cite:
+When using the wrmXrpress back-end on a remote machine, please cite:
 
     @ARTICLE{Wheeler2022-ou,
       title    = "{wrmXpress}: A modular package for high-throughput image analysis
@@ -87,7 +91,7 @@ When using the wrmXrpress backend on a remote machine, please cite:
       language = "en"
     }
 
-When using the GUI, please site the backend (above) as well as this repository:
+When using the GUI, please site the back-end (above) as well as the GUI's GitHub repository:
 
     @software{Caterer2024,
       author = {Caterer, Zachary and Horejsi, Rachel and Weber, Carly and Mathisen, Blake and 
