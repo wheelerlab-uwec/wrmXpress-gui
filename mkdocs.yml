@@ -8,16 +8,16 @@ nav:
   - Home: index.md
   - Data Organization: data_organization.md
   - Configuration:
-    - Instrument Settings: instrument_settings.md
-    - Image Transformations: image_transformations.md
+    - Instrument Settings: configuration/instrument_settings.md
+    - Image Transformations: configuration/image_transformations.md
     - Pipeline Selection:
-      - Motility: pipelines/motility.md
-      - Development: pipelines/development.md
-      - Fecundity: pipelines/fecundity.md
-      - Toxicity: pipelines/toxicity.md
-      - Feeding: pipelines/feeding.md
-    - Run Diagnostics: dx.md
-    - Run-Time Settings: run_time.md
+      - Motility: configuration/pipelines/motility.md
+      - Development: configuration/pipelines/development.md
+      - Fecundity: configuration/pipelines/fecundity.md
+      - Toxicity: configuration/pipelines/toxicity.md
+      - Feeding: configuration/pipelines/feeding.md
+    - Run Diagnostics: configuration/dx.md
+    - Run-Time Settings: configuration/run_time.md
   - Metadata:
     - Adding Metadata: metadata.md
   - Preview: 

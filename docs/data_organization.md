@@ -6,16 +6,16 @@ Each experiment should include a root directory with the plate name formated as 
 
 Inside a plate folder, there are two options for organizing the images, either as an individual TIF image for each well stored in a directory of each time point (total number of images = # time points x # wells x # wavelengths) or as a single AVI video for each well (total number of videos = # wells).
 
-## TIF files
+## TIF files (ImageXpress default)
 
 Compatible with the following pipelines:
 
-- [Motility](pipelines/motility.md)
-- [Fecundity](pipelines/fecundity.md)
-- [Toxicity](pipelines/toxicity.md)
-- [Feeding](pipelines/feeding.md)
-- [Development](pipelines/development.md)
-- [Tracking](pipelines/tracking.md)
+- [Motility](configuration/pipelines/motility.md)
+- [Fecundity](configuration/pipelines/fecundity.md)
+- [Toxicity](configuration/pipelines/toxicity.md)
+- [Feeding](configuration/pipelines/feeding.md)
+- [Development](configuration/pipelines/development.md)
+- [Tracking](configuration/pipelines/tracking.md)
 
 Detailed data structure expectactions for each pipeline can be found in the relevant pipeline documentation.
 
