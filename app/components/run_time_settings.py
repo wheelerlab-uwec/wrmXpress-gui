@@ -38,7 +38,7 @@ run_time_settings = dbc.AccordionItem(
                             placement="left",
                             target="mounted-info-icon",
                         ),
-                        html.H6("Volume Path:", id="volume-path-label"),
+                        html.H6("Volume path:", id="volume-path-label"),
                         html.Div(
                             [
                                 html.I(
@@ -75,7 +75,7 @@ run_time_settings = dbc.AccordionItem(
                 dbc.Row(
                     [
                         html.H6(
-                            "Plate/Folder name:"
+                            "Plate name:"
                         ),  # Label for the plate/folder name input field
                         html.Div(
                             [
@@ -117,7 +117,7 @@ run_time_settings = dbc.AccordionItem(
                     [
                         dbc.Col(
                             [
-                                html.H4("Wells", id="well-table-header"),
+                                html.H5("Wells", id="well-table-header"),
                             ],
                             width="auto",
                         ),
