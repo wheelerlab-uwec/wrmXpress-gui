@@ -8,8 +8,8 @@ At minimum, static diagnostics will stitch the first image from each will to gen
 
 ### Examples:
 
-![Motility diagnostic](https://github.com/zamanianlab/wrmXpress/blob/v2dev/img/flow_dx.png)
-![Fecundity diagnostic](https://github.com/zamanianlab/wrmXpress/blob/v2dev/img/fecundity.png)
+![Motility diagnostic](img/flow_dx.png)
+![Fecundity diagnostic](img/fecundity.png)
 
 ## Video
 
