@@ -8,8 +8,17 @@ At minimum, static diagnostics will stitch the first image from each will to gen
 
 ### Examples:
 
-![Motility diagnostic](img/flow_dx.png)
-![Fecundity diagnostic](img/fecundity.png)
+/// html | div[style='float: left;width: 50%;']
+*Motility*
+
+![Motility diagnostic](img/flow_dx.png){: style="width:95%"}
+///
+
+/// html | div[style='float: left;width: 50%;']
+*Fecundity*
+
+![Fecundity diagnostic](img/fecundity.png){: style="width:95%"}
+///
 
 ## Video
 
