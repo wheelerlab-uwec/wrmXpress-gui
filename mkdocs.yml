@@ -18,7 +18,7 @@ nav:
       - Feeding: configuration/pipelines/feeding.md
       - Tracking: configuration/pipelines/tracking.md
     - Run Diagnostics: configuration/dx.md
-    - Run-Time Settings: configuration/run_time.md
+    - Run-Time Settings: configuration/runtime.md
   - Metadata:
     - Adding Metadata: metadata.md
   - Preview: 

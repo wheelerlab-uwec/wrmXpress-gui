@@ -1,6 +1,6 @@
 # Run Diagnostics
 
-wrmXpress can generate a variety of diagnostics that allow for quick evaluation of the analysis. If selected, diagnostics are genereated based on the pipeline selected.
+wrmXpress can generate a variety of diagnostics that allow for evaluation of the analysis. If selected, diagnostics are genereated based on the pipeline selected.
 
 ## Static
 
