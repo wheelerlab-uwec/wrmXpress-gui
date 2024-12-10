@@ -16,6 +16,7 @@ nav:
       - Fecundity: configuration/pipelines/fecundity.md
       - Toxicity: configuration/pipelines/toxicity.md
       - Feeding: configuration/pipelines/feeding.md
+      - Tracking: configuration/pipelines/tracking.md
     - Run Diagnostics: configuration/dx.md
     - Run-Time Settings: configuration/run_time.md
   - Metadata:
@@ -33,4 +34,5 @@ markdown_extensions:
   - codehilite  # Enables syntax highlighting for code blocks
   - toc         # Generates a table of contents for each page
   - attr_list
+  - pymdownx.blocks.html
 
