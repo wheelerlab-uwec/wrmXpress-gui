@@ -22,4 +22,4 @@ At minimum, static diagnostics will stitch the first image from each will to gen
 
 ## Video
 
-If all wells are selected in [Run-Time Settings](run_time.md), video diagnostics will stich all wells together, include all time points, and return the output as an AVI or GIF. If fewer than all wells are selected, no stitching will be performed and instead videos for individual selected wells will be generated. This is useful for multi-timepoint ImageXpress analyses, for which videos are difficult to generate.
+If all wells are selected in [Run-Time Settings](runtime.md), video diagnostics will stich all wells together, include all time points, and return the output as an AVI or GIF. If fewer than all wells are selected, no stitching will be performed and instead videos for individual selected wells will be generated. This is useful for multi-timepoint ImageXpress analyses, for which videos are difficult to generate.

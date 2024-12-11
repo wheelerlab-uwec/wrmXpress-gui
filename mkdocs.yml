@@ -1,6 +1,6 @@
 site_name: wrmXpress-gui
 # site_url: https://example.com  # Customize with your project URL
-site_description: This is the documentation for the wrmXpress-gui package.
+site_description: Documentation for the wrmXpress GUI.
 
 theme: readthedocs
 
@@ -25,12 +25,13 @@ nav:
     - Testing pipelines: preview.md
   - Run:
     - Running full analyses: run.md
+
 plugins:
   - search
   - mkdocstrings
 
 markdown_extensions:
-  - admonition  # Enables 'Note' and 'Warning' blocks
+  - pymdownx.blocks.admonition  
   - codehilite  # Enables syntax highlighting for code blocks
   - toc         # Generates a table of contents for each page
   - attr_list

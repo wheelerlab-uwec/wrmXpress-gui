@@ -8,12 +8,12 @@
 
 wrmXpress is a suite of tools to analyze images and videos of free-living and parasitic flatworms and nematodes. It is designed to work out-of-the-box with data generated with a Molecular Devices ImageXpress high-content imager, but will work with any image type that is organized in an idiosyncratic manner (described in [Data Organization](data_organization.md)). Analytical pipelines featured in wrmXpress include:
 
-- [Motility](pipelines/motility.md)
-- [Fecundity](pipelines/fecundity.md)
-- [Toxicity](pipelines/toxicity.md)
-- [Feeding](pipelines/feeding.md)
-- [Development](pipelines/development.md)
-- [Tracking](pipelines/tracking.md)
+- [Motility](configuration/pipelines/motility.md)
+- [Fecundity](configuration/pipelines/fecundity.md)
+- [Toxicity](configuration/pipelines/toxicity.md)
+- [Feeding](configuration/pipelines/feeding.md)
+- [Development](configuration/pipelines/development.md)
+- [Tracking](configuration/pipelines/tracking.md)
 
 Some pipelines require specific experimental procedures to generate the proper data (i.e., the Feeding pipline requires images of worms that have been fed fluorescent dyes), while other pipelines are generalizable across multiple worm species, stages, and imaging environments. Detailed documentation for each pipeline can be found at the corresponding links above.
 
@@ -57,7 +57,7 @@ The GUI is deployed via Docker Desktop and is run in any modern browser (i.e., C
 
 ## Quick start
 
-To configure and run analyses, use the navigation column at left-hand side of the screen.
+To configure and run analyses, use the navigation column at left-hand side of the GUI. Full documentation for the Configure, Metadata, Preview, and Run steps can be found in the corresponding sections of this documentation site.
 
 1. **Configure** allows you to select relevant experimental and imaging parameters, as well as select the pipeline that you wish to run. Note that some selections will clash and be disallowed - you should see relevant warnings/errors if so.
 2. **Metadata** allows you to include well-based metadata. Each metadata type (i.e., concentration, treatment, time point, etc.) will be saved in a separate CSV with the same numbers of rows/columns selected in Configure - [Run-Time Settings](configuration/runtime.md).
@@ -71,7 +71,14 @@ Custom metadata types can be added. Metadata will be merged with raw output afte
 
 ## Developers
 
-wrmXpress is entirely open-source. The code for the back-end is maintained by the [Zamanian Lab](https://www.zamanianlab.org/) at the University of Wisconsin-Madison and can be found [here](https://github.com/zamanianlab/wrmXpress). The code for the front-end is maintained by the [Wheeler Lab](https://wheelerlab.bio/) at the University of Wisconsin-Eau Claire and can be found [here](https://github.com/wheelerlab-uwec/wrmXpress-gui). To receive support for either the GUI or running wrmXpress remotely, please submit a GitHub Issue at the relevant linked repositories.
+wrmXpress is entirely open-source. The code for the back-end is maintained by the [Zamanian Lab](https://www.zamanianlab.org/) at the University of Wisconsin-Madison and can be found [here](https://github.com/zamanianlab/wrmXpress). The code for the front-end is maintained by the [Wheeler Lab](https://wheelerlab.bio/) at the University of Wisconsin-Eau Claire and can be found [here](https://github.com/wheelerlab-uwec/wrmXpress-gui).
+
+## Getting support
+
+To receive support for either the GUI or running wrmXpress remotely, please submit a GitHub Issue at the relevant linked repositories:
+
+- [wrmXpress back-end](https://github.com/zamanianlab/wrmXpress)
+- [wrmXpress GUI](https://github.com/wheelerlab-uwec/wrmXpress-gui)
 
 ## Citing wrmXpress
 
