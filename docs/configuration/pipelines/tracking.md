@@ -1,5 +1,9 @@
 # Tracking
 
+/// warning | Note
+Tracking is implemented for worms that are native to a liquid environment. So far, the tracking pipeline has only been tested with schistosome miracidia. It is unlikely to perform well for worms that only trash and do not demonstrate translatioal movement in liquid culture. For situations such as this, we recommend the [optical flow motility pipeline](motility.md).
+//
+
 ## Expected input
 
 Tracking data may be analyzed in the form of individual TIF images per frame (i.e., the TimePoint structure utilized by ImageXpress) or in the form of raw, uncompressed AVI video containers. See the [Data Organization](../../data_organization.md) page for more details. In the case of individual TIF images per frame, the directory structure should look like this:
