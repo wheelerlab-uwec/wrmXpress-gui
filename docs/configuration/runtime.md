@@ -12,8 +12,10 @@ The "Plate name" should be the name of the plate that was copied to the working 
 
 Invidual or groups of wells can be selected for analysis instead of an entire plate. By default, the entire plate will be analyzed. To select specifc wells of interest, simply remove the well ID from the table. 
 
-!!! warning
-    wrmXpress will give a warning if wells are selected that don't have corresponding data in the input plate name directory, but the analysis will still run.
+/// warning
+wrmXpress will give a warning if wells are selected that don't have corresponding data in the input plate name directory, but the analysis will still run.
+///
 
-!!! note
-    Multiple wells can be selected and deleted by holding Shift while clicking on the table. If some wells are inadvertently deselected, simply refresh the page.
+/// note | Tip
+Multiple wells can be selected and deleted by holding Shift while clicking on the table. If some wells are inadvertently deselected, simply refresh the page.
+///

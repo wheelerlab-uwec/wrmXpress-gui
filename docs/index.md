@@ -23,8 +23,9 @@ For large high-throughput analyses, wrmXpress can be run using a command-line in
 
 ### Installation of the GUI
 
-!!! note
-    Before starting, download and install [Docker Desktop](https://www.docker.com/products/docker-desktop/)
+/// note | Prerequisites
+Before starting, download and install [Docker Desktop](https://www.docker.com/products/docker-desktop/)
+///
 
 The GUI is deployed via Docker Desktop and is run in any modern browser (i.e., Chrome, Firefox, Safari, etc.). Installation through Docker Desktop is simple and allows for pain-free updates when desired.
 
@@ -50,8 +51,9 @@ The GUI is deployed via Docker Desktop and is run in any modern browser (i.e., C
 
     ![Starting the GUI image](img/start.gif){: style="width:100%"}
 
-    !!! warning
-        It may take 15-30 seconds for the GUI to start. Refresh the page if the GUI is not showing up in your browser.
+    /// warning | Be patient
+    It may take 15-30 seconds for the GUI to start. Refresh the page if the GUI is not showing up in your browser.
+    ///
 
 8. Follow the guidance in below to configure and run your analysis.
 
