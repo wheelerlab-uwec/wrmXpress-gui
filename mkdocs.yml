@@ -1,26 +1,40 @@
 site_name: wrmXpress-gui
 # site_url: https://example.com  # Customize with your project URL
-site_description: This is the documentation for the wrmXpress-gui package.
+site_description: Documentation for the wrmXpress GUI.
 
 theme: readthedocs
 
 nav:
   - Home: index.md
-  - Data organization: data_organization.md
-  - Pipelines:
-    - Motility: pipelines/motility.md
-    - Development: pipelines/development.md
-    - Fecundity: pipelines/fecundity.md
-    - Toxicity: pipelines/toxicity.md
-    - Feeding: pipelines/feeding.md
+  - Data Organization: data_organization.md
+  - Configuration:
+    - Instrument Settings: configuration/instrument_settings.md
+    - Image Transformations: configuration/image_transformations.md
+    - Pipeline Selection:
+      - Motility: configuration/pipelines/motility.md
+      - Development: configuration/pipelines/development.md
+      - Fecundity: configuration/pipelines/fecundity.md
+      - Toxicity: configuration/pipelines/toxicity.md
+      - Feeding: configuration/pipelines/feeding.md
+      - Tracking: configuration/pipelines/tracking.md
+    - Run Diagnostics: configuration/dx.md
+    - Run-Time Settings: configuration/runtime.md
+  - Metadata:
+    - Adding Metadata: metadata.md
+  - Preview: 
+    - Testing pipelines: preview.md
+  - Run:
+    - Running full analyses: run.md
 
 plugins:
   - search
   - mkdocstrings
 
 markdown_extensions:
-  - admonition  # Enables 'Note' and 'Warning' blocks
+  - pymdownx.blocks.admonition  
   - codehilite  # Enables syntax highlighting for code blocks
   - toc         # Generates a table of contents for each page
   - attr_list
+  - pymdownx.blocks.html
+  - pymdownx.blocks.caption
 
