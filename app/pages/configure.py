@@ -101,139 +101,23 @@ def update_options_visibility(imaging_mode, file_structure, mask, static_dx, vid
     )  # return the styles
 
 
-@callback(Output("pipeline-params", "children"), Input("pipeline-selection", "value"))
+@callback(
+        Output("pipeline-params-header", "style"),
+        Output("motility_params", "style"), 
+        Output("fecundity_params", "style"),
+        Output("cellprofile_params", "style"),
+        Input("pipeline-selection", "value"))
 def update_params_visibility(pipeline):
 
-    params_pane = None
-
     if pipeline == "motility":
-        params_pane = html.Div(
-            [
-                dbc.Row(
-                    [
-                        dbc.Col(html.P("Wavelength:")),
-                        dbc.Col(
-                            dbc.Input(
-                                id="wavelengths",
-                                placeholder="Wavelength",
-                                type="text",
-                                persistence=True,
-                                persistence_type="memory",
-                                style={"display": "flex"},
-                            ),
-                        ),
-                    ]
-                ),
-                dbc.Row(
-                    [
-                        dbc.Col(html.P("pyrScale:")),
-                        dbc.Col(
-                            dbc.Input(
-                                id="pyrscale",
-                                placeholder="0.5",
-                                type="number",
-                                persistence=True,
-                                persistence_type="memory",
-                                style={"display": "flex"},
-                            ),
-                        ),
-                    ]
-                ),
-                dbc.Row(
-                    [
-                        dbc.Col(html.P("Levels:")),
-                        dbc.Col(
-                            dbc.Input(
-                                id="levels",
-                                placeholder="5",
-                                type="number",
-                                persistence=True,
-                                persistence_type="memory",
-                                style={"display": "flex"},
-                            ),
-                        ),
-                    ]
-                ),
-                dbc.Row(
-                    [
-                        dbc.Col(html.P("Window size:")),
-                        dbc.Col(
-                            dbc.Input(
-                                id="winsize",
-                                placeholder="20",
-                                type="number",
-                                persistence=True,
-                                persistence_type="memory",
-                                style={"display": "flex"},
-                            ),
-                        ),
-                    ]
-                ),
-                dbc.Row(
-                    [
-                        dbc.Col(html.P("Iterations:")),
-                        dbc.Col(
-                            dbc.Input(
-                                id="iterations",
-                                placeholder="7",
-                                type="number",
-                                persistence=True,
-                                persistence_type="memory",
-                                style={"display": "flex"},
-                            ),
-                        ),
-                    ]
-                ),
-                dbc.Row(
-                    [
-                        dbc.Col(html.P("Poly N:")),
-                        dbc.Col(
-                            dbc.Input(
-                                id="poly_n",
-                                placeholder="5",
-                                type="number",
-                                persistence=True,
-                                persistence_type="memory",
-                                style={"display": "flex"},
-                            ),
-                        ),
-                    ]
-                ),
-                dbc.Row(
-                    [
-                        dbc.Col(html.P("Poly Sigma:")),
-                        dbc.Col(
-                            dbc.Input(
-                                id="poly_sigma",
-                                placeholder="1.1",
-                                step=0.1,
-                                type="number",
-                                persistence=True,
-                                persistence_type="memory",
-                                style={"display": "flex"},
-                            ),
-                        ),
-                    ]
-                ),
-                dbc.Row(
-                    [
-                        dbc.Col(html.P("Flags:")),
-                        dbc.Col(
-                            dbc.Input(
-                                id="flags",
-                                placeholder="0",
-                                type="number",
-                                persistence=True,
-                                persistence_type="memory",
-                                style={"display": "flex"},
-                            ),
-                        ),
-                    ]
-                ),
-            ]
-        )
+        return {"display": "flex"}, {"display": "flex"}, {"display": "none"}, {"display": "none"}
+    elif pipeline == "fecundity":
+        return {"display": "flex"}, {"display": "none"}, {"display": "flex"}, {"display": "none"}
+    elif pipeline in ["wormsize_intensity_cellpose", "mf_celltox", "feeding"]:
+        return {"display": "flex"}, {"display": "none"}, {"display": "none"}, {"display": "flex"}
+    else:
+        return {"display": "none"}, {"display": "none"}, {"display": "none"}, {"display": "none"}
 
-    return params_pane
 
 
 @callback(
@@ -345,7 +229,6 @@ def update_wells(table_contents):  # list of cells from selection table
     This function will populate the list of wells to be analyzed.
     =======================================================================================================
     Arguments:
-        - table_contents : list : The list of cells from the selection table
     =======================================================================================================
     Returns:
         - list : The sorted list of wells to be analyzed
@@ -402,11 +285,19 @@ def update_wells(table_contents):  # list of cells from selection table
     State("poly_n", "value"),
     State("poly_sigma", "value"),
     State("flags", "value"),
+    # Newly added inputs
+    State("cellpose-model-segmentation", "value"),
+    State("cellpose-model-type-segmentation", "value"),
+    State("wavelengths-segmentation", "value"),
+    State("cellpose-model-cellprofile", "value"),
+    # State("cellpose-model-type-cellprofile", "value"),
+    State("wavelengths-cellprofile", "value"),
+
     prevent_initial_call=True,
     allow_duplicate=True,
 )
 # saving the yaml file from the sections in the configuration page
-def run_analysis(  # function to save the yaml file from the sections in the configuration page
+def save_configuration_upon_clicking_finalize_button(  # function to save the yaml file from the sections in the configuration page
     nclicks,
     imagingmode,
     filestructure,
@@ -437,13 +328,22 @@ def run_analysis(  # function to save the yaml file from the sections in the con
     poly_n,
     poly_sigma,
     flags,
+    # Newly added inputs
+    cellpose_model_segmentation,
+    cellpose_model_type_segmentation,
+    wavelengths_segmentation,
+    cellpose_model_cellprofile,
+    # cellpose_model_type_cellprofile,
+    wavelengths_cellprofile
 ):
 
     if nclicks:
 
         # try to catch any errors that may occur
         # return an error message if an error occurs
-        try:
+        # try: will include something here later
+
+        """
             # initializing the first error message
             error_messages = [
                 "While finalizing the configuration, the following errors were found:"
@@ -617,8 +517,9 @@ def run_analysis(  # function to save the yaml file from the sections in the con
             return "danger", True, "A ValueError occurred", "danger"
         except Exception as e:
             return "danger", True, f"An unexpected error occurred: {str(e)}", "danger"
-
-        diagnosticdx = "True"  # set diagnosticdx to True
+        """
+        
+        # diagnosticdx = "True"  # set diagnosticdx to True
 
         # if no error messages are found, write the configuration to a YAML file
         config = prep_yaml(
@@ -650,6 +551,13 @@ def run_analysis(  # function to save the yaml file from the sections in the con
             poly_n,
             poly_sigma,
             flags,
+            # Newly added inputs
+            cellpose_model_segmentation,
+            cellpose_model_type_segmentation,
+            wavelengths_segmentation,
+            cellpose_model_cellprofile,
+            # cellpose_model_type_cellprofile,
+            wavelengths_cellprofile
         )
 
         output_file = Path(volume, platename + ".yml")

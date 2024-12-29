@@ -90,14 +90,19 @@ def create_na_df_from_inputs(_rows, _cols):
 def eval_bool(v):
     """
     This function evaluates a boolean value from a string.
-      ===============================================================================
-      Arguments:
-          - v : str : A string that represents a boolean value
-      ===============================================================================
-      Returns:
-          - bool : A boolean value
+    ===============================================================================
+    Arguments:
+        - v : str : A string that represents a boolean value
+    ===============================================================================
+    Returns:
+        - bool : A boolean value
     """
-    return str(v).lower() in ("yes", "true", "t", "1", "True")
+    return str(v).lower() in ("yes", "true", "t", "1")
+
+
+def get_default_value(param, default_value):
+    """Helper function to return the default value if the param is None."""
+    return param if param is not None else default_value
 
 
 def prep_yaml(
@@ -129,6 +134,13 @@ def prep_yaml(
     poly_n,
     poly_sigma,
     flags,
+    # Newly added inputs
+    cellpose_model_segmentation,
+    cellpose_model_type_segmentation,
+    wavelengths_segmentation,
+    cellpose_model_cellprofile,
+    # cellpose_model_type_cellprofile,
+    wavelengths_cellprofile,
 ):
     # Check if wellselection is a list or a string
     if isinstance(wellselection, list):
@@ -140,39 +152,97 @@ def prep_yaml(
         # Set wellselection to a list containing the input string
         wellselection = [wellselection]
 
-    if multiwellrows is None:  # If multiwellrows is None
-        multiwellrows = 1  # Set multiwellrows to 0
-    if multiwellcols is None:  # If multiwellcols is None
-        multiwellcols = 1  # Set multiwellcols to 0
-    # if conversionrescalemultiplier is None:  # If conversionrescalemultiplier is None
-    #    conversionrescalemultiplier = 0  # Set conversionrescalemultiplier to 0
+    if multiwellrows is None:
+        multiwellrows = 1  # Default multiwellrows
+    if multiwellcols is None:
+        multiwellcols = 1  # Default multiwellcols
 
-    if xsites is None:
-        xsites = "NA"
-    if ysites is None:
-        ysites = "NA"
+    # Default xsites and ysites
+    xsites = get_default_value(xsites, "NA")
+    ysites = get_default_value(ysites, "NA")
 
+    # Mask diameter handling
     if mask == "circular":
-        circlediameter = maskdiameter
+        circlediameter = get_default_value(maskdiameter, "NA")
         squarediameter = "NA"
     elif mask == "square":
         circlediameter = "NA"
-        squarediameter = maskdiameter
-    elif mask == "NA":
-        circlediameter = "NA"
-        squarediameter = "NA"
+        squarediameter = get_default_value(maskdiameter, "NA")
+    else:
+        circlediameter = squarediameter = "NA"
 
+    # Evaluate staticdx and videodx conditions
+    staticdx_dict = (
+        {}
+        if not eval_bool(staticdx)
+        else {
+            "run": eval_bool(staticdx),
+            "rescale_multiplier": staticdxrescale,
+        }
+    )
+
+    videodx_dict = (
+        {}
+        if not eval_bool(videodx)
+        else {
+            "run": eval_bool(videodx),
+            "format": videodxformat,
+            "rescale_multiplier": videodxrescale,
+        }
+    )
+
+    # Select modules for YAML
     module_selction_dict = formatting_module_for_yaml(pipeline)
-    motilityrun = module_selction_dict["motilityrun"]
-    conversionrun = module_selction_dict["conversionrun"]
-    segmentrun = module_selction_dict["segmentrun"]
-    cellprofilerrun = module_selction_dict["cellprofilerrun"]
-    diagnosticdx = module_selction_dict["diagnosticdx"]
-    fecundity = module_selction_dict["fecundity"]
-    trackingrun = module_selction_dict["trackingrun"]
-    cellprofilerpipeline = module_selction_dict["cellprofilerpipeline"]
 
-    # Create a dictionary for the YAML file in the required format
+    # Extract runs from module selection
+    motilityrun = module_selction_dict.get("motilityrun")
+    segmentrun = module_selction_dict.get("segmentrun")
+    cellprofilerrun = module_selction_dict.get("cellprofilerrun")
+    trackingrun = module_selction_dict.get("trackingrun")
+    cellprofilerpipeline = module_selction_dict.get("cellprofilerpipeline")
+
+    # Dictionary for motilityrun, segmentation, cellprofiler, etc.
+    motilityrun_dict = (
+        {}
+        if not eval_bool(motilityrun)
+        else {
+            "run": True,
+            "wavelengths": [wavelength or "default_wavelength"],
+            "pyrScale": get_default_value(pyrscale, 0.5),
+            "levels": get_default_value(levels, 5),
+            "winsize": get_default_value(winsize, 20),
+            "iterations": get_default_value(iterations, 7),
+            "poly_n": get_default_value(poly_n, 5),
+            "poly_sigma": get_default_value(poly_sigma, 1.1),
+            "flags": get_default_value(flags, 0),
+        }
+    )
+
+    segmentation_dict = (
+        {}
+        if not eval_bool(segmentrun)
+        else {
+            "run": True,
+            "model": get_default_value(cellpose_model_segmentation, "cyto"),
+            "model_type": get_default_value(cellpose_model_type_segmentation, "cyto"),
+            "wavelength": [get_default_value(wavelengths_segmentation, "w1")],
+        }
+    )
+
+    cellprofiler_dict = (
+        {}
+        if not eval_bool(cellprofilerrun)
+        else {
+            "run": True,
+            "cellpose_model": get_default_value(
+                cellpose_model_cellprofile, "20220830_all"
+            ),
+            "cellpose_wavelength": get_default_value(wavelengths_cellprofile, "w1"),
+            "pipeline": [cellprofilerpipeline],
+        }
+    )
+
+    # Final YAML dictionary construction
     yaml_dict = {
         "imaging_mode": [imagingmode],
         "file_structure": [filestructure],
@@ -187,34 +257,11 @@ def prep_yaml(
         "species": [species],
         "stages": [stages],
         "pipelines": {
-            "static-dx": {
-                "run": eval_bool(staticdx),
-                "rescale_multiplier": staticdxrescale,
-            },
-            "video-dx": {
-                "run": eval_bool(videodx),
-                "format": videodxformat,
-                "rescale_multiplier": videodxrescale,
-            },
-            "optical_flow": {
-                "run": eval_bool(motilityrun),
-                "wavelengths": [wavelength],
-                "flow": "",
-                "pyrScale": pyrscale,
-                "levels": levels,
-                "winsize": winsize,
-                "iterations": iterations,
-                "poly_n": poly_n,
-                "poly_sigma": poly_sigma,
-                "flags": flags,
-            },
-            "segment": {"run": eval_bool(segmentrun), "wavelength": [wavelength]},
-            "cellprofiler": {
-                "run": eval_bool(cellprofilerrun),
-                "pipeline": [cellprofilerpipeline],
-            },
-            "dx": {"run": eval_bool(diagnosticdx)},
-            "fecundity": {"run": eval_bool(fecundity)},
+            "statix_dx": staticdx_dict,
+            "video-dx": videodx_dict,
+            "optical_flow": motilityrun_dict,
+            "segmentation": segmentation_dict,
+            "cellprofiler": cellprofiler_dict,
             "tracking": {"run": eval_bool(trackingrun)},
         },
         "wells": wellselection,
@@ -225,8 +272,31 @@ def prep_yaml(
         },
     }
 
-    # Return the dictionary
     return yaml_dict
+
+
+def get_diameters(mask, maskdiameter, circlediameter=None, squarediameter=None):
+    """Get the diameters for the mask type.
+
+    Args:
+        mask (mask): type of mask
+        maskdiameter (maskdiameter): diameter of the mask
+        circlediameter (
+        squarediameter (_type_, optional): _description_. Defaults to None.
+
+    Returns:
+        _type_: _description_
+    """
+    if mask == "circular":
+        circlediameter = circlediameter if circlediameter is not None else maskdiameter
+        squarediameter = "NA"
+    elif mask == "square":
+        circlediameter = "NA"
+        squarediameter = squarediameter if squarediameter is not None else maskdiameter
+    elif mask == "NA":
+        circlediameter = "NA"
+        squarediameter = "NA"
+    return circlediameter, squarediameter
 
 
 def send_ctrl_c(pid):

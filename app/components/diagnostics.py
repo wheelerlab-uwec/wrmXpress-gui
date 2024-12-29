@@ -34,30 +34,31 @@ diagnostics = dbc.AccordionItem(
                                                     },
                                                 ],
                                                 id="static-dx",
+                                                persistence=True,
                                             ),
+                                            # Tooltip for static diagnostics
+                                            dbc.Tooltip(
+                                                "Run static diagnostics on the input data.",
+                                                target="static-dx",
+                                                placement="left",
+                                            )
                                         ]
                                     ),
                                     dbc.Row(
                                         [
-                                            dbc.Col(
-                                                [
-                                                    html.P("Rescale multiplier:")
-                                                    ],
-                                                    width=3
+                                            dbc.Col([
+                                            html.P("Rescale multiplier:"),
+                                            dbc.Input(
+                                                placeholder="1",
+                                                type="number",
+                                                min=0,
+                                                max=1,
+                                                step=0.1,
+                                                persistence=True,
+                                                persistence_type="memory",
                                             ),
-                                            dbc.Col(
-                                                [
-                                                    dbc.Input(
-                                                        placeholder="1",
-                                                        type="number",
-                                                        min=0,
-                                                        max=1,
-                                                        step=0.1,
-                                                        persistence=True,
-                                                        persistence_type="memory",
-                                                    ),
-                                                ],
-                                                width=9,
+                                            ],
+                                            width=11,
                                             ),
                                         ],
                                         id="static-dx-rescale",
@@ -76,7 +77,14 @@ diagnostics = dbc.AccordionItem(
                                                     },
                                                 ],
                                                 id="video-dx",
+                                                persistence=True,
                                             ),
+                                            # Tooltip for video diagnostics
+                                            dbc.Tooltip(
+                                                "Run video diagnostics on the input data.",
+                                                target="video-dx",
+                                                placement="left",
+                                            )
                                         ]
                                     ),
                                     dbc.Row(
