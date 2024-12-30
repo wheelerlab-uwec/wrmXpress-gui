@@ -1,8 +1,24 @@
 # Tracking
 
 /// warning | Note
-Tracking is implemented for worms that are native to a liquid environment. So far, the tracking pipeline has only been tested with schistosome miracidia. It is unlikely to perform well for worms that only trash and do not demonstrate translatioal movement in liquid culture. For situations such as this, we recommend the [optical flow motility pipeline](motility.md).
-//
+Tracking is implemented for worms that are native to a liquid environment. So far, the tracking pipeline has only been tested with schistosome miracidia. It is unlikely to perform well for worms that only thrash and do not demonstrate translational movement in liquid culture. For situations such as this, we recommend the [optical flow motility pipeline](motility.md).
+///
+
+## Configuration of the GUI
+
+Tracking of worms is implemented with [Trackpy](https://soft-matter.github.io/trackpy/v0.6.4/) and is split into two steps: object identification and object linking. Some information below is copied from the Trackpy documentation.
+
+Two parameters can be set for object identification (used to configure [`trackpy.locate`](https://soft-matter.github.io/trackpy/v0.6.4/generated/trackpy.locate.html#trackpy.locate)):
+
+1. `diameter` (Default = 35): The diameter in pixels of the objects of interest.
+2. `minmass` (Default = 1200): The minimum integrated brightness of objects of interest. Lower values will maintain dimmer objects. Set to 0 to disable all object filtering (may cause problems in the object linking step).
+3. `noise_size` (Default = 2): The standard deviation to be used for the Gaussian kernel used to add blur and denoise the image prior to object identification.
+
+Two parameters can be set for object identification (used to configure [`trackpy.link`](https://soft-matter.github.io/trackpy/v0.6.4/generated/trackpy.link.html#trackpy.link)):
+
+1. `search_range` (Default = 45): The maximum distance features can move between frames. This is related to the maximum speed of the worm (use larger values for faster animals).
+2. `memory` (Default = 25): The maximum number of frames during which a feature can vanish, then reappear nearby, and be considered the same particle.
+3. `adaptive_stop` (Default = 30): If an object cannot be linked between two frames by searching within `search_range` becasue there are two many objects within that range, the algorithm will reduce `search_range` and search again. When `search_range` becomes less than or equal to `adaptive_stop`, the search will stop and an error will be raised.
 
 ## Expected input
 
@@ -31,7 +47,3 @@ All experiments should include a single wavelength and single site.
 ## Expected output
 
 A CSV file with at least 11 columns: well, y, x, mass, size, ecc, signal, raw_mass, ep, frame, and particle. If using [Metadata](), there will be an additional column for each provided metadata data frame.
-
-## Configuration of the GUI
-
-No special configuration is required.
