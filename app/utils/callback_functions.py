@@ -170,7 +170,7 @@ def prep_yaml(
 
     # Write script to determine which modules to run
     # TODO: Add more modules as needed
-    print(store_data["wrmXpress_gui_obj"]["pipeline_selection"])
+    
     # Dictionary for motilityrun, segmentation, cellprofiler, etc.
     motilityrun_dict = (
         {
