@@ -112,7 +112,7 @@ module_selection = dbc.AccordionItem(
                                                                                     "value": "w4",
                                                                                 }
                                                                             ],
-                                                                            value="w1",
+                                                                            value="All",
                                                                             persistence=True,
                                                                             persistence_type="memory",
                                                                         ),
@@ -405,7 +405,7 @@ module_selection = dbc.AccordionItem(
                                                                                 "value": "w4",
                                                                             },
                                                                         ],
-                                                                        value="red",
+                                                                        value="All",
                                                                         persistence=True,
                                                                         persistence_type="memory",
                                                                         style={
@@ -536,7 +536,7 @@ module_selection = dbc.AccordionItem(
                                                                                 "value": "w4",
                                                                             },
                                                                         ],
-                                                                        value="red",
+                                                                        value="All",
                                                                         persistence=True,
                                                                         persistence_type="memory",
                                                                         style={
