@@ -32,6 +32,7 @@ dependencies:
   - waitress==3.0.0
   - webdriver-manager==4.0.1
   - yaml==0.2.5
+  - zenodo_get
 
 # backend
   - cellpose==3.0.9
