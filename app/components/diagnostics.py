@@ -19,7 +19,7 @@ diagnostics = dbc.AccordionItem(
         children=[
             dbc.Row(
                 [
-                    html.H5("Diagnostic Options:"),
+                    html.H5("Options:"),
                     dbc.Row(
                         [
                             dbc.Col(
@@ -56,6 +56,7 @@ diagnostics = dbc.AccordionItem(
                                                 step=0.1,
                                                 persistence=True,
                                                 persistence_type="memory",
+                                                id="static-dx-rescale-input",
                                             ),
                                             ],
                                             width=11,
@@ -98,15 +99,23 @@ diagnostics = dbc.AccordionItem(
                                                             {
                                                                 "label": "AVI",
                                                                 "value": "avi",
-                                                            }
+                                                            },
+                                                            # {
+                                                            #     "label": "GIF",
+                                                            #     "value": "gif",
+                                                            # },
+                                                            # {
+                                                            #     "label": "NA", 
+                                                            #     "value": "NA",
+                                                            # },
                                                         ],
-                                                        value="NA",
+                                                        value="avi",
                                                         persistence=True,
                                                         persistence_type="memory",
                                                     ),
                                                 ],
                                                 width=6,
-                                                id="video-dx-format",
+                                                id="video-dx-format-column",
                                             ),
                                             dbc.Col(
                                                 [

@@ -53,58 +53,6 @@ instrument_settings = dbc.AccordionItem(
                         ],
                         width="auto",
                     ),
-                    dbc.Col(
-                        [
-                            html.Div(
-                                html.P(
-                                    "Cropping options:",  # text of cropping items
-                                    style={
-                                        "textDecoration": "underline",
-                                        "cursor": "pointer",
-                                    },
-                                    id="crop-options",
-                                )
-                            ),
-                            dbc.Tooltip(
-                                [
-                                    # Tooltip element for text "cropping items", displays message when cursor over the text
-                                    html.P(
-                                        "Select the method of cropping wells.",
-                                        style={"text-align": "left"},
-                                    ),
-                                    html.P(
-                                        "Auto: in development.",
-                                        style={"text-align": "left"},
-                                    ),
-                                    html.P(
-                                        "Grid: Crops a grid based on the provided number of columns and rows.",
-                                        style={"text-align": "left"},
-                                    ),
-                                ],
-                                placement="bottom",
-                                target="crop-options",
-                                style={"text-align": "left"},
-                            ),
-                            dbc.RadioItems(
-                                # Radio button selection of Auto or Grid
-                                id="multi-well-detection",
-                                className="btn-group",
-                                inputClassName="btn-check",
-                                labelClassName="btn btn-outline-primary",
-                                labelCheckedClassName="active",
-                                options=[
-                                    # {"label": "Auto", "value": "auto"},
-                                    {"label": "Grid", "value": "grid"},
-                                ],
-                                value="grid",
-                                persistence=True,
-                                persistence_type="memory",
-                            ),
-                        ],
-                        width="auto",
-                        id="additional-options-row",
-                        style={"display": "flex"},
-                    ),
                 ],
                 align="center",
             )
@@ -176,6 +124,58 @@ instrument_settings = dbc.AccordionItem(
                         ),
                         dbc.Col(
                             [
+                                html.Div(
+                                    html.P(
+                                        "Cropping options:",  # text of cropping items
+                                        style={
+                                            "textDecoration": "underline",
+                                            "cursor": "pointer",
+                                        },
+                                        id="crop-options",
+                                    )
+                                ),
+                                dbc.Tooltip(
+                                    [
+                                        # Tooltip element for text "cropping items", displays message when cursor over the text
+                                        html.P(
+                                            "Select the method of cropping wells.",
+                                            style={"text-align": "left"},
+                                        ),
+                                        html.P(
+                                            "Auto: in development.",
+                                            style={"text-align": "left"},
+                                        ),
+                                        html.P(
+                                            "Grid: Crops a grid based on the provided number of columns and rows.",
+                                            style={"text-align": "left"},
+                                        ),
+                                    ],
+                                    placement="bottom",
+                                    target="crop-options",
+                                    style={"text-align": "left"},
+                                ),
+                                dbc.RadioItems(
+                                    # Radio button selection of Auto or Grid
+                                    id="multi-well-detection",
+                                    className="btn-group",
+                                    inputClassName="btn-check",
+                                    labelClassName="btn btn-outline-primary",
+                                    labelCheckedClassName="active",
+                                    options=[
+                                        # {"label": "Auto", "value": "auto"},
+                                        {"label": "Grid", "value": "grid"},
+                                    ],
+                                    value="grid",
+                                    persistence=True,
+                                    persistence_type="memory",
+                                ),
+                            ],
+                            width="auto",
+                            id="additional-options-row",
+                            style={"display": "flex"},
+                        ),
+                        dbc.Col(
+                            [
                                 dbc.Input(
                                     id="x-sites",  # Input values for rows per image
                                     placeholder="X-sites per image",
@@ -194,8 +194,10 @@ instrument_settings = dbc.AccordionItem(
                                     options=[{"label": "Stitch", "value": False}],
                                     id="stitch-switch",
                                     switch=True,
-                                    style={"margin-top": "10px", 
-                                           "margin-left": "10px"}, # adjust the position of the switch based on personal preference
+                                    style={
+                                        "margin-top": "10px",
+                                        "margin-left": "10px",
+                                    },  # adjust the position of the switch based on personal preference
                                 ),
                             ],
                             width="auto",

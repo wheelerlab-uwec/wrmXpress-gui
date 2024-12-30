@@ -45,18 +45,6 @@ layout = metadata_layout
 def create_tabs_from_checklist(store, n_clicks, checklist_values):
     """
     This function creates a list of dcc.Tab components from the checklist values
-    =================================================================================================
-    Arguments:
-        - store : dict : the store dictionary
-        - n_clicks : int : the number of times the (finalize metatadata table)button has been clicked
-        - checklist_values : list : the values of the checklist
-    =================================================================================================
-    Returns:
-        - tabs : list : a list of dcc.Tab components
-        - selected_tab : str : the value of the selected tab (the first tab)
-        - color : str : the color of the finalize-metadata-table-button
-            +- 'success' : if the checklist values are available
-            +- 'primary' : if the checklist values are not available
     """
     default_cols = 12
     default_rows = 8
@@ -125,14 +113,6 @@ def create_tabs_from_checklist(store, n_clicks, checklist_values):
 def update_metadata_checklist(n_clicks, new_table_name, existing_options):
     """
     This function updates the checklist options with the new table name
-    =================================================================================================
-    Arguments:
-        - n_clicks : int : the number of times the (add-metadata-table-button) button has been clicked
-        - new_table_name : str : the value of the uneditable input box
-        - existing_options : list : the existing options of the checklist
-    =================================================================================================
-    Returns:
-        - updated_options : list : the updated options of the checklist
     """
     if (
         n_clicks and new_table_name
@@ -164,26 +144,6 @@ def update_metadata_checklist(n_clicks, new_table_name, existing_options):
 def save_the_metadata_tables_to_csv(n_clicks, metadata_tabs, store):
     """
     This function saves the metadata tables to a CSV file
-    =================================================================================================
-    Arguments:
-        - n_clicks : int : the number of times the (save-meta-data-to-csv) button has been clicked
-        - metadata_tabs : list : the metadata tabs
-        - store : dict : the store dictionary
-    =================================================================================================
-    Returns:
-        - color : str : the color of the save-meta-data-to-csv button
-            +- 'success' : if the metadata tables are saved
-            +- 'primary' : if the metadata tables are not saved
-        - is_open : bool : whether the metadata-saved-alert is open
-            +- True : if the metadata tables are saved
-            +- False : if the metadata tables are not saved
-        - children : str : the message to display in the metadata-saved-alert
-        - color : str : the color of the metadata-saved-alert
-            +- 'success' : if the metadata tables are saved
-            +- 'danger' : if the metadata tables are not saved, or unable to save due to insufficient configuration
-        - disabled : bool : whether the save-meta-data-to-csv button is disabled
-            +- True : if the metadata tables are saved
-            +- False : if the metadata tables are not saved, or unable to save due to insufficient configuration
     """
     # If no store is available, return an error message and disable the button
     if not store:

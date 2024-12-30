@@ -19,41 +19,675 @@ module_selection = dbc.AccordionItem(
             dbc.Row(
                 [
                     dbc.Col(
-                        dbc.Row(
-                            [
-                                html.H5("wrmXpress pipeline:"),
-                                dbc.RadioItems(
-                                    id="pipeline-selection",
-                                    options=[
-                                        {"label": "Motility", "value": "motility"},
-                                        {"label": "Fecundity", "value": "fecundity"},
-                                        {"label": "Tracking", "value": "tracking"},
-                                        {
-                                            "label": [
-                                                html.I("C. elegans"),
-                                                " size and intensity (Cellpose)",
+                        [
+                            dbc.Row(
+                                [
+                                    html.H5("wrmXpress pipeline:"),
+                                    dbc.RadioItems(
+                                        id="pipeline-selection",
+                                        options=[
+                                            {
+                                                "label": "Optical Flow (motility)",
+                                                "value": "motility",
+                                            },
+                                            {
+                                                "label": "Segmentation",
+                                                "value": "segmentation",
+                                            },
+                                            {
+                                                "label": "CellProfiler",
+                                                "value": "cellprofile",
+                                            },
+                                            {"label": "Tracking", "value": "tracking"},
+                                            # {"label": "Fecundity", "value": "fecundity"},
+                                            # {
+                                            #     "label": [
+                                            #         html.I("C. elegans"),
+                                            #         " size and intensity (Cellpose)",
+                                            #     ],
+                                            #     "value": "wormsize_intensity_cellpose",
+                                            # },
+                                            # {
+                                            #     "label": "Microfilariae viability",
+                                            #     "value": "mf_celltox",
+                                            # },
+                                            # {
+                                            #     "label": [html.I("C. elegans"), " feeding"],
+                                            #     "value": "feeding",
+                                            # },
+                                            # {
+                                            #     "label": [html.I("C. elegans"), " size"],
+                                            #     "value": "wormsize",
+                                            # },
+                                        ],
+                                        value=None,
+                                        persistence=True,
+                                        persistence_type="memory",
+                                    ),
+                                ]
+                            ),
+                            dbc.Row(
+                                dbc.Col(
+                                    [
+                                        html.Br(),
+                                        html.H5(
+                                            "Parameters:",
+                                            id="pipeline-params-header",
+                                            style={"display": "none"},
+                                        ),
+                                        dbc.Row(  # Tracking parameters for motility pipeline
+                                            [
+                                                html.Div(
+                                                    [
+                                                        dbc.Row(
+                                                            [
+                                                                dbc.Col(
+                                                                    html.P(
+                                                                        "Wavelength:"
+                                                                    )
+                                                                ),
+                                                                dbc.Col(
+                                                                    [
+                                                                        dbc.Select(
+                                                                            id="wavelengths",
+                                                                            options=[
+                                                                                {
+                                                                                    "label": "All",
+                                                                                    "value": "All",
+                                                                                },
+                                                                                {
+                                                                                    "label": "w1",
+                                                                                    "value": "w1",
+                                                                                },
+                                                                                {
+                                                                                    "label": "w2",
+                                                                                    "value": "w2",
+                                                                                },
+                                                                                {
+                                                                                    "label": "w3",
+                                                                                    "value": "w3",
+                                                                                },
+                                                                                {
+                                                                                    "label": "w4",
+                                                                                    "value": "w4",
+                                                                                }
+                                                                            ],
+                                                                            value="w1",
+                                                                            persistence=True,
+                                                                            persistence_type="memory",
+                                                                        ),
+                                                                        # dbc.Input(
+                                                                        #     id="wavelengths",
+                                                                        #     placeholder="Wavelength",
+                                                                        #     type="text",
+                                                                        #     persistence=True,
+                                                                        #     persistence_type="memory",
+                                                                        #     style={"display": "flex"},
+                                                                        # ),
+                                                                    ],
+                                                                ),
+                                                            ]
+                                                        ),
+                                                        dbc.Row(
+                                                            [
+                                                                dbc.Col(
+                                                                    html.P("pyrScale:")
+                                                                ),
+                                                                dbc.Col(
+                                                                    dbc.Input(
+                                                                        id="pyrscale",
+                                                                        placeholder="0.5",
+                                                                        type="number",
+                                                                        persistence=True,
+                                                                        persistence_type="memory",
+                                                                        style={
+                                                                            "display": "flex"
+                                                                        },
+                                                                    ),
+                                                                ),
+                                                            ]
+                                                        ),
+                                                        dbc.Row(
+                                                            [
+                                                                dbc.Col(
+                                                                    html.P("Levels:")
+                                                                ),
+                                                                dbc.Col(
+                                                                    dbc.Input(
+                                                                        id="levels",
+                                                                        placeholder="5",
+                                                                        type="number",
+                                                                        persistence=True,
+                                                                        persistence_type="memory",
+                                                                        style={
+                                                                            "display": "flex"
+                                                                        },
+                                                                    ),
+                                                                ),
+                                                            ]
+                                                        ),
+                                                        dbc.Row(
+                                                            [
+                                                                dbc.Col(
+                                                                    html.P(
+                                                                        "Window size:"
+                                                                    )
+                                                                ),
+                                                                dbc.Col(
+                                                                    dbc.Input(
+                                                                        id="winsize",
+                                                                        placeholder="20",
+                                                                        type="number",
+                                                                        persistence=True,
+                                                                        persistence_type="memory",
+                                                                        style={
+                                                                            "display": "flex"
+                                                                        },
+                                                                    ),
+                                                                ),
+                                                            ]
+                                                        ),
+                                                        dbc.Row(
+                                                            [
+                                                                dbc.Col(
+                                                                    html.P(
+                                                                        "Iterations:"
+                                                                    )
+                                                                ),
+                                                                dbc.Col(
+                                                                    dbc.Input(
+                                                                        id="iterations",
+                                                                        placeholder="7",
+                                                                        type="number",
+                                                                        persistence=True,
+                                                                        persistence_type="memory",
+                                                                        style={
+                                                                            "display": "flex"
+                                                                        },
+                                                                    ),
+                                                                ),
+                                                            ]
+                                                        ),
+                                                        dbc.Row(
+                                                            [
+                                                                dbc.Col(
+                                                                    html.P("Poly N:")
+                                                                ),
+                                                                dbc.Col(
+                                                                    dbc.Input(
+                                                                        id="poly_n",
+                                                                        placeholder="5",
+                                                                        type="number",
+                                                                        persistence=True,
+                                                                        persistence_type="memory",
+                                                                        style={
+                                                                            "display": "flex"
+                                                                        },
+                                                                    ),
+                                                                ),
+                                                            ]
+                                                        ),
+                                                        dbc.Row(
+                                                            [
+                                                                dbc.Col(
+                                                                    html.P(
+                                                                        "Poly Sigma:"
+                                                                    )
+                                                                ),
+                                                                dbc.Col(
+                                                                    dbc.Input(
+                                                                        id="poly_sigma",
+                                                                        placeholder="1.1",
+                                                                        step=0.1,
+                                                                        type="number",
+                                                                        persistence=True,
+                                                                        persistence_type="memory",
+                                                                        style={
+                                                                            "display": "flex"
+                                                                        },
+                                                                    ),
+                                                                ),
+                                                            ]
+                                                        ),
+                                                        dbc.Row(
+                                                            [
+                                                                dbc.Col(
+                                                                    html.P("Flags:")
+                                                                ),
+                                                                dbc.Col(
+                                                                    dbc.Input(
+                                                                        id="flags",
+                                                                        placeholder="0",
+                                                                        type="number",
+                                                                        persistence=True,
+                                                                        persistence_type="memory",
+                                                                        style={
+                                                                            "display": "flex"
+                                                                        },
+                                                                    ),
+                                                                ),
+                                                            ]
+                                                        ),
+                                                    ]
+                                                ),
                                             ],
-                                            "value": "wormsize_intensity_cellpose",
-                                        },
-                                        {
-                                            "label": "Microfilariae viability",
-                                            "value": "mf_celltox",
-                                        },
-                                        {
-                                            "label": [html.I("C. elegans"), " feeding"],
-                                            "value": "feeding",
-                                        },
-                                        {
-                                            "label": [html.I("C. elegans"), " size"],
-                                            "value": "wormsize",
-                                        },
+                                            id="motility_params",
+                                            style={"display": "none"},
+                                        ),
+                                        dbc.Row(  # Tracking parameters for Segmentation pipeline
+                                            [
+                                                html.Div(
+                                                    [
+                                                        dbc.Row(
+                                                            [
+                                                                # cellpose model selection
+                                                                dbc.Col(
+                                                                    html.P(
+                                                                        "Cellpose Model:"
+                                                                    )
+                                                                ),
+                                                                dbc.Col(
+                                                                    dbc.Select(
+                                                                        id="cellpose-model-segmentation",
+                                                                        options=[
+                                                                            {
+                                                                                "label": "20220830_all",
+                                                                                "value": "20220830_all",
+                                                                            },
+                                                                            {
+                                                                                "label": "CP_20220801_scratch",
+                                                                                "value": "CP_20220801_scratch",
+                                                                            },
+                                                                            {
+                                                                                "label": "CP_20220803_LC4",
+                                                                                "value": "CP_20220803_LC4",
+                                                                            },
+                                                                            {
+                                                                                "label": "CP_20230203_155226_pharynx3",
+                                                                                "value": "CP_20230203_155226_pharynx3",
+                                                                            },
+                                                                        ],
+                                                                        value="cyto",
+                                                                        persistence=True,
+                                                                        persistence_type="memory",
+                                                                        style={
+                                                                            "display": "flex"
+                                                                        },
+                                                                    ),
+                                                                ),
+                                                            ],
+                                                        ),
+                                                        dbc.Row(
+                                                            [
+                                                                # cellpose model type
+                                                                dbc.Col(
+                                                                    html.P(
+                                                                        "Cellpose Model Type:"
+                                                                    )
+                                                                ),
+                                                                dbc.Col(
+                                                                    dbc.Select(
+                                                                        id="cellpose-model-type-segmentation",
+                                                                        options=[
+                                                                            {
+                                                                                "label": "cellpose",
+                                                                                "value": "cellpose",
+                                                                            },
+                                                                            {
+                                                                                "label": "python",
+                                                                                "value": "python",
+                                                                            },
+                                                                        ],
+                                                                        value="cellpose",
+                                                                        persistence=True,
+                                                                        persistence_type="memory",
+                                                                        style={
+                                                                            "display": "flex"
+                                                                        },
+                                                                    ),
+                                                                ),
+                                                            ],
+                                                        ),
+                                                        dbc.Row(
+                                                            [
+                                                                # cellpose model type
+                                                                dbc.Col(
+                                                                    html.P(
+                                                                        "Python Model Sigma:"
+                                                                    )
+                                                                ),
+                                                                dbc.Col(
+                                                                    dbc.Input(
+                                                                        id="python-model-sigma",
+                                                                        placeholder="0.2",
+                                                                        type="number",
+                                                                        persistence=True,
+                                                                        persistence_type="memory",
+                                                                        style={
+                                                                            "display": "flex"
+                                                                        },
+                                                                    ),
+                                                                ),
+                                                            ],
+                                                            id="python-model-sigma-row",
+                                                            style={"display": "none"},
+                                                        ),
+                                                        dbc.Row(
+                                                            [
+                                                                # cellpose wavelength selection
+                                                                dbc.Col(
+                                                                    html.P(
+                                                                        "Wavelength:"
+                                                                    )
+                                                                ),
+                                                                dbc.Col(
+                                                                    dbc.Select(
+                                                                        id="wavelengths-segmentation",
+                                                                        options=[
+                                                                            {
+                                                                                "label": "All",
+                                                                                "value": "All",
+                                                                            },
+                                                                            {
+                                                                                "label": "w1",
+                                                                                "value": "w1",
+                                                                            },
+                                                                            {
+                                                                                "label": "w2",
+                                                                                "value": "w2",
+                                                                            },
+                                                                            {
+                                                                                "label": "w3",
+                                                                                "value": "w3",
+                                                                            },
+                                                                            {
+                                                                                "label": "w4",
+                                                                                "value": "w4",
+                                                                            },
+                                                                        ],
+                                                                        value="red",
+                                                                        persistence=True,
+                                                                        persistence_type="memory",
+                                                                        style={
+                                                                            "display": "flex"
+                                                                        },
+                                                                    ),
+                                                                ),
+                                                            ],
+                                                        ),
+                                                    ]
+                                                )
+                                            ],
+                                            id="segmentation_params",
+                                            style={"display": "none"},
+                                        ),
+                                        dbc.Row(  # Tracking parameters for Cellprofiler pipeline
+                                            [
+                                                html.Div(
+                                                    [
+                                                        dbc.Row(
+                                                            [
+                                                                dbc.Col(
+                                                                    [
+                                                                        html.P(
+                                                                            "Cellprofiler pipeline:"
+                                                                        ),
+                                                                    ]
+                                                                ),
+                                                                dbc.Col(
+                                                                    [
+                                                                        dbc.Select(
+                                                                            id="cellprofiler-pipeline-selection",
+                                                                            options=[
+                                                                                {
+                                                                                    "label": "Worm size and intensity",
+                                                                                    "value": "wormsize_intensity_cellpose",
+                                                                                },
+                                                                                {
+                                                                                    "label": "Microfilariae viability",
+                                                                                    "value": "mf_celltox",
+                                                                                },
+                                                                                {
+                                                                                    "label": "C. elegans feeding",
+                                                                                    "value": "feeding",
+                                                                                },
+                                                                                {
+                                                                                    "label": "C. elegans size",
+                                                                                    "value": "wormsize",
+                                                                                },
+                                                                            ],
+                                                                            value="wormsize_intensity_cellpose",
+                                                                            persistence=True,
+                                                                            persistence_type="memory",
+                                                                        ),
+                                                                    ]
+                                                                ),
+                                                            ]
+                                                        ),
+                                                        dbc.Row(
+                                                            [
+                                                                # cellpose model selection
+                                                                dbc.Col(
+                                                                    html.P(
+                                                                        "Cellpose Model:"
+                                                                    )
+                                                                ),
+                                                                dbc.Col(
+                                                                    dbc.Select(
+                                                                        id="cellpose-model-cellprofile",
+                                                                        options=[
+                                                                            {
+                                                                                "label": "20220830_all",
+                                                                                "value": "20220830_all",
+                                                                            },
+                                                                            {
+                                                                                "label": "CP_20220801_scratch",
+                                                                                "value": "CP_20220801_scratch",
+                                                                            },
+                                                                            {
+                                                                                "label": "CP_20220803_LC4",
+                                                                                "value": "CP_20220803_LC4",
+                                                                            },
+                                                                            {
+                                                                                "label": "CP_20230203_155226_pharynx3",
+                                                                                "value": "CP_20230203_155226_pharynx3",
+                                                                            },
+                                                                        ],
+                                                                        value="cyto",
+                                                                        persistence=True,
+                                                                        persistence_type="memory",
+                                                                        style={
+                                                                            "display": "flex"
+                                                                        },
+                                                                    ),
+                                                                ),
+                                                            ],
+                                                        ),
+                                                        dbc.Row(
+                                                            [
+                                                                # cellpose wavelength selection
+                                                                dbc.Col(
+                                                                    html.P(
+                                                                        "Wavelength:"
+                                                                    )
+                                                                ),
+                                                                dbc.Col(
+                                                                    dbc.Select(
+                                                                        id="wavelengths-cellprofile",
+                                                                        options=[
+                                                                            {
+                                                                                "label": "All",
+                                                                                "value": "All",
+                                                                            },
+                                                                            {
+                                                                                "label": "w1",
+                                                                                "value": "w1",
+                                                                            },
+                                                                            {
+                                                                                "label": "w2",
+                                                                                "value": "w2",
+                                                                            },
+                                                                            {
+                                                                                "label": "w3",
+                                                                                "value": "w3",
+                                                                            },
+                                                                            {
+                                                                                "label": "w4",
+                                                                                "value": "w4",
+                                                                            },
+                                                                        ],
+                                                                        value="red",
+                                                                        persistence=True,
+                                                                        persistence_type="memory",
+                                                                        style={
+                                                                            "display": "flex"
+                                                                        },
+                                                                    ),
+                                                                ),
+                                                            ],
+                                                        ),
+                                                    ]
+                                                ),
+                                            ],
+                                            id="cellprofile_params",
+                                            style={"display": "none"},
+                                        ),
+                                        dbc.Row(  # Tracking parameters for Tracking pipeline
+                                            [
+                                                html.Div(
+                                                    [
+                                                        dbc.Row(
+                                                            [
+                                                                dbc.Col(
+                                                                    html.P("Diameter:")
+                                                                ),
+                                                                dbc.Col(
+                                                                    dbc.Input(
+                                                                        id="tracking-diameter",
+                                                                        placeholder="35",
+                                                                        type="number",
+                                                                        persistence=True,
+                                                                        persistence_type="memory",
+                                                                        style={
+                                                                            "display": "flex"
+                                                                        },
+                                                                    ),
+                                                                ),
+                                                            ]
+                                                        ),
+                                                        dbc.Row(
+                                                            [
+                                                                dbc.Col(
+                                                                    html.P(
+                                                                        "Minimum Mass:"
+                                                                    )
+                                                                ),
+                                                                dbc.Col(
+                                                                    dbc.Input(
+                                                                        id="tracking-minmass",
+                                                                        placeholder="1200",
+                                                                        type="number",
+                                                                        persistence=True,
+                                                                        persistence_type="memory",
+                                                                        style={
+                                                                            "display": "flex"
+                                                                        },
+                                                                    ),
+                                                                ),
+                                                            ]
+                                                        ),
+                                                        dbc.Row(
+                                                            [
+                                                                dbc.Col(
+                                                                    html.P(
+                                                                        "Noise Size:"
+                                                                    )
+                                                                ),
+                                                                dbc.Col(
+                                                                    dbc.Input(
+                                                                        id="tracking-noisesize",
+                                                                        placeholder="2",
+                                                                        type="number",
+                                                                        persistence=True,
+                                                                        persistence_type="memory",
+                                                                        style={
+                                                                            "display": "flex"
+                                                                        },
+                                                                    ),
+                                                                ),
+                                                            ]
+                                                        ),
+                                                        dbc.Row(
+                                                            [
+                                                                dbc.Col(
+                                                                    html.P(
+                                                                        "Search Range:"
+                                                                    )
+                                                                ),
+                                                                dbc.Col(
+                                                                    dbc.Input(
+                                                                        id="tracking-searchrange",
+                                                                        placeholder="45",
+                                                                        type="number",
+                                                                        persistence=True,
+                                                                        persistence_type="memory",
+                                                                        style={
+                                                                            "display": "flex"
+                                                                        },
+                                                                    ),
+                                                                ),
+                                                            ]
+                                                        ),
+                                                        dbc.Row(
+                                                            [
+                                                                dbc.Col(
+                                                                    html.P("Memory:")
+                                                                ),
+                                                                dbc.Col(
+                                                                    dbc.Input(
+                                                                        id="tracking-memory",
+                                                                        placeholder="25",
+                                                                        type="number",
+                                                                        persistence=True,
+                                                                        persistence_type="memory",
+                                                                        style={
+                                                                            "display": "flex"
+                                                                        },
+                                                                    ),
+                                                                ),
+                                                            ]
+                                                        ),
+                                                        dbc.Row(
+                                                            [
+                                                                dbc.Col(
+                                                                    html.P(
+                                                                        "Adaptive Stop:"
+                                                                    )
+                                                                ),
+                                                                dbc.Col(
+                                                                    dbc.Input(
+                                                                        id="tracking-adaptivestop",
+                                                                        placeholder="30",
+                                                                        type="number",
+                                                                        persistence=True,
+                                                                        persistence_type="memory",
+                                                                        style={
+                                                                            "display": "flex"
+                                                                        },
+                                                                    ),
+                                                                ),
+                                                            ]
+                                                        ),
+                                                    ]
+                                                ),
+                                            ],
+                                            id="tracking_params",
+                                            style={"display": "none"},
+                                        ),
                                     ],
-                                    value=None,
-                                    persistence=True,
-                                    persistence_type="memory",
-                                ),
-                            ]
-                        ),
+                                )
+                            ),
+                        ],
                         width=4,
                     ),
                     dbc.Col(
@@ -69,269 +703,6 @@ module_selection = dbc.AccordionItem(
                         width=8,
                     ),
                 ],
-            ),
-            dbc.Row(
-                dbc.Col(
-                    [
-                        html.Br(),
-                        html.H5(
-                            "Pipeline Parameters:",
-                            id="pipeline-params-header",
-                            style={"display": "none"},
-                        ),
-                        # html.Div(
-                        #     id="pipeline-params",
-                        # ),
-                        dbc.Row(  # Tracking parameters for motility pipeline
-                            [
-                                html.Div(
-                                    [
-                                        dbc.Row(
-                                            [
-                                                dbc.Col(html.P("Wavelength:")),
-                                                dbc.Col(
-                                                    dbc.Input(
-                                                        id="wavelengths",
-                                                        placeholder="Wavelength",
-                                                        type="text",
-                                                        persistence=True,
-                                                        persistence_type="memory",
-                                                        style={"display": "flex"},
-                                                    ),
-                                                ),
-                                            ]
-                                        ),
-                                        dbc.Row(
-                                            [
-                                                dbc.Col(html.P("pyrScale:")),
-                                                dbc.Col(
-                                                    dbc.Input(
-                                                        id="pyrscale",
-                                                        placeholder="0.5",
-                                                        type="number",
-                                                        persistence=True,
-                                                        persistence_type="memory",
-                                                        style={"display": "flex"},
-                                                    ),
-                                                ),
-                                            ]
-                                        ),
-                                        dbc.Row(
-                                            [
-                                                dbc.Col(html.P("Levels:")),
-                                                dbc.Col(
-                                                    dbc.Input(
-                                                        id="levels",
-                                                        placeholder="5",
-                                                        type="number",
-                                                        persistence=True,
-                                                        persistence_type="memory",
-                                                        style={"display": "flex"},
-                                                    ),
-                                                ),
-                                            ]
-                                        ),
-                                        dbc.Row(
-                                            [
-                                                dbc.Col(html.P("Window size:")),
-                                                dbc.Col(
-                                                    dbc.Input(
-                                                        id="winsize",
-                                                        placeholder="20",
-                                                        type="number",
-                                                        persistence=True,
-                                                        persistence_type="memory",
-                                                        style={"display": "flex"},
-                                                    ),
-                                                ),
-                                            ]
-                                        ),
-                                        dbc.Row(
-                                            [
-                                                dbc.Col(html.P("Iterations:")),
-                                                dbc.Col(
-                                                    dbc.Input(
-                                                        id="iterations",
-                                                        placeholder="7",
-                                                        type="number",
-                                                        persistence=True,
-                                                        persistence_type="memory",
-                                                        style={"display": "flex"},
-                                                    ),
-                                                ),
-                                            ]
-                                        ),
-                                        dbc.Row(
-                                            [
-                                                dbc.Col(html.P("Poly N:")),
-                                                dbc.Col(
-                                                    dbc.Input(
-                                                        id="poly_n",
-                                                        placeholder="5",
-                                                        type="number",
-                                                        persistence=True,
-                                                        persistence_type="memory",
-                                                        style={"display": "flex"},
-                                                    ),
-                                                ),
-                                            ]
-                                        ),
-                                        dbc.Row(
-                                            [
-                                                dbc.Col(html.P("Poly Sigma:")),
-                                                dbc.Col(
-                                                    dbc.Input(
-                                                        id="poly_sigma",
-                                                        placeholder="1.1",
-                                                        step=0.1,
-                                                        type="number",
-                                                        persistence=True,
-                                                        persistence_type="memory",
-                                                        style={"display": "flex"},
-                                                    ),
-                                                ),
-                                            ]
-                                        ),
-                                        dbc.Row(
-                                            [
-                                                dbc.Col(html.P("Flags:")),
-                                                dbc.Col(
-                                                    dbc.Input(
-                                                        id="flags",
-                                                        placeholder="0",
-                                                        type="number",
-                                                        persistence=True,
-                                                        persistence_type="memory",
-                                                        style={"display": "flex"},
-                                                    ),
-                                                ),
-                                            ]
-                                        ),
-                                    ]
-                                ),
-                            ],
-                            id="motility_params",
-                            style={"display": "none"},
-                        ),
-                        dbc.Row(  # Tracking parameters for fecundity pipeline
-                            [
-                                html.Div(
-                                    [
-                                        dbc.Row(
-                                            [
-                                                # cellpose model selection
-                                                dbc.Col(html.P("Cellpose Model:")),
-                                                dbc.Col(
-                                                    dbc.Input(
-                                                        id="cellpose-model-segmentation",
-                                                        placeholder="cyto",
-                                                        type="text",
-                                                        persistence=True,
-                                                        persistence_type="memory",
-                                                        style={"display": "flex"},
-                                                    ),
-                                                ),
-                                            ],
-                                        ),
-                                        dbc.Row(
-                                            [
-                                                # cellpose model type
-                                                dbc.Col(html.P("Cellpose Model Type:")),
-                                                dbc.Col(
-                                                    dbc.Input(
-                                                        id="cellpose-model-type-segmentation",
-                                                        placeholder="cytoplasm",
-                                                        type="text",
-                                                        persistence=True,
-                                                        persistence_type="memory",
-                                                        style={"display": "flex"},
-                                                    ),
-                                                ),
-                                            ],
-                                        ),
-                                        dbc.Row(
-                                            [
-                                                # cellpose wavelength selection
-                                                dbc.Col(html.P("Wavelength:")),
-                                                dbc.Col(
-                                                    dbc.Input(
-                                                        id="wavelengths-segmentation",
-                                                        placeholder="Wavelength",
-                                                        type="text",
-                                                        persistence=True,
-                                                        persistence_type="memory",
-                                                        style={"display": "flex"},
-                                                    ),
-                                                ),
-                                            ],
-                                        ),
-                                    ]
-                                )
-                            ],
-                            id="fecundity_params",
-                            style={"display": "none"},
-                        ),
-                        dbc.Row(  # Tracking parameters for wrmsize, mf_celltox, and feeding pipelines
-                            [
-                                html.Div(
-                                    [
-                                        dbc.Row(
-                                            [
-                                                # cellpose model selection
-                                                dbc.Col(html.P("Cellpose Model:")),
-                                                dbc.Col(
-                                                    dbc.Input(
-                                                        id="cellpose-model-cellprofile",
-                                                        placeholder="cyto",
-                                                        type="text",
-                                                        persistence=True,
-                                                        persistence_type="memory",
-                                                        style={"display": "flex"},
-                                                    ),
-                                                ),
-                                            ],
-                                        ),
-                                        dbc.Row(
-                                            [
-                                                # cellpose model type
-                                                # dbc.Col(html.P("Cellpose Model Type:")),
-                                                # dbc.Col(
-                                                #     dbc.Input(
-                                                #         id="cellpose-model-type-cellprofile",
-                                                #         placeholder="cytoplasm",
-                                                #         type="text",
-                                                #         persistence=True,
-                                                #         persistence_type="memory",
-                                                #         style={"display": "flex"},
-                                                #     ),
-                                                # ),
-                                            ],
-                                        ),
-                                        dbc.Row(
-                                            [
-                                                # cellpose wavelength selection
-                                                dbc.Col(html.P("Wavelength:")),
-                                                dbc.Col(
-                                                    dbc.Input(
-                                                        id="wavelengths-cellprofile",
-                                                        placeholder="Wavelength",
-                                                        type="text",
-                                                        persistence=True,
-                                                        persistence_type="memory",
-                                                        style={"display": "flex"},
-                                                    ),
-                                                ),
-                                            ],
-                                        ),
-                                    ]
-                                ),
-                            ],
-                            id="cellprofile_params",
-                            style={"display": "none"},
-                        ),
-                    ],
-                    width=4,
-                )
             ),
         ]
     ),

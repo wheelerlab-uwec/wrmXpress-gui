@@ -17,6 +17,7 @@ import glob
 import tifffile as tiff
 from skimage import exposure
 
+import subprocess
 ########################################################################
 ####                                                                ####
 ####                          Functions                             ####
@@ -27,13 +28,6 @@ from skimage import exposure
 def create_df_from_inputs(_rows, _cols):
     """
     This function creates a dataframe from the input rows and columns.
-    ===============================================================================
-    Arguments:
-        - _rows : int : Number of rows in the dataframe
-        - _cols : int : Number of columns in the dataframe
-    ===============================================================================
-    Returns:
-        - df : pd.DataFrame : A dataframe with the specified number of rows and columns
     """
     rows_total = list("ABCDEFGHIJKLMNOP")  # List of letters A-P
     rows = rows_total[: int(_rows)]  # List of letters A-_rows
@@ -48,13 +42,6 @@ def create_df_from_inputs(_rows, _cols):
 def create_empty_df_from_inputs(_rows, _cols):
     """
     This function creates an empty dataframe from the input rows and columns.
-    ===============================================================================
-    Arguments:
-        - _rows : int : Number of rows in the dataframe
-        - _cols : int : Number of columns in the dataframe
-    ===============================================================================
-    Returns:
-        - df : pd.DataFrame : An empty dataframe with the specified number of rows and columns
     """
     rows_total = list("ABCDEFGHIJKLMNOP")  # List of letters A-P
     rows = rows_total[: int(_rows)]  # List of letters A-_rows
@@ -69,13 +56,6 @@ def create_empty_df_from_inputs(_rows, _cols):
 def create_na_df_from_inputs(_rows, _cols):
     """
     This function creates an NA dataframe from the input rows and columns.
-    ===============================================================================
-    Arguments:
-        - _rows : int : Number of rows in the dataframe
-        - _cols : int : Number of columns in the dataframe
-    ===============================================================================
-    Returns:
-        - df : pd.DataFrame : An NA dataframe with the specified number of rows and columns
     """
     rows_total = list("ABCDEFGHIJKLMNOP")  # List of letters A-P
     rows = rows_total[: int(_rows)]  # List of letters A-_rows
@@ -90,12 +70,6 @@ def create_na_df_from_inputs(_rows, _cols):
 def eval_bool(v):
     """
     This function evaluates a boolean value from a string.
-    ===============================================================================
-    Arguments:
-        - v : str : A string that represents a boolean value
-    ===============================================================================
-    Returns:
-        - bool : A boolean value
     """
     return str(v).lower() in ("yes", "true", "t", "1")
 
@@ -106,169 +80,243 @@ def get_default_value(param, default_value):
 
 
 def prep_yaml(
-    imagingmode,
-    filestructure,
-    multiwellrows,
-    multiwellcols,
-    multiwelldetection,
-    xsites,
-    ysites,
-    stitchswitch,
-    mask,
-    maskdiameter,
-    species,
-    stages,
-    wellselection,
-    volume,
-    pipeline,
-    staticdx,
-    staticdxrescale,
-    videodx,
-    videodxformat,
-    videodxrescale,
-    wavelength,
-    pyrscale,
-    levels,
-    winsize,
-    iterations,
-    poly_n,
-    poly_sigma,
-    flags,
-    # Newly added inputs
-    cellpose_model_segmentation,
-    cellpose_model_type_segmentation,
-    wavelengths_segmentation,
-    cellpose_model_cellprofile,
-    # cellpose_model_type_cellprofile,
-    wavelengths_cellprofile,
+        store_data
 ):
-    # Check if wellselection is a list or a string
-    if isinstance(wellselection, list):
-        if len(wellselection) == 96:  # If all wells are selected
-            wellselection = ["All"]  # Set wellselection to 'All'
-        else:  # If not all wells are selected
-            wellselection = wellselection  # Set wellselection to the input list
-    elif isinstance(wellselection, str):  # If wellselection is a string
-        # Set wellselection to a list containing the input string
-        wellselection = [wellselection]
 
-    if multiwellrows is None:
-        multiwellrows = 1  # Default multiwellrows
-    if multiwellcols is None:
-        multiwellcols = 1  # Default multiwellcols
+    # Check if wellselection is a list or a string
+    if isinstance(store_data["wrmXpress_gui_obj"]["well_selection_list"], list):
+        if len(store_data["wrmXpress_gui_obj"]["well_selection_list"]) == 96:  # If all wells are selected
+            store_data["wrmXpress_gui_obj"]["well_selection_list"] = [
+                "All"
+            ]  # Set wellselection to 'All'
+        else:  # If not all wells are selected
+            store_data["wrmXpress_gui_obj"]["well_selection_list"] = store_data[
+                "wrmXpress_gui_obj"
+            ][
+                "well_selection_list"
+            ]  # Set wellselection to the input list
+    elif isinstance(
+        store_data["wrmXpress_gui_obj"]["well_selection_list"], str
+    ):  # If wellselection is a string
+        # Set wellselection to a list containing the input string
+        store_data["wrmXpress_gui_obj"]["well_selection_list"] = [
+            store_data["wrmXpress_gui_obj"]["well_selection_list"]
+        ]
+
+    if store_data["wrmXpress_gui_obj"]["multi_well_row"] is None:
+        store_data["wrmXpress_gui_obj"]["multi_well_row"] = 1  # Default multiwellrows
+    if store_data["wrmXpress_gui_obj"]["multi_well_col"] is None:
+        store_data["wrmXpress_gui_obj"]["multi_well_col"] = 1  # Default multiwellcols
 
     # Default xsites and ysites
-    xsites = get_default_value(xsites, "NA")
-    ysites = get_default_value(ysites, "NA")
+    xsites = get_default_value(store_data["wrmXpress_gui_obj"]["x_sites"], "NA")
+    ysites = get_default_value(store_data["wrmXpress_gui_obj"]["y_sites"], "NA")
 
     # Mask diameter handling
-    if mask == "circular":
-        circlediameter = get_default_value(maskdiameter, "NA")
+    if store_data["wrmXpress_gui_obj"]["mask"] == "circular":
+        circlediameter = get_default_value(
+            store_data["wrmXpress_gui_obj"]["mask_diameter"], "NA"
+        )
         squarediameter = "NA"
-    elif mask == "square":
+    elif store_data["wrmXpress_gui_obj"]["mask"] == "square":
         circlediameter = "NA"
-        squarediameter = get_default_value(maskdiameter, "NA")
+        squarediameter = get_default_value(
+            store_data["wrmXpress_gui_obj"]["mask_diameter"], "NA"
+        )
     else:
         circlediameter = squarediameter = "NA"
+    well_row = (
+        store_data["wrmXpress_gui_obj"]["well_row"]
+        if store_data["wrmXpress_gui_obj"]["well_row"] is not None
+        else 8
+    )
+
+    well_col = (
+        store_data["wrmXpress_gui_obj"]["well_col"]
+        if store_data["wrmXpress_gui_obj"]["well_col"] is not None
+        else 12
+    )
 
     # Evaluate staticdx and videodx conditions
     staticdx_dict = (
-        {}
-        if not eval_bool(staticdx)
+        {
+            "run": False,
+            "rescale_multiplier": 1.0,
+        }
+        if len(store_data["wrmXpress_gui_obj"]["static_dx"]) == 0
         else {
-            "run": eval_bool(staticdx),
-            "rescale_multiplier": staticdxrescale,
+            "run": eval_bool(store_data["wrmXpress_gui_obj"]["static_dx"][0]),
+            "rescale_multiplier": (
+                store_data["wrmXpress_gui_obj"]["static_dx_rescale"]
+                if store_data["wrmXpress_gui_obj"]["static_dx_rescale"] is not None
+                else 1.0
+            ),
         }
     )
 
     videodx_dict = (
-        {}
-        if not eval_bool(videodx)
+        {
+            "run": False,
+            "format": "avi",
+            "rescale_multiplier": 0.5,
+        }
+        if len(store_data["wrmXpress_gui_obj"]["video_dx"]) == 0
         else {
-            "run": eval_bool(videodx),
-            "format": videodxformat,
-            "rescale_multiplier": videodxrescale,
+            "run": eval_bool(store_data["wrmXpress_gui_obj"]["video_dx"][0]),
+            "format": get_default_value(store_data["wrmXpress_gui_obj"]["video_dx_format"], "avi"),
+            "rescale_multiplier": (store_data["wrmXpress_gui_obj"]["video_dx_rescale"] if store_data["wrmXpress_gui_obj"]["video_dx_rescale"] is not None else 0.5),
         }
     )
 
-    # Select modules for YAML
-    module_selction_dict = formatting_module_for_yaml(pipeline)
-
-    # Extract runs from module selection
-    motilityrun = module_selction_dict.get("motilityrun")
-    segmentrun = module_selction_dict.get("segmentrun")
-    cellprofilerrun = module_selction_dict.get("cellprofilerrun")
-    trackingrun = module_selction_dict.get("trackingrun")
-    cellprofilerpipeline = module_selction_dict.get("cellprofilerpipeline")
-
+    # Write script to determine which modules to run
+    # TODO: Add more modules as needed
+    print(store_data["wrmXpress_gui_obj"]["pipeline_selection"])
     # Dictionary for motilityrun, segmentation, cellprofiler, etc.
     motilityrun_dict = (
-        {}
-        if not eval_bool(motilityrun)
-        else {
+        {
             "run": True,
-            "wavelengths": [wavelength or "default_wavelength"],
-            "pyrScale": get_default_value(pyrscale, 0.5),
-            "levels": get_default_value(levels, 5),
-            "winsize": get_default_value(winsize, 20),
-            "iterations": get_default_value(iterations, 7),
-            "poly_n": get_default_value(poly_n, 5),
-            "poly_sigma": get_default_value(poly_sigma, 1.1),
-            "flags": get_default_value(flags, 0),
+            "wavelengths": [store_data["wrmXpress_gui_obj"]["wavelengths"]],
+            "pyrScale": get_default_value(
+                store_data["wrmXpress_gui_obj"]["pyrscale"], 0.5
+            ),
+            "levels": get_default_value(store_data["wrmXpress_gui_obj"]["levels"], 5),
+            "winsize": get_default_value(
+                store_data["wrmXpress_gui_obj"]["winsize"], 20
+            ),
+            "iterations": get_default_value(
+                store_data["wrmXpress_gui_obj"]["iterations"], 7
+            ),
+            "poly_n": get_default_value(store_data["wrmXpress_gui_obj"]["poly_n"], 5),
+            "poly_sigma": get_default_value(
+                store_data["wrmXpress_gui_obj"]["poly_sigma"], 1.1
+            ),
+            "flags": get_default_value(store_data["wrmXpress_gui_obj"]["flags"], 0),
+            "flow": "farneback",
+        }
+        if store_data["wrmXpress_gui_obj"]["pipeline_selection"] == "motility"
+        else {
+            "run": False,
+            "wavelengths": ["All"],
+            "flow": "farneback",
+            "pyrScale": 0.5,
+            "levels": 5,
+            "winsize": 20,
+            "iterations": 7,
+            "poly_n": 5,
+            "poly_sigma": 1.1,
+            "flags": 0,
         }
     )
 
     segmentation_dict = (
-        {}
-        if not eval_bool(segmentrun)
-        else {
+        {
             "run": True,
-            "model": get_default_value(cellpose_model_segmentation, "cyto"),
-            "model_type": get_default_value(cellpose_model_type_segmentation, "cyto"),
-            "wavelength": [get_default_value(wavelengths_segmentation, "w1")],
+            "model": get_default_value(
+                store_data["wrmXpress_gui_obj"]["cellpose_model_segmentation"], "cyto"
+            ),
+            "model_type": get_default_value(
+                store_data["wrmXpress_gui_obj"]["cellpose_model_type_segmentation"],
+                "cyto",
+            ),
+            "wavelengths": [
+                get_default_value(
+                    store_data["wrmXpress_gui_obj"]["wavelengths_segmentation"], "w1"
+                )
+            ],
+        }
+        if store_data["wrmXpress_gui_obj"]["pipeline_selection"] == "segmentation"
+        else {
+            "run": False,
+            "model": "20220830_all",
+            "model_type": "cellpose",
+            "wavelengths": ["All"],
         }
     )
 
     cellprofiler_dict = (
-        {}
-        if not eval_bool(cellprofilerrun)
-        else {
+        {
             "run": True,
             "cellpose_model": get_default_value(
-                cellpose_model_cellprofile, "20220830_all"
+                store_data["wrmXpress_gui_obj"]["cellpose_model_cellprofile"], "cyto"
             ),
-            "cellpose_wavelength": get_default_value(wavelengths_cellprofile, "w1"),
-            "pipeline": [cellprofilerpipeline],
+            "cellpose_wavelength": get_default_value(
+                store_data["wrmXpress_gui_obj"]["wavelengths_cellprofile"], "w1"
+            ),
+            "pipeline": get_default_value(
+                store_data["wrmXpress_gui_obj"]["cellprofiler_pipeline_selection"],
+                "wormsize_intensity_cellpose",
+            ),
+        }
+        if store_data["wrmXpress_gui_obj"]["pipeline_selection"] == "cellprofiler"
+        else {
+            "run": False,
+            "cellpose_model": "20220830_all",
+            "cellpose_wavelength": "w1",
+            "pipeline": "wormsize_intensity_cellpose",
+        }
+    )
+
+    trackingrun_dict = (
+        {
+            "run": True,
+            "diameter": get_default_value(
+                store_data["wrmXpress_gui_obj"]["tracking_diameter"], 35
+            ),
+            "minmass": get_default_value(
+                store_data["wrmXpress_gui_obj"]["tracking_minmass"], 1200
+            ),
+            "noisesize": get_default_value(
+                store_data["wrmXpress_gui_obj"]["tracking_noisesize"], 2
+            ),
+            "search_range": get_default_value(
+                store_data["wrmXpress_gui_obj"]["tracking_searchrange"], 45
+            ),
+            "memory": get_default_value(
+                store_data["wrmXpress_gui_obj"]["tracking_memory"], 25
+            ),
+            "adaptive_stop": get_default_value(
+                store_data["wrmXpress_gui_obj"]["tracking_adaptivestop"], 30
+            ),
+        }
+        if store_data["wrmXpress_gui_obj"]["pipeline_selection"] == "tracking"
+        else {
+            "run": False,
+            "diameter": 35,
+            "minmass": 1200,
+            "noisesize": 2,
+            "search_range": 45,
+            "memory": 25,
+            "adaptive_stop": 30,
         }
     )
 
     # Final YAML dictionary construction
     yaml_dict = {
-        "imaging_mode": [imagingmode],
-        "file_structure": [filestructure],
-        "multi-well-row": int(multiwellrows),
-        "multi-well-col": int(multiwellcols),
-        "multi-well-detection": [multiwelldetection],
+        "imaging_mode": [store_data["wrmXpress_gui_obj"]["imaging_mode"]],
+        "file_structure": [store_data["wrmXpress_gui_obj"]["file_structure"]],
+        "well-row": well_row,
+        "well-col": well_col,
+        "multi-well-row": int(store_data["wrmXpress_gui_obj"]["multi_well_row"]),
+        "multi-well-col": int(store_data["wrmXpress_gui_obj"]["multi_well_col"]),
+        "multi-well-detection": str(store_data["wrmXpress_gui_obj"]["multi_well_detection"]),
         "x-sites": xsites,
         "y-sites": ysites,
-        "stitch": eval_bool(stitchswitch),
+        "stitch": eval_bool(store_data["wrmXpress_gui_obj"]["stitch_switch"]),
         "circle_diameter": circlediameter,
         "square_side": squarediameter,
-        "species": [species],
-        "stages": [stages],
         "pipelines": {
             "statix_dx": staticdx_dict,
             "video-dx": videodx_dict,
             "optical_flow": motilityrun_dict,
             "segmentation": segmentation_dict,
             "cellprofiler": cellprofiler_dict,
-            "tracking": {"run": eval_bool(trackingrun)},
+            "tracking": trackingrun_dict
         },
-        "wells": wellselection,
+        "wells": store_data["wrmXpress_gui_obj"]["well_selection_list"],
         "directories": {
-            "work": [str(Path(volume, "work"))],
-            "input": [str(Path(volume, "input"))],
-            "output": [str(Path(volume, "output"))],
+            "work": [str(Path(store_data["wrmXpress_gui_obj"]["mounted_volume"], "work"))],
+            "input": [str(Path(store_data["wrmXpress_gui_obj"]["mounted_volume"], "input"))],
+            "output": [str(Path(store_data["wrmXpress_gui_obj"]["mounted_volume"], "output"))],
         },
     }
 
@@ -277,15 +325,6 @@ def prep_yaml(
 
 def get_diameters(mask, maskdiameter, circlediameter=None, squarediameter=None):
     """Get the diameters for the mask type.
-
-    Args:
-        mask (mask): type of mask
-        maskdiameter (maskdiameter): diameter of the mask
-        circlediameter (
-        squarediameter (_type_, optional): _description_. Defaults to None.
-
-    Returns:
-        _type_: _description_
     """
     if mask == "circular":
         circlediameter = circlediameter if circlediameter is not None else maskdiameter
@@ -302,12 +341,6 @@ def get_diameters(mask, maskdiameter, circlediameter=None, squarediameter=None):
 def send_ctrl_c(pid):
     """
     Sends a SIGINT signal to the process with the given PID.
-    ===============================================================================
-    Arguments:
-        - pid : int : Process ID
-    ===============================================================================
-    Returns:
-        - None
     """
 
     try:
@@ -322,16 +355,6 @@ def clean_and_create_directories(input_path, work_path, output_path=False):
     The purpose of this function is to clean and create the input, work, and output directories.
     That is to say, it will delete the contents of the input, work, and output directories (if they exist)
     and then recreate them.
-    ===============================================================================
-    Arguments:
-        - input_path : str : Path to the input directory
-        - work_path : str : Path to the work directory
-        - output_path : str : Path to the output directory
-            +- Default: False: The output directory will not be cleaned and created
-            +- True: The output directory will be cleaned and created
-    ===============================================================================
-    Returns:
-        - None
     """
     # wipe previous runs
     if os.path.exists(work_path):
@@ -372,17 +395,6 @@ def copy_files_to_input_directory(
 ):
     """
     The purpose of this function is to copy the input files to the input directory.
-    ===============================================================================
-    Arguments:
-        - platename_input_dir : str : Path to the input directory
-        - htd_file : str : Path to the .HTD file
-        - img_dir : str : Path to the directory containing the images
-        - plate_base : str : Base name of the plate
-        - wells : list : List of well names
-        - file_types : list : List of file extensions to consider. Example: ['.tif', '.avi']
-    ===============================================================================
-    Returns:
-        - None
     """
     if file_types is None:
         file_types = [".tif", ".avi", ".TIF"]  # Default file types
@@ -423,12 +435,6 @@ def copy_files_to_input_directory(
 def create_figure_from_filepath(img_path, scale="gray"):
     """
     This function creates a figure from the input file path.
-    ===============================================================================
-    Arguments:
-        - img_path : str : Path to the image file
-    ===============================================================================
-    Returns:
-        - fig : matplotlib.figure.Figure : A figure
     """
 
     try:
@@ -469,13 +475,6 @@ def create_figure_from_filepath(img_path, scale="gray"):
 def update_yaml_file(input_full_yaml, output_full_yaml, updates):
     """
     This function updates the YAML file with the specified updates.
-    ===============================================================================
-    Arguments:
-        - full_yaml : str : Path to the YAML file
-        - updates : dict : Dictionary of updates
-    ===============================================================================
-    Returns:
-        - None
     """
     # reading in yaml file
     with open(input_full_yaml, "r") as file:
@@ -495,13 +494,6 @@ def convert_tiff_to_tif(input_file, output_file):
     """
     This function was developed for the conversion of a .tiff file to a .TIF file.
     However, this can be used for other file types as well.
-    ===============================================================================
-    Arguments:
-        - input_file : str : Path to the .tiff file
-        - output_file : str : Path to the .TIF file
-    ===============================================================================
-    Returns:
-        - None
     """
     # Open the .tiff file
     with Image.open(input_file) as img:
@@ -512,23 +504,6 @@ def convert_tiff_to_tif(input_file, output_file):
 def formatting_module_for_yaml(pipeline):
     """
     This function formats the pipeline for the YAML file based on the input pipeline.
-    ===============================================================================
-    Arguments:
-        - pipeline : str : The pipeline
-    ===============================================================================
-    Returns:
-        - motilityrun : str : Motility run
-        - conversionrun : str : Conversion run
-        - segmentrun : str : Segment run
-        - cellprofilerrun : str : CellProfiler run
-        - diagnosticdx : str : Diagnostic DX
-        - fecundity : str : Fecundity
-        - trackingrun : str : Tracking run
-        - cellprofilerpipeline : str : CellProfiler pipeline
-        - save_video : str : Save video
-        - rescale_multiplier : str : Rescale multiplier
-        - wavelength : str : Wavelength
-    ===============================================================================
     """
     if pipeline == "motility":
         motilityrun = "yes"
@@ -640,12 +615,6 @@ def formatting_module_for_yaml(pipeline):
 def create_figure_from_url(image_url, scale="gray"):
     """
     This function creates a Plotly figure from the input image URL.
-    ===============================================================================
-    Arguments:
-        - image_url : str : URL to the image file
-    ===============================================================================
-    Returns:
-        - fig : plotly.graph_objs._figure.Figure : A Plotly figure
     """
     from urllib.request import urlopen
 
