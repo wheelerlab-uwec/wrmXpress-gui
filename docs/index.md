@@ -1,10 +1,13 @@
-# wrmXpress GUI
+# wrmXpress
 
-![GitHub release (with filter)](https://img.shields.io/github/v/release/wheelerlab-uwec/wrmXpress-gui)
+GUI: ![GitHub release (with filter)](https://img.shields.io/github/v/release/wheelerlab-uwec/wrmXpress-gui)
 ![GitHub Release Date - Published_At](https://img.shields.io/github/release-date/wheelerlab-uwec/wrmxpress-gui)
 [![GitHub Workflow Status (with event)](https://img.shields.io/github/actions/workflow/status/wheelerlab-uwec/wrmxpress-gui/push-docker-image.yml?event=release)](https://hub.docker.com/r/wheelern/wrmxpress_gui/tags)
 ![Docker Image Size (tag)](https://img.shields.io/docker/image-size/wheelern/wrmxpress_gui/latest)
 ![Docker Pulls](https://img.shields.io/docker/pulls/wheelern/wrmxpress_gui)
+
+Back-end: ![GitHub Release](https://img.shields.io/github/v/release/zamanianlab/wrmXpress)
+![GitHub Release Date - Published_At](https://img.shields.io/github/release-date/zamanianlab/wrmxpress)
 
 wrmXpress is a suite of tools to analyze images and videos of free-living and parasitic flatworms and nematodes. It is designed to work out-of-the-box with data generated with a Molecular Devices ImageXpress high-content imager, but will work with any image type that is organized in an idiosyncratic manner (described in [Data Organization](data_organization.md)). Analytical pipelines featured in wrmXpress include:
 
