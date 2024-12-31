@@ -141,17 +141,17 @@ def prep_yaml(
     # Evaluate staticdx and videodx conditions
     staticdx_dict = (
         {
-            "run": False,
-            "rescale_multiplier": 1.0,
-        }
-        if len(store_data["wrmXpress_gui_obj"]["static_dx"]) == 0
-        else {
             "run": eval_bool(store_data["wrmXpress_gui_obj"]["static_dx"][0]),
             "rescale_multiplier": (
                 store_data["wrmXpress_gui_obj"]["static_dx_rescale"]
                 if store_data["wrmXpress_gui_obj"]["static_dx_rescale"] is not None
                 else 1.0
             ),
+        }
+        if len(store_data["wrmXpress_gui_obj"]["static_dx"]) == 1
+        else {
+            "run": False,
+            "rescale_multiplier": 1.0,
         }
     )
 
@@ -169,9 +169,6 @@ def prep_yaml(
         }
     )
 
-    # Write script to determine which modules to run
-    # TODO: Add more modules as needed
-    
     # Dictionary for motilityrun, segmentation, cellprofiler, etc.
     motilityrun_dict = (
         {
@@ -209,50 +206,76 @@ def prep_yaml(
         }
     )
 
-    segmentation_dict = (
-        {
+    if store_data["wrmXpress_gui_obj"]["pipeline_selection"] == "segmentation" and store_data["wrmXpress_gui_obj"]["cellpose_model_type_segmentation"] == 'python':
+        segmentation_dict = {
             "run": True,
             "model": get_default_value(
-                store_data["wrmXpress_gui_obj"]["cellpose_model_segmentation"], "cyto"
+                store_data["wrmXpress_gui_obj"]["cellpose_model_segmentation"],
+                "20220830_all",
             ),
             "model_type": get_default_value(
                 store_data["wrmXpress_gui_obj"]["cellpose_model_type_segmentation"],
-                "cyto",
+                "cellpose",
+            ),
+            "sigma": get_default_value(
+                store_data["wrmXpress_gui_obj"]["python_model_sigma"], 0.25
             ),
             "wavelengths": [
                 get_default_value(
-                    store_data["wrmXpress_gui_obj"]["wavelengths_segmentation"], "w1"
+                    store_data["wrmXpress_gui_obj"]["wavelengths_segmentation"], "All"
                 )
             ],
         }
-        if store_data["wrmXpress_gui_obj"]["pipeline_selection"] == "segmentation"
-        else {
-            "run": False,
-            "model": "20220830_all",
-            "model_type": "cellpose",
-            "wavelengths": ["All"],
-        }
-    )
+
+    else:        
+        segmentation_dict = (
+            {
+                "run": True,
+                "model": get_default_value(
+                    store_data["wrmXpress_gui_obj"]["cellpose_model_segmentation"],
+                    "20220830_all",
+                ),
+                "model_type": get_default_value(
+                    store_data["wrmXpress_gui_obj"]["cellpose_model_type_segmentation"],
+                    "cellpose",
+                ),
+                'sigma': 0.25,
+                "wavelengths": [
+                    get_default_value(
+                        store_data["wrmXpress_gui_obj"]["wavelengths_segmentation"], "All"
+                    )
+                ],
+            }
+            if store_data["wrmXpress_gui_obj"]["pipeline_selection"] == "segmentation"
+            else {
+                "run": False,
+                "model": "20220830_all",
+                "model_type": "cellpose",
+                'sigma': 0.25,
+                "wavelengths": ["All"],
+            }
+        )
 
     cellprofiler_dict = (
         {
             "run": True,
             "cellpose_model": get_default_value(
-                store_data["wrmXpress_gui_obj"]["cellpose_model_cellprofile"], "cyto"
+                store_data["wrmXpress_gui_obj"]["cellpose_model_cellprofile"],
+                "20220830_all",
             ),
             "cellpose_wavelength": get_default_value(
-                store_data["wrmXpress_gui_obj"]["wavelengths_cellprofile"], "w1"
+                store_data["wrmXpress_gui_obj"]["wavelengths_cellprofile"], "All"
             ),
             "pipeline": get_default_value(
                 store_data["wrmXpress_gui_obj"]["cellprofiler_pipeline_selection"],
                 "wormsize_intensity_cellpose",
             ),
         }
-        if store_data["wrmXpress_gui_obj"]["pipeline_selection"] == "cellprofiler"
+        if store_data["wrmXpress_gui_obj"]["pipeline_selection"] == "cellprofile"
         else {
             "run": False,
             "cellpose_model": "20220830_all",
-            "cellpose_wavelength": "w1",
+            "cellpose_wavelength": "All",
             "pipeline": "wormsize_intensity_cellpose",
         }
     )
@@ -291,6 +314,29 @@ def prep_yaml(
         }
     )
 
+    if store_data["wrmXpress_gui_obj"]["imaging_mode"] == 'single-well':
+        store_data["wrmXpress_gui_obj"]["multi_well_row"] = 1
+        store_data["wrmXpress_gui_obj"]["multi_well_col"] = 1
+        store_data["wrmXpress_gui_obj"]["multi_well_detection"] = 'grid'
+        xsites = 'NA'
+        ysites = 'NA'
+        store_data["wrmXpress_gui_obj"]["stitch_switch"] = False
+
+    elif store_data["wrmXpress_gui_obj"]["imaging_mode"] == 'multi-well':
+        store_data["wrmXpress_gui_obj"]["multi_well_detection"] = 'grid'
+        store_data["wrmXpress_gui_obj"]["stitch_switch"] = False
+        xsites = 'NA'
+        ysites = 'NA'
+        store_data["wrmXpress_gui_obj"]["stitch_switch"] = False
+
+    elif store_data["wrmXpress_gui_obj"]["imaging_mode"] == 'multi-site':
+        store_data["wrmXpress_gui_obj"]["multi_well_detection"] = 'grid'
+        store_data["wrmXpress_gui_obj"]["multi_well_row"] = 1
+        store_data["wrmXpress_gui_obj"]["multi_well_col"] = 1
+        store_data["wrmXpress_gui_obj"]["stitch_switch"] = (
+            False if store_data["wrmXpress_gui_obj"]["stitch_switch"] == None else True
+        )
+
     # Final YAML dictionary construction
     yaml_dict = {
         "imaging_mode": [store_data["wrmXpress_gui_obj"]["imaging_mode"]],
@@ -299,10 +345,10 @@ def prep_yaml(
         "well-col": well_col,
         "multi-well-row": int(store_data["wrmXpress_gui_obj"]["multi_well_row"]),
         "multi-well-col": int(store_data["wrmXpress_gui_obj"]["multi_well_col"]),
-        "multi-well-detection": str(store_data["wrmXpress_gui_obj"]["multi_well_detection"]),
+        "multi-well-detection": store_data["wrmXpress_gui_obj"]["multi_well_detection"],
         "x-sites": xsites,
         "y-sites": ysites,
-        "stitch": eval_bool(store_data["wrmXpress_gui_obj"]["stitch_switch"]),
+        "stitch": store_data["wrmXpress_gui_obj"]["stitch_switch"],
         "circle_diameter": circlediameter,
         "square_side": squarediameter,
         "pipelines": {

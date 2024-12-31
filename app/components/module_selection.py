@@ -110,7 +110,7 @@ module_selection = dbc.AccordionItem(
                                                                                 {
                                                                                     "label": "w4",
                                                                                     "value": "w4",
-                                                                                }
+                                                                                },
                                                                             ],
                                                                             value="All",
                                                                             persistence=True,
@@ -307,7 +307,7 @@ module_selection = dbc.AccordionItem(
                                                                                 "value": "CP_20230203_155226_pharynx3",
                                                                             },
                                                                         ],
-                                                                        value="cyto",
+                                                                        value="20220830_all",
                                                                         persistence=True,
                                                                         persistence_type="memory",
                                                                         style={
@@ -493,7 +493,7 @@ module_selection = dbc.AccordionItem(
                                                                                 "value": "CP_20230203_155226_pharynx3",
                                                                             },
                                                                         ],
-                                                                        value="cyto",
+                                                                        value="20220830_all",
                                                                         persistence=True,
                                                                         persistence_type="memory",
                                                                         style={

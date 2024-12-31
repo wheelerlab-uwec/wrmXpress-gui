@@ -41,25 +41,34 @@ diagnostics = dbc.AccordionItem(
                                                 "Run static diagnostics on the input data.",
                                                 target="static-dx",
                                                 placement="left",
-                                            )
+                                            ),
                                         ]
                                     ),
                                     dbc.Row(
                                         [
-                                            dbc.Col([
-                                            html.P("Rescale multiplier:"),
-                                            dbc.Input(
-                                                placeholder="1",
-                                                type="number",
-                                                min=0,
-                                                max=1,
-                                                step=0.1,
-                                                persistence=True,
-                                                persistence_type="memory",
-                                                id="static-dx-rescale-input",
-                                            ),
-                                            ],
-                                            width=11,
+                                            dbc.Col(
+                                                [
+                                                    html.P(
+                                                        "Rescale multiplier:",
+                                                        id="static-dx-rescale-label",
+                                                    ),
+                                                    dbc.Tooltip(
+                                                        "Rescale multiplier is a number between 0 and 1 that determines the size of the output image.",
+                                                        target="static-dx-rescale-label",
+                                                        placement="left",
+                                                    ),
+                                                    dbc.Input(
+                                                        placeholder="1",
+                                                        type="number",
+                                                        min=0,
+                                                        max=1,
+                                                        step=0.1,
+                                                        persistence=True,
+                                                        persistence_type="memory",
+                                                        id="static-dx-rescale-input",
+                                                    ),
+                                                ],
+                                                width=11,
                                             ),
                                         ],
                                         id="static-dx-rescale",
@@ -85,7 +94,7 @@ diagnostics = dbc.AccordionItem(
                                                 "Run video diagnostics on the input data.",
                                                 target="video-dx",
                                                 placement="left",
-                                            )
+                                            ),
                                         ]
                                     ),
                                     dbc.Row(
@@ -105,7 +114,7 @@ diagnostics = dbc.AccordionItem(
                                                             #     "value": "gif",
                                                             # },
                                                             # {
-                                                            #     "label": "NA", 
+                                                            #     "label": "NA",
                                                             #     "value": "NA",
                                                             # },
                                                         ],
@@ -119,10 +128,17 @@ diagnostics = dbc.AccordionItem(
                                             ),
                                             dbc.Col(
                                                 [
-                                                    html.P("Rescale multiplier:"),
+                                                    html.P(
+                                                        "Rescale multiplier:",
+                                                        id="video-rescale-multiplier-label",
+                                                    ),
+                                                    dbc.Tooltip(
+                                                        "Rescale multiplier is a number between 0 and 1 that determines the size of the output video.",
+                                                        target="video-rescale-multiplier-label",
+                                                    ),
                                                     dbc.Input(
                                                         id="video-dx-rescale",
-                                                        placeholder="1",
+                                                        placeholder="0.5",
                                                         type="number",
                                                         min=0,
                                                         max=1,

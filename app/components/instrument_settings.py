@@ -191,7 +191,7 @@ instrument_settings = dbc.AccordionItem(
                                     persistence_type="memory",
                                 ),
                                 dbc.Checklist(
-                                    options=[{"label": "Stitch", "value": False}],
+                                    options=[{"label": "Stitch", "value": True}],
                                     id="stitch-switch",
                                     switch=True,
                                     style={
