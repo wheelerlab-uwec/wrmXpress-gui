@@ -13,8 +13,8 @@ from dash.dependencies import Input, Output, State
 # Importing Components
 from app.utils.styling import CONTENT_STYLE, SIDEBAR_STYLE
 from app.components.header import header
+from app.components.fetch_data_modal import fetch_data_modal
 from app.utils.background_callback import callback
-from app.utils.callback_functions import zenodo_get
 
 # Diskcache
 import diskcache
@@ -104,6 +104,7 @@ app.layout = html.Div(
             ],
             style=CONTENT_STYLE,  # Style of the content, see styling.py
         ),
+        fetch_data_modal,  # Fetch data modal, see fetch_data_modal.py
     ]
 )
 
@@ -193,16 +194,24 @@ def background_callback(set_progress, n_clicks, store):
         )
 
 
+# Add callbacks for handling the modal and fetch operation
 @app.callback(
-    Output("fetch-data-link", "children"),  # Update the link text as an example
-    Input("fetch-data-link", "n_clicks"),  # Listen for clicks on the NavLink
+    Output("fetch-data-modal", "is_open"),  # Controls the modal visibility
+    [
+        Input("fetch-data-link", "n_clicks"),
+        Input("confirm-fetch", "n_clicks"),
+        Input("cancel-fetch", "n_clicks"),
+    ],
+    [State("fetch-data-modal", "is_open")],
 )
-def fetch_data_on_click(n_clicks):
-    if n_clicks:
-        # Call your zenodo_get function
-        result = zenodo_get()
-        return result  # You can update the text of the link or other components
-    return "Fetch Example Data"  # Default text if not clicked yet
+def toggle_modal(fetch_click, confirm_click, cancel_click, is_open):
+    # Open the modal on fetch-data-link click
+    if fetch_click and not is_open:
+        return True
+    # Close the modal on Yes or No button click
+    if confirm_click or cancel_click:
+        return False
+    return is_open
 
 
 ########################################################################

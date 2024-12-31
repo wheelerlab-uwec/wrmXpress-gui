@@ -16,9 +16,8 @@ import yaml
 import glob
 import tifffile as tiff
 from skimage import exposure
-from zenodo_get import zenodo_get  # Import the zenodo_get package
+from zenodo_get.zget import zenodo_get
 
-import subprocess
 ########################################################################
 ####                                                                ####
 ####                          Functions                             ####
@@ -695,12 +694,9 @@ def create_figure_from_url(image_url, scale="gray"):
     return fig
 
 
-def zenodo_get():
-
-    return "remove this line to run the function"
-
+def zenodo_get_id():
     # Zenodo record ID
-    zenodo_record_id = ""  # "12760651" ## add the zenodo record ID here commented this out so it doesn't run
+    zenodo_record_id = "12760651"  # Replace with your Zenodo record ID
 
     # Determine the Downloads directory path
     downloads_path = str(Path.home() / "Downloads")
@@ -708,8 +704,10 @@ def zenodo_get():
     # Prepare the Zenodo download command
     zenodo_url = f"https://zenodo.org/record/{zenodo_record_id}"
 
-    # Download the files from Zenodo to the Downloads folder
-    os.chdir(downloads_path)  # Change the working directory to Downloads
-    zenodo_get(zenodo_url)  # Download the data
+    # Change the working directory to Downloads
+    os.chdir(downloads_path)
+
+    # Pass the URL as a list to simulate CLI arguments
+    zenodo_get([zenodo_url])  # Note the use of a list
 
     return "Download complete!"

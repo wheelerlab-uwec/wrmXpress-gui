@@ -351,164 +351,243 @@ def save_configuration_upon_clicking_finalize_button(  # function to save the ya
     nclicks,
     store_data,
 ):
-    
+
     if nclicks:
 
         # try to catch any errors that may occur
         # return an error message if an error occurs
         # try: will include something here later
-
-        """
+        try:
             # initializing the first error message
             error_messages = [
                 "While finalizing the configuration, the following errors were found:"
             ]
+            minor_error_messages = [
+                "Warning: when finalizing the configuration, the following values were not set. The default will be used."
+            ]
+
             error_occured = False  # initializing the error flag
+            minor_error_occured = False  # initializing the minor error flag
 
             # checks volume and plate names to ensure they are adequately named
             check_cases = [None, "", " "]
 
-            if imagingmode == "multi-well":
-                if (
-                    multiwellrows == None
-                    or multiwellrows == ""
-                    or multiwellcols == None
-                    or multiwellcols == ""
-                ):
+            if store_data["wrmXpress_gui_obj"]["imaging_mode"] == "multi-well":
+                rows_missing = (
+                    store_data["wrmXpress_gui_obj"]["multi_well_row"] is None 
+                    or store_data["wrmXpress_gui_obj"]["multi_well_row"] == ""
+                )
+                cols_missing = (
+                    store_data["wrmXpress_gui_obj"]["multi_well_col"] is None 
+                    or store_data["wrmXpress_gui_obj"]["multi_well_col"] == ""
+                )
+
+                if rows_missing and cols_missing:
                     error_occured = True
                     error_messages.append(
-                        "The number of rows and columns for the multi-well plate is missing."
+                        "Both the number of rows and columns for the multi-well plate are missing."
                     )
-
-            # checks to ensure that plate name and volume contains characters
-            if platename in check_cases:
-                error_occured = True
-                error_messages.append("Plate/Folder name is missing.")  # error message
-            if volume in check_cases:
-                error_occured = True
-                error_messages.append("Volume path is missing.")  # error message
-
-            # ensures that plate name and volume contains characters
-            if volume not in check_cases and platename not in check_cases:
-
-                # splits plate name into a list of characters
-                platename_parts = list(platename)
-                if len(platename_parts) > 0:
-
-                    # ensures plate name does not contain spaces or slashes
-                    has_invalid_chars = any(
-                        letter == " " or letter == "/" for letter in platename_parts
-                    )
-                    if has_invalid_chars == True:
-                        error_occured = True
-                        error_messages.append(
-                            "Plate/Folder name contains invalid characters. A valid platename only contains letters, numbers, underscores ( _ ), and dashs ( - )."
-                        )
-
-                # splits volume into a list of characters
-                volume_parts = list(volume)
-                if len(volume_parts) > 0:
-
-                    # obtains last character of volume
-                    volume_parts_end = volume_parts[-1]
-
-                    # ensures last character of volume is not a forbidden character
-                    if volume_parts_end in check_cases:
-                        error_occured = True
-                        error_messages.append(
-                            "Volume path contains invalid characters. A valid path only contains letters, numbers, underscores ( _ ), dashes ( - ), and slashes ( / )."
-                        )
-
-                    # ensures volume does not contain spaces
-                    has_invalid_characters = any(
-                        letter == " " for letter in volume_parts
-                    )
-                    if has_invalid_characters == True:
-                        error_occured = True
-                        error_messages.append(
-                            "Volume path contains invalid characters. A valid path only contains letters, numbers, underscores ( _ ), dashes ( - ), and slashes ( / )."
-                        )
-
-                # check to see if volume, plate, and input directories exist
-                # obtain and full plate name path
-                platename_path = Path(volume, platename)
-                plate_base = platename.split("_", 1)[0]
-
-                # ensure all of these file paths exist (volume, input path, and plate name path)
-                if not os.path.exists(volume):
+                elif rows_missing:
                     error_occured = True
-                    error_messages.append("The volume path does not exist.")
-
-                # check to see if the plate name path exists
-                if not os.path.exists(platename_path):
+                    error_messages.append("The number of rows for the multi-well plate is missing.")
+                elif cols_missing:
                     error_occured = True
-                    error_messages.append("No Plate/Folder in the volume.")
+                    error_messages.append("The number of columns for the multi-well plate is missing.")
 
-                # check to see if imagexpress mode is selected
-                # if so, ensure that an .htd file exists
-                if filestructure == "imagexpress":
-                    HTD_file = Path(platename_path, f"{plate_base}.HTD")
-                    htd_file = Path(platename_path, f"{plate_base}.htd")
-                    if not os.path.exists(htd_file) or not os.path.exists(HTD_file):
-                        error_occured = True
-                        error_messages.append("No .HTD file found in the Plate/Folder.")
-                if filestructure == "avi":
-                    avi_folder_path = Path(volume, platename)
-                    avi_pattern = f"{platename}_"
-                    matched_files_avi = list(
-                        avi_folder_path.glob(avi_pattern + "*.avi")
-                    )
-                    if not matched_files_avi:
-                        error_occured = True
-                        error_messages.append("No AVI files found in the Plate/Folder.")
+            if store_data["wrmXpress_gui_obj"]["imaging_mode"] == "multi-site":
+                missing_x_sites = (
+                    store_data["wrmXpress_gui_obj"]["x_sites"] is None 
+                    or store_data["wrmXpress_gui_obj"]["x_sites"] == ""
+                )
 
-                # check to see if avi mode is selected for fecundity, and any
-                # of the cellprofiler modules, if it is thow an error
-                if filestructure == "avi" and pipeline in [
-                    "fecundity",
-                    "wormsize_intensity_cellpose",
-                    "mf_celltox",
-                    "feeding",
-                    "wormsize",
-                ]:
+                missing_y_sites = (
+                    store_data["wrmXpress_gui_obj"]["y_sites"] is None 
+                    or store_data["wrmXpress_gui_obj"]["y_sites"] == ""
+                )
+
+                if missing_x_sites and missing_y_sites:
                     error_occured = True
                     error_messages.append(
-                        "AVI mode is not supported for the selected pipeline."
+                        "Both the number of x and y sites for the multi-site plate are missing."
                     )
 
-                plate_base = platename.split("_", 1)[0]
+                elif missing_x_sites:
+                    error_occured = True
+                    error_messages.append("The number of x sites for the multi-site plate is missing.")
 
-                # Directory containing the TIFF files
-                folder_path = Path(volume, f"{platename}/TimePoint_1")
-                avi_folder_path = Path(volume, platename)
-                # Iterate through the wells that have been selected
-                for well in wells:
-                    # Construct a pattern to match files for the current well, ignoring suffixes
-                    pattern = f"{plate_base}_{well}"
-                    avi_pattern = f"{platename}_{well}"
+                elif missing_y_sites:
+                    error_occured = True
+                    error_messages.append("The number of y sites for the multi-site plate is missing.")
 
-                    # Find all files in the directory that match the well pattern
-                    matched_files_TIF = list(folder_path.glob(pattern + "*.TIF"))
-                    matched_files_tif = list(folder_path.glob(pattern + "*.tif"))
-                    matched_files_avi = list(
-                        avi_folder_path.glob(avi_pattern + "*.avi")
-                    )
-                    matched_files = (
-                        matched_files_tif + matched_files_avi + matched_files_TIF
-                    )
-                    # If no files match the current well, set error flags
-                    if not matched_files:
-                        error_occured = True
-                        error_messages.append(
-                            f"No images found for well {well}. This may result in unexpected errors or results."
-                        )
-            if pipeline is None:
+            # check mask diameter
+            if store_data["wrmXpress_gui_obj"]["mask"] in ["circular", "square"]:
+                if store_data["wrmXpress_gui_obj"]["mask_diameter"] is None:
+                    minor_error_occured = True
+                    minor_error_messages.append("Mask diameter is missing. Default value (0) will be used.")
+
+            # check if the pipeline is selected
+            if store_data["wrmXpress_gui_obj"]["pipeline_selection"] is None:
                 error_occured = True
                 error_messages.append("No pipeline selected.")
 
-            if wells == []:
+            # check platename
+            if store_data["wrmXpress_gui_obj"]["plate_name"] in check_cases:
+                error_occured = True
+                error_messages.append("Plate/Folder name is missing.")
+
+            # check mounted volume
+            if store_data["wrmXpress_gui_obj"]["mounted_volume"] in check_cases:
+                error_occured = True
+                error_messages.append("Volume path is missing.")
+
+            # check to see if the well selection list is empty
+            if store_data["wrmXpress_gui_obj"]["well_selection_list"] == []:
                 error_occured = True
                 error_messages.append("No wells selected.")
+
+            # minor error messages if parameters for motility are missing
+            if store_data["wrmXpress_gui_obj"]["pipeline_selection"] == "motility":
+                if store_data["wrmXpress_gui_obj"]["pyrscale"] is None:
+                    minor_error_occured = True
+                    minor_error_messages.append("Pyrscale is missing. Default value (0.5) will be used.")
+                if store_data["wrmXpress_gui_obj"]["levels"] is None:
+                    minor_error_occured = True
+                    minor_error_messages.append("Levels is missing. Default value (5) will be used.")
+                if store_data["wrmXpress_gui_obj"]["winsize"] is None:
+                    minor_error_occured = True
+                    minor_error_messages.append("Winsize is missing. Default value (20) will be used.")
+                if store_data["wrmXpress_gui_obj"]["iterations"] is None:
+                    minor_error_occured = True
+                    minor_error_messages.append("Iterations is missing. Default value (7) will be used.")
+                if store_data["wrmXpress_gui_obj"]["poly_n"] is None:
+                    minor_error_occured = True
+                    minor_error_messages.append("Poly_n is missing. Default value (5) will be used.")
+                if store_data["wrmXpress_gui_obj"]["poly_sigma"] is None:
+                    minor_error_occured = True
+                    minor_error_messages.append("Poly_sigma is missing. Default value (1.1) will be used.")
+                if store_data["wrmXpress_gui_obj"]["flags"] is None:
+                    minor_error_occured = True
+                    minor_error_messages.append("Flags is missing. Default value (0) will be used.")
+
+            # minor error messages if parameters for segmentation are missing
+            if store_data["wrmXpress_gui_obj"]["pipeline_selection"] == "segmentation":
+                if store_data["wrmXpress_gui_obj"]["cellpose_model_type_segmentation"] == "python":
+                    if store_data["wrmXpress_gui_obj"]["python_model_sigma"] is None:
+                        minor_error_occured = True
+                        minor_error_messages.append("Python model sigma is missing. Default value (0.25) will be used.")
+
+            # minor error messages if parameters for tracking are missing
+            if store_data["wrmXpress_gui_obj"]["pipeline_selection"] == "tracking":
+                if store_data["wrmXpress_gui_obj"]["tracking_diameter"] is None:
+                    minor_error_occured = True
+                    minor_error_messages.append("Tracking diameter is missing. Default value (35) will be used.")
+                if store_data["wrmXpress_gui_obj"]["tracking_minmass"] is None:
+                    minor_error_occured = True
+                    minor_error_messages.append("Tracking minmass is missing. Default value (1200) will be used.")
+                if store_data["wrmXpress_gui_obj"]["tracking_noisesize"] is None:
+                    minor_error_occured = True
+                    minor_error_messages.append("Tracking noisesize is missing. Default value (2) will be used.")
+                if store_data["wrmXpress_gui_obj"]["tracking_searchrange"] is None:
+                    minor_error_occured = True
+                    minor_error_messages.append("Tracking searchrange is missing. Default value (45) will be used.")
+                if store_data["wrmXpress_gui_obj"]["tracking_memory"] is None:
+                    minor_error_occured = True
+                    minor_error_messages.append("Tracking memory is missing. Default value (25) will be used.")
+                if store_data["wrmXpress_gui_obj"]["tracking_adaptivestop"] is None:
+                    minor_error_occured = True
+                    minor_error_messages.append("Tracking adaptivestop is missing. Default value (30) will be used.")
+
+            # avi should only be selected for motility and tracking
+            if store_data["wrmXpress_gui_obj"]["file_structure"] == "avi" and store_data["wrmXpress_gui_obj"]["pipeline_selection"] not in ["motility", "tracking"]:
+                error_occured = True
+                error_messages.append("AVI mode is not supported for the selected pipeline.")
+
+            # check to see if the volume path and plate name are valid
+            if store_data["wrmXpress_gui_obj"]["mounted_volume"] not in check_cases:
+
+                # ensure that the volume path exists
+                if not os.path.exists(
+                    store_data["wrmXpress_gui_obj"]["mounted_volume"]
+                ):
+                    error_occured = True
+                    error_messages.append("The volume path does not exist.")
+
+                if store_data["wrmXpress_gui_obj"]["plate_name"] not in check_cases:
+                    # ensure that the plate name path exists and lives in the volume path
+                    platename_path = Path(
+                        store_data["wrmXpress_gui_obj"]["mounted_volume"],
+                        store_data["wrmXpress_gui_obj"]["plate_name"],
+                    )
+                    if not os.path.exists(platename_path):
+                        error_occured = True
+                        error_messages.append("No Plate/Folder in the volume.")
+
+                    # if imagexpress mode is selected, ensure that an .htd file exists
+                    if (
+                        store_data["wrmXpress_gui_obj"]["file_structure"]
+                        == "imagexpress"
+                    ):
+                        # Define the directory to search
+                        platename_path = Path(platename_path)
+
+                        # Search for .htd and .HTD files
+                        htd_files = list(platename_path.glob("*.htd"))
+                        HTD_files = list(platename_path.glob("*.HTD"))
+
+                        # Check if no matching files exist
+                        if not htd_files and not HTD_files:
+                            error_occured = True
+                            error_messages.append("No .HTD file found in the Plate/Folder.")
+
+                        # get a list of all subdirectories in the plate/folder
+                        subdirectories = [
+                            x for x in platename_path.iterdir()
+                            if x.is_dir()
+                        ]
+
+                        for subdirectory in subdirectories:
+                            # get a list of all files in the subdirectory
+                            files = list(subdirectory.glob("*"))
+
+                            # check if the str(well) is in the list of files
+                            # if not, set error flags
+                            for well in store_data["wrmXpress_gui_obj"]["well_selection_list"]:
+                                if not any([str(well) in str(file) for file in files]):
+                                    error_occured = True
+                                    error_messages.append(
+                                        f"No images found for well {well}. This may result in unexpected errors or results."
+                                    )
+
+                    # if avi mode is selected, ensure that an avi file exists
+                    if store_data["wrmXpress_gui_obj"]["file_structure"] == "avi":
+                        avi_folder_path = Path(
+                            store_data["wrmXpress_gui_obj"]["mounted_volume"],
+                            store_data["wrmXpress_gui_obj"]["plate_name"],
+                        )
+                        avi_pattern = (
+                            f"{store_data['wrmXpress_gui_obj']['plate_name']}_"
+                        )
+                        matched_files_avi = list(
+                            avi_folder_path.glob(avi_pattern + "*.avi")
+                        )
+                        if not matched_files_avi:
+                            error_occured = True
+                            error_messages.append(
+                                "No AVI files found in the Plate/Folder."
+                            )
+
+                        # check to see if all wells selected have an associated .avi file
+                        for well in store_data["wrmXpress_gui_obj"]["well_selection_list"]:
+                            # Construct a pattern to match files for the current well, ignoring suffixes
+                            pattern = f"{store_data['wrmXpress_gui_obj']['plate_name']}_{well}"
+                            # Find all files in the directory that match the well pattern
+                            matched_files = list(avi_folder_path.glob(pattern + "*.avi"))
+                            # If no files match the current well, set error flags
+                            if not matched_files:
+                                error_occured = True
+                                error_messages.append(
+                                    f"No images found for well {well}. This may result in unexpected errors or results."
+                                )
 
             # check to see if there was an error message
             if error_occured == True:
@@ -532,8 +611,7 @@ def save_configuration_upon_clicking_finalize_button(  # function to save the ya
             return "danger", True, "A ValueError occurred", "danger"
         except Exception as e:
             return "danger", True, f"An unexpected error occurred: {str(e)}", "danger"
-        """
-        
+
         # diagnosticdx = "True"  # set diagnosticdx to True
 
         # if no error messages are found, write the configuration to a YAML file
@@ -546,6 +624,20 @@ def save_configuration_upon_clicking_finalize_button(  # function to save the ya
         # dump preview data to YAML file
         with open(output_file, "w") as yaml_file:
             yaml.dump(config, yaml_file, default_flow_style=False)
+
+        if minor_error_occured == True:
+            # formats the first line of the error message
+            minor_error_messages[0] = html.H5(
+                f"{minor_error_messages[0]}", className="alert-heading"
+            )
+
+            # format the content of the error messages
+            for i in range(1, len(minor_error_messages)):
+                minor_error_messages[i] = html.P(
+                    f"{i}. {minor_error_messages[i]}", className="mb-0"
+                )
+
+            return "warning", True, minor_error_messages, "warning"
 
         # return success message
         return "success", True, f"Configuration written to {output_file}", "success"
