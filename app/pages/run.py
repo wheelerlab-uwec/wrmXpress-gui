@@ -41,12 +41,6 @@ layout = run_layout
 def cancel_analysis(n_clicks):
     """
     This function cancels the analysis by typing "Control" + "C" in the terminal.
-    =========================================================================================
-    Arguments:
-        - n_clicks : int : The number of clicks
-    =========================================================================================
-    Returns:
-        - n_clicks : int : The number of clicks
     """
     if n_clicks:
 
@@ -78,21 +72,6 @@ def cancel_analysis(n_clicks):
 def load_analysis_img(selection, n_clicks, store):
     """
     This function loads the analysis image based on the selection.
-    =========================================================================================
-    Arguments:
-        - selection : str : The selection
-        - n_clicks : int : The number of clicks
-        - store : dict : The store data
-    =========================================================================================
-    Returns:
-        - fig : plotly.graph_objs._figure.Figure : The figure
-        - f'```{output_thumbs_path}```' : str : The output thumbs path
-        - is_open : bool : whether the (first-view-of-analysis) alert is open or not
-            +- True : if the alert is open
-            +- False : if the alert is not open
-        - is_open : bool : whether the (additional view of analysis) alert is open or not
-            +- True : if the alert is open
-            +- False : if the alert is not open
     """
     # Check to see if store exists
     if not store:
@@ -100,15 +79,15 @@ def load_analysis_img(selection, n_clicks, store):
 
     try:
         # Get the store data
-        volume = store["mount"]
-        platename = store["platename"]
+        volume = store["wrmXpress_gui_obj"]["mounted_volume"]
+        platename = store["wrmXpress_gui_obj"]["plate_name"]
 
         # Handle NoneType for platename
         if platename is None:
             return {}, "", True, False, True, True, True, False
 
         plate_base = platename.split("_", 1)[0]
-        wells = store["wells"]
+        wells = store["wrmXpress_gui_obj"]["well_selection_list"]
 
         img_path = None
         scale = "gray"
@@ -179,13 +158,6 @@ def load_analysis_img(selection, n_clicks, store):
 def get_options_analysis(nclicks, store):
     """
     This function gets the options for the analysis.
-    =========================================================================================
-    Arguments:
-        - nclicks : int : The number of clicks
-        - store : dict : The store data
-    =========================================================================================
-    Returns:
-        - options : list : The options
     """
 
     # check to see if store exists
@@ -193,7 +165,7 @@ def get_options_analysis(nclicks, store):
         return {}
 
     # get the store from the data
-    pipeline_selection = store["pipeline_selection"]
+    pipeline_selection = store["wrmXpress_gui_obj"]["pipeline_selection"]
     if pipeline_selection == "motility":
 
         # create the options
@@ -249,8 +221,8 @@ def get_options_analysis(nclicks, store):
 
     elif pipeline_selection == "feeding":
         # obtain the wavelength options
-        volume = store["mount"]
-        platename = store["platename"]
+        volume = store["wrmXpress_gui_obj"]["mounted_volume"]
+        platename = store["wrmXpress_gui_obj"]["plate_name"]
         plate_base = platename.split("_", 1)[0]
         input_file_path = Path(volume, f"{platename}/TimePoint_1/")
 

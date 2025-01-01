@@ -1,8 +1,5 @@
-########################################################################
-####                                                                ####
-####                             Imports                            ####
-####                                                                ####
-########################################################################
+# In[1]: Imports
+
 import dash
 from dash import dcc, html, callback, dash_table, Input, Output, State
 import pandas as pd
@@ -16,20 +13,11 @@ from app.components.metadata_layout import metadata_layout
 # registering dash page
 dash.register_page(__name__)
 
-########################################################################
-####                                                                ####
-####                             Layout                             ####
-####                                                                ####
-########################################################################
+# In[2]: Metadata Page Layout
 
 layout = metadata_layout
 
-########################################################################
-####                                                                ####
-####                             Callbacks                          ####
-####                                                                ####
-########################################################################
-
+# In[3]: Callbacks
 
 @callback(
     [
@@ -52,8 +40,8 @@ def create_tabs_from_checklist(store, n_clicks, checklist_values):
     # attempting to catch any errors that may occur
     # if the rows are not available, set them to the default values
     try:
-        if store["rows"] is not None:
-            num_rows = store["rows"]
+        if store["wrmXpress_gui_obj"]["well_row"] is not None:
+            num_rows = store["wrmXpress_gui_obj"]["well_row"]
         else:
             num_rows = default_rows
     except KeyError:
@@ -61,8 +49,8 @@ def create_tabs_from_checklist(store, n_clicks, checklist_values):
 
     # if the columns are not available, set them to the default values
     try:
-        if store["cols"] is not None:
-            num_cols = store["cols"]
+        if store["wrmXpress_gui_obj"]["well_col"] is not None:
+            num_cols = store["wrmXpress_gui_obj"]["well_col"]
         else:
             num_cols = default_cols
     except KeyError:
@@ -156,7 +144,10 @@ def save_the_metadata_tables_to_csv(n_clicks, metadata_tabs, store):
         )
 
     # check if the store values are none
-    if store["mount"] is None or store["platename"] is None:
+    if (
+        store["wrmXpress_gui_obj"]["mounted_volume"] is None
+        or store["wrmXpress_gui_obj"]["plate_name"] is None
+    ):
         return (
             "primary",
             True,
@@ -202,8 +193,8 @@ def save_the_metadata_tables_to_csv(n_clicks, metadata_tabs, store):
             # Reorder the DataFrame columns
             df = df[sorted_columns]
 
-            volume = store["mount"]  # Get the volume from the store
-            plate = store["platename"]
+            volume = store["wrmXpress_gui_obj"]["mounted_volume"]
+            plate = store["wrmXpress_gui_obj"]["plate_name"]
 
             # Save the DataFrame to a CSV file
             metadata_dir = Path(volume).joinpath(

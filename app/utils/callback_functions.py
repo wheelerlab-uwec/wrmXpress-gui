@@ -16,7 +16,8 @@ import yaml
 import glob
 import tifffile as tiff
 from skimage import exposure
-from zenodo_get.zget import zenodo_get
+from zenodo_get import zenodo_get
+import subprocess
 
 ########################################################################
 ####                                                                ####
@@ -326,7 +327,7 @@ def prep_yaml(
         store_data["wrmXpress_gui_obj"]["stitch_switch"] = False
         xsites = 'NA'
         ysites = 'NA'
-        store_data["wrmXpress_gui_obj"]["stitch_switch"] = False
+
 
     elif store_data["wrmXpress_gui_obj"]["imaging_mode"] == 'multi-site':
         store_data["wrmXpress_gui_obj"]["multi_well_detection"] = 'grid'
@@ -694,20 +695,49 @@ def create_figure_from_url(image_url, scale="gray"):
     return fig
 
 
-def zenodo_get_id():
-    # Zenodo record ID
+
+def zenodo_get_id(selected_plates, file_path):
+    # Zenodo record ID (DOI can be used for reference but Zenodo ID is used for fetching)
     zenodo_record_id = "12760651"  # Replace with your Zenodo record ID
 
     # Determine the Downloads directory path
-    downloads_path = str(Path.home() / "Downloads")
-
-    # Prepare the Zenodo download command
-    zenodo_url = f"https://zenodo.org/record/{zenodo_record_id}"
+    try:
+        downloads_path = Path(file_path)
+        downloads_path.mkdir(parents=True, exist_ok=True)
+    except Exception as e:
+        print(f"Error creating Downloads directory: {e}")
+        try: 
+            downloads_path = Path.home() / "Downloads"
+            downloads_path.mkdir(parents=True, exist_ok=True)
+        except Exception as e:
+            print(f"Error creating Downloads directory: {e}")
+            return "Error creating Downloads directory"
 
     # Change the working directory to Downloads
     os.chdir(downloads_path)
 
-    # Pass the URL as a list to simulate CLI arguments
-    zenodo_get([zenodo_url])  # Note the use of a list
+    # Loop over selected plates and download specific files
+    for plate in selected_plates:
+        # Construct the glob pattern for each plate
+        file_pattern = (
+            f"{plate}.zip"  # Adjust the pattern if needed (e.g., for all .zip files)
+        )
+
+        print(f"Attempting to download file: {file_pattern}")  # For debugging purposes
+
+        try:
+            # Run zenodo_get with glob pattern to download the specific file
+            subprocess.run(
+                [
+                    "zenodo_get",
+                    zenodo_record_id,  # Use the record ID
+                    "-g",
+                    file_pattern,  # Use the glob pattern to specify the file
+                ],
+                check=True,  # This ensures an error is raised if the command fails
+            )
+
+        except subprocess.CalledProcessError as e:
+            print(f"Error downloading {plate}: {str(e)}")
 
     return "Download complete!"

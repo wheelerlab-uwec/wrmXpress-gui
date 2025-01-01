@@ -157,24 +157,6 @@ app.layout = html.Div(
 def background_callback(set_progress, n_clicks, store):
     """
     This function runs the wrmXpress analysis in the background.
-    =========================================================================================
-    Arguments:
-        - set_progress : function : The function to set the progress
-            +- progress bar value : int : The progress bar value
-            +- progress bar max : int : The progress bar max
-            +- image analysis preview : dict : The image analysis preview
-            +- progress message run page for analysis : str : The progress message run page for analysis
-            +- progress message run page markdown : str : The progress message run page markdown
-        - n_clicks : int : The number of clicks of the submit button on the run page
-        - store : dict : The store data
-            +- this data is generated from the configure page. see app/pages/configure.py for more details
-    =========================================================================================
-    Returns:
-        - callback : function : The callback function defined in app/utils/background_callback.py
-            +- set progress : function : The set progress function defined above
-            +- n_clicks : int : The number of clicks from the submit button on the run page
-            +- store : dict : The store data defined above
-    =========================================================================================
     """
     try:
         return callback(set_progress, n_clicks, store)

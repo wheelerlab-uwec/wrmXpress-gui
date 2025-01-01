@@ -27,24 +27,6 @@ from app.utils.callback_functions import (
 def preview_callback_functions(store):
     """
     This function is used to preview the analysis of the selected options.
-    ======================================================================
-    Arguments:
-        - motility_selection : str : Motility selection
-        - segment_selection : str : Segment selection
-        - fecundity_selection : str : Fecundity selection
-        - selection : str : Selection
-        - cellprofiler : str : Cell profiler
-        - cellprofilepipeline : str : Cell profile pipeline
-        - platename : str : Plate name
-        - volume : str : Volume
-        - wells : str : Wells
-        - plate_base : str : Plate base
-    ======================================================================
-    Returns:
-        - function : function : Function to preview the analysis
-            -- These functions are defined in app/utils/callback_functions.py
-            -- and specified in what lines they are defined in the file
-    ======================================================================
 
     """
     pipeline_selection = store["pipeline_selection"]

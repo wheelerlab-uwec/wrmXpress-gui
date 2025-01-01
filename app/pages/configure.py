@@ -1,8 +1,4 @@
-########################################################################
-####                                                                ####
-####                             Imports                            ####
-####                                                                ####
-########################################################################
+# In[1]: Imports
 
 import dash
 from dash import callback, html, Input, Output, State, dash_table
@@ -20,20 +16,11 @@ from app.utils.wrmxpress_gui_obj import WrmXpressGui
 # Registering this page
 dash.register_page(__name__)
 
-########################################################################
-####                                                                ####
-####                             Layout                             ####
-####                                                                ####
-########################################################################
+# In[2]: Configure Page Layout
 
 layout = configure_layout
 
-########################################################################
-####                                                                ####
-####                              Callback                          ####
-####                                                                ####
-########################################################################
-
+# In[3]: Callbacks
 
 @callback(
     [
@@ -47,7 +34,7 @@ layout = configure_layout
     ],
     [
         Input("imaging-mode", "value"),
-        Input("file-structure", "value"),
+        # Input("file-structure", "value"),
         Input("mask", "value"),
         Input("static-dx", "value"),
         Input("video-dx", "value"),
@@ -55,7 +42,13 @@ layout = configure_layout
     ],
 )
 # appearing selections upon meeting certain critera
-def update_options_visibility(imaging_mode, file_structure, mask, static_dx, video_dx, cellprofiler_pipeline_selection):
+def update_options_visibility(imaging_mode, 
+                              # file_structure,
+                              mask, 
+                              static_dx, 
+                              video_dx, 
+                              cellprofiler_pipeline_selection
+                              ):
     """
     This function will display the multi-well options and additional options based on the imaging mode and file structure selected.
     """
@@ -359,238 +352,67 @@ def save_configuration_upon_clicking_finalize_button(  # function to save the ya
         # try: will include something here later
         try:
             # initializing the first error message
-            error_messages = [
+            initial_error_messages = [
                 "While finalizing the configuration, the following errors were found:"
             ]
-            minor_error_messages = [
+            initial_minor_error_messages = [
                 "Warning: when finalizing the configuration, the following values were not set. The default will be used."
             ]
 
-            error_occured = False  # initializing the error flag
-            minor_error_occured = False  # initializing the minor error flag
+            # create a wrmXpress gui object from the stored data and use the validate method to check for errors
 
-            # checks volume and plate names to ensure they are adequately named
-            check_cases = [None, "", " "]
+            wrmXpress_gui_obj = WrmXpressGui(
+                file_structure = store_data['wrmXpress_gui_obj']['file_structure'],
+                imaging_mode = store_data["wrmXpress_gui_obj"]["imaging_mode"],
+                multi_well_row = store_data["wrmXpress_gui_obj"]["multi_well_row"],
+                multi_well_col = store_data["wrmXpress_gui_obj"]["multi_well_col"],
+                multi_well_detection = store_data["wrmXpress_gui_obj"]["multi_well_detection"],
+                x_sites = store_data["wrmXpress_gui_obj"]["x_sites"],
+                y_sites = store_data["wrmXpress_gui_obj"]["y_sites"],
+                stitch_switch = store_data["wrmXpress_gui_obj"]["stitch_switch"],
+                well_col = store_data["wrmXpress_gui_obj"]["well_col"],
+                well_row = store_data["wrmXpress_gui_obj"]["well_row"],
+                mask = store_data["wrmXpress_gui_obj"]["mask"],
+                mask_diameter = store_data["wrmXpress_gui_obj"]["mask_diameter"],
+                pipeline_selection = store_data["wrmXpress_gui_obj"]["pipeline_selection"],
+                wavelengths = store_data["wrmXpress_gui_obj"]["wavelengths"],
+                pyrscale = store_data["wrmXpress_gui_obj"]["pyrscale"],
+                levels = store_data["wrmXpress_gui_obj"]["levels"],
+                winsize = store_data["wrmXpress_gui_obj"]["winsize"],
+                iterations = store_data["wrmXpress_gui_obj"]["iterations"],
+                poly_n = store_data["wrmXpress_gui_obj"]["poly_n"],
+                poly_sigma = store_data["wrmXpress_gui_obj"]["poly_sigma"],
+                flags = store_data["wrmXpress_gui_obj"]["flags"],
+                cellpose_model_segmentation = store_data["wrmXpress_gui_obj"]["cellpose_model_segmentation"],
+                cellpose_model_type_segmentation = store_data["wrmXpress_gui_obj"]["cellpose_model_type_segmentation"],
+                python_model_sigma = store_data["wrmXpress_gui_obj"]["python_model_sigma"],
+                wavelengths_segmentation = store_data["wrmXpress_gui_obj"]["wavelengths_segmentation"],
+                cellprofiler_pipeline_selection = store_data["wrmXpress_gui_obj"]["cellprofiler_pipeline_selection"],
+                cellpose_model_cellprofile = store_data["wrmXpress_gui_obj"]["cellpose_model_cellprofile"],
+                wavelengths_cellprofile = store_data["wrmXpress_gui_obj"]["wavelengths_cellprofile"],
+                tracking_diameter = store_data["wrmXpress_gui_obj"]["tracking_diameter"],
+                tracking_minmass = store_data["wrmXpress_gui_obj"]["tracking_minmass"],
+                tracking_noisesize = store_data["wrmXpress_gui_obj"]["tracking_noisesize"],
+                tracking_searchrange = store_data["wrmXpress_gui_obj"]["tracking_searchrange"],
+                tracking_memory = store_data["wrmXpress_gui_obj"]["tracking_memory"],
+                tracking_adaptivestop = store_data["wrmXpress_gui_obj"]["tracking_adaptivestop"],
+                static_dx = store_data["wrmXpress_gui_obj"]["static_dx"],
+                static_dx_rescale = store_data["wrmXpress_gui_obj"]["static_dx_rescale"],
+                video_dx = store_data["wrmXpress_gui_obj"]["video_dx"],
+                video_dx_format = store_data["wrmXpress_gui_obj"]["video_dx_format"],
+                video_dx_rescale = store_data["wrmXpress_gui_obj"]["video_dx_rescale"],
+                mounted_volume = store_data["wrmXpress_gui_obj"]["mounted_volume"],
+                plate_name = store_data["wrmXpress_gui_obj"]["plate_name"],
+                well_selection_list = store_data["wrmXpress_gui_obj"]["well_selection_list"]
+            )
 
-            if store_data["wrmXpress_gui_obj"]["imaging_mode"] == "multi-well":
-                rows_missing = (
-                    store_data["wrmXpress_gui_obj"]["multi_well_row"] is None 
-                    or store_data["wrmXpress_gui_obj"]["multi_well_row"] == ""
-                )
-                cols_missing = (
-                    store_data["wrmXpress_gui_obj"]["multi_well_col"] is None 
-                    or store_data["wrmXpress_gui_obj"]["multi_well_col"] == ""
-                )
-
-                if rows_missing and cols_missing:
-                    error_occured = True
-                    error_messages.append(
-                        "Both the number of rows and columns for the multi-well plate are missing."
-                    )
-                elif rows_missing:
-                    error_occured = True
-                    error_messages.append("The number of rows for the multi-well plate is missing.")
-                elif cols_missing:
-                    error_occured = True
-                    error_messages.append("The number of columns for the multi-well plate is missing.")
-
-            if store_data["wrmXpress_gui_obj"]["imaging_mode"] == "multi-site":
-                missing_x_sites = (
-                    store_data["wrmXpress_gui_obj"]["x_sites"] is None 
-                    or store_data["wrmXpress_gui_obj"]["x_sites"] == ""
-                )
-
-                missing_y_sites = (
-                    store_data["wrmXpress_gui_obj"]["y_sites"] is None 
-                    or store_data["wrmXpress_gui_obj"]["y_sites"] == ""
-                )
-
-                if missing_x_sites and missing_y_sites:
-                    error_occured = True
-                    error_messages.append(
-                        "Both the number of x and y sites for the multi-site plate are missing."
-                    )
-
-                elif missing_x_sites:
-                    error_occured = True
-                    error_messages.append("The number of x sites for the multi-site plate is missing.")
-
-                elif missing_y_sites:
-                    error_occured = True
-                    error_messages.append("The number of y sites for the multi-site plate is missing.")
-
-            # check mask diameter
-            if store_data["wrmXpress_gui_obj"]["mask"] in ["circular", "square"]:
-                if store_data["wrmXpress_gui_obj"]["mask_diameter"] is None:
-                    minor_error_occured = True
-                    minor_error_messages.append("Mask diameter is missing. Default value (0) will be used.")
-
-            # check if the pipeline is selected
-            if store_data["wrmXpress_gui_obj"]["pipeline_selection"] is None:
-                error_occured = True
-                error_messages.append("No pipeline selected.")
-
-            # check platename
-            if store_data["wrmXpress_gui_obj"]["plate_name"] in check_cases:
-                error_occured = True
-                error_messages.append("Plate/Folder name is missing.")
-
-            # check mounted volume
-            if store_data["wrmXpress_gui_obj"]["mounted_volume"] in check_cases:
-                error_occured = True
-                error_messages.append("Volume path is missing.")
-
-            # check to see if the well selection list is empty
-            if store_data["wrmXpress_gui_obj"]["well_selection_list"] == []:
-                error_occured = True
-                error_messages.append("No wells selected.")
-
-            # minor error messages if parameters for motility are missing
-            if store_data["wrmXpress_gui_obj"]["pipeline_selection"] == "motility":
-                if store_data["wrmXpress_gui_obj"]["pyrscale"] is None:
-                    minor_error_occured = True
-                    minor_error_messages.append("Pyrscale is missing. Default value (0.5) will be used.")
-                if store_data["wrmXpress_gui_obj"]["levels"] is None:
-                    minor_error_occured = True
-                    minor_error_messages.append("Levels is missing. Default value (5) will be used.")
-                if store_data["wrmXpress_gui_obj"]["winsize"] is None:
-                    minor_error_occured = True
-                    minor_error_messages.append("Winsize is missing. Default value (20) will be used.")
-                if store_data["wrmXpress_gui_obj"]["iterations"] is None:
-                    minor_error_occured = True
-                    minor_error_messages.append("Iterations is missing. Default value (7) will be used.")
-                if store_data["wrmXpress_gui_obj"]["poly_n"] is None:
-                    minor_error_occured = True
-                    minor_error_messages.append("Poly_n is missing. Default value (5) will be used.")
-                if store_data["wrmXpress_gui_obj"]["poly_sigma"] is None:
-                    minor_error_occured = True
-                    minor_error_messages.append("Poly_sigma is missing. Default value (1.1) will be used.")
-                if store_data["wrmXpress_gui_obj"]["flags"] is None:
-                    minor_error_occured = True
-                    minor_error_messages.append("Flags is missing. Default value (0) will be used.")
-
-            # minor error messages if parameters for segmentation are missing
-            if store_data["wrmXpress_gui_obj"]["pipeline_selection"] == "segmentation":
-                if store_data["wrmXpress_gui_obj"]["cellpose_model_type_segmentation"] == "python":
-                    if store_data["wrmXpress_gui_obj"]["python_model_sigma"] is None:
-                        minor_error_occured = True
-                        minor_error_messages.append("Python model sigma is missing. Default value (0.25) will be used.")
-
-            # minor error messages if parameters for tracking are missing
-            if store_data["wrmXpress_gui_obj"]["pipeline_selection"] == "tracking":
-                if store_data["wrmXpress_gui_obj"]["tracking_diameter"] is None:
-                    minor_error_occured = True
-                    minor_error_messages.append("Tracking diameter is missing. Default value (35) will be used.")
-                if store_data["wrmXpress_gui_obj"]["tracking_minmass"] is None:
-                    minor_error_occured = True
-                    minor_error_messages.append("Tracking minmass is missing. Default value (1200) will be used.")
-                if store_data["wrmXpress_gui_obj"]["tracking_noisesize"] is None:
-                    minor_error_occured = True
-                    minor_error_messages.append("Tracking noisesize is missing. Default value (2) will be used.")
-                if store_data["wrmXpress_gui_obj"]["tracking_searchrange"] is None:
-                    minor_error_occured = True
-                    minor_error_messages.append("Tracking searchrange is missing. Default value (45) will be used.")
-                if store_data["wrmXpress_gui_obj"]["tracking_memory"] is None:
-                    minor_error_occured = True
-                    minor_error_messages.append("Tracking memory is missing. Default value (25) will be used.")
-                if store_data["wrmXpress_gui_obj"]["tracking_adaptivestop"] is None:
-                    minor_error_occured = True
-                    minor_error_messages.append("Tracking adaptivestop is missing. Default value (30) will be used.")
-
-            # avi should only be selected for motility and tracking
-            if store_data["wrmXpress_gui_obj"]["file_structure"] == "avi" and store_data["wrmXpress_gui_obj"]["pipeline_selection"] not in ["motility", "tracking"]:
-                error_occured = True
-                error_messages.append("AVI mode is not supported for the selected pipeline.")
-
-            # check to see if the volume path and plate name are valid
-            if store_data["wrmXpress_gui_obj"]["mounted_volume"] not in check_cases:
-
-                # ensure that the volume path exists
-                if not os.path.exists(
-                    store_data["wrmXpress_gui_obj"]["mounted_volume"]
-                ):
-                    error_occured = True
-                    error_messages.append("The volume path does not exist.")
-
-                if store_data["wrmXpress_gui_obj"]["plate_name"] not in check_cases:
-                    # ensure that the plate name path exists and lives in the volume path
-                    platename_path = Path(
-                        store_data["wrmXpress_gui_obj"]["mounted_volume"],
-                        store_data["wrmXpress_gui_obj"]["plate_name"],
-                    )
-                    if not os.path.exists(platename_path):
-                        error_occured = True
-                        error_messages.append("No Plate/Folder in the volume.")
-
-                    # if imagexpress mode is selected, ensure that an .htd file exists
-                    if (
-                        store_data["wrmXpress_gui_obj"]["file_structure"]
-                        == "imagexpress"
-                    ):
-                        # Define the directory to search
-                        platename_path = Path(platename_path)
-
-                        # Search for .htd and .HTD files
-                        htd_files = list(platename_path.glob("*.htd"))
-                        HTD_files = list(platename_path.glob("*.HTD"))
-
-                        # Check if no matching files exist
-                        if not htd_files and not HTD_files:
-                            error_occured = True
-                            error_messages.append("No .HTD file found in the Plate/Folder.")
-
-                        # get a list of all subdirectories in the plate/folder
-                        subdirectories = [
-                            x for x in platename_path.iterdir()
-                            if x.is_dir()
-                        ]
-
-                        for subdirectory in subdirectories:
-                            # get a list of all files in the subdirectory
-                            files = list(subdirectory.glob("*"))
-
-                            # check if the str(well) is in the list of files
-                            # if not, set error flags
-                            for well in store_data["wrmXpress_gui_obj"]["well_selection_list"]:
-                                if not any([str(well) in str(file) for file in files]):
-                                    error_occured = True
-                                    error_messages.append(
-                                        f"No images found for well {well}. This may result in unexpected errors or results."
-                                    )
-
-                    # if avi mode is selected, ensure that an avi file exists
-                    if store_data["wrmXpress_gui_obj"]["file_structure"] == "avi":
-                        avi_folder_path = Path(
-                            store_data["wrmXpress_gui_obj"]["mounted_volume"],
-                            store_data["wrmXpress_gui_obj"]["plate_name"],
-                        )
-                        avi_pattern = (
-                            f"{store_data['wrmXpress_gui_obj']['plate_name']}_"
-                        )
-                        matched_files_avi = list(
-                            avi_folder_path.glob(avi_pattern + "*.avi")
-                        )
-                        if not matched_files_avi:
-                            error_occured = True
-                            error_messages.append(
-                                "No AVI files found in the Plate/Folder."
-                            )
-
-                        # check to see if all wells selected have an associated .avi file
-                        for well in store_data["wrmXpress_gui_obj"]["well_selection_list"]:
-                            # Construct a pattern to match files for the current well, ignoring suffixes
-                            pattern = f"{store_data['wrmXpress_gui_obj']['plate_name']}_{well}"
-                            # Find all files in the directory that match the well pattern
-                            matched_files = list(avi_folder_path.glob(pattern + "*.avi"))
-                            # If no files match the current well, set error flags
-                            if not matched_files:
-                                error_occured = True
-                                error_messages.append(
-                                    f"No images found for well {well}. This may result in unexpected errors or results."
-                                )
+            error_occured, error_messages, warning_occured, warning_messages = wrmXpress_gui_obj.validate()
 
             # check to see if there was an error message
             if error_occured == True:
+
+                # add error messages to the initial error messages
+                error_messages = initial_error_messages + error_messages
 
                 # formats the first line of the error message
                 error_messages[0] = html.H5(
@@ -615,9 +437,11 @@ def save_configuration_upon_clicking_finalize_button(  # function to save the ya
         # diagnosticdx = "True"  # set diagnosticdx to True
 
         # if no error messages are found, write the configuration to a YAML file
-        config = prep_yaml(
-            store_data
-            )
+        # config = prep_yaml(
+        #     store_data
+        #     )
+
+        config = wrmXpress_gui_obj.prep_yml()
 
         output_file = Path(store_data['wrmXpress_gui_obj']['mounted_volume'], store_data['wrmXpress_gui_obj']['plate_name'] + ".yml")
 
@@ -625,19 +449,23 @@ def save_configuration_upon_clicking_finalize_button(  # function to save the ya
         with open(output_file, "w") as yaml_file:
             yaml.dump(config, yaml_file, default_flow_style=False)
 
-        if minor_error_occured == True:
+        if warning_occured == True:
+            
+            # add error messages to the initial error messages
+            warning_messages = initial_minor_error_messages + warning_messages
+
             # formats the first line of the error message
-            minor_error_messages[0] = html.H5(
-                f"{minor_error_messages[0]}", className="alert-heading"
+            warning_messages[0] = html.H5(
+                f"{warning_messages[0]}", className="alert-heading"
             )
 
             # format the content of the error messages
-            for i in range(1, len(minor_error_messages)):
-                minor_error_messages[i] = html.P(
-                    f"{i}. {minor_error_messages[i]}", className="mb-0"
+            for i in range(1, len(warning_messages)):
+                warning_messages[i] = html.P(
+                    f"{i}. {warning_messages[i]}", className="mb-0"
                 )
 
-            return "warning", True, minor_error_messages, "warning"
+            return "warning", True, warning_messages, "warning"
 
         # return success message
         return "success", True, f"Configuration written to {output_file}", "success"

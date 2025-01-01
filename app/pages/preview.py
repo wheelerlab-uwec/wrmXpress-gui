@@ -1,8 +1,4 @@
-########################################################################
-####                                                                ####
-####                             Imports                            ####
-####                                                                ####
-########################################################################
+# In[1]: Imports
 
 import dash
 from dash import callback, Input, Output, State
@@ -14,23 +10,15 @@ import os
 from app.utils.callback_functions import create_figure_from_filepath
 from app.utils.preview_callback_functions import preview_callback_functions
 from app.components.preview_layout import preview_layout
+from app.utils.wrmxpress_gui_obj import WrmXpressGui
 
 dash.register_page(__name__)
 
-########################################################################
-####                                                                ####
-####                              Layout                            ####
-####                                                                ####
-########################################################################
+# In[2]: Layout
 
 layout = preview_layout
 
-########################################################################
-####                                                                ####
-####                           Callbacks                            ####
-####                                                                ####
-########################################################################
-
+# In[3]: Callbacks
 
 @callback(
     Output("analysis-preview-other-img", "figure"),
@@ -48,30 +36,10 @@ layout = preview_layout
 def update_analysis_preview_image(selection, nclicks, store):
     """
     This function updates the analysis preview image based on the selection
-    =======================================================================
-    Arguments:
-        - selection : str : The selection from the dropdown
-        - nclicks : int : The number of times the button has been clicked
-        - store : dict : The store data
-    =======================================================================
-    Returns:
-        - fig : plotly.graph_objs._figure.Figure : The figure to be displayed
-        - is_open : bool : Whether the (preview-imgage) alert is open
-            +- True : The alert is open
-            +- False : The alert is closed
-        - is_open : bool : Whether the (post analysis first well) alert is open
-            +- True : The alert is open
-            +- False : The alert is closed
-        - is_open : bool : Whether the (no store )alert is open
-            +- True : The alert is open
-            +- False : The alert is closed
-        - disabled : bool : Whether the button is disabled
-            +- True : The button is disabled
-            +- False : The button is enabled
     """
 
-    if store == error_test:
-        return error_check_test_true()
+    # if store == error_test:
+    #     return error_check_test_true()
 
     # Check if store is empty
     if not store:
@@ -87,7 +55,7 @@ def update_analysis_preview_image(selection, nclicks, store):
         )
 
     # check if store has the essential elements
-    if store["platename"] == None or store["mount"] == None:
+    if store["wrmXpress_gui_obj"]["plate_name"] == None or store["wrmXpress_gui_obj"]['mounted_volume'] == None:
         return (
             None,
             True,
@@ -100,9 +68,9 @@ def update_analysis_preview_image(selection, nclicks, store):
         )
 
     try:
-        volume = store["mount"]
-        platename = store["platename"]
-        wells = store["wells"]
+        volume = store["wrmXpress_gui_obj"]["mounted_volume"]
+        platename = store["wrmXpress_gui_obj"]["plate_name"]
+        wells = store["wrmXpress_gui_obj"]["well_selection_list"]
 
         try:
             plate_base = platename.split("_", 1)[0]
@@ -110,7 +78,7 @@ def update_analysis_preview_image(selection, nclicks, store):
         except Exception as e:
             return None, True, False, False, False, True, False, f"```{str(e)}```"
 
-        pipeline_selection = store["pipeline_selection"]
+        pipeline_selection = store["wrmXpress_gui_obj"]["pipeline_selection"]
 
         if nclicks:
             if pipeline_selection == "motility":
@@ -214,27 +182,19 @@ def update_analysis_preview_image(selection, nclicks, store):
 def update_preview_image(n_clicks, store):
     """
     This function updates the input preview image
-    =======================================================
-    Arguments:
-        - n_clicks : int : The number of times the button has been clicked
-        - store : dict : The store data
-    =======================================================
-    Returns:
-        - str : The path to the image
-        - fig : plotly.graph_objs._figure.Figure : The figure to be displayed
     """
     # Obtaining the store data
-    wells = store["wells"]  # Get the wells
+    wells = store["wrmXpress_gui_obj"]["well_selection_list"]  # Get the wells
     first_well = wells[0].replace(", ", "")  # Get the first well
-    platename = store["platename"]  # Get the platename
+    platename = store["wrmXpress_gui_obj"]["plate_name"]  # Get the platename
 
     try:
         plate_base = platename.split("_", 1)[0]  # Get the plate base
     except Exception as e:
         return "```Please finish setting up the configuration```", {}
 
-    volume = store["mount"]  # Get the volume
-    file_structure = store["file_structure"]  # Get the file structure
+    volume = store["wrmXpress_gui_obj"]["mounted_volume"]  # Get the volume
+    file_structure = store["wrmXpress_gui_obj"]["file_structure"]  # Get the file structure
 
     # Check if the button has been clicked
     if n_clicks >= 1:
@@ -295,19 +255,12 @@ def update_preview_image(n_clicks, store):
 def get_options_preview(nclicks, store):
     """
     This function gets the options for the preview of the analysis.
-    =========================================================================================
-    Arguments:
-        - nclicks : int : The number of clicks
-        - store : dict : The store data
-    =========================================================================================
-    Returns:
-        - options : list : The options
     """
     # check to see if store exists
     if not store:
         return {}
     # get the store from the data
-    pipeline_selection = store["pipeline_selection"]
+    pipeline_selection = store["wrmXpress_gui_obj"]["pipeline_selection"]
     if pipeline_selection == "motility":
 
         # create the options
@@ -378,8 +331,8 @@ def get_options_preview(nclicks, store):
 
     elif pipeline_selection == "feeding":
         # obtain the wavelength options
-        volume = store["mount"]
-        platename = store["platename"]
+        volume = store["wrmXpress_gui_obj"]["mounted_volume"]
+        platename = store["wrmXpress_gui_obj"]["plate_name"]
         plate_base = platename.split("_", 1)[0]
         input_file_path = Path(volume, f"{platename}/TimePoint_1/")
 
@@ -433,21 +386,6 @@ def run_analysis(
 ):
     """
     This function runs the analysis of the first well if the first well has not been run before and the button has been clicked
-    =======================================================
-    Arguments:
-        - nclicks : int : The number of times the button has been clicked
-        - store : dict : The store data
-    =======================================================
-    Returns:
-        - str : The command message
-        - fig : plotly.graph_objs._figure.Figure : The figure to be displayed
-        - is_open : bool : Whether the alert is open
-            +- True : The alert is open
-            +- False : The alert is closed
-        - str : The message to be displayed
-        - disabled : bool : Whether the button is disabled
-            +- True : The button is disabled
-            +- False : The button is enabled
     """
     try:
 
@@ -461,7 +399,7 @@ def run_analysis(
                 True,
             )
 
-        if store["platename"] == None or store["mount"] == None:
+        if store["wrmXpress_gui_obj"]["plate_name"] == None or store["wrmXpress_gui_obj"]['mounted_volume'] == None:
             return (
                 "",
                 {},
