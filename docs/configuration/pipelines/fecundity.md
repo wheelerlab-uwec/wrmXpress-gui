@@ -18,7 +18,7 @@ Fecundity can be analyzed using the generic segmentation methods. In Pipeline Se
 
 ## Expected input
 
-Fecundity data may be analyzed in the form of individual TIF images per frame (i.e., the TimePoint structure utilized by ImageXpress).  See the [Data Organization](../../data_organization.md) page for more details. The plate directory should have a single TimePoint with individual images for each well:
+Fecundity data may be analyzed in the form of individual TIF images per frame (i.e., the TimePoint structure utilized by ImageXpress). See the [Data Organization](../../data_organization.md) page for more details. The plate directory should have a single TimePoint with individual images for each well:
 
 ![Fecundity file structure](../img/fecundity_structure.png)
 

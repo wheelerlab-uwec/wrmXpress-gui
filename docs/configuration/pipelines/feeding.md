@@ -15,7 +15,7 @@ Performance of the pipeline will very based on the magnification used to take th
 
 ## Expected input
 
-Feeding data may be analyzed in the form of individual TIF images per frame (i.e., the TimePoint structure utilized by ImageXpress).  See the [Data Organization](../../data_organization.md) page for more details. In the case of individual TIF images per frame, the directory structure should look like this:
+Feeding data may be analyzed in the form of individual TIF images per frame (i.e., the TimePoint structure utilized by ImageXpress). See the [Data Organization](../../data_organization.md) page for more details. In the case of individual TIF images per frame, the directory structure should look like this:
 
 ![Feeding file structure](../img/feeding_structure.png)
 

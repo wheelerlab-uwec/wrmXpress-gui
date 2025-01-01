@@ -10,7 +10,7 @@ Detailed procedures for preparing and recording videos of filarial nematode micr
 
 ## Configuration of the GUI
 
-Motility in wrmXpress is measured using Farneback's dense optical flow algorithm implemented by [OpenCV](https://docs.opencv.org/4.6.0/dc/d6b/group__video__track.html#ga5d10ebbd59fe09c5f650289ec0ece5af). This is a departure from other published tools for measuring worm motility, which use the Lucas-Kanade algorithm that focuses on keypoints. 
+Motility in wrmXpress is measured using Farneback's dense optical flow algorithm implemented by [OpenCV](https://docs.opencv.org/4.6.0/dc/d6b/group__video__track.html#ga5d10ebbd59fe09c5f650289ec0ece5af). This is a departure from other published tools for measuring worm motility, which use the Lucas-Kanade algorithm that focuses on keypoints. Motility can run on data in the ImageXpress file structure or the AVI file structure (see [Expected input](#expected-input) below).
 
 In Pipeline Selection, choose Optical Flow. Additionally, the OpenCV function includes six parameters that can be adjusted. The following is taken directly from the OpenCV docs:
 
@@ -23,12 +23,20 @@ In Pipeline Selection, choose Optical Flow. Additionally, the OpenCV function in
 
 ## Expected input
 
-Motility data may be analyzed in the form of individual TIF images per frame (i.e., the TimePoint structure utilized by ImageXpress) or in the form of raw, uncompressed AVI video containers. See the [Data Organization](../../data_organization.md) page for more details. In the case of individual TIF images per frame, the directory structure should look like this:
+Motility data may be analyzed in the form of individual TIF images per frame (i.e., the TimePoint structure utilized by ImageXpress) or in the form of raw, uncompressed AVI video containers. See the [Data Organization](../../data_organization.md) page for more details.  All experiments should include a single wavelength.
+
+### File structure: ImageXpress + Single Well
+
+In the case of individual TIF images per frame, the directory structure should look like this:
 
 ![Structure for individual TIF images](../../img/tif_structure.png)
 /// caption
 In this experiment, the plate directory (`20210819-p01-NJW_753`) has 10 TimePoint directories. TimePoint directories have a single TIF image for each well.
 ///
+
+In [Instrument Settings](../instrument_settings.md), choose ImageXpress + Single Well as the File Structure. Motility has not been tested with a Multi Well or Multi Site ImageXpress format.
+
+### File structure: AVI
 
 In the case of AVIs, the directory structure should look like this:
 
@@ -39,7 +47,7 @@ In this experiment, the plate directory (`20240307-p01-RVH`) has 6 videos, 1 vid
 
 If the AVI includes multiple wells per videos, then the plate directory should include a single AVI with the same plate name.
 
-All experiments should include a single wavelength and single site.
+In [Instrument Settings](../instrument_settings.md), choose AVI + Single Well or AVI + Multi Well as the File Structure.
 
 ### Validated species and stages
 
@@ -64,9 +72,9 @@ All experiments should include a single wavelength and single site.
 
 ### Example plates
 
-- 20210819-p01-NJW_753: *Brugia malayi* microfilariae, 96-well plate, individual wells
-- 20220622-p02-KTR: *Brugia pahangi* adults, 96-well plate, whole plate
-- 20220527-p02-KTR: *Brugia pahangi* adults, 24-well plate, whole plate
+- 20210819-p01-NJW_753: *Brugia malayi* microfilariae, 96-well plate, individual wells (ImageXpress + Single Well)
+- 20220622-p02-KTR: *Brugia pahangi* adults, 96-well plate, whole plate (AVI + Multi Well)
+- 20220527-p02-KTR: *Brugia pahangi* adults, 24-well plate, whole plate (AVI + Multi Well)
 
 ## Expected output
 
