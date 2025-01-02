@@ -245,6 +245,16 @@ class WrmXpressGui:
                             f"No images found for well {well}. This may result in unexpected errors or results."
                         )
 
+    def validate_static_dx_mode(self):
+        if len(self.static_dx) == 1 and not self.static_dx_rescale:
+            self.warning_occurred = True
+            self.warning_messages.append("Static DX rescale multiplier is missing, default value (1) will be used.")
+
+    def validate_video_dx_mode(self):
+        if len(self.video_dx) == 1 and not self.video_dx_rescale:
+            self.warning_occurred = True
+            self.warning_messages.append("Video DX rescale multiplier is missing, default value (0.5) will be used.")
+
     def validate_avi_mode(self):
         if self.file_structure == "avi":
             avi_folder_path = Path(self.mounted_volume, self.plate_name)
@@ -273,6 +283,8 @@ class WrmXpressGui:
         self.validate_multi_well_mode()
         self.validate_multi_site_mode()
         self.validate_pipeline_parameters()
+        self.validate_static_dx_mode()
+        self.validate_video_dx_mode()
 
         platename_path = Path(self.mounted_volume, self.plate_name)
 
@@ -304,10 +316,10 @@ class WrmXpressGui:
 
     def set_default_mask_diameter(self):
         if self.mask == "circular":
-            self.circle_diameter = get_default_value(self.mask_diameter, "NA")
+            self.circle_diameter = get_default_value(self.mask_diameter, 0)
             self.square_diameter = "NA"
         elif self.mask == "square":
-            self.square_diameter = get_default_value(self.mask_diameter, "NA")
+            self.square_diameter = get_default_value(self.mask_diameter, 0)
             self.circle_diameter = "NA"
         else:
             self.circle_diameter = "NA"
@@ -334,9 +346,9 @@ class WrmXpressGui:
             if len(self.video_dx) == 1
             else "avi",
             "rescale_multiplier": (
-                get_default_value(self.video_dx_rescale, 1)
+                get_default_value(self.video_dx_rescale, 0.5)
                 if len(self.video_dx) == 1
-                else 1
+                else 0.5
             ),
         }
 
@@ -615,7 +627,76 @@ class WrmXpressGui:
             **params,
         }
 
-    # In[7]: Preview Analysis
+    # In[7]: Analysis Methods
+
+    def preamble_analysis(self, file_structure, first_well=False):
+    
+        # Prepare paths
+        image_directory = Path(self.mounted_volume, self.plate_name)
+        input_directory = Path(self.mounted_volume, "input")
+        platename_input_directory = Path(input_directory, self.plate_name)
+        work_directory = Path(self.mounted_volume, "work", self.plate_name)
+        output_directory = Path(self.mounted_volume, "output")
+
+        # Clean and create directories
+        clean_and_create_directories(
+            input_path=platename_input_directory,
+            work_path=work_directory,
+            output_path=output_directory,
+        )
+
+        # Handle specific file structure logic
+        htd_file = None
+        plate_base = None
+        if file_structure == "imagexpress":
+            plate_base = self.plate_name.split("_", 1)[0]
+            htd_file = Path(image_directory, f"{plate_base}.HTD")
+
+        # Determine wells to copy
+        wells_to_process = (
+            self.get_first_well() if first_well else self.well_selection_list
+        )
+
+        # Copy files to input directory
+        copy_files_to_input_directory(
+            platename_input_dir=platename_input_directory,
+            htd_file=htd_file,
+            img_dir=image_directory,
+            plate_base=plate_base,
+            wells=wells_to_process,
+            platename=self.plate_name,
+        )
+
+    def analysis_setup(self, type_of_analysis):
+        if type_of_analysis == "preview":
+            self.run_preview_analysis(file_structure=self.file_structure)
+        elif type_of_analysis == "run":
+            self.run_analysis(file_structure=self.file_structure)
+
+    def prepare_wrmxpress_command(self):
+
+        # Helper methods within the class
+        def generate_command(is_preview=False):
+            """Generate the command split for wrmXpress based on preview flag."""
+            file_prefix = f".{self.plate_name}" if is_preview else self.plate_name
+            command = f"python wrmXpress/wrapper.py {self.mounted_volume}/{file_prefix}.yml {self.plate_name}"
+            return shlex.split(command)
+
+        def generate_log_file(is_preview=False):
+            """Generate the log file path for wrmXpress based on preview flag."""
+            log_file_name = f"{self.plate_name}_preview.log" if is_preview else f"{self.plate_name}.log"
+            return Path(self.mounted_volume, "work", self.plate_name, log_file_name)
+
+        # Core logic
+        self.command_message = (
+            f"```python wrmXpress/wrapper.py {self.plate_name}.yml {self.plate_name}```"
+        )
+        self.wrmxpress_preview_command_split = generate_command(is_preview=True)
+        self.wrmxpress_command_split = generate_command()
+        self.output_preview_log_file = generate_log_file(is_preview=True)
+        self.output_log_file = generate_log_file()
+
+    # In[8]: Preview Analysis Methods
 
     def get_first_well(self):
         if self.well_selection_list == ["All"]:
@@ -638,13 +719,7 @@ class WrmXpressGui:
 
         with open(preview_yaml_filepath, "w") as f:
             yaml.dump(configure_yaml_file, f)
-
-    def preview_analysis(self):
-        if self.file_structure == "imagexpress":
-            self.run_preview_analysis("imagexpress")
-        elif self.file_structure == "avi":
-            self.run_preview_analysis("avi")
-
+            
     def run_preview_analysis(self, file_structure):
         # Check if the first well has already been run (implement this logic)
         if self.first_well_already_run():
@@ -652,7 +727,9 @@ class WrmXpressGui:
             return
 
         # Prepare for preview analysis
-        self.preamble_to_preview_analysis(file_structure)
+        self.prepare_preview_yaml()
+        self.preamble_analysis(file_structure, first_well=True)
+        self.prepare_wrmxpress_command()
 
         # Run the subprocess
         print("Running wrmXpress.")
@@ -670,61 +747,24 @@ class WrmXpressGui:
             if process.returncode != 0:
                 print(f"Error occurred during wrmXpress execution: {stdout}")
             else:
+
+                # TODO: include code to check if the first well has been processed
+                # and load the first well image for preview
+
                 print("wrmXpress completed successfully.")
             docker_output.append(stdout)
         except Exception as e:
             print(f"Subprocess execution failed: {e}")
             docker_output.append(str(e))
 
-    def preamble_to_preview_analysis(self, file_structure):
-        self.prepare_preview_yaml()
-
-        # Prepare paths
-        image_directory = Path(self.mounted_volume, self.plate_name)
-        input_directory = Path(self.mounted_volume, "input")
-        platename_input_directory = Path(input_directory, self.plate_name)
-        work_directory = Path(self.mounted_volume, "work", self.plate_name)
-        output_directory = Path(self.mounted_volume, "output")
-
-        # Clean and create directories
-        clean_and_create_directories(
-            input_path=platename_input_directory,
-            work_path=work_directory,
-            output_path=output_directory,
-        )
-
-        # Handle specific file structure logic
-        htd_file = None
-        plate_base = None
-        if file_structure == "imagexpress":
-            plate_base = self.plate_name.split("_", 1)[0]
-            htd_file = Path(image_directory, f"{plate_base}.HTD")
-
-        # Copy files to input directory
-        copy_files_to_input_directory(
-            platename_input_dir=platename_input_directory,
-            htd_file=htd_file,
-            img_dir=image_directory,
-            plate_base=plate_base,
-            wells=self.get_first_well(),
-            platename=self.plate_name,
-        )
-
-        # Prepare wrmXpress command
-        self.prepare_preview_wrmxpress_command()
-
-    def prepare_preview_wrmxpress_command(self):
-        self.command_message = (
-            f"```python wrmXpress/wrapper.py {self.plate_name}.yml {self.plate_name}```"
-        )
-        wrmxpress_preview_command = (
-            f"python wrmXpress/wrapper.py {self.mounted_volume}/.{self.plate_name}.yml {self.plate_name}"
-        )
-        self.wrmxpress_preview_command_split = shlex.split(wrmxpress_preview_command)
-        self.output_preview_log_file = Path(
-            self.mounted_volume, "work", self.plate_name, f"{self.plate_name}_preview.log"
-        )
-
     def first_well_already_run(self):
         # TODO: Implement logic to check if the first well has already been processed
         return False
+
+    # In[8]: Run Analysis
+        
+
+    def run_analysis(self, file_structure):
+        # Prepare for analysis
+        self.preamble_analysis(file_structure)
+        self.prepare_wrmxpress_command()

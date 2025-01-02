@@ -31,18 +31,6 @@ def callback(set_progress, n_clicks, store):
     This function is used for the callback function in the app.py file. The
     purpose of this function is to run the wrmXpress pipeline based on the
     pipeline selection and return the figure, open status, and command message.
-    ===============================================================================
-    Arguments:
-        - set_progress : function : The function to set the progress
-            +- see app.py for more information
-        - n_clicks : int : The number of clicks from the submit button on the run page
-        - store : dict : The store data
-            +- this data is generated from the configure page. see app/pages/configure.py for more details
-    ===============================================================================
-    Returns:
-        - functions : function : The function to run the wrmXpress pipeline depending on the pipeline selection
-            +- these funcitons are defined in this file, see below for more details
-    ===============================================================================
     """
     try:
 
@@ -115,23 +103,6 @@ def callback(set_progress, n_clicks, store):
 def preamble_run_wrmXpress_avi_selection(store):
     """
     The purpose of this function is to prepare the necessary files and directories for wrmXpress for avi files.
-    ===============================================================================
-    Arguments:
-        - store : dict : The store data
-            +- this data is generated from the configure page. see app/pages/configure.py for more details
-    ===============================================================================
-    Returns:
-        - new_store : dict : The updated store data
-            +- wrmxpress_command_split : list : wrmXpress command
-            +- output_folder : str : Path to the output folder
-            +- output_file : str : Path to the output file
-            +- command_message : str : A command message for the user
-            +- wells : list : List of wells
-            +- volume : str : Path to the volume
-            +- platename : str : Name of the plate
-            +- wells_analyzed : list : List of wells analyzed
-            +- tracking_well : list : List of tracking wells
-    ===============================================================================
     """
     volume = store["mount"]
     platename = store["platename"]
@@ -192,23 +163,6 @@ def preamble_run_wrmXpress_avi_selection(store):
 def preamble_run_wrmXpress_imagexpress_selection(store):
     """
     The purpose of this function is to prepare the necessary files and directories for wrmXpress for imagexpress formatted files.
-    ===============================================================================
-    Arguments:
-        - store : dict : The store data
-            +- this data is generated from the configure page. see app/pages/configure.py for more details
-    ===============================================================================
-    Returns:
-        - new_store : dict : The updated store data
-            +- wrmxpress_command_split : list : wrmXpress command
-            +- output_folder : str : Path to the output folder
-            +- output_file : str : Path to the output file
-            +- command_message : str : A command message for the user
-            +- wells : list : List of wells
-            +- volume : str : Path to the volume
-            +- platename : str : Name of the plate
-            +- wells_analyzed : list : List of wells analyzed
-            +- tracking_well : list : List of tracking wells
-    ===============================================================================
     """
     volume = store["mount"]
     platename = store["platename"]
@@ -271,23 +225,6 @@ def preamble_run_wrmXpress_imagexpress_selection(store):
 def tracking_wrmXpress_run(store, set_progress):
     """
     The purpose of this function is to run wrmXpress for tracking and return the figure, open status, and command message.
-    ===============================================================================
-    Arguments:
-        - store : dict : The store data
-            +- this data is generated from the configure page. see app/pages/configure.py for more details
-        - set_progress : function : Function to set the progress
-    ===============================================================================
-    set_progress: for more information see app.py
-        - progress bar value : int : The progress bar value
-        - progress bar max : int : The progress bar max
-        - image analysis preview : dict : The image analysis preview
-        - progress message run page for analysis : str : The progress message run page for analysis
-    ===============================================================================
-    Returns:
-        - fig : matplotlib.figure.Figure : A figure
-        - open_status : bool : Open status of the alerts
-        - command_message : str : A command message
-    ===============================================================================
     """
     try:
         file_structure = store["file_structure"]
@@ -316,23 +253,6 @@ def tracking_wrmXpress_run(store, set_progress):
 def motility_or_segment_run(store, set_progress):
     """
     The purpose of this function is to run wrmXpress for motility and segment and return the figure, open status, and command message.
-    ===============================================================================
-    Arguments:
-        - store : dict : The store data
-            +- this data is generated from the configure page. see app/pages/configure.py for more details
-        - set_progress : function : Function to set the progress
-    ===============================================================================
-    set_progress: for more information see app.py
-        - progress bar value : int : The progress bar value
-        - progress bar max : int : The progress bar max
-        - image analysis preview : dict : The image analysis preview
-        - progress message run page for analysis : str : The progress message run page for analysis
-    ===============================================================================
-    Returns:
-        - fig : matplotlib.figure.Figure : A figure
-        - open_status : bool : Open status of the alerts
-        - command_message : str : A command message
-    ===============================================================================
     """
     try:
         file_structure = store["file_structure"]
@@ -363,23 +283,6 @@ def motility_or_segment_run(store, set_progress):
 def fecundity_run(store, set_progress):
     """
     The purpose of this function is to run wrmXpress for fecundity and return the figure, open status, and command message.
-    ===============================================================================
-    Arguments:
-        - store : dict : The store data
-            +- this data is generated from the configure page. see app/pages/configure.py for more details
-        - set_progress : function : Function to set the progress
-    ===============================================================================
-    set_progress: for more information see app.py
-        - progress bar value : int : The progress bar value
-        - progress bar max : int : The progress bar max
-        - image analysis preview : dict : The image analysis preview
-        - progress message run page for analysis : str : The progress message run page for analysis
-    ===============================================================================
-    Returns:
-        - fig : matplotlib.figure.Figure : A figure
-        - open_status : bool : Open status of the alerts
-        - command_message : str : A command message
-    ===============================================================================
     """
     try:
         file_structure = store["file_structure"]
@@ -467,23 +370,6 @@ def fecundity_run(store, set_progress):
 def cellprofile_wormsize_run(store, set_progress):
     """
     The purpose of this function is to run wrmXpress for wormsize and return the figure, open status, and command message.
-    ===============================================================================
-    Arguments:
-        - store : dict : The store data
-            +- this data is generated from the configure page. see app/pages/configure.py for more details
-        - set_progress : function : Function to set the progress
-    ===============================================================================
-    set_progress: for more information see app.py
-        - progress bar value : int : The progress bar value
-        - progress bar max : int : The progress bar max
-        - image analysis preview : dict : The image analysis preview
-        - progress message run page for analysis : str : The progress message run page for analysis
-    ===============================================================================
-    Returns:
-        - fig : matplotlib.figure.Figure : A figure
-        - open_status : bool : Open status of the alerts
-        - command_message : str : A command message
-    ===============================================================================
     """
     try:
         file_structure = store["file_structure"]
@@ -572,23 +458,6 @@ def cellprofile_wormsize_run(store, set_progress):
 def cellprofile_wormsize_intesity_cellpose_run(store, set_progress):
     """
     The purpose of this function is to run wrmXpress for wormsize_intensity_cellpose and return the figure, open status, and command message.
-    ===============================================================================
-    Arguments:
-        - store : dict : The store data
-            +- this data is generated from the configure page. see app/pages/configure.py for more details
-        - set_progress : function : Function to set the progress
-    ===============================================================================
-    set_progress: for more information see app.py
-        - progress bar value : int : The progress bar value
-        - progress bar max : int : The progress bar max
-        - image analysis preview : dict : The image analysis preview
-        - progress message run page for analysis : str : The progress message run page for analysis
-    ===============================================================================
-    Returns:
-        - fig : matplotlib.figure.Figure : A figure
-        - open_status : bool : Open status of the alerts
-        - command_message : str : A command message
-    ===============================================================================
     """
     try:
         file_structure = store["file_structure"]
@@ -694,23 +563,6 @@ def cellprofile_wormsize_intesity_cellpose_run(store, set_progress):
 def cellprofile_mf_celltox_run(store, set_progress):
     """
     The purpose of this function is to run wrmXpress for mf_celltox and return the figure, open status, and command message.
-    ===============================================================================
-    Arguments:
-        - store : dict : The store data
-            +- this data is generated from the configure page. see app/pages/configure.py for more details
-        - set_progress : function : Function to set the progress
-    ===============================================================================
-    set_progress: for more information see app.py
-        - progress bar value : int : The progress bar value
-        - progress bar max : int : The progress bar max
-        - image analysis preview : dict : The image analysis preview
-        - progress message run page for analysis : str : The progress message run page for analysis
-    ===============================================================================
-    Returns:
-        - fig : matplotlib.figure.Figure : A figure
-        - open_status : bool : Open status of the alerts
-        - command_message : str : A command message
-    ===============================================================================
     """
     try:
         file_structure = store["file_structure"]
@@ -806,23 +658,6 @@ def cellprofile_mf_celltox_run(store, set_progress):
 def cellprofile_feeding_run(store, set_progress):
     """
     The purpose of this function is to run wrmXpress for feeding and return the figure, open status, and command message.
-    ===============================================================================
-    Arguments:
-        - store : dict : The store data
-            +- this data is generated from the configure page. see app/pages/configure.py for more details
-        - set_progress : function : Function to set the progress
-    ===============================================================================
-    set_progress: for more information see app.py
-        - progress bar value : int : The progress bar value
-        - progress bar max : int : The progress bar max
-        - image analysis preview : dict : The image analysis preview
-        - progress message run page for analysis : str : The progress message run page for analysis
-    ===============================================================================
-    Returns:
-        - fig : matplotlib.figure.Figure : A figure
-        - open_status : bool : Open status of the alerts
-        - command_message : str : A command message
-    ===============================================================================
     """
     try:
         file_structure = store["file_structure"]
@@ -1499,150 +1334,3 @@ def handle_failure(docker_output, output_file):
         f"```{docker_output_formatted}```",
         None,
     )
-
-
-########################################################################
-####                                                                ####
-####                   old/unused functions                         ####
-####                                                                ####
-########################################################################
-
-
-""" 
-def preamble_to_run_wrmXpress_tracking(store):
-    '''
-    The purpose of this function is to prepare the wrmXpress command, output folder, output file, 
-    command message, wells, volume, platename, motility, segment, cellprofiler, and cellprofilepipeline.
-    ===============================================================================
-    Arguments:
-        - store : dict : A dictionary containing the store
-    ===============================================================================
-    Returns:
-        - wrmxpress_command_split : list : List of wrmXpress commands
-        - output_folder : str : Path to the output folder
-        - output_file : str : Path to the output file
-        - command_message : str : A command message
-        - wells : list : List of well names
-        - volume : str : Path to the volume
-        - platename : str : Name of the plate
-        - wells_analyzed : list : List of wells analyzed
-        - tracking_well : list : List of tracking wells
-    ===============================================================================
-
-    '''
-    volume = store['mount']
-    platename = store['platename']
-    wells = store["wells"]
-    file_structure = store['file_structure']
-    print('Running wrmXpress.')
-    # necessary file paths
-    img_dir = Path(volume, platename)
-    input_dir = Path(volume, 'input')
-    platename_input_dir = Path(input_dir, platename)
-    full_yaml = Path(volume, platename + '.yml')
-
-    update_yaml_file(
-            full_yaml,
-            full_yaml,
-            {'wells': ['All']}
-        )
-
-        # clean and create directories
-    clean_and_create_directories(
-            input_path=Path(volume, 'input', platename), 
-            work_path=Path(volume, 'work', platename),
-            output_path=Path(volume, 'output')
-        )
-    if file_structure == 'avi':
-        copy_files_to_input_directory(
-                platename_input_dir=platename_input_dir,
-                htd_file= None,
-                img_dir=img_dir,
-                wells=wells,
-                plate_base=None,
-                platename=platename
-            )
-    elif file_structure == 'imagexpress':
-        htd_file = Path(img_dir, f'{platename}.HTD')
-        copy_files_to_input_directory(
-                platename_input_dir=platename_input_dir,
-                htd_file= htd_file,
-                img_dir=img_dir,
-                wells=wells,
-                plate_base=None,
-                platename=platename
-            )
-        # Command message
-    command_message = f"```python wrmXpress/wrapper.py {platename}.yml {platename}```"
-
-    wrmxpress_command = f'python -u wrmXpress/wrapper.py {volume}/{platename}.yml {platename}'
-    wrmxpress_command_split = shlex.split(wrmxpress_command)
-    output_folder = Path(volume, 'work', platename)
-    output_file = Path(volume, 'work', platename, f"{platename}_run.log")  # Specify the name and location of the output file
-    wells_analyzed = []
-    tracking_well = []
-    return wrmxpress_command_split, output_folder, output_file, command_message, wells, volume, platename, wells_analyzed, tracking_well
-
-def preamble_to_run_wrmXpress_non_tracking(store):
-    '''
-    The purpose of this function is to prepare the wrmXpress command, output folder, output file,
-    command message, wells, volume, platename, motility, segment, cellprofiler, and cellprofilepipeline.
-    ===============================================================================
-    Arguments:
-        - store : dict : A dictionary containing the store
-    ===============================================================================
-    Returns:
-        - wrmxpress_command_split : list : List of wrmXpress commands
-        - output_folder : str : Path to the output folder
-        - output_file : str : Path to the output file
-        - command_message : str : A command message
-        - wells : list : List of well names
-        - volume : str : Path to the volume
-        - platename : str : Name of the plate
-    ===============================================================================
-    '''
-    volume = store['mount']
-    platename = store['platename']
-    wells = store["wells"]
-    print('Running wrmXpress.')
-
-    # necessary file paths
-    img_dir = Path(volume, platename)
-    input_dir = Path(volume, 'input')
-    platename_input_dir = Path(input_dir, platename)
-    plate_base = platename.split("_", 1)[0]
-    htd_file = Path(img_dir, f'{plate_base}.HTD')
-    full_yaml = Path(volume, platename + '.yml')
-
-    update_yaml_file(
-            full_yaml,
-            full_yaml,
-            {'wells': ['All']}
-        )
-
-        # clean and create directories
-    clean_and_create_directories(
-            input_path=Path(volume, 'input', platename), 
-            work_path=Path(volume, 'work', platename),
-            output_path=Path(volume, 'output')
-        )
-
-    copy_files_to_input_directory(
-            platename_input_dir=platename_input_dir,
-            htd_file=htd_file,
-            img_dir=img_dir,
-            plate_base=plate_base,
-            wells=wells,
-            platename=platename
-        )
-
-        # Command message
-    command_message = f"```python wrmXpress/wrapper.py {platename}.yml {platename}```"
-
-    wrmxpress_command = f'python -u wrmXpress/wrapper.py {volume}/{platename}.yml {platename}'
-    wrmxpress_command_split = shlex.split(wrmxpress_command)
-    output_folder = Path(volume, 'work', platename)
-    output_file = Path(volume, 'work', platename, f"{platename}_run.log")  # Specify the name and location of the output file
-    return wrmxpress_command_split, output_folder, output_file, command_message, wells, volume, platename, plate_base
-
-"""

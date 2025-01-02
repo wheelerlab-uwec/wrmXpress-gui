@@ -1,8 +1,4 @@
-########################################################################
-####                                                                ####
-####                             Imports                            ####
-####                                                                ####
-########################################################################
+# In[1]: Imports
 
 import dash
 from waitress import serve
@@ -15,6 +11,7 @@ from app.utils.styling import CONTENT_STYLE, SIDEBAR_STYLE
 from app.components.header import header
 from app.components.fetch_data_modal import fetch_data_modal
 from app.utils.background_callback import callback
+from app.utils.wrmxpress_gui_obj import WrmXpressGui
 
 # Diskcache
 import diskcache
@@ -31,11 +28,7 @@ app = Dash(
     suppress_callback_exceptions=True,
 )
 
-########################################################################
-####                                                                ####
-####                             LAYOUT                             ####
-####                                                                ####
-########################################################################
+# In[2]: App Layout
 
 sidebar = html.Div(
     [
@@ -108,12 +101,7 @@ app.layout = html.Div(
     ]
 )
 
-########################################################################
-####                                                                ####
-####                           Callbacks                            ####
-####                                                                ####
-########################################################################
-
+# In[3]: Callbacks
 
 @app.callback(
     output=[
@@ -154,12 +142,103 @@ app.layout = html.Div(
     allow_duplicate=True,
     background=True,
 )
-def background_callback(set_progress, n_clicks, store):
+def background_callback(set_progress, n_clicks, store_data):
     """
     This function runs the wrmXpress analysis in the background.
     """
+
     try:
-        return callback(set_progress, n_clicks, store)
+
+        if not store_data:
+            return (
+                {},
+                True,
+                True,
+                "No Configuration Found. Please go to the Configuration Page to set the configuration.",
+                None,
+                None,
+            )
+
+        wrmXpress_gui_obj = WrmXpressGui(
+            file_structure=store_data["wrmXpress_gui_obj"]["file_structure"],
+            imaging_mode=store_data["wrmXpress_gui_obj"]["imaging_mode"],
+            multi_well_row=store_data["wrmXpress_gui_obj"]["multi_well_row"],
+            multi_well_col=store_data["wrmXpress_gui_obj"]["multi_well_col"],
+            multi_well_detection=store_data["wrmXpress_gui_obj"][
+                "multi_well_detection"
+            ],
+            x_sites=store_data["wrmXpress_gui_obj"]["x_sites"],
+            y_sites=store_data["wrmXpress_gui_obj"]["y_sites"],
+            stitch_switch=store_data["wrmXpress_gui_obj"]["stitch_switch"],
+            well_col=store_data["wrmXpress_gui_obj"]["well_col"],
+            well_row=store_data["wrmXpress_gui_obj"]["well_row"],
+            mask=store_data["wrmXpress_gui_obj"]["mask"],
+            mask_diameter=store_data["wrmXpress_gui_obj"]["mask_diameter"],
+            pipeline_selection=store_data["wrmXpress_gui_obj"]["pipeline_selection"],
+            wavelengths=store_data["wrmXpress_gui_obj"]["wavelengths"],
+            pyrscale=store_data["wrmXpress_gui_obj"]["pyrscale"],
+            levels=store_data["wrmXpress_gui_obj"]["levels"],
+            winsize=store_data["wrmXpress_gui_obj"]["winsize"],
+            iterations=store_data["wrmXpress_gui_obj"]["iterations"],
+            poly_n=store_data["wrmXpress_gui_obj"]["poly_n"],
+            poly_sigma=store_data["wrmXpress_gui_obj"]["poly_sigma"],
+            flags=store_data["wrmXpress_gui_obj"]["flags"],
+            cellpose_model_segmentation=store_data["wrmXpress_gui_obj"][
+                "cellpose_model_segmentation"
+            ],
+            cellpose_model_type_segmentation=store_data["wrmXpress_gui_obj"][
+                "cellpose_model_type_segmentation"
+            ],
+            python_model_sigma=store_data["wrmXpress_gui_obj"]["python_model_sigma"],
+            wavelengths_segmentation=store_data["wrmXpress_gui_obj"][
+                "wavelengths_segmentation"
+            ],
+            cellprofiler_pipeline_selection=store_data["wrmXpress_gui_obj"][
+                "cellprofiler_pipeline_selection"
+            ],
+            cellpose_model_cellprofile=store_data["wrmXpress_gui_obj"][
+                "cellpose_model_cellprofile"
+            ],
+            wavelengths_cellprofile=store_data["wrmXpress_gui_obj"][
+                "wavelengths_cellprofile"
+            ],
+            tracking_diameter=store_data["wrmXpress_gui_obj"]["tracking_diameter"],
+            tracking_minmass=store_data["wrmXpress_gui_obj"]["tracking_minmass"],
+            tracking_noisesize=store_data["wrmXpress_gui_obj"]["tracking_noisesize"],
+            tracking_searchrange=store_data["wrmXpress_gui_obj"][
+                "tracking_searchrange"
+            ],
+            tracking_memory=store_data["wrmXpress_gui_obj"]["tracking_memory"],
+            tracking_adaptivestop=store_data["wrmXpress_gui_obj"][
+                "tracking_adaptivestop"
+            ],
+            static_dx=store_data["wrmXpress_gui_obj"]["static_dx"],
+            static_dx_rescale=store_data["wrmXpress_gui_obj"]["static_dx_rescale"],
+            video_dx=store_data["wrmXpress_gui_obj"]["video_dx"],
+            video_dx_format=store_data["wrmXpress_gui_obj"]["video_dx_format"],
+            video_dx_rescale=store_data["wrmXpress_gui_obj"]["video_dx_rescale"],
+            mounted_volume=store_data["wrmXpress_gui_obj"]["mounted_volume"],
+            plate_name=store_data["wrmXpress_gui_obj"]["plate_name"],
+            well_selection_list=store_data["wrmXpress_gui_obj"]["well_selection_list"],
+        )
+
+        error_occured, _, _, _ = wrmXpress_gui_obj.validate()
+
+        if error_occured:
+            return (
+                {},
+                True,
+                True,
+                "An configuration error has occurred. Please return to the Configuration Page to fix the error.",
+                None,
+                None,
+            )
+
+        if n_clicks:
+                
+            wrmXpress_gui_obj.analysis_setup("run")
+
+        # return callback(set_progress, n_clicks, store)
 
     except Exception as e:
         # Log the error to your output file or a dedicated log file
@@ -195,12 +274,7 @@ def toggle_modal(fetch_click, confirm_click, cancel_click, is_open):
         return False
     return is_open
 
-
-########################################################################
-####                                                                ####
-####                        RUNNING SERVER                          ####
-####                                                                ####
-########################################################################
+# In[4]: Run the app
 
 if __name__ == "__main__":
     # for dev/debugging
