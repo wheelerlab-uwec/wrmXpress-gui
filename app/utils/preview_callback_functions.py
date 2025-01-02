@@ -29,28 +29,34 @@ def preview_callback_functions(store):
     This function is used to preview the analysis of the selected options.
 
     """
-    pipeline_selection = store["pipeline_selection"]
+
+    pipeline_selection = store["wrmXpress_gui_obj"]['pipeline_selection']
 
     if pipeline_selection == "motility":
         return motility_segment_fecundity_preview(store)
 
-    elif pipeline_selection == "fecundity":
+    elif pipeline_selection == "segmentation":
         return motility_segment_fecundity_preview(store)
 
     elif pipeline_selection == "tracking":
         return tracking_wrmXpress_preview(store)
 
-    elif pipeline_selection == "wormsize":
-        return cellprofile_wormsize_preview(store)
+    elif pipeline_selection == 'cellprofile':
+        pipeline_selection = store["wrmXpress_gui_obj"][
+            "cellprofiler_pipeline_selection"
+            ]
+            
+        if pipeline_selection == "wormsize":
+            return cellprofile_wormsize_preview(store)
 
-    elif pipeline_selection == "wormsize_intensity_cellpose":
-        return cellprofile_wormsize_intensity_cellpose_preview(store)
+        elif pipeline_selection == "wormsize_intensity_cellpose":
+            return cellprofile_wormsize_intensity_cellpose_preview(store)
 
-    elif pipeline_selection == "mf_celltox":
-        return cellprofile_mf_celltox_preview(store)
+        elif pipeline_selection == "mf_celltox":
+            return cellprofile_mf_celltox_preview(store)
 
-    elif pipeline_selection == "feeding":
-        return cellprofile_feeding_preview(store)
+        elif pipeline_selection == "feeding":
+            return cellprofile_feeding_preview(store)
 
 
 ########################################################################
@@ -63,19 +69,6 @@ def preview_callback_functions(store):
 def preamble_preview_imgxpress_selection(store):
     """
     This function prepares the wrmXpress command, output preview log file, command message, and first well.
-    ===============================================================================
-    Arguments:
-        - platename : str : Name of the plate
-        - volume : str : Path to the volume
-        - wells : list : List of well names
-    ===============================================================================
-    Returns:
-        - wrmxpress_command_split : list : List of wrmXpress commands
-        - output_preview_log_file : str : Path to the output preview log file
-        - command_message : str : A command message
-        - first_well : str : The first well in the list of wells
-    ===============================================================================
-
     """
     # Obtain the store data
     volume = store["mount"]
@@ -141,21 +134,6 @@ def preamble_preview_avi_selection(store):
     """
     The purpose of this function is to prepare the wrmXpress command, output folder, output file,
     command message, wells, volume, platename, motility, segment, cellprofiler, and cellprofilepipeline.
-    ===============================================================================
-    Arguments:
-        - store : dict : A dictionary containing the store
-    ===============================================================================
-    Returns:
-        - wrmxpress_command_split : list : List of wrmXpress commands
-        - output_folder : str : Path to the output folder
-        - output_file : str : Path to the output file
-        - command_message : str : A command message
-        - wells : list : List of well names
-        - volume : str : Path to the volume
-        - platename : str : Name of the plate
-        - wells_analyzed : list : List of wells analyzed
-        - tracking_well : list : List of tracking wells
-    ===============================================================================
 
     """
     # Obtain the store data
@@ -222,20 +200,6 @@ def motility_segment_fecundity_preview(store):
     the configuration page, including motility, segment, and fecundity. This function
     will run wrmXpress and return the path to the image, the figure, and the open status
     if the first well has not already been analyzed.
-    ===============================================================================
-    Arguments:
-        - volume : str : Path to the volume
-        - platename : str : Name of the plate
-        - wells : list : List of well names
-        - selection : str : Selection
-    ===============================================================================
-    Returns:
-        - path : str : Path to the image
-        - fig : matplotlib.figure.Figure : A figure
-        - open_status : bool : Open status of the alerts
-        - command_message : str : A command message
-        - open_status : bool : Open status of the alerts
-    ===============================================================================
     """
     try:
         # Obtain the store data
@@ -335,20 +299,6 @@ def cellprofile_wormsize_preview(store):
     The purpose of this function is to preview the analysis of the selected options from
     the configuration page, including worm size. This function will run wrmXpress and return
     the path to the image, the figure, and the open status if the first well has not already been analyzed.
-    ===============================================================================
-    Arguments:
-        - wells : list : List of well names
-        - volume : str : Path to the volume
-        - platename : str : Name of the plate
-        - plate_base : str : Base name of the plate
-    ===============================================================================
-    Returns:
-        - path : str : Path to the image
-        - fig : matplotlib.figure.Figure : A figure
-        - open_status : bool : Open status of the alerts
-        - command_message : str : A command message
-        - open_status : bool : Open status of the alerts
-    ===============================================================================
     """
     try:
         # Obtain the store data
@@ -430,20 +380,6 @@ def cellprofile_wormsize_intensity_cellpose_preview(store):
     The purpose of this function is to preview the analysis of the selected options from
     the configuration page, including worm size and intensity using CellPose. This function
     will run wrmXpress and return the path to the image, the figure, and the open status if the first well has not already been analyzed.
-    ===============================================================================
-    Arguments:
-        - wells : list : List of well names
-        - volume : str : Path to the volume
-        - platename : str : Name of the plate
-        - plate_base : str : Base name of the plate
-    ===============================================================================
-    Returns:
-        - path : str : Path to the image
-        - fig : matplotlib.figure.Figure : A figure
-        - open_status : bool : Open status of the alerts
-        - command_message : str : A command message
-        - open_status : bool : Open status of the alerts
-    ===============================================================================
     """
     try:
         # Obtain the store data
@@ -530,20 +466,6 @@ def cellprofile_mf_celltox_preview(store):
     The purpose of this function is to preview the analysis of the selected options from
     the configuration page, including motility, fecundity, and celltox. This function
     will run wrmXpress and return the path to the image, the figure, and the open status if the first well has not already been analyzed.
-    ===============================================================================
-    Arguments:
-        - wells : list : List of well names
-        - volume : str : Path to the volume
-        - platename : str : Name of the plate
-        - plate_base : str : Base name of the plate
-    ===============================================================================
-    Returns:
-        - path : str : Path to the image
-        - fig : matplotlib.figure.Figure : A figure
-        - open_status : bool : Open status of the alerts
-        - command_message : str : A command message
-        - open_status : bool : Open status of the alerts
-    ===============================================================================
     """
     try:
         # Obtain the store data
@@ -642,20 +564,6 @@ def cellprofile_feeding_preview(store):
     The purpose of this function is to preview the analysis of the selected options from
     the configuration page, including feeding. This function will run wrmXpress and return
     the path to the image, the figure, and the open status if the first well has not already been analyzed.
-    ===============================================================================
-    Arguments:
-        - wells : list : List of well names
-        - volume : str : Path to the volume
-        - platename : str : Name of the plate
-        - plate_base : str : Base name of the plate
-    ===============================================================================
-    Returns:
-        - path : str : Path to the image
-        - fig : matplotlib.figure.Figure : A figure
-        - open_status : bool : Open status of the alerts
-        - command_message : str : A command message
-        - open_status : bool : Open status of the alerts
-    ===============================================================================
     """
     try:
         # Obtain the store data
@@ -739,20 +647,6 @@ def tracking_wrmXpress_preview(store):
     the configuration page, including motility, segment, and fecundity. This function
     will run wrmXpress and return the path to the image, the figure, and the open status
     if the first well has not already been analyzed.
-    ===============================================================================
-    Arguments:
-        - volume : str : Path to the volume
-        - platename : str : Name of the plate
-        - wells : list : List of well names
-        - selection : str : Selection
-    ===============================================================================
-    Returns:
-        - path : str : Path to the image
-        - fig : matplotlib.figure.Figure : A figure
-        - open_status : bool : Open status of the alerts
-        - command_message : str : A command message
-        - open_status : bool : Open status of the alerts
-    ===============================================================================
     """
     try:
         # Obtain the store data

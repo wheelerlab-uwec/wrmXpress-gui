@@ -252,120 +252,65 @@ def update_preview_image(n_clicks, store):
     State("store", "data"),
     prevent_initial_call=True,
 )
-def get_options_preview(nclicks, store):
+def get_options_preview(nclicks, store_data):
     """
     This function gets the options for the preview of the analysis.
     """
     # check to see if store exists
-    if not store:
+    if not store_data:
         return {}
+
     # get the store from the data
-    pipeline_selection = store["wrmXpress_gui_obj"]["pipeline_selection"]
-    if pipeline_selection == "motility":
+    wrmXpress_gui_obj = WrmXpressGui(
+        file_structure = store_data['wrmXpress_gui_obj']['file_structure'],
+        imaging_mode = store_data["wrmXpress_gui_obj"]["imaging_mode"],
+        multi_well_row = store_data["wrmXpress_gui_obj"]["multi_well_row"],
+        multi_well_col = store_data["wrmXpress_gui_obj"]["multi_well_col"],
+        multi_well_detection = store_data["wrmXpress_gui_obj"]["multi_well_detection"],
+        x_sites = store_data["wrmXpress_gui_obj"]["x_sites"],
+        y_sites = store_data["wrmXpress_gui_obj"]["y_sites"],
+        stitch_switch = store_data["wrmXpress_gui_obj"]["stitch_switch"],
+        well_col = store_data["wrmXpress_gui_obj"]["well_col"],
+        well_row = store_data["wrmXpress_gui_obj"]["well_row"],
+        mask = store_data["wrmXpress_gui_obj"]["mask"],
+        mask_diameter = store_data["wrmXpress_gui_obj"]["mask_diameter"],
+        pipeline_selection = store_data["wrmXpress_gui_obj"]["pipeline_selection"],
+        wavelengths = store_data["wrmXpress_gui_obj"]["wavelengths"],
+        pyrscale = store_data["wrmXpress_gui_obj"]["pyrscale"],
+        levels = store_data["wrmXpress_gui_obj"]["levels"],
+        winsize = store_data["wrmXpress_gui_obj"]["winsize"],
+        iterations = store_data["wrmXpress_gui_obj"]["iterations"],
+        poly_n = store_data["wrmXpress_gui_obj"]["poly_n"],
+        poly_sigma = store_data["wrmXpress_gui_obj"]["poly_sigma"],
+        flags = store_data["wrmXpress_gui_obj"]["flags"],
+        cellpose_model_segmentation = store_data["wrmXpress_gui_obj"]["cellpose_model_segmentation"],
+        cellpose_model_type_segmentation = store_data["wrmXpress_gui_obj"]["cellpose_model_type_segmentation"],
+        python_model_sigma = store_data["wrmXpress_gui_obj"]["python_model_sigma"],
+        wavelengths_segmentation = store_data["wrmXpress_gui_obj"]["wavelengths_segmentation"],
+        cellprofiler_pipeline_selection = store_data["wrmXpress_gui_obj"]["cellprofiler_pipeline_selection"],
+        cellpose_model_cellprofile = store_data["wrmXpress_gui_obj"]["cellpose_model_cellprofile"],
+        wavelengths_cellprofile = store_data["wrmXpress_gui_obj"]["wavelengths_cellprofile"],
+        tracking_diameter = store_data["wrmXpress_gui_obj"]["tracking_diameter"],
+        tracking_minmass = store_data["wrmXpress_gui_obj"]["tracking_minmass"],
+        tracking_noisesize = store_data["wrmXpress_gui_obj"]["tracking_noisesize"],
+        tracking_searchrange = store_data["wrmXpress_gui_obj"]["tracking_searchrange"],
+        tracking_memory = store_data["wrmXpress_gui_obj"]["tracking_memory"],
+        tracking_adaptivestop = store_data["wrmXpress_gui_obj"]["tracking_adaptivestop"],
+        static_dx = store_data["wrmXpress_gui_obj"]["static_dx"],
+        static_dx_rescale = store_data["wrmXpress_gui_obj"]["static_dx_rescale"],
+        video_dx = store_data["wrmXpress_gui_obj"]["video_dx"],
+        video_dx_format = store_data["wrmXpress_gui_obj"]["video_dx_format"],
+        video_dx_rescale = store_data["wrmXpress_gui_obj"]["video_dx_rescale"],
+        mounted_volume = store_data["wrmXpress_gui_obj"]["mounted_volume"],
+        plate_name = store_data["wrmXpress_gui_obj"]["plate_name"],
+        well_selection_list = store_data["wrmXpress_gui_obj"]["well_selection_list"]
+    )
 
-        # create the options
-        selection_dict = {
-            "motility": "motility",
-            "segment": "binary",
-            "blur": "blur",
-            "edge": "edge",
-            "raw": "raw",
-        }
-
-        # check to see if the button has been clicked (nclicks)
-        if nclicks is not None:
-            return selection_dict  # return the option dictionary
-
-    elif pipeline_selection == "fecundity":
-
-        # create the options
-        selection_dict = {
-            "binary": "binary",
-            "blur": "blur",
-            "edge": "edge",
-            "raw": "raw",
-        }
-
-        # check to see if the button has been clicked (nclicks)
-        if nclicks is not None:
-            return selection_dict
-
-    elif pipeline_selection == "tracking":
-
-        # create the options
-        selection_dict = {"tracks": "tracks", "raw": "raw"}
-
-        # check to see if the button has been clicked (nclicks)
-        if nclicks is not None:
-            return selection_dict
-
-    elif pipeline_selection == "wormsize_intensity_cellpose":
-
-        # create the options
-        selection_dict = {
-            "raw": "raw",
-            "straightened_worms": "straightened_worms",
-            "cp_masks": "cp_masks",
-        }
-
-        # check to see if the button has been clicked (nclicks)
-        if nclicks is not None:
-            return selection_dict
-
-    elif pipeline_selection == "mf_celltox":
-
-        # create the options
-        selection_dict = {"raw": "raw"}
-
-        # check to see if the button has been clicked (nclicks)
-        if nclicks is not None:
-            return selection_dict
-
-    elif pipeline_selection == "wormsize":
-        # create the options
-        selection_dict = {"raw": "raw", "straightened_worms": "straightened_worms"}
-
-        # check to see if the button has been clicked (nclicks)
-        if nclicks is not None:
-            return selection_dict
-
-    elif pipeline_selection == "feeding":
-        # obtain the wavelength options
-        volume = store["wrmXpress_gui_obj"]["mounted_volume"]
-        platename = store["wrmXpress_gui_obj"]["plate_name"]
-        plate_base = platename.split("_", 1)[0]
-        input_file_path = Path(volume, f"{platename}/TimePoint_1/")
-
-        # create the options
-        selection_dict = {
-            "straightened_worms": "straightened_worms",
-        }
-
-        # New code to add: list all matching files and extract unique identifiers
-        pattern = f"{plate_base}*.TIF"
-        # Using glob to match the pattern
-        all_files = list(input_file_path.glob(pattern))
-        # Extracting unique identifiers from filenames (e.g., _w1, _w2, etc.)
-        wavelengths = set()
-
-        for file_path in all_files:
-            parts = file_path.name.split("_")
-            if (
-                len(parts) > 1
-                and parts[-1].startswith("w")
-                and parts[-1].endswith(".TIF")
-            ):
-                wavelengths.add(parts[-1].replace(".TIF", ""))
-
-        # Adding these wavelengths to the selection dictionary
-        for wave in sorted(wavelengths):
-            selection_key = f"wavelength_{wave}"  # Format the key as you see fit
-            selection_dict[selection_key] = wave
-
-        # Assuming nclicks is some condition you've checked elsewhere
-        nclicks = 1
-        if nclicks is not None:
-            return selection_dict
+    # get the pipeline selection
+    selection_dict = wrmXpress_gui_obj.get_image_diagnostic_parameters()
+    
+    if nclicks is not None:
+        return selection_dict
     else:
         return {"raw": "raw"}
 
@@ -382,7 +327,7 @@ def get_options_preview(nclicks, store):
 )
 def run_analysis(
     nclicks,
-    store,
+    store_data,
 ):
     """
     This function runs the analysis of the first well if the first well has not been run before and the button has been clicked
@@ -390,7 +335,7 @@ def run_analysis(
     try:
 
         # Check if the store is empty or has None values for essential elements
-        if not store:
+        if not store_data:
             return (
                 "",
                 {},
@@ -399,7 +344,80 @@ def run_analysis(
                 True,
             )
 
-        if store["wrmXpress_gui_obj"]["plate_name"] == None or store["wrmXpress_gui_obj"]['mounted_volume'] == None:
+        wrmXpress_gui_obj = WrmXpressGui(
+                file_structure=store_data["wrmXpress_gui_obj"]["file_structure"],
+                imaging_mode=store_data["wrmXpress_gui_obj"]["imaging_mode"],
+                multi_well_row=store_data["wrmXpress_gui_obj"]["multi_well_row"],
+                multi_well_col=store_data["wrmXpress_gui_obj"]["multi_well_col"],
+                multi_well_detection=store_data["wrmXpress_gui_obj"][
+                    "multi_well_detection"
+                ],
+                x_sites=store_data["wrmXpress_gui_obj"]["x_sites"],
+                y_sites=store_data["wrmXpress_gui_obj"]["y_sites"],
+                stitch_switch=store_data["wrmXpress_gui_obj"]["stitch_switch"],
+                well_col=store_data["wrmXpress_gui_obj"]["well_col"],
+                well_row=store_data["wrmXpress_gui_obj"]["well_row"],
+                mask=store_data["wrmXpress_gui_obj"]["mask"],
+                mask_diameter=store_data["wrmXpress_gui_obj"]["mask_diameter"],
+                pipeline_selection=store_data["wrmXpress_gui_obj"][
+                    "pipeline_selection"
+                ],
+                wavelengths=store_data["wrmXpress_gui_obj"]["wavelengths"],
+                pyrscale=store_data["wrmXpress_gui_obj"]["pyrscale"],
+                levels=store_data["wrmXpress_gui_obj"]["levels"],
+                winsize=store_data["wrmXpress_gui_obj"]["winsize"],
+                iterations=store_data["wrmXpress_gui_obj"]["iterations"],
+                poly_n=store_data["wrmXpress_gui_obj"]["poly_n"],
+                poly_sigma=store_data["wrmXpress_gui_obj"]["poly_sigma"],
+                flags=store_data["wrmXpress_gui_obj"]["flags"],
+                cellpose_model_segmentation=store_data["wrmXpress_gui_obj"][
+                    "cellpose_model_segmentation"
+                ],
+                cellpose_model_type_segmentation=store_data["wrmXpress_gui_obj"][
+                    "cellpose_model_type_segmentation"
+                ],
+                python_model_sigma=store_data["wrmXpress_gui_obj"][
+                    "python_model_sigma"
+                ],
+                wavelengths_segmentation=store_data["wrmXpress_gui_obj"][
+                    "wavelengths_segmentation"
+                ],
+                cellprofiler_pipeline_selection=store_data["wrmXpress_gui_obj"][
+                    "cellprofiler_pipeline_selection"
+                ],
+                cellpose_model_cellprofile=store_data["wrmXpress_gui_obj"][
+                    "cellpose_model_cellprofile"
+                ],
+                wavelengths_cellprofile=store_data["wrmXpress_gui_obj"][
+                    "wavelengths_cellprofile"
+                ],
+                tracking_diameter=store_data["wrmXpress_gui_obj"]["tracking_diameter"],
+                tracking_minmass=store_data["wrmXpress_gui_obj"]["tracking_minmass"],
+                tracking_noisesize=store_data["wrmXpress_gui_obj"][
+                    "tracking_noisesize"
+                ],
+                tracking_searchrange=store_data["wrmXpress_gui_obj"][
+                    "tracking_searchrange"
+                ],
+                tracking_memory=store_data["wrmXpress_gui_obj"]["tracking_memory"],
+                tracking_adaptivestop=store_data["wrmXpress_gui_obj"][
+                    "tracking_adaptivestop"
+                ],
+                static_dx=store_data["wrmXpress_gui_obj"]["static_dx"],
+                static_dx_rescale=store_data["wrmXpress_gui_obj"]["static_dx_rescale"],
+                video_dx=store_data["wrmXpress_gui_obj"]["video_dx"],
+                video_dx_format=store_data["wrmXpress_gui_obj"]["video_dx_format"],
+                video_dx_rescale=store_data["wrmXpress_gui_obj"]["video_dx_rescale"],
+                mounted_volume=store_data["wrmXpress_gui_obj"]["mounted_volume"],
+                plate_name=store_data["wrmXpress_gui_obj"]["plate_name"],
+                well_selection_list=store_data["wrmXpress_gui_obj"][
+                    "well_selection_list"
+                ],
+            )
+
+        error_occured, _, _, _ = wrmXpress_gui_obj.validate()
+
+        if error_occured:
             return (
                 "",
                 {},
@@ -410,7 +428,8 @@ def run_analysis(
 
         # Check if the button has been clicked
         if nclicks:
+            wrmXpress_gui_obj.preview_analysis()
+            # return preview_callback_functions(store_data)
 
-            return preview_callback_functions(store)
     except Exception as e:
         return f"```{str(e)}```", {}, True, f"```{str(e)}```", True

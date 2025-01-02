@@ -2,8 +2,11 @@
 
 import json
 import os
+import yaml
+import shlex
+import subprocess
 from pathlib import Path
-from app.utils.callback_functions import get_default_value, eval_bool
+from app.utils.callback_functions import get_default_value, eval_bool, clean_and_create_directories, copy_files_to_input_directory
 
 # In[2]: WrmXpressGui Class
 class WrmXpressGui:
@@ -365,30 +368,34 @@ class WrmXpressGui:
     def pre_motility_run_dict(self):
         # Base dictionary with default values
         self.motility_run_dict = {
-            'run': False,
-            'wavelengths': ["All"],
-            "pyrscale": 0.5,
+            "run": False,
+            "wavelengths": ["All"],
+            "pyrScale": 0.5,
             "levels": 5,
             "winsize": 20,
             "iterations": 7,
             "poly_n": 5,
             "poly_sigma": 1.1,
             "flags": 0,
+            "flow": None,
         }
 
         # Update dictionary if pipeline_selection is "motility"
         if self.pipeline_selection == "motility":
-            self.motility_run_dict.update({
-                'run': True,
-                'wavelengths': [self.wavelengths],
-                "pyrscale": get_default_value(self.pyrscale, 0.5),
-                "levels": get_default_value(self.levels, 5),
-                "winsize": get_default_value(self.winsize, 20),
-                "iterations": get_default_value(self.iterations, 7),
-                "poly_n": get_default_value(self.poly_n, 5),
-                "poly_sigma": get_default_value(self.poly_sigma, 1.1),
-                "flags": get_default_value(self.flags, 0),
-            })
+            self.motility_run_dict.update(
+                {
+                    "run": True,
+                    "wavelengths": [self.wavelengths],
+                    "pyrScale": get_default_value(self.pyrscale, 0.5),
+                    "levels": get_default_value(self.levels, 5),
+                    "winsize": get_default_value(self.winsize, 20),
+                    "iterations": get_default_value(self.iterations, 7),
+                    "poly_n": get_default_value(self.poly_n, 5),
+                    "poly_sigma": get_default_value(self.poly_sigma, 1.1),
+                    "flags": get_default_value(self.flags, 0),
+                    "flow": None,
+                }
+            )
 
     def prep_cell_profile_dict(self):
         self.cell_profile_dict = {
@@ -463,8 +470,8 @@ class WrmXpressGui:
             'x-sites': self.x_sites,
             'y-sites': self.y_sites,
             "stitch": self.stitch_switch,
-            'circle-diameter': self.circle_diameter,
-            'square-diameter': self.square_diameter,
+            'circle_diameter': self.circle_diameter,
+            'square_side': self.square_diameter,
             "pipelines": {
                 "static_dx": self.static_dx_dict,
                 "video_dx": self.video_dx_dict,
@@ -475,9 +482,9 @@ class WrmXpressGui:
             },
             "wells": self.well_selection_list,
             "directories": {
-                "work": [str(Path(self.mounted_volume, self.plate_name, "work"))],
-                "input": [str(Path(self.mounted_volume, self.plate_name, "input"))],
-                "output": [str(Path(self.mounted_volume, self.plate_name, "output"))],
+                "work": [str(Path(self.mounted_volume, "work"))],
+                "input": [str(Path(self.mounted_volume, 'input'))],
+                "output": [str(Path(self.mounted_volume, 'output'))],
             }
         }
 
@@ -501,7 +508,223 @@ class WrmXpressGui:
 
         return self.create_yaml_dict()
 
-    # In[6]: Preview Functions
+    # In[6]: Select Diagnostic Image to Preview
 
-    
+    def get_motility_image_diagnostic_parameters(self):
+        return {
+            "motility": "motility",
+            "segment": "binary",
+            "blur": "blur",
+            "edge": "edge",
+            "raw": "raw",
+        } if self.pipeline_selection == "motility" else {}
 
+    def get_segmentation_image_diagnostic_parameters(self):
+        return (
+            {
+                "binary": "binary",
+                "blur": "blur",
+                "edge": "edge",
+                "raw": "raw",
+            }
+            if self.pipeline_selection == "segmentation"
+            else {}
+        )
+
+    def get_tracking_image_diagnostic_parameters(self):
+        return (
+            {"tracks": "tracks", "raw": "raw"}
+            if self.pipeline_selection == "tracking"
+            else {}
+        )
+
+    def get_cell_profile_image_diagnostic_parameters(self):
+        if self.pipeline_selection == "cellprofile":
+            pipeline_mapping = {
+                "wormsize_intensity_cellpose": {
+                    "raw": "raw",
+                    "straightened_worms": "straightened_worms",
+                    "cp_masks": "cp_masks",
+                },
+                "mf_celltox": {
+                    "raw": "raw",
+                },
+                "wormsize": {
+                    "raw": "raw",
+                    "straightened_worms": "straightened_worms",
+                },
+                "feeding": {
+                    "straightened_worms": "straightened_worms",
+                },
+            }
+
+            return pipeline_mapping.get(
+                self.cellprofiler_pipeline_selection, {}
+            )
+
+        return {}
+
+    def get_wavelengths_from_files(self, params):
+        plate_folder = Path(self.mounted_volume, self.plate_name)
+
+        # Find the first folder containing "TimePoint_"
+        timepoint_folders = [
+            folder for folder in plate_folder.iterdir() if "TimePoint_" in folder.name
+        ]
+        if not timepoint_folders:
+            raise FileNotFoundError(
+                f"No folders containing 'TimePoint_' found in {plate_folder}"
+            )
+
+        first_folder = timepoint_folders[0]
+
+        # Find all files in the first folder
+        all_files = list(first_folder.glob("*"))
+
+        # Extract unique wavelengths from filenames
+        wavelengths = {
+            file.stem.split("_")[-1]
+            for file in all_files
+            if "w" in file.stem.split("_")[-1]  # Ensure the part contains 'w'
+        }
+
+        # add wavelengths to params for each wavelength have a key where its wavelength_{number} with the value of the w{number}
+        for i, wavelength in enumerate(wavelengths):
+            params[f"wavelength_{i + 1}"] = wavelength
+
+        return params
+
+    def get_image_diagnostic_parameters(self):
+        motility_params = self.get_motility_image_diagnostic_parameters()
+        segmentation_params = self.get_segmentation_image_diagnostic_parameters()
+        tracking_params = self.get_tracking_image_diagnostic_parameters()
+        cell_profile_params = self.get_cell_profile_image_diagnostic_parameters()
+
+        # get the params that is not {}
+
+        params = {
+            **motility_params,
+            **segmentation_params,
+            **tracking_params,
+            **cell_profile_params,
+        }
+
+        params = self.get_wavelengths_from_files(params)
+
+        return {
+            **params,
+        }
+
+    # In[7]: Preview Analysis
+
+    def get_first_well(self):
+        if self.well_selection_list == ["All"]:
+            first_well = "A01"
+        else:
+            first_well = self.well_selection_list[0]
+
+        return first_well
+
+    def prepare_preview_yaml(self):
+        # convert well selection to first well
+        configure_yaml_file = self.prep_yml()
+
+        first_well = self.get_first_well()
+
+        configure_yaml_file["wells"] = [first_well]
+
+        preview_yaml_platename = "." + self.plate_name + ".yml"
+        preview_yaml_filepath = Path(self.mounted_volume, preview_yaml_platename)
+
+        with open(preview_yaml_filepath, "w") as f:
+            yaml.dump(configure_yaml_file, f)
+
+    def preview_analysis(self):
+        if self.file_structure == "imagexpress":
+            self.run_preview_analysis("imagexpress")
+        elif self.file_structure == "avi":
+            self.run_preview_analysis("avi")
+
+    def run_preview_analysis(self, file_structure):
+        # Check if the first well has already been run (implement this logic)
+        if self.first_well_already_run():
+            print(f"First well already processed for {file_structure}.")
+            return
+
+        # Prepare for preview analysis
+        self.preamble_to_preview_analysis(file_structure)
+
+        # Run the subprocess
+        print("Running wrmXpress.")
+        docker_output = ["Running wrmXpress."]
+
+        try:
+            process = subprocess.Popen(
+                self.wrmxpress_preview_command_split,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                text=True,
+            )
+            stdout, _ = process.communicate()
+
+            if process.returncode != 0:
+                print(f"Error occurred during wrmXpress execution: {stdout}")
+            else:
+                print("wrmXpress completed successfully.")
+            docker_output.append(stdout)
+        except Exception as e:
+            print(f"Subprocess execution failed: {e}")
+            docker_output.append(str(e))
+
+    def preamble_to_preview_analysis(self, file_structure):
+        self.prepare_preview_yaml()
+
+        # Prepare paths
+        image_directory = Path(self.mounted_volume, self.plate_name)
+        input_directory = Path(self.mounted_volume, "input")
+        platename_input_directory = Path(input_directory, self.plate_name)
+        work_directory = Path(self.mounted_volume, "work", self.plate_name)
+        output_directory = Path(self.mounted_volume, "output")
+
+        # Clean and create directories
+        clean_and_create_directories(
+            input_path=platename_input_directory,
+            work_path=work_directory,
+            output_path=output_directory,
+        )
+
+        # Handle specific file structure logic
+        htd_file = None
+        plate_base = None
+        if file_structure == "imagexpress":
+            plate_base = self.plate_name.split("_", 1)[0]
+            htd_file = Path(image_directory, f"{plate_base}.HTD")
+
+        # Copy files to input directory
+        copy_files_to_input_directory(
+            platename_input_dir=platename_input_directory,
+            htd_file=htd_file,
+            img_dir=image_directory,
+            plate_base=plate_base,
+            wells=self.get_first_well(),
+            platename=self.plate_name,
+        )
+
+        # Prepare wrmXpress command
+        self.prepare_preview_wrmxpress_command()
+
+    def prepare_preview_wrmxpress_command(self):
+        self.command_message = (
+            f"```python wrmXpress/wrapper.py {self.plate_name}.yml {self.plate_name}```"
+        )
+        wrmxpress_preview_command = (
+            f"python wrmXpress/wrapper.py {self.mounted_volume}/.{self.plate_name}.yml {self.plate_name}"
+        )
+        self.wrmxpress_preview_command_split = shlex.split(wrmxpress_preview_command)
+        self.output_preview_log_file = Path(
+            self.mounted_volume, "work", self.plate_name, f"{self.plate_name}_preview.log"
+        )
+
+    def first_well_already_run(self):
+        # TODO: Implement logic to check if the first well has already been processed
+        return False
