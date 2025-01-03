@@ -325,7 +325,7 @@ class WrmXpressGui:
         if isinstance(self.well_selection_list, str):
             self.well_selection_list = [self.well_selection_list]
 
-        elif isinstance(self.well_selection_list, list):
+        elif isinstance(self.well_selection_list, list) and len(self.well_selection_list) == 96:
             self.well_selection_list = self.well_selection_list
 
         # if length of well selection is 96, then change to "All"
@@ -506,7 +506,7 @@ class WrmXpressGui:
 
             self.segmentation_dict.update(update_dict)
 
-    def create_yaml_dict(self):
+    def create_yaml_dict(self): 
         yml = {
             "imaging_mode": [self.imaging_mode],
             "file_structure": [self.file_structure],
@@ -731,66 +731,6 @@ class WrmXpressGui:
             else:
                 output_path.mkdir(parents=True, exist_ok=True)
 
-    def copy_files_to_input_directory(
-        self,
-        platename_input_dir,
-        htd_file,
-        img_dir,
-        plate_base,
-        wells,
-        platename,
-        file_types=None,
-    ):
-        """
-        Copies the input files to the specified input directory based on wells and file types.
-        """
-        # Default file types
-        if file_types is None:
-            file_types = [".tif", ".tiff", ".jpg", ".jpeg", ".png", ".bmp", ".avi"]
-
-        # Ensure wells is a list
-        wells = wells if isinstance(wells, list) else [wells]
-
-        # Copy the HTD file to the input directory if provided
-        if htd_file:
-            try:
-                shutil.copy(htd_file, platename_input_dir)
-            except Exception as e:
-                print(f"Failed to copy HTD file {htd_file}: {e}")
-                return
-
-        try:
-            # Get time points if HTD file exists, otherwise use a single directory
-            time_points = (
-                [item for item in Path(img_dir).iterdir() if item.is_dir()]
-                if htd_file
-                else [None]
-            )
-
-            # Iterate over time points, wells, and file types to copy files
-            for time_point in time_points:
-                for well in wells:
-                    for file_type in file_types:
-                        pattern = (
-                            f"{plate_base}_{well}*" if htd_file else f"{platename}_{well}*"
-                        )
-                        search_dir = (
-                            Path(img_dir, time_point) if time_point else Path(img_dir)
-                        )
-                        search_pattern = str(search_dir / f"{pattern}{file_type}")
-
-                        # Find matching files and copy them to the destination
-                        for file_path in glob.glob(search_pattern):
-                            dest_dir = (
-                                Path(platename_input_dir, time_point)
-                                if time_point
-                                else Path(platename_input_dir)
-                            )
-                            dest_dir.mkdir(parents=True, exist_ok=True)
-                            shutil.copy(file_path, dest_dir)
-        except Exception as e:
-            print(f"Error copying files to input directory: {e}")
-
     def analysis_setup(self, type_of_analysis):
         if type_of_analysis == "preview":
             self.run_preview_analysis(file_structure=self.file_structure)
@@ -828,7 +768,8 @@ class WrmXpressGui:
 
     def get_first_well(self):
         
-        if len(self.well_selection_list) == 1:
+        if len(self.well_selection_list) == 1 and self.well_selection_list[0] != "All":
+            print("First well is not All")
             first_well = self.well_selection_list
         elif self.well_selection_list == ["All"]:
             first_well = "A01"
@@ -858,6 +799,7 @@ class WrmXpressGui:
         Otherwise, it prepares and executes the analysis.
         """
         try:
+            
             # Check if the first well has already been analyzed
             if self.first_well_already_run():
                 self._load_preview_image()
@@ -933,7 +875,7 @@ class WrmXpressGui:
             pipeline = "tracking"
 
         elif self.pipeline_selection == "cellprofiler":
-            pipeline = "cell-profile"
+            pipeline = "cellprofiler"
 
         pipeline = Path(self.mounted_volume, "work", f"{pipeline}")
         if not pipeline.exists():
