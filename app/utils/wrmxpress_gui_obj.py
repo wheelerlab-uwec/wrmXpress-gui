@@ -188,7 +188,7 @@ class WrmXpressGui:
             self.error_occurred = True
             self.error_messages.append("No pipeline selected.")
 
-        if self.pipeline_selection == "motility":
+        if  "motility" in self.pipeline_selection:
             defaults = {
                 "pyrscale": 0.5,
                 "levels": 5,
@@ -204,13 +204,13 @@ class WrmXpressGui:
                         f"{param} is missing. Default value ({default}) will be used."
                     )
 
-        if self.pipeline_selection == "segmentation" and self.cellpose_model_cellprofiler == "python" and not self.python_model_sigma:
+        if  "segmentation" in self.pipeline_selection and self.cellpose_model_cellprofiler == "python" and not self.python_model_sigma:
             self.warning_occurred = True
             self.warning_messages.append(
                 "Python model sigma is missing. Default value (0.25) will be used."
             )
 
-        if self.pipeline_selection == "tracking":
+        if  "tracking" in self.pipeline_selection:
             defaults = {
                 "tracking_diameter": 35,
                 "tracking_minmass": 1200,
@@ -421,7 +421,7 @@ class WrmXpressGui:
         }
 
         # Update dictionary if pipeline_selection is "motility"
-        if self.pipeline_selection == "motility":
+        if "motility" in self.pipeline_selection:
             self.motility_run_dict.update(
                 {
                     "run": True,
@@ -444,7 +444,7 @@ class WrmXpressGui:
             "cellpose_model": "20220830_all",
             "pipeline": "wormsize_intensity_cellpose",
         }
-        if self.pipeline_selection == "cellprofiler":
+        if "cellprofiler" in self.pipeline_selection:
             self.cell_profile_dict.update(
                 {
                     "run": True,
@@ -468,7 +468,7 @@ class WrmXpressGui:
             "adaptivestop": 30,
         }
 
-        if self.pipeline_selection == "tracking":
+        if "tracking" in self.pipeline_selection:
             self.tracking_dict.update(
                 {
                     "run": True,
@@ -491,7 +491,7 @@ class WrmXpressGui:
             "wavelengths": ["All"],
         }
 
-        if self.pipeline_selection == "segmentation":
+        if  "segmentation" in self.pipeline_selection:
             update_dict = {
                 "run": True,
                 "model": self.cellpose_model_segmentation,
@@ -564,7 +564,7 @@ class WrmXpressGui:
                 "motility": "optical_flow",
                 "raw": "raw",
             }
-            if self.pipeline_selection == "motility"
+            if  "motility" in self.pipeline_selection
             else {}
         )
 
@@ -574,19 +574,19 @@ class WrmXpressGui:
                 "segmentation": "segmentation",
                 "raw": "raw",
             }
-            if self.pipeline_selection == "segmentation"
+            if  "segmentation" in self.pipeline_selection
             else {}
         )
 
     def get_tracking_image_diagnostic_parameters(self):
         return (
             {"tracks": "tracks", "raw": "raw"}
-            if self.pipeline_selection == "tracking"
+            if "tracking" in self.pipeline_selection
             else {}
         )
 
     def get_cell_profile_image_diagnostic_parameters(self):
-        if self.pipeline_selection == "cellprofiler":
+        if "cellprofiler" in self.pipeline_selection:
             pipeline_mapping = {
                 "wormsize_intensity_cellpose": {
                     "raw": "raw",
