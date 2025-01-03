@@ -767,7 +767,7 @@ class WrmXpressGui:
     # In[8]: Preview Analysis Methods
 
     def get_first_well(self):
-        
+
         if len(self.well_selection_list) == 1 and self.well_selection_list[0] != "All":
             print("First well is not All")
             first_well = self.well_selection_list
@@ -799,12 +799,10 @@ class WrmXpressGui:
         Otherwise, it prepares and executes the analysis.
         """
         try:
-            
             # Check if the first well has already been analyzed
             if self.first_well_already_run():
                 self._load_preview_image()
                 return
-
             # Prepare necessary files and commands for analysis
             self.prepare_preview_yaml()
             self.preamble_analysis(file_structure, first_well=True)
@@ -865,38 +863,38 @@ class WrmXpressGui:
         Checks if the first well has already been processed and a preview image exists.
         Returns True if the image is found, otherwise False.
         """
-        if self.pipeline_selection == "motility":
-            pipeline = "optical_flow"
+        pipeline = []
+        if  "motility" in self.pipeline_selection:
+            pipeline.append("optical_flow")
 
-        elif self.pipeline_selection == "segmentation":
-            pipeline = "segmentation"
+        if "segmentation" in self.pipeline_selection:
+            pipeline.append("segmentation")
 
-        elif self.pipeline_selection == "tracking":
-            pipeline = "tracking"
+        elif  "tracking" in self.pipeline_selection:
+            pipeline.append("tracking")
 
-        elif self.pipeline_selection == "cellprofiler":
-            pipeline = "cellprofiler"
+        elif  "cellprofiler" in self.pipeline_selection:
+            pipeline.append("cellprofiler")
 
-        pipeline = Path(self.mounted_volume, "work", f"{pipeline}")
-        if not pipeline.exists():
-            return False
+        # pipeline = Path(self.mounted_volume, "work", f"{pipeline}")
+        # get a list of the different pipeline paths in work directory
+        pipeline = [Path(self.mounted_volume, "work", f"{pipeline}") for pipeline in pipeline]
 
         first_well = self.get_first_well()
         png_file_pattern = f"*{first_well}*.png"
+        for pipe in pipeline:
+            try:
 
-        try:
-            # search for the first matching .png file in the directory 
-            # self.mounted_volume/work/{pipeline}/*{first_well}*.png
+                # Search for the first matching .png file
+                first_well_image = next(pipe.glob(png_file_pattern), None)
 
-            # Search for the first matching .png file
-            first_well_image = next(pipeline.glob(png_file_pattern), None)
+                if first_well_image:
+                    self.preview_first_well_image_filepath = first_well_image
+                    return True
+            except Exception as e:
+                print(f"Error checking for first well: {e}")
 
-            if first_well_image:
-                self.preview_first_well_image_filepath = first_well_image
-                return True
-        except Exception as e:
-            print(f"Error checking for first well: {e}")
-
+            return False
         return False
 
     # In[8]: Run Analysis
