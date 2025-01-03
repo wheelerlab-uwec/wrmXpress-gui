@@ -438,6 +438,7 @@ def run_analysis(
 
         # Check if the button has been clicked
         if nclicks:
+
             wrmXpress_gui_obj.analysis_setup("preview")
 
             return (

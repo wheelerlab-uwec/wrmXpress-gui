@@ -230,24 +230,21 @@ def background_callback(set_progress, n_clicks, store_data):
                 {},
                 True,
                 True,
-                "An configuration error has occurred. Please return to the Configuration Page to fix the error.",
+                "A configuration error has occurred. Please return to the Configuration Page to fix the error.",
                 None,
                 None,
             )
 
         if n_clicks:
-
-            wrmXpress_gui_obj.analysis_setup("run")
-
-            return wrmXpress_gui_obj.run_analysis(set_progress)
-
-            # return callback(set_progress, n_clicks, store_data)
+            # print("Preparing to run analysis")
+            # wrmXpress_gui_obj.setup_run_analysis(store_data["file_structure"])
+            # print("Running analysis")
+            # wrmXpress_gui_obj.run_analysis(set_progress)
+            return callback(set_progress, n_clicks, store_data)
 
     except Exception as e:
-        # Log the error to your output file or a dedicated log file
         error_message = f"An error occurred: {str(e)}"
-
-        # Return an error indication to the callback
+        print(error_message)
         return (
             {},
             True,

@@ -46,7 +46,7 @@ def callback(set_progress, n_clicks, store):
             )
 
         # obtain the necessary data from the store
-        pipeline_selection = store["pipeline_selection"]
+        pipeline_selection = store["wrmXpress_gui_obj"]["pipeline_selection"]
 
         # Check if the submit button has been clicked
         if n_clicks:
@@ -58,25 +58,31 @@ def callback(set_progress, n_clicks, store):
 
                 return motility_or_segment_run(store, set_progress)
 
-            elif pipeline_selection == "fecundity":
+            elif pipeline_selection == "segmentation":
 
                 return fecundity_run(store, set_progress)
 
-            elif pipeline_selection == "wormsize_intensity_cellpose":
+            elif pipeline_selection == "cellprofiler":
 
-                return cellprofiler_wormsize_intesity_cellpose_run(store, set_progress)
+                cell_profile_pipeline = store["wrmXpress_gui_obj"][
+                    "cellprofiler_pipeline_selection"
+                ]
 
-            elif pipeline_selection == "mf_celltox":
+                if cell_profile_pipeline == "wormsize_intensity_cellpose":
 
-                return cellprofiler_mf_celltox_run(store, set_progress)
+                    return cellprofiler_wormsize_intesity_cellpose_run(store, set_progress)
 
-            elif pipeline_selection == "feeding":
+                elif cell_profile_pipeline == "mf_celltox":
 
-                return cellprofiler_feeding_run(store, set_progress)
+                    return cellprofiler_mf_celltox_run(store, set_progress)
 
-            elif pipeline_selection == "wormsize":
+                elif cell_profile_pipeline == "feeding":
 
-                return cellprofiler_wormsize_run(store, set_progress)
+                    return cellprofiler_feeding_run(store, set_progress)
+
+                elif cell_profile_pipeline == "wormsize":
+
+                    return cellprofiler_wormsize_run(store, set_progress)
 
     except Exception as e:
         # Log the error to your output file or a dedicated log file
@@ -114,7 +120,7 @@ def preamble_run_wrmXpress_avi_selection(store):
     platename_input_dir = Path(input_dir, platename)
     full_yaml = Path(volume, platename + ".yml")
 
-    update_yaml_file(full_yaml, full_yaml, {"wells": ["All"]})
+    update_yaml_file(full_yaml, full_yaml, {"wells": store["wrmXpress_gui_obj"]["well_selection_list"]})
 
     # clean and create directories
     clean_and_create_directories(
@@ -175,7 +181,11 @@ def preamble_run_wrmXpress_imagexpress_selection(store):
     platename_input_dir = Path(input_dir, platename)
     full_yaml = Path(volume, platename + ".yml")
 
-    update_yaml_file(full_yaml, full_yaml, {"wells": ["All"]})
+    update_yaml_file(
+        full_yaml,
+        full_yaml,
+        {"wells": store["wrmXpress_gui_obj"]["well_selection_list"]},
+    )
 
     # clean and create directories
     clean_and_create_directories(
@@ -263,7 +273,7 @@ def motility_or_segment_run(store, set_progress):
 
         elif file_structure == "imagexpress":
             new_store = preamble_run_wrmXpress_imagexpress_selection(store)
-            return run_wrmXpress_imagexpress_selection_motility(new_store, set_progress)
+            return run_wrmXpress_imagexpress_selection_motility(new_store, set_progress, store)
 
     except Exception as e:
         # Log the error to your output file or a dedicated log file
@@ -320,32 +330,44 @@ def fecundity_run(store, set_progress):
             print("Running wrmXpress.")
 
             docker_output = []
-            wells_analyzed = []
+            # wells_analyzed = []
 
             for line in iter(process.stdout.readline, ""):
                 docker_output.append(line)
                 file.write(line)
                 file.flush()
 
-                if "Running" in line:
+                # check if any of the wells in well_selection_list are being analyzed
+                # the line must contain only one of the wells in the selection list, if contains more disregard it
+                # the line looks something like "{well} {number}/{total number of wells}"
+                if len(re.findall(r"\b" + "|".join(wells) + r"\b", line)) == 1:
 
-                    process_running_wells(
-                        line,
-                        wells_analyzed,
-                        wells,
-                        volume,
-                        platename,
-                        plate_base,
-                        set_progress,
-                        docker_output,
-                    )
+                    updated_running_wells(
+                        set_progress, 
+                        line, 
+                        store, 
+                        docker_output
+                        )
+                # if "Running" in line:
+
+                #     process_running_wells(
+                #         line,
+                #         wells_analyzed,
+                #         wells,
+                #         volume,
+                #         platename,
+                #         plate_base,
+                #         set_progress,
+                #         docker_output,
+                #     )
 
             process.wait()
 
             if process.returncode == 0:
-
+                
+                print("wrmXpress process successful.")  
                 return handle_thumbnail_generation(
-                    volume, platename, docker_output, output_file
+                    volume, platename, docker_output, output_file, pipeline="segmentation"
                 )
 
             else:
@@ -948,14 +970,14 @@ def run_wrmXpress_avi_selection_motility(new_store, set_progress):
             return handle_failure(docker_output, log_file_path)
 
 
-def run_wrmXpress_imagexpress_selection_motility(new_store, set_progress):
+def run_wrmXpress_imagexpress_selection_motility(new_store, set_progress, store):
     wrmxpress_command_split = new_store["wrmxpress_command_split"]
     output_folder = new_store["output_folder"]
     output_file = new_store["output_file"]
     wells = new_store["wells"]
     volume = new_store["volume"]
     platename = new_store["platename"]
-    plate_base = platename.split("_", 1)[0]
+    # plate_base = platename.split("_", 1)[0]
 
     # Should try and figure out an alternative to this
     # potential brick mechanism for the user
@@ -972,35 +994,50 @@ def run_wrmXpress_imagexpress_selection_motility(new_store, set_progress):
         print("Running wrmXpress.")
 
         docker_output = []
-        wells_analyzed = []
+        # wells_analyzed = []
 
         # Process all output from the subprocess
         for line in iter(process.stdout.readline, ""):
             docker_output.append(line)
             file.write(line)
             file.flush()
-            # Process 'Running' lines to update progress
-            if "Running" in line:
-                process_running_wells(
-                    line,
-                    wells_analyzed,
-                    wells,
-                    volume,
-                    platename,
-                    plate_base,
+
+            # check if any of the wells in well_selection_list are being analyzed
+            # the line must contain only one of the wells in the selection list, if contains more disregard it
+            # the line looks something like "{well} {number}/{total number of wells}"
+            if len(re.findall(r"\b" + "|".join(wells) + r"\b", line)) == 1:
+
+                updated_running_wells(
                     set_progress,
-                    docker_output,
+                    line, 
+                    store, 
+                    docker_output
                 )
+
+            # Process 'Running' lines to update progress
+            # if "Running" in line:
+            #     process_running_wells(
+            #         line,
+            #         wells_analyzed,
+            #         wells,
+            #         volume,
+            #         platename,
+            #         plate_base,
+            #         set_progress,
+            #         docker_output,
+            #     )
 
         # Wait for the subprocess to complete its execution
         process.communicate()  # Ensure all output has been processed and subprocess has finished
 
         if process.returncode == 0:
+            # TODO: Implement thumbnail generation, finish this when backend is finished
             return handle_thumbnail_generation(
                 volume, platename, docker_output, output_file
             )
 
         else:
+            # TODO: Implement failure handling
             print("wrmXpress has failed.")
             return handle_failure(docker_output, output_file)
 
@@ -1095,6 +1132,50 @@ def process_running_wells(
                     f"```{docker_output_formatted}```",
                 )
             )
+
+def updated_running_wells(
+    set_progress,
+    line,
+    store,
+    docker_output
+):
+
+    well_being_analyzed, progress = line.split(" ")
+    current_number, total_number = progress.split("/")
+    plate_base = store["platename"].split("_", 1)[0]
+    well_base_path = Path(  
+        store["wrmXpress_gui_obj"]["mounted_volume"],
+        f"{store['wrmXpress_gui_obj']['plate_name']}/TimePoint_1/{plate_base}_{well_being_analyzed}",
+    )
+    # Use rglob with case-insensitive pattern matching for .TIF and .tif
+    file_paths = list(
+        well_base_path.parent.rglob(well_base_path.name + "*[._][tT][iI][fF]")
+    )
+    # Sort the matching files to find the one with the lowest suffix number
+    if file_paths:
+        file_paths_sorted = sorted(file_paths, key=lambda x: x.stem)
+        # Select the first file (with the lowest number) if multiple matches are found
+        img_path = file_paths_sorted[0]
+
+    else:
+        # Fallback if no matching files are found
+        img_path = well_base_path.with_suffix(
+            ".TIF"
+        )
+    
+    if img_path.exists():
+        fig = create_figure_from_filepath(img_path)
+        docker_output_formatted = "".join(docker_output)
+
+        set_progress(
+            (
+                str(current_number),
+                str(total_number),
+                fig,
+                f"```{str(img_path)}```",
+                f"```{docker_output_formatted}```",
+            )
+        )
 
 
 def process_tracking_wells(
@@ -1276,9 +1357,10 @@ def process_info_and_percent(
             )
 
 
-def handle_thumbnail_generation(volume, platename, docker_output, output_file):
-    output_path_base = Path(volume, "output", "thumbs", platename)
-
+def handle_thumbnail_generation(volume, platename, docker_output, output_file, pipeline=""):
+    
+    output_path_base = Path(volume, "output", pipeline)
+    print('output_path_base', output_path_base)
     file_paths = list(
         output_path_base.parent.rglob(output_path_base.name + "*[._][pP][nN][gG]")
     )
