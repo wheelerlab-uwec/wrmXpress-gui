@@ -24,6 +24,27 @@ layout = configure_layout
 
 
 @callback(
+    Output("pipeline-selection", "value"),
+    Input("pipeline-selection", "value"),
+    prevent_initial_call=True,
+)
+def handle_pipeline_selections(pipeline_selection):
+    """
+    Manage pipeline selections to enforce mutual exclusivity for 'CellProfiler':
+    - If 'CellProfiler' is selected and another pipeline is chosen, deselect 'CellProfiler'.
+    - If another pipeline is selected and 'CellProfiler' is chosen, deselect the other pipelines.
+    """
+    
+    if "cellprofiler" in pipeline_selection:
+        if 'cellprofiler' == pipeline_selection[-1]:
+            return 'cellprofiler'
+        else:
+            return pipeline_selection[:-1]
+    else:
+        return pipeline_selection
+
+
+@callback(
     [
         Output("multi-well-options-row", "style"),
         Output("additional-options-row", "style"),
@@ -98,7 +119,7 @@ def update_options_visibility(
 
 
 @callback(
-    Output("pipeline-params-header", "style"),
+    # Output("pipeline-params-header", "style"),
     Output("motility_params", "style"),
     Output("segmentation_params", "style"),
     Output("cellprofiler_params", "style"),
@@ -106,47 +127,37 @@ def update_options_visibility(
     Input("pipeline-selection", "value"),
 )
 def update_params_visibility(pipeline):
-    """This function will display the parameters based on the pipeline selected."""
-    if pipeline == "motility":
-        return (
-            {"display": "flex"},
-            {"display": "flex"},
-            {"display": "none"},
-            {"display": "none"},
-            {"display": "none"},
-        )
-    elif pipeline == "segmentation":
-        return (
-            {"display": "flex"},
-            {"display": "none"},
-            {"display": "flex"},
-            {"display": "none"},
-            {"display": "none"},
-        )
-    elif pipeline == "cellprofiler":
-        return (
-            {"display": "flex"},
-            {"display": "none"},
-            {"display": "none"},
-            {"display": "flex"},
-            {"display": "none"},
-        )
-    elif pipeline == "tracking":
-        return (
-            {"display": "flex"},
-            {"display": "none"},
-            {"display": "none"},
-            {"display": "none"},
-            {"display": "flex"},
-        )
-    else:
-        return (
-            {"display": "none"},
-            {"display": "none"},
-            {"display": "none"},
-            {"display": "none"},
-            {"display": "none"},
-        )
+    """
+    Update the visibility of parameter sections based on the selected pipeline(s).
+    """
+    # Default all styles to hidden
+    # header_style = {"display": "none"}
+    motility_params_style = {"display": "none"}
+    segmentation_params_style = {"display": "none"}
+    cellprofiler_params_style = {"display": "none"}
+    tracking_params_style = {"display": "none"}
+
+    # Show the header if any pipeline is selected
+    # if pipeline:
+    #     header_style = {"display": "flex"}
+
+    # Update styles based on the selected pipelines
+    if "motility" in pipeline:
+        motility_params_style = {"display": "flex"}
+    if "segmentation" in pipeline:
+        segmentation_params_style = {"display": "flex"}
+    if "cellprofiler" in pipeline:
+        cellprofiler_params_style = {"display": "flex"}
+    if "tracking" in pipeline:
+        tracking_params_style = {"display": "flex"}
+
+    return (
+        # header_style,
+        motility_params_style,
+        segmentation_params_style,
+        cellprofiler_params_style,
+        tracking_params_style,
+    )
 
 
 @callback(
@@ -535,9 +546,9 @@ def save_configuration_upon_clicking_finalize_button(  # function to save the ya
 
 
 @callback(
-    Output("configure-input-preview", "src"),
-    Output("configure-input-preview", "style"),
-    Output("configure-input-text", "children"),
+    Output("cellprofiler-input-preview", "src"),
+    Output("cellprofiler-input-preview", "style"),
+    Output("cellprofiler-input-text", "children"),
     Input("pipeline-selection", "value"),
     Input("cellprofiler-pipeline-selection", "value"),
     prevent_initial_call=True,  # Preventing callback from running before any action is taken
@@ -548,31 +559,7 @@ def update_figure_based_on_selection(module_initial, cellprofiler_pipeline_selec
     This function will load the image module for the selected pipeline.
     """
 
-    if module_initial == "motility":
-        fig = "assets/configure_assets/motility/A01/img/20210819-p01-NJW_753_A01_motility.png"
-        return (
-            fig,
-            {"width": "40%"},
-            'The motility pipeline exports a "flow cloud" as a diagnostic and saves a single value as output.',
-        )
-
-    elif module_initial == "segmentation":
-        fig = "assets/configure_assets/fecundity/A01/img/20210906-p01-NJW_857_A01_binary.png"
-        return (
-            fig,
-            {"width": "40%"},
-            "The fecundity pipeline exports a segmented image as a diagnostic and saves a single value as output.",
-        )
-
-    elif module_initial == "tracking":
-        fig = "assets/configure_assets/tracking/20240307-p01-RVH_A05_tracks.png"
-        return (
-            fig,
-            {"width": "40%"},
-            "The tracking pipeline exports tracks as a diagnostic and saves a single value per track as output.",
-        )
-
-    elif module_initial == "cellprofiler":
+    if  "cellprofiler" in module_initial:
         if cellprofiler_pipeline_selection == "wormsize_intensity_cellpose":
             fig = "assets/configure_assets/wormsize_intensity_cellpose/A01/img/20220408-p01-MGC_A01.png"
             return (
@@ -604,3 +591,10 @@ def update_figure_based_on_selection(module_initial, cellprofiler_pipeline_selec
                 {"width": "60%"},
                 "The wormsize pipeline exports straightened worms as a diagnostic and saves many values per worm as output.",
             )
+        
+    else: # if no pipeline is selected
+        return (
+            "",
+            {"display": "none"},
+            "Please select a pipeline to view the input image.",
+        )
