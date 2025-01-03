@@ -1,6 +1,7 @@
-name: wrmxpress_gui
+name: wrmxpress_v2
 channels:
   - conda-forge
+  - bioconda
 dependencies:
 
 # readthedocs
@@ -33,6 +34,7 @@ dependencies:
   - webdriver-manager==4.0.1
   - yaml==0.2.5
   - zenodo_get
+  - pip
 
 # backend
   - cellpose==3.0.9
@@ -57,4 +59,4 @@ dependencies:
   
   - pip:
     - dash[testing]
-    - cellprofiler==4.2.6
+    - cellprofiler==4.2.8
