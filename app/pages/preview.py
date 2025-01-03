@@ -438,7 +438,16 @@ def run_analysis(
 
         # Check if the button has been clicked
         if nclicks:
+
             wrmXpress_gui_obj.analysis_setup("preview")
+
+            return (
+                wrmXpress_gui_obj.formatted_preview_first_well_path,
+                wrmXpress_gui_obj.preview_first_well_figure,
+                False,
+                "",
+                False,
+            )
             # return preview_callback_functions(store_data)
 
     except Exception as e:

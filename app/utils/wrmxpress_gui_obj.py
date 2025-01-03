@@ -5,12 +5,15 @@ import os
 import yaml
 import shlex
 import subprocess
+import glob
+import shutil
 from pathlib import Path
 from app.utils.callback_functions import (
     get_default_value,
     eval_bool,
     clean_and_create_directories,
     copy_files_to_input_directory,
+    create_figure_from_filepath,
 )
 
 
@@ -201,7 +204,7 @@ class WrmXpressGui:
                         f"{param} is missing. Default value ({default}) will be used."
                     )
 
-        if self.pipeline_selection == "segmentation" and not self.python_model_sigma:
+        if self.pipeline_selection == "segmentation" and self.cellpose_model_cellprofiler == "python" and not self.python_model_sigma:
             self.warning_occurred = True
             self.warning_messages.append(
                 "Python model sigma is missing. Default value (0.25) will be used."
@@ -322,6 +325,9 @@ class WrmXpressGui:
         if isinstance(self.well_selection_list, str):
             self.well_selection_list = [self.well_selection_list]
 
+        elif isinstance(self.well_selection_list, list):
+            self.well_selection_list = self.well_selection_list
+
         # if length of well selection is 96, then change to "All"
         if len(self.well_selection_list) == 96:
             self.well_selection_list = ["All"]
@@ -380,7 +386,7 @@ class WrmXpressGui:
             self.multi_well_col = 1
             self.x_sites = "NA"
             self.y_sites = "NA"
-            self.well_selection_list = ["All"]
+            # self.well_selection_list = ["All"] # commented out as this might have been the problem
             self.multi_well_detection = "grid"
             self.stitch_switch = False
 
@@ -395,7 +401,7 @@ class WrmXpressGui:
         if self.imaging_mode == "multi-site":
             self.multi_well_row = 1
             self.multi_well_col = 1
-            self.well_selection_list = ["All"]
+            # self.well_selection_list = ["All"] # commented out as this might have been the problem
             self.multi_well_detection = "grid"
             self.stitch_switch = get_default_value(self.stitch_switch, False)
 
@@ -438,7 +444,6 @@ class WrmXpressGui:
             "cellpose_model": "20220830_all",
             "pipeline": "wormsize_intensity_cellpose",
         }
-
         if self.pipeline_selection == "cellprofiler":
             self.cell_profile_dict.update(
                 {
@@ -556,10 +561,7 @@ class WrmXpressGui:
     def get_motility_image_diagnostic_parameters(self):
         return (
             {
-                "motility": "motility",
-                "segment": "binary",
-                "blur": "blur",
-                "edge": "edge",
+                "motility": "optical_flow",
                 "raw": "raw",
             }
             if self.pipeline_selection == "motility"
@@ -569,9 +571,7 @@ class WrmXpressGui:
     def get_segmentation_image_diagnostic_parameters(self):
         return (
             {
-                "binary": "binary",
-                "blur": "blur",
-                "edge": "edge",
+                "segmentation": "segmentation",
                 "raw": "raw",
             }
             if self.pipeline_selection == "segmentation"
@@ -672,7 +672,7 @@ class WrmXpressGui:
         output_directory = Path(self.mounted_volume, "output")
 
         # Clean and create directories
-        clean_and_create_directories(
+        self.clean_and_create_directories(
             input_path=platename_input_directory,
             work_path=work_directory,
             output_path=output_directory,
@@ -700,11 +700,102 @@ class WrmXpressGui:
             platename=self.plate_name,
         )
 
+    def clean_and_create_directories(self, input_path, work_path, output_path=None):
+        """
+        Cleans and creates the input, work, and optionally output directories.
+        Deletes existing contents and recreates the directories as needed.
+        """
+        # Ensure the paths are Path objects
+        input_path = Path(input_path)
+        work_path = Path(work_path)
+        output_path = Path(output_path) if output_path else None
+
+        # Clean and create the work directory
+        if work_path.exists():
+            shutil.rmtree(work_path)
+        work_path.mkdir(parents=True, exist_ok=True)
+
+        # Clean and create the input directory
+        if input_path.exists():
+            shutil.rmtree(input_path)
+        input_path.mkdir(parents=True, exist_ok=True)
+
+        # Clean and create the output directory, if specified
+        if output_path:
+            if output_path.exists():
+                for item in output_path.iterdir():
+                    if item.is_file() or item.is_symlink():
+                        item.unlink()
+                    elif item.is_dir():
+                        shutil.rmtree(item)
+            else:
+                output_path.mkdir(parents=True, exist_ok=True)
+
+    def copy_files_to_input_directory(
+        self,
+        platename_input_dir,
+        htd_file,
+        img_dir,
+        plate_base,
+        wells,
+        platename,
+        file_types=None,
+    ):
+        """
+        Copies the input files to the specified input directory based on wells and file types.
+        """
+        # Default file types
+        if file_types is None:
+            file_types = [".tif", ".tiff", ".jpg", ".jpeg", ".png", ".bmp", ".avi"]
+
+        # Ensure wells is a list
+        wells = wells if isinstance(wells, list) else [wells]
+
+        # Copy the HTD file to the input directory if provided
+        if htd_file:
+            try:
+                shutil.copy(htd_file, platename_input_dir)
+            except Exception as e:
+                print(f"Failed to copy HTD file {htd_file}: {e}")
+                return
+
+        try:
+            # Get time points if HTD file exists, otherwise use a single directory
+            time_points = (
+                [item for item in Path(img_dir).iterdir() if item.is_dir()]
+                if htd_file
+                else [None]
+            )
+
+            # Iterate over time points, wells, and file types to copy files
+            for time_point in time_points:
+                for well in wells:
+                    for file_type in file_types:
+                        pattern = (
+                            f"{plate_base}_{well}*" if htd_file else f"{platename}_{well}*"
+                        )
+                        search_dir = (
+                            Path(img_dir, time_point) if time_point else Path(img_dir)
+                        )
+                        search_pattern = str(search_dir / f"{pattern}{file_type}")
+
+                        # Find matching files and copy them to the destination
+                        for file_path in glob.glob(search_pattern):
+                            dest_dir = (
+                                Path(platename_input_dir, time_point)
+                                if time_point
+                                else Path(platename_input_dir)
+                            )
+                            dest_dir.mkdir(parents=True, exist_ok=True)
+                            shutil.copy(file_path, dest_dir)
+        except Exception as e:
+            print(f"Error copying files to input directory: {e}")
+
     def analysis_setup(self, type_of_analysis):
         if type_of_analysis == "preview":
             self.run_preview_analysis(file_structure=self.file_structure)
         elif type_of_analysis == "run":
-            self.run_analysis(file_structure=self.file_structure)
+            self.setup_run_analysis(file_structure=self.file_structure)
 
     def prepare_wrmxpress_command(self):
 
@@ -712,7 +803,7 @@ class WrmXpressGui:
         def generate_command(is_preview=False):
             """Generate the command split for wrmXpress based on preview flag."""
             file_prefix = f".{self.plate_name}" if is_preview else self.plate_name
-            command = f"python wrmXpress/wrapper.py {self.mounted_volume}/{file_prefix}.yml {self.plate_name}"
+            command = f"python wrmXpress/wrapper.py {self.mounted_volume}{file_prefix}.yml {self.plate_name}"
             return shlex.split(command)
 
         def generate_log_file(is_preview=False):
@@ -736,7 +827,10 @@ class WrmXpressGui:
     # In[8]: Preview Analysis Methods
 
     def get_first_well(self):
-        if self.well_selection_list == ["All"]:
+        
+        if len(self.well_selection_list) == 1:
+            first_well = self.well_selection_list
+        elif self.well_selection_list == ["All"]:
             first_well = "A01"
         else:
             first_well = self.well_selection_list[0]
@@ -758,49 +852,287 @@ class WrmXpressGui:
             yaml.dump(configure_yaml_file, f)
 
     def run_preview_analysis(self, file_structure):
-        # Check if the first well has already been run (implement this logic)
-        if self.first_well_already_run():
-            print(f"First well already processed for {file_structure}.")
-            return
+        """
+        Runs a preview analysis for the first well.
+        If the analysis has already been performed, it loads the preview image.
+        Otherwise, it prepares and executes the analysis.
+        """
+        try:
+            # Check if the first well has already been analyzed
+            if self.first_well_already_run():
+                self._load_preview_image()
+                return
 
-        # Prepare for preview analysis
-        self.prepare_preview_yaml()
-        self.preamble_analysis(file_structure, first_well=True)
-        self.prepare_wrmxpress_command()
+            # Prepare necessary files and commands for analysis
+            self.prepare_preview_yaml()
+            self.preamble_analysis(file_structure, first_well=True)
+            self.prepare_wrmxpress_command()
 
-        # Run the subprocess
+            # Run wrmXpress using the prepared command
+            docker_output = self._run_wrmxpress_subprocess(self.wrmxpress_preview_command_split)
+
+            # Check again if the first well has been processed after running the command
+            if self.first_well_already_run():
+                print("wrmXpress completed successfully.")
+                self._load_preview_image()
+
+            return docker_output
+
+        except Exception as e:
+            print(f"Error in run_preview_analysis: {e}")
+            self.run_preview_error_message = f"Error: {str(e)}"
+
+    # Helper methods
+    def _load_preview_image(self):
+        """
+        Loads the preview image for the first well and creates a figure.
+        """
+        fig = create_figure_from_filepath(self.preview_first_well_image_filepath)
+        self.preview_first_well_figure = fig
+        self.formatted_preview_first_well_path = (
+            f"```{self.preview_first_well_image_filepath}```"
+        )
+
+    def _run_wrmxpress_subprocess(self, command_split):
+        """
+        Executes the wrmXpress command as a subprocess and returns its output.
+        """
         print("Running wrmXpress.")
         docker_output = ["Running wrmXpress."]
-
         try:
             process = subprocess.Popen(
-                self.wrmxpress_preview_command_split,
+                command_split,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.STDOUT,
                 text=True,
             )
             stdout, _ = process.communicate()
+            docker_output.append(stdout)
 
             if process.returncode != 0:
-                print(f"Error occurred during wrmXpress execution: {stdout}")
-            else:
+                raise RuntimeError(f"wrmXpress failed: {stdout}")
 
-                # TODO: include code to check if the first well has been processed
-                # and load the first well image for preview
-
-                print("wrmXpress completed successfully.")
-            docker_output.append(stdout)
         except Exception as e:
+            docker_output.append(f"Error: {str(e)}")
             print(f"Subprocess execution failed: {e}")
-            docker_output.append(str(e))
+
+        return docker_output
 
     def first_well_already_run(self):
-        # TODO: Implement logic to check if the first well has already been processed
+        """
+        Checks if the first well has already been processed and a preview image exists.
+        Returns True if the image is found, otherwise False.
+        """
+        if self.pipeline_selection == "motility":
+            pipeline = "optical_flow"
+
+        elif self.pipeline_selection == "segmentation":
+            pipeline = "segmentation"
+
+        elif self.pipeline_selection == "tracking":
+            pipeline = "tracking"
+
+        elif self.pipeline_selection == "cellprofiler":
+            pipeline = "cell-profile"
+
+        pipeline = Path(self.mounted_volume, "work", f"{pipeline}")
+        if not pipeline.exists():
+            return False
+
+        first_well = self.get_first_well()
+        png_file_pattern = f"*{first_well}*.png"
+
+        try:
+            # search for the first matching .png file in the directory 
+            # self.mounted_volume/work/{pipeline}/*{first_well}*.png
+
+            # Search for the first matching .png file
+            first_well_image = next(pipeline.glob(png_file_pattern), None)
+
+            if first_well_image:
+                self.preview_first_well_image_filepath = first_well_image
+                return True
+        except Exception as e:
+            print(f"Error checking for first well: {e}")
+
         return False
 
     # In[8]: Run Analysis
 
-    def run_analysis(self, file_structure):
+    def setup_run_analysis(self, file_structure):
         # Prepare for analysis
         self.preamble_analysis(file_structure)
         self.prepare_wrmxpress_command()
+
+    def run_analysis(self, set_progress):
+        # Run wrmXpress using the prepared command
+        docker_output = self._run_wrmxpress_subprocess_analysis(self.wrmxpress_command_split, set_progress)
+
+        return docker_output
+
+    def _run_wrmxpress_subprocess_analysis(self, command_split, set_progress):
+        """
+        Executes the wrmXpress command as a subprocess and prints its output to the terminal in real-time.
+        """
+        print("Running wrmXpress.")
+        docker_output = ["Running wrmXpress."]
+
+        # Use subprocess.Popen to execute the command and capture the output line-by-line
+        process = subprocess.Popen(
+            command_split, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True
+        )
+
+        # Read and print the output line-by-line
+        for line in process.stdout:
+            line = line.strip()  # Remove any trailing whitespace
+            if line:
+                print(line)  # Print each line to the terminal
+                docker_output.append(line)
+
+        # Wait for the process to finish
+        process.wait()
+
+        return docker_output
+
+        """
+        # Read and process the output in real-time
+        for line in process.stdout:
+            docker_output.append(line.strip())
+            print(line.strip())  # Print each line as it's received
+
+            # Check if any of the wells from well_selection_list is in the line
+            if any([well in line for well in self.well_selection_list]):
+                well_being_analyzed, progress = line.split(" ")
+                current_progress, total_progress = progress.split("/")
+                print(
+                    f"Current Progress: {current_progress}, Total Progress: {total_progress}"
+                )
+                plate_base = self.plate_name.split("_")[0]
+
+                # Hard code for now
+                wave_length = "w1"
+
+                well_analyzed_base_path = Path(
+                    self.mounted_volume,
+                    "input",
+                    self.plate_name,
+                    "TimePoint_1",
+                    f"{plate_base}_{well_being_analyzed}_{wave_length}",
+                )
+                file_paths = list(
+                    well_analyzed_base_path.parent.rglob(
+                        f"{plate_base}_{well_being_analyzed}_{wave_length}"
+                        + "*[._][tT][iI][fF]"
+                    )
+                )
+                if file_paths:
+                    file_paths_sorted = sorted(file_paths, key=lambda x: x.stem)
+                    img_path = file_paths_sorted[-1]
+                else:
+                    img_path = well_analyzed_base_path.with_suffix(".TIF")
+
+                if img_path.exists():
+                    figure = create_figure_from_filepath(img_path)
+
+                    docker_output_formatted = "".join(docker_output)
+
+                    # Set the progress
+                    set_progress(
+                        (
+                            int(current_progress),
+                            int(total_progress),
+                            figure,
+                            f"```{str(well_analyzed_base_path)}```",
+                            f"```{docker_output_formatted}```",
+                        )
+                    )
+
+        # Wait for the process to complete
+        process.wait()
+
+        return docker_output
+        """
+
+"""
+    def _run_wrmxpress_subprocess_analysis(self, command_split, set_progress):
+
+        print("Running wrmXpress.")
+        docker_output = ["Running wrmXpress."]
+        try:
+            # Use subprocess.run to execute the command and capture the output
+            process = subprocess.run(
+                command_split,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                text=True,
+                check=True,  # Raise exception if the command fails
+            )
+
+            # Print each line of the output to the terminal
+            for line in process.stdout.splitlines():
+                docker_output.append(line)
+                print(line)
+
+                # Check if any of the wells from well_selection_list is in the line
+                if any([well in line for well in self.well_selection_list]):
+                    well_being_analyzed, progress = line.split(" ")
+                    # Process progress data
+                    current_progress, total_progress = progress.split("/")
+                    print(
+                        f"Current Progress: {current_progress}, Total Progress: {total_progress}"
+                    )
+                    plate_base = self.plate_name.split("_")[0]
+
+                    # Hard code for now
+                    wave_length = "w1"
+
+                    well_analyzed_base_path = Path(
+                        self.mounted_volume,
+                        "input",
+                        self.plate_name,
+                        "TimePoint_1",
+                        f"{plate_base}_{well_being_analyzed}_{wave_length}",
+                    )
+                    file_paths = list(
+                        well_analyzed_base_path.parent.rglob(
+                            f"{plate_base}_{well_being_analyzed}_{wave_length}"
+                            + "*[._][tT][iI][fF]"
+                        )
+                    )
+                    if file_paths:
+                        file_paths_sorted = sorted(file_paths, key=lambda x: x.stem)
+                        img_path = file_paths_sorted[-1]
+                    else:
+                        img_path = well_analyzed_base_path.with_suffix(".TIF")
+
+                    # Check if the file exists
+                    if img_path.exists():
+                        figure = create_figure_from_filepath(img_path)
+
+                        docker_output_formatted = "".join(docker_output)
+
+                        # Set the progress
+                        set_progress(
+                            (
+                                int(current_progress),
+                                int(total_progress),
+                                figure,
+                                f"```{str(well_analyzed_base_path)}```",
+                                f"```{docker_output_formatted}```",
+                            )
+                        )
+
+            return docker_output
+
+        except subprocess.CalledProcessError as e:
+            # Capture the error output
+            error_message = e.stdout if e.stdout else str(e)
+            docker_output.append(f"Error: {error_message}")
+            print(f"Command failed with error: {error_message}")
+
+        except Exception as e:
+            docker_output.append(f"Error: {str(e)}")
+            print(f"Execution failed: {e}")
+
+        return docker_output
+"""
