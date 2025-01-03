@@ -30,7 +30,7 @@ def preview_callback_functions(store):
 
     """
 
-    pipeline_selection = store["wrmXpress_gui_obj"]['pipeline_selection']
+    pipeline_selection = store["wrmXpress_gui_obj"]["pipeline_selection"]
 
     if pipeline_selection == "motility":
         return motility_segment_fecundity_preview(store)
@@ -41,22 +41,22 @@ def preview_callback_functions(store):
     elif pipeline_selection == "tracking":
         return tracking_wrmXpress_preview(store)
 
-    elif pipeline_selection == 'cellprofile':
+    elif pipeline_selection == "cellprofiler":
         pipeline_selection = store["wrmXpress_gui_obj"][
             "cellprofiler_pipeline_selection"
-            ]
-            
+        ]
+
         if pipeline_selection == "wormsize":
-            return cellprofile_wormsize_preview(store)
+            return cellprofiler_wormsize_preview(store)
 
         elif pipeline_selection == "wormsize_intensity_cellpose":
-            return cellprofile_wormsize_intensity_cellpose_preview(store)
+            return cellprofiler_wormsize_intensity_cellpose_preview(store)
 
         elif pipeline_selection == "mf_celltox":
-            return cellprofile_mf_celltox_preview(store)
+            return cellprofiler_mf_celltox_preview(store)
 
         elif pipeline_selection == "feeding":
-            return cellprofile_feeding_preview(store)
+            return cellprofiler_feeding_preview(store)
 
 
 ########################################################################
@@ -294,7 +294,7 @@ def motility_segment_fecundity_preview(store):
         )
 
 
-def cellprofile_wormsize_preview(store):
+def cellprofiler_wormsize_preview(store):
     """
     The purpose of this function is to preview the analysis of the selected options from
     the configuration page, including worm size. This function will run wrmXpress and return
@@ -375,7 +375,7 @@ def cellprofile_wormsize_preview(store):
         )
 
 
-def cellprofile_wormsize_intensity_cellpose_preview(store):
+def cellprofiler_wormsize_intensity_cellpose_preview(store):
     """
     The purpose of this function is to preview the analysis of the selected options from
     the configuration page, including worm size and intensity using CellPose. This function
@@ -461,7 +461,7 @@ def cellprofile_wormsize_intensity_cellpose_preview(store):
         )
 
 
-def cellprofile_mf_celltox_preview(store):
+def cellprofiler_mf_celltox_preview(store):
     """
     The purpose of this function is to preview the analysis of the selected options from
     the configuration page, including motility, fecundity, and celltox. This function
@@ -559,7 +559,7 @@ def cellprofile_mf_celltox_preview(store):
         )
 
 
-def cellprofile_feeding_preview(store):
+def cellprofiler_feeding_preview(store):
     """
     The purpose of this function is to preview the analysis of the selected options from
     the configuration page, including feeding. This function will run wrmXpress and return

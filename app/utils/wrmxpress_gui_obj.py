@@ -6,7 +6,13 @@ import yaml
 import shlex
 import subprocess
 from pathlib import Path
-from app.utils.callback_functions import get_default_value, eval_bool, clean_and_create_directories, copy_files_to_input_directory
+from app.utils.callback_functions import (
+    get_default_value,
+    eval_bool,
+    clean_and_create_directories,
+    copy_files_to_input_directory,
+)
+
 
 # In[2]: WrmXpressGui Class
 class WrmXpressGui:
@@ -38,8 +44,8 @@ class WrmXpressGui:
         python_model_sigma,
         wavelengths_segmentation,
         cellprofiler_pipeline_selection,
-        cellpose_model_cellprofile,
-        wavelengths_cellprofile,
+        cellpose_model_cellprofiler,
+        wavelengths_cellprofiler,
         tracking_diameter,
         tracking_minmass,
         tracking_noisesize,
@@ -81,8 +87,8 @@ class WrmXpressGui:
         self.python_model_sigma = python_model_sigma
         self.wavelengths_segmentation = wavelengths_segmentation
         self.cellprofiler_pipeline_selection = cellprofiler_pipeline_selection
-        self.cellpose_model_cellprofile = cellpose_model_cellprofile
-        self.wavelengths_cellprofile = wavelengths_cellprofile
+        self.cellpose_model_cellprofiler = cellpose_model_cellprofiler
+        self.wavelengths_cellprofiler = wavelengths_cellprofiler
         self.tracking_diameter = tracking_diameter
         self.tracking_minmass = tracking_minmass
         self.tracking_noisesize = tracking_noisesize
@@ -218,9 +224,14 @@ class WrmXpressGui:
                     )
 
     def validate_avi_pipeline_parameters(self):
-        if self.file_structure == "avi" and self.pipeline_selection not in ["motility", "tracking"]:
+        if self.file_structure == "avi" and self.pipeline_selection not in [
+            "motility",
+            "tracking",
+        ]:
             self.error_occurred = True
-            self.error_messages.append("Only motility and tracking pipelines are supported for AVI files.")
+            self.error_messages.append(
+                "Only motility and tracking pipelines are supported for AVI files."
+            )
 
     def validate_imagexpress_mode(self, platename_path):
         if self.file_structure == "imagexpress":
@@ -248,12 +259,16 @@ class WrmXpressGui:
     def validate_static_dx_mode(self):
         if len(self.static_dx) == 1 and not self.static_dx_rescale:
             self.warning_occurred = True
-            self.warning_messages.append("Static DX rescale multiplier is missing, default value (1) will be used.")
+            self.warning_messages.append(
+                "Static DX rescale multiplier is missing, default value (1) will be used."
+            )
 
     def validate_video_dx_mode(self):
         if len(self.video_dx) == 1 and not self.video_dx_rescale:
             self.warning_occurred = True
-            self.warning_messages.append("Video DX rescale multiplier is missing, default value (0.5) will be used.")
+            self.warning_messages.append(
+                "Video DX rescale multiplier is missing, default value (0.5) will be used."
+            )
 
     def validate_avi_mode(self):
         if self.file_structure == "avi":
@@ -294,7 +309,12 @@ class WrmXpressGui:
             elif self.file_structure == "avi":
                 self.validate_avi_mode()
 
-        return self.error_occurred, self.error_messages, self.warning_occurred, self.warning_messages
+        return (
+            self.error_occurred,
+            self.error_messages,
+            self.warning_occurred,
+            self.warning_messages,
+        )
 
     # In[5]: Preparing the yaml file
     def prep_well_instance(self):
@@ -342,9 +362,11 @@ class WrmXpressGui:
     def create_video_dx_dict(self):
         self.video_dx_dict = {
             "run": eval_bool(self.video_dx[0]) if len(self.video_dx) == 1 else False,
-            "format": get_default_value(self.video_dx_format, "avi")
-            if len(self.video_dx) == 1
-            else "avi",
+            "format": (
+                get_default_value(self.video_dx_format, "avi")
+                if len(self.video_dx) == 1
+                else "avi"
+            ),
             "rescale_multiplier": (
                 get_default_value(self.video_dx_rescale, 0.5)
                 if len(self.video_dx) == 1
@@ -359,14 +381,14 @@ class WrmXpressGui:
             self.x_sites = "NA"
             self.y_sites = "NA"
             self.well_selection_list = ["All"]
-            self.multi_well_detection = 'grid'
+            self.multi_well_detection = "grid"
             self.stitch_switch = False
 
     def modify_params_if_multi_well(self):
         if self.imaging_mode == "multi-well":
             self.x_sites = "NA"
             self.y_sites = "NA"
-            self.multi_well_detection = 'grid'
+            self.multi_well_detection = "grid"
             self.stitch_switch = False
 
     def modify_params_if_multi_site(self):
@@ -374,7 +396,7 @@ class WrmXpressGui:
             self.multi_well_row = 1
             self.multi_well_col = 1
             self.well_selection_list = ["All"]
-            self.multi_well_detection = 'grid'
+            self.multi_well_detection = "grid"
             self.stitch_switch = get_default_value(self.stitch_switch, False)
 
     def pre_motility_run_dict(self):
@@ -412,18 +434,23 @@ class WrmXpressGui:
     def prep_cell_profile_dict(self):
         self.cell_profile_dict = {
             "run": False,
-            "wavelengths": ["All"],
+            "cellpose_wavelength": "w1",
             "cellpose_model": "20220830_all",
             "pipeline": "wormsize_intensity_cellpose",
         }
 
-        if self.pipeline_selection == "cellprofile":
-            self.cell_profile_dict.update({
-                'run': True,
-                'wavelengths': [self.wavelengths_cellprofile],
-                'cellpose_model': self.cellpose_model_cellprofile,
-                'pipeline': get_default_value(self.cellprofiler_pipeline_selection, "wormsize_intensity_cellpose"),
-            })
+        if self.pipeline_selection == "cellprofiler":
+            self.cell_profile_dict.update(
+                {
+                    "run": True,
+                    "cellpose_wavelength": self.wavelengths_cellprofiler,
+                    "cellpose_model": self.cellpose_model_cellprofiler,
+                    "pipeline": get_default_value(
+                        self.cellprofiler_pipeline_selection,
+                        "wormsize_intensity_cellpose",
+                    ),
+                }
+            )
 
     def prep_tracking_dict(self):
         self.tracking_dict = {
@@ -437,15 +464,17 @@ class WrmXpressGui:
         }
 
         if self.pipeline_selection == "tracking":
-            self.tracking_dict.update({
-                'run': True,
-                'diameter': get_default_value(self.tracking_diameter, 35),
-                'minmass': get_default_value(self.tracking_minmass, 1200),
-                'noisesize': get_default_value(self.tracking_noisesize, 2),
-                'searchrange': get_default_value(self.tracking_searchrange, 45),
-                'memory': get_default_value(self.tracking_memory, 25),
-                'adaptivestop': get_default_value(self.tracking_adaptivestop, 30),
-            })
+            self.tracking_dict.update(
+                {
+                    "run": True,
+                    "diameter": get_default_value(self.tracking_diameter, 35),
+                    "minmass": get_default_value(self.tracking_minmass, 1200),
+                    "noisesize": get_default_value(self.tracking_noisesize, 2),
+                    "searchrange": get_default_value(self.tracking_searchrange, 45),
+                    "memory": get_default_value(self.tracking_memory, 25),
+                    "adaptivestop": get_default_value(self.tracking_adaptivestop, 30),
+                }
+            )
 
     def prep_segmentation_dict(self):
         # Base dictionary with default values
@@ -459,45 +488,47 @@ class WrmXpressGui:
 
         if self.pipeline_selection == "segmentation":
             update_dict = {
-                'run': True,
-                'model': self.cellpose_model_segmentation,
-                'model_type': self.cellpose_model_type_segmentation,
-                'wavelengths': [self.wavelengths_segmentation],
+                "run": True,
+                "model": self.cellpose_model_segmentation,
+                "model_type": self.cellpose_model_type_segmentation,
+                "wavelengths": [self.wavelengths_segmentation],
             }
 
             if self.cellpose_model_segmentation == "python":
-                update_dict['model_sigma'] = get_default_value(self.python_model_sigma, 0.25)
+                update_dict["model_sigma"] = get_default_value(
+                    self.python_model_sigma, 0.25
+                )
 
             self.segmentation_dict.update(update_dict)
 
     def create_yaml_dict(self):
         yml = {
             "imaging_mode": [self.imaging_mode],
-            'file_structure': [self.file_structure],
-            'well-row': self.well_row,
-            'well-col': self.well_col,
-            'multi-well-row': self.multi_well_row,
-            'multi-well-col': self.multi_well_col,
-            'multi-well-detection': self.multi_well_detection,
-            'x-sites': self.x_sites,
-            'y-sites': self.y_sites,
+            "file_structure": [self.file_structure],
+            "well-row": self.well_row,
+            "well-col": self.well_col,
+            "multi-well-row": self.multi_well_row,
+            "multi-well-col": self.multi_well_col,
+            "multi-well-detection": self.multi_well_detection,
+            "x-sites": self.x_sites,
+            "y-sites": self.y_sites,
             "stitch": self.stitch_switch,
-            'circle_diameter': self.circle_diameter,
-            'square_side': self.square_diameter,
+            "circle_diameter": self.circle_diameter,
+            "square_side": self.square_diameter,
             "pipelines": {
                 "static_dx": self.static_dx_dict,
                 "video_dx": self.video_dx_dict,
                 "optical_flow": self.motility_run_dict,
                 "segmentation": self.segmentation_dict,
-                "cell-profile": self.cell_profile_dict,
-                "tracking": self.tracking_dict
+                "cellprofiler": self.cell_profile_dict,
+                "tracking": self.tracking_dict,
             },
             "wells": self.well_selection_list,
             "directories": {
                 "work": [str(Path(self.mounted_volume, "work"))],
-                "input": [str(Path(self.mounted_volume, 'input'))],
-                "output": [str(Path(self.mounted_volume, 'output'))],
-            }
+                "input": [str(Path(self.mounted_volume, "input"))],
+                "output": [str(Path(self.mounted_volume, "output"))],
+            },
         }
 
         return yml
@@ -523,13 +554,17 @@ class WrmXpressGui:
     # In[6]: Select Diagnostic Image to Preview
 
     def get_motility_image_diagnostic_parameters(self):
-        return {
-            "motility": "motility",
-            "segment": "binary",
-            "blur": "blur",
-            "edge": "edge",
-            "raw": "raw",
-        } if self.pipeline_selection == "motility" else {}
+        return (
+            {
+                "motility": "motility",
+                "segment": "binary",
+                "blur": "blur",
+                "edge": "edge",
+                "raw": "raw",
+            }
+            if self.pipeline_selection == "motility"
+            else {}
+        )
 
     def get_segmentation_image_diagnostic_parameters(self):
         return (
@@ -551,7 +586,7 @@ class WrmXpressGui:
         )
 
     def get_cell_profile_image_diagnostic_parameters(self):
-        if self.pipeline_selection == "cellprofile":
+        if self.pipeline_selection == "cellprofiler":
             pipeline_mapping = {
                 "wormsize_intensity_cellpose": {
                     "raw": "raw",
@@ -570,9 +605,7 @@ class WrmXpressGui:
                 },
             }
 
-            return pipeline_mapping.get(
-                self.cellprofiler_pipeline_selection, {}
-            )
+            return pipeline_mapping.get(self.cellprofiler_pipeline_selection, {})
 
         return {}
 
@@ -630,7 +663,7 @@ class WrmXpressGui:
     # In[7]: Analysis Methods
 
     def preamble_analysis(self, file_structure, first_well=False):
-    
+
         # Prepare paths
         image_directory = Path(self.mounted_volume, self.plate_name)
         input_directory = Path(self.mounted_volume, "input")
@@ -684,7 +717,11 @@ class WrmXpressGui:
 
         def generate_log_file(is_preview=False):
             """Generate the log file path for wrmXpress based on preview flag."""
-            log_file_name = f"{self.plate_name}_preview.log" if is_preview else f"{self.plate_name}.log"
+            log_file_name = (
+                f"{self.plate_name}_preview.log"
+                if is_preview
+                else f"{self.plate_name}.log"
+            )
             return Path(self.mounted_volume, "work", self.plate_name, log_file_name)
 
         # Core logic
@@ -719,7 +756,7 @@ class WrmXpressGui:
 
         with open(preview_yaml_filepath, "w") as f:
             yaml.dump(configure_yaml_file, f)
-            
+
     def run_preview_analysis(self, file_structure):
         # Check if the first well has already been run (implement this logic)
         if self.first_well_already_run():
@@ -762,7 +799,6 @@ class WrmXpressGui:
         return False
 
     # In[8]: Run Analysis
-        
 
     def run_analysis(self, file_structure):
         # Prepare for analysis

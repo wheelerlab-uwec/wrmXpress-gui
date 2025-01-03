@@ -64,19 +64,19 @@ def callback(set_progress, n_clicks, store):
 
             elif pipeline_selection == "wormsize_intensity_cellpose":
 
-                return cellprofile_wormsize_intesity_cellpose_run(store, set_progress)
+                return cellprofiler_wormsize_intesity_cellpose_run(store, set_progress)
 
             elif pipeline_selection == "mf_celltox":
 
-                return cellprofile_mf_celltox_run(store, set_progress)
+                return cellprofiler_mf_celltox_run(store, set_progress)
 
             elif pipeline_selection == "feeding":
 
-                return cellprofile_feeding_run(store, set_progress)
+                return cellprofiler_feeding_run(store, set_progress)
 
             elif pipeline_selection == "wormsize":
 
-                return cellprofile_wormsize_run(store, set_progress)
+                return cellprofiler_wormsize_run(store, set_progress)
 
     except Exception as e:
         # Log the error to your output file or a dedicated log file
@@ -367,7 +367,7 @@ def fecundity_run(store, set_progress):
         )
 
 
-def cellprofile_wormsize_run(store, set_progress):
+def cellprofiler_wormsize_run(store, set_progress):
     """
     The purpose of this function is to run wrmXpress for wormsize and return the figure, open status, and command message.
     """
@@ -455,7 +455,7 @@ def cellprofile_wormsize_run(store, set_progress):
         )
 
 
-def cellprofile_wormsize_intesity_cellpose_run(store, set_progress):
+def cellprofiler_wormsize_intesity_cellpose_run(store, set_progress):
     """
     The purpose of this function is to run wrmXpress for wormsize_intensity_cellpose and return the figure, open status, and command message.
     """
@@ -560,7 +560,7 @@ def cellprofile_wormsize_intesity_cellpose_run(store, set_progress):
         )
 
 
-def cellprofile_mf_celltox_run(store, set_progress):
+def cellprofiler_mf_celltox_run(store, set_progress):
     """
     The purpose of this function is to run wrmXpress for mf_celltox and return the figure, open status, and command message.
     """
@@ -655,7 +655,7 @@ def cellprofile_mf_celltox_run(store, set_progress):
         )
 
 
-def cellprofile_feeding_run(store, set_progress):
+def cellprofiler_feeding_run(store, set_progress):
     """
     The purpose of this function is to run wrmXpress for feeding and return the figure, open status, and command message.
     """

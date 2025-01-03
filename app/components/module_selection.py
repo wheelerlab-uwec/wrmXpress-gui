@@ -36,7 +36,7 @@ module_selection = dbc.AccordionItem(
                                             },
                                             {
                                                 "label": "CellProfiler",
-                                                "value": "cellprofile",
+                                                "value": "cellprofiler",
                                             },
                                             {"label": "Tracking", "value": "tracking"},
                                             # {"label": "Fecundity", "value": "fecundity"},
@@ -474,7 +474,7 @@ module_selection = dbc.AccordionItem(
                                                                 ),
                                                                 dbc.Col(
                                                                     dbc.Select(
-                                                                        id="cellpose-model-cellprofile",
+                                                                        id="cellpose-model-cellprofiler",
                                                                         options=[
                                                                             {
                                                                                 "label": "20220830_all",
@@ -513,7 +513,7 @@ module_selection = dbc.AccordionItem(
                                                                 ),
                                                                 dbc.Col(
                                                                     dbc.Select(
-                                                                        id="wavelengths-cellprofile",
+                                                                        id="wavelengths-cellprofiler",
                                                                         options=[
                                                                             {
                                                                                 "label": "All",
@@ -549,7 +549,7 @@ module_selection = dbc.AccordionItem(
                                                     ]
                                                 ),
                                             ],
-                                            id="cellprofile_params",
+                                            id="cellprofiler_params",
                                             style={"display": "none"},
                                         ),
                                         dbc.Row(  # Tracking parameters for Tracking pipeline

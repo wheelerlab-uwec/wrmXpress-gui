@@ -103,6 +103,7 @@ app.layout = html.Div(
 
 # In[3]: Callbacks
 
+
 @app.callback(
     output=[
         Output("image-analysis-preview", "figure"),
@@ -196,11 +197,11 @@ def background_callback(set_progress, n_clicks, store_data):
             cellprofiler_pipeline_selection=store_data["wrmXpress_gui_obj"][
                 "cellprofiler_pipeline_selection"
             ],
-            cellpose_model_cellprofile=store_data["wrmXpress_gui_obj"][
-                "cellpose_model_cellprofile"
+            cellpose_model_cellprofiler=store_data["wrmXpress_gui_obj"][
+                "cellpose_model_cellprofiler"
             ],
-            wavelengths_cellprofile=store_data["wrmXpress_gui_obj"][
-                "wavelengths_cellprofile"
+            wavelengths_cellprofiler=store_data["wrmXpress_gui_obj"][
+                "wavelengths_cellprofiler"
             ],
             tracking_diameter=store_data["wrmXpress_gui_obj"]["tracking_diameter"],
             tracking_minmass=store_data["wrmXpress_gui_obj"]["tracking_minmass"],
@@ -235,7 +236,7 @@ def background_callback(set_progress, n_clicks, store_data):
             )
 
         if n_clicks:
-                
+
             wrmXpress_gui_obj.analysis_setup("run")
 
         # return callback(set_progress, n_clicks, store)
@@ -273,6 +274,7 @@ def toggle_modal(fetch_click, confirm_click, cancel_click, is_open):
     if confirm_click or cancel_click:
         return False
     return is_open
+
 
 # In[4]: Run the app
 

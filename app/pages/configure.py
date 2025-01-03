@@ -22,6 +22,7 @@ layout = configure_layout
 
 # In[3]: Callbacks
 
+
 @callback(
     [
         Output("multi-well-options-row", "style"),
@@ -42,13 +43,14 @@ layout = configure_layout
     ],
 )
 # appearing selections upon meeting certain critera
-def update_options_visibility(imaging_mode, 
-                              # file_structure,
-                              mask, 
-                              static_dx, 
-                              video_dx, 
-                              cellprofiler_pipeline_selection
-                              ):
+def update_options_visibility(
+    imaging_mode,
+    # file_structure,
+    mask,
+    static_dx,
+    video_dx,
+    cellprofiler_pipeline_selection,
+):
     """
     This function will display the multi-well options and additional options based on the imaging mode and file structure selected.
     """
@@ -95,27 +97,57 @@ def update_options_visibility(imaging_mode,
     )  # return the styles
 
 
-@callback( 
+@callback(
     Output("pipeline-params-header", "style"),
     Output("motility_params", "style"),
     Output("segmentation_params", "style"),
-    Output("cellprofile_params", "style"),
+    Output("cellprofiler_params", "style"),
     Output("tracking_params", "style"),
     Input("pipeline-selection", "value"),
 )
 def update_params_visibility(pipeline):
-    """ This function will display the parameters based on the pipeline selected.
-    """
+    """This function will display the parameters based on the pipeline selected."""
     if pipeline == "motility":
-        return {"display": "flex"}, {"display": "flex"}, {"display": "none"}, {"display": "none"}, {"display": "none"}
+        return (
+            {"display": "flex"},
+            {"display": "flex"},
+            {"display": "none"},
+            {"display": "none"},
+            {"display": "none"},
+        )
     elif pipeline == "segmentation":
-        return {"display": "flex"}, {"display": "none"}, {"display": "flex"}, {"display": "none"}, {"display": "none"}
-    elif pipeline == "cellprofile":
-        return {"display": "flex"}, {"display": "none"}, {"display": "none"}, {"display": "flex"}, {"display": "none"}
+        return (
+            {"display": "flex"},
+            {"display": "none"},
+            {"display": "flex"},
+            {"display": "none"},
+            {"display": "none"},
+        )
+    elif pipeline == "cellprofiler":
+        return (
+            {"display": "flex"},
+            {"display": "none"},
+            {"display": "none"},
+            {"display": "flex"},
+            {"display": "none"},
+        )
     elif pipeline == "tracking":
-        return {"display": "flex"}, {"display": "none"}, {"display": "none"}, {"display": "none"}, {"display": "flex"}
+        return (
+            {"display": "flex"},
+            {"display": "none"},
+            {"display": "none"},
+            {"display": "none"},
+            {"display": "flex"},
+        )
     else:
-        return {"display": "none"}, {"display": "none"}, {"display": "none"}, {"display": "none"}, {"display": "none"}
+        return (
+            {"display": "none"},
+            {"display": "none"},
+            {"display": "none"},
+            {"display": "none"},
+            {"display": "none"},
+        )
+
 
 @callback(
     Output("store", "data"),
@@ -145,8 +177,8 @@ def update_params_visibility(pipeline):
     Input("python-model-sigma", "value"),
     Input("wavelengths-segmentation", "value"),
     Input("cellprofiler-pipeline-selection", "value"),
-    Input("cellpose-model-cellprofile", "value"),
-    Input("wavelengths-cellprofile", "value"),
+    Input("cellpose-model-cellprofiler", "value"),
+    Input("wavelengths-cellprofiler", "value"),
     Input("tracking-diameter", "value"),
     Input("tracking-minmass", "value"),
     Input("tracking-noisesize", "value"),
@@ -190,8 +222,8 @@ def store_values(
     python_model_sigma,
     wavelengths_segmentation,
     cellprofiler_pipeline_selection,
-    cellpose_model_cellprofile,
-    wavelengths_cellprofile,
+    cellpose_model_cellprofiler,
+    wavelengths_cellprofiler,
     tracking_diameter,
     tracking_minmass,
     tracking_noisesize,
@@ -237,8 +269,8 @@ def store_values(
         python_model_sigma,
         wavelengths_segmentation,
         cellprofiler_pipeline_selection,
-        cellpose_model_cellprofile,
-        wavelengths_cellprofile,
+        cellpose_model_cellprofiler,
+        wavelengths_cellprofiler,
         tracking_diameter,
         tracking_minmass,
         tracking_noisesize,
@@ -266,7 +298,7 @@ def store_values(
         "img_mode": imaging_mode,
         "file_structure": file_structure,
         "pipeline_selection": pipeline_selection,
-        "wrmXpress_gui_obj": serialized_obj
+        "wrmXpress_gui_obj": serialized_obj,
     }
 
 
@@ -362,51 +394,79 @@ def save_configuration_upon_clicking_finalize_button(  # function to save the ya
             # create a wrmXpress gui object from the stored data and use the validate method to check for errors
 
             wrmXpress_gui_obj = WrmXpressGui(
-                file_structure = store_data['wrmXpress_gui_obj']['file_structure'],
-                imaging_mode = store_data["wrmXpress_gui_obj"]["imaging_mode"],
-                multi_well_row = store_data["wrmXpress_gui_obj"]["multi_well_row"],
-                multi_well_col = store_data["wrmXpress_gui_obj"]["multi_well_col"],
-                multi_well_detection = store_data["wrmXpress_gui_obj"]["multi_well_detection"],
-                x_sites = store_data["wrmXpress_gui_obj"]["x_sites"],
-                y_sites = store_data["wrmXpress_gui_obj"]["y_sites"],
-                stitch_switch = store_data["wrmXpress_gui_obj"]["stitch_switch"],
-                well_col = store_data["wrmXpress_gui_obj"]["well_col"],
-                well_row = store_data["wrmXpress_gui_obj"]["well_row"],
-                mask = store_data["wrmXpress_gui_obj"]["mask"],
-                mask_diameter = store_data["wrmXpress_gui_obj"]["mask_diameter"],
-                pipeline_selection = store_data["wrmXpress_gui_obj"]["pipeline_selection"],
-                wavelengths = store_data["wrmXpress_gui_obj"]["wavelengths"],
-                pyrscale = store_data["wrmXpress_gui_obj"]["pyrscale"],
-                levels = store_data["wrmXpress_gui_obj"]["levels"],
-                winsize = store_data["wrmXpress_gui_obj"]["winsize"],
-                iterations = store_data["wrmXpress_gui_obj"]["iterations"],
-                poly_n = store_data["wrmXpress_gui_obj"]["poly_n"],
-                poly_sigma = store_data["wrmXpress_gui_obj"]["poly_sigma"],
-                flags = store_data["wrmXpress_gui_obj"]["flags"],
-                cellpose_model_segmentation = store_data["wrmXpress_gui_obj"]["cellpose_model_segmentation"],
-                cellpose_model_type_segmentation = store_data["wrmXpress_gui_obj"]["cellpose_model_type_segmentation"],
-                python_model_sigma = store_data["wrmXpress_gui_obj"]["python_model_sigma"],
-                wavelengths_segmentation = store_data["wrmXpress_gui_obj"]["wavelengths_segmentation"],
-                cellprofiler_pipeline_selection = store_data["wrmXpress_gui_obj"]["cellprofiler_pipeline_selection"],
-                cellpose_model_cellprofile = store_data["wrmXpress_gui_obj"]["cellpose_model_cellprofile"],
-                wavelengths_cellprofile = store_data["wrmXpress_gui_obj"]["wavelengths_cellprofile"],
-                tracking_diameter = store_data["wrmXpress_gui_obj"]["tracking_diameter"],
-                tracking_minmass = store_data["wrmXpress_gui_obj"]["tracking_minmass"],
-                tracking_noisesize = store_data["wrmXpress_gui_obj"]["tracking_noisesize"],
-                tracking_searchrange = store_data["wrmXpress_gui_obj"]["tracking_searchrange"],
-                tracking_memory = store_data["wrmXpress_gui_obj"]["tracking_memory"],
-                tracking_adaptivestop = store_data["wrmXpress_gui_obj"]["tracking_adaptivestop"],
-                static_dx = store_data["wrmXpress_gui_obj"]["static_dx"],
-                static_dx_rescale = store_data["wrmXpress_gui_obj"]["static_dx_rescale"],
-                video_dx = store_data["wrmXpress_gui_obj"]["video_dx"],
-                video_dx_format = store_data["wrmXpress_gui_obj"]["video_dx_format"],
-                video_dx_rescale = store_data["wrmXpress_gui_obj"]["video_dx_rescale"],
-                mounted_volume = store_data["wrmXpress_gui_obj"]["mounted_volume"],
-                plate_name = store_data["wrmXpress_gui_obj"]["plate_name"],
-                well_selection_list = store_data["wrmXpress_gui_obj"]["well_selection_list"]
+                file_structure=store_data["wrmXpress_gui_obj"]["file_structure"],
+                imaging_mode=store_data["wrmXpress_gui_obj"]["imaging_mode"],
+                multi_well_row=store_data["wrmXpress_gui_obj"]["multi_well_row"],
+                multi_well_col=store_data["wrmXpress_gui_obj"]["multi_well_col"],
+                multi_well_detection=store_data["wrmXpress_gui_obj"][
+                    "multi_well_detection"
+                ],
+                x_sites=store_data["wrmXpress_gui_obj"]["x_sites"],
+                y_sites=store_data["wrmXpress_gui_obj"]["y_sites"],
+                stitch_switch=store_data["wrmXpress_gui_obj"]["stitch_switch"],
+                well_col=store_data["wrmXpress_gui_obj"]["well_col"],
+                well_row=store_data["wrmXpress_gui_obj"]["well_row"],
+                mask=store_data["wrmXpress_gui_obj"]["mask"],
+                mask_diameter=store_data["wrmXpress_gui_obj"]["mask_diameter"],
+                pipeline_selection=store_data["wrmXpress_gui_obj"][
+                    "pipeline_selection"
+                ],
+                wavelengths=store_data["wrmXpress_gui_obj"]["wavelengths"],
+                pyrscale=store_data["wrmXpress_gui_obj"]["pyrscale"],
+                levels=store_data["wrmXpress_gui_obj"]["levels"],
+                winsize=store_data["wrmXpress_gui_obj"]["winsize"],
+                iterations=store_data["wrmXpress_gui_obj"]["iterations"],
+                poly_n=store_data["wrmXpress_gui_obj"]["poly_n"],
+                poly_sigma=store_data["wrmXpress_gui_obj"]["poly_sigma"],
+                flags=store_data["wrmXpress_gui_obj"]["flags"],
+                cellpose_model_segmentation=store_data["wrmXpress_gui_obj"][
+                    "cellpose_model_segmentation"
+                ],
+                cellpose_model_type_segmentation=store_data["wrmXpress_gui_obj"][
+                    "cellpose_model_type_segmentation"
+                ],
+                python_model_sigma=store_data["wrmXpress_gui_obj"][
+                    "python_model_sigma"
+                ],
+                wavelengths_segmentation=store_data["wrmXpress_gui_obj"][
+                    "wavelengths_segmentation"
+                ],
+                cellprofiler_pipeline_selection=store_data["wrmXpress_gui_obj"][
+                    "cellprofiler_pipeline_selection"
+                ],
+                cellpose_model_cellprofiler=store_data["wrmXpress_gui_obj"][
+                    "cellpose_model_cellprofiler"
+                ],
+                wavelengths_cellprofiler=store_data["wrmXpress_gui_obj"][
+                    "wavelengths_cellprofiler"
+                ],
+                tracking_diameter=store_data["wrmXpress_gui_obj"]["tracking_diameter"],
+                tracking_minmass=store_data["wrmXpress_gui_obj"]["tracking_minmass"],
+                tracking_noisesize=store_data["wrmXpress_gui_obj"][
+                    "tracking_noisesize"
+                ],
+                tracking_searchrange=store_data["wrmXpress_gui_obj"][
+                    "tracking_searchrange"
+                ],
+                tracking_memory=store_data["wrmXpress_gui_obj"]["tracking_memory"],
+                tracking_adaptivestop=store_data["wrmXpress_gui_obj"][
+                    "tracking_adaptivestop"
+                ],
+                static_dx=store_data["wrmXpress_gui_obj"]["static_dx"],
+                static_dx_rescale=store_data["wrmXpress_gui_obj"]["static_dx_rescale"],
+                video_dx=store_data["wrmXpress_gui_obj"]["video_dx"],
+                video_dx_format=store_data["wrmXpress_gui_obj"]["video_dx_format"],
+                video_dx_rescale=store_data["wrmXpress_gui_obj"]["video_dx_rescale"],
+                mounted_volume=store_data["wrmXpress_gui_obj"]["mounted_volume"],
+                plate_name=store_data["wrmXpress_gui_obj"]["plate_name"],
+                well_selection_list=store_data["wrmXpress_gui_obj"][
+                    "well_selection_list"
+                ],
             )
 
-            error_occured, error_messages, warning_occured, warning_messages = wrmXpress_gui_obj.validate()
+            error_occured, error_messages, warning_occured, warning_messages = (
+                wrmXpress_gui_obj.validate()
+            )
 
             # check to see if there was an error message
             if error_occured == True:
@@ -443,14 +503,17 @@ def save_configuration_upon_clicking_finalize_button(  # function to save the ya
 
         config = wrmXpress_gui_obj.prep_yml()
 
-        output_file = Path(store_data['wrmXpress_gui_obj']['mounted_volume'], store_data['wrmXpress_gui_obj']['plate_name'] + ".yml")
+        output_file = Path(
+            store_data["wrmXpress_gui_obj"]["mounted_volume"],
+            store_data["wrmXpress_gui_obj"]["plate_name"] + ".yml",
+        )
 
         # dump preview data to YAML file
         with open(output_file, "w") as yaml_file:
             yaml.dump(config, yaml_file, default_flow_style=False)
 
         if warning_occured == True:
-            
+
             # add error messages to the initial error messages
             warning_messages = initial_minor_error_messages + warning_messages
 
@@ -509,7 +572,7 @@ def update_figure_based_on_selection(module_initial, cellprofiler_pipeline_selec
             "The tracking pipeline exports tracks as a diagnostic and saves a single value per track as output.",
         )
 
-    elif module_initial == "cellprofile":
+    elif module_initial == "cellprofiler":
         if cellprofiler_pipeline_selection == "wormsize_intensity_cellpose":
             fig = "assets/configure_assets/wormsize_intensity_cellpose/A01/img/20220408-p01-MGC_A01.png"
             return (

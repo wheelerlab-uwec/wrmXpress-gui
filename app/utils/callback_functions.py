@@ -80,13 +80,13 @@ def get_default_value(param, default_value):
     return param if param is not None else default_value
 
 
-def prep_yaml(
-        store_data
-):
+def prep_yaml(store_data):
 
     # Check if wellselection is a list or a string
     if isinstance(store_data["wrmXpress_gui_obj"]["well_selection_list"], list):
-        if len(store_data["wrmXpress_gui_obj"]["well_selection_list"]) == 96:  # If all wells are selected
+        if (
+            len(store_data["wrmXpress_gui_obj"]["well_selection_list"]) == 96
+        ):  # If all wells are selected
             store_data["wrmXpress_gui_obj"]["well_selection_list"] = [
                 "All"
             ]  # Set wellselection to 'All'
@@ -164,8 +164,14 @@ def prep_yaml(
         if len(store_data["wrmXpress_gui_obj"]["video_dx"]) == 0
         else {
             "run": eval_bool(store_data["wrmXpress_gui_obj"]["video_dx"][0]),
-            "format": get_default_value(store_data["wrmXpress_gui_obj"]["video_dx_format"], "avi"),
-            "rescale_multiplier": (store_data["wrmXpress_gui_obj"]["video_dx_rescale"] if store_data["wrmXpress_gui_obj"]["video_dx_rescale"] is not None else 0.5),
+            "format": get_default_value(
+                store_data["wrmXpress_gui_obj"]["video_dx_format"], "avi"
+            ),
+            "rescale_multiplier": (
+                store_data["wrmXpress_gui_obj"]["video_dx_rescale"]
+                if store_data["wrmXpress_gui_obj"]["video_dx_rescale"] is not None
+                else 0.5
+            ),
         }
     )
 
@@ -206,7 +212,11 @@ def prep_yaml(
         }
     )
 
-    if store_data["wrmXpress_gui_obj"]["pipeline_selection"] == "segmentation" and store_data["wrmXpress_gui_obj"]["cellpose_model_type_segmentation"] == 'python':
+    if (
+        store_data["wrmXpress_gui_obj"]["pipeline_selection"] == "segmentation"
+        and store_data["wrmXpress_gui_obj"]["cellpose_model_type_segmentation"]
+        == "python"
+    ):
         segmentation_dict = {
             "run": True,
             "model": get_default_value(
@@ -227,7 +237,7 @@ def prep_yaml(
             ],
         }
 
-    else:        
+    else:
         segmentation_dict = (
             {
                 "run": True,
@@ -239,10 +249,11 @@ def prep_yaml(
                     store_data["wrmXpress_gui_obj"]["cellpose_model_type_segmentation"],
                     "cellpose",
                 ),
-                'sigma': 0.25,
+                "sigma": 0.25,
                 "wavelengths": [
                     get_default_value(
-                        store_data["wrmXpress_gui_obj"]["wavelengths_segmentation"], "All"
+                        store_data["wrmXpress_gui_obj"]["wavelengths_segmentation"],
+                        "All",
                     )
                 ],
             }
@@ -251,7 +262,7 @@ def prep_yaml(
                 "run": False,
                 "model": "20220830_all",
                 "model_type": "cellpose",
-                'sigma': 0.25,
+                "sigma": 0.25,
                 "wavelengths": ["All"],
             }
         )
@@ -260,18 +271,18 @@ def prep_yaml(
         {
             "run": True,
             "cellpose_model": get_default_value(
-                store_data["wrmXpress_gui_obj"]["cellpose_model_cellprofile"],
+                store_data["wrmXpress_gui_obj"]["cellpose_model_cellprofiler"],
                 "20220830_all",
             ),
             "cellpose_wavelength": get_default_value(
-                store_data["wrmXpress_gui_obj"]["wavelengths_cellprofile"], "All"
+                store_data["wrmXpress_gui_obj"]["wavelengths_cellprofiler"], "All"
             ),
             "pipeline": get_default_value(
                 store_data["wrmXpress_gui_obj"]["cellprofiler_pipeline_selection"],
                 "wormsize_intensity_cellpose",
             ),
         }
-        if store_data["wrmXpress_gui_obj"]["pipeline_selection"] == "cellprofile"
+        if store_data["wrmXpress_gui_obj"]["pipeline_selection"] == "cellprofiler"
         else {
             "run": False,
             "cellpose_model": "20220830_all",
@@ -314,23 +325,22 @@ def prep_yaml(
         }
     )
 
-    if store_data["wrmXpress_gui_obj"]["imaging_mode"] == 'single-well':
+    if store_data["wrmXpress_gui_obj"]["imaging_mode"] == "single-well":
         store_data["wrmXpress_gui_obj"]["multi_well_row"] = 1
         store_data["wrmXpress_gui_obj"]["multi_well_col"] = 1
-        store_data["wrmXpress_gui_obj"]["multi_well_detection"] = 'grid'
-        xsites = 'NA'
-        ysites = 'NA'
+        store_data["wrmXpress_gui_obj"]["multi_well_detection"] = "grid"
+        xsites = "NA"
+        ysites = "NA"
         store_data["wrmXpress_gui_obj"]["stitch_switch"] = False
 
-    elif store_data["wrmXpress_gui_obj"]["imaging_mode"] == 'multi-well':
-        store_data["wrmXpress_gui_obj"]["multi_well_detection"] = 'grid'
+    elif store_data["wrmXpress_gui_obj"]["imaging_mode"] == "multi-well":
+        store_data["wrmXpress_gui_obj"]["multi_well_detection"] = "grid"
         store_data["wrmXpress_gui_obj"]["stitch_switch"] = False
-        xsites = 'NA'
-        ysites = 'NA'
+        xsites = "NA"
+        ysites = "NA"
 
-
-    elif store_data["wrmXpress_gui_obj"]["imaging_mode"] == 'multi-site':
-        store_data["wrmXpress_gui_obj"]["multi_well_detection"] = 'grid'
+    elif store_data["wrmXpress_gui_obj"]["imaging_mode"] == "multi-site":
+        store_data["wrmXpress_gui_obj"]["multi_well_detection"] = "grid"
         store_data["wrmXpress_gui_obj"]["multi_well_row"] = 1
         store_data["wrmXpress_gui_obj"]["multi_well_col"] = 1
         store_data["wrmXpress_gui_obj"]["stitch_switch"] = (
@@ -357,13 +367,19 @@ def prep_yaml(
             "optical_flow": motilityrun_dict,
             "segmentation": segmentation_dict,
             "cellprofiler": cellprofiler_dict,
-            "tracking": trackingrun_dict
+            "tracking": trackingrun_dict,
         },
         "wells": store_data["wrmXpress_gui_obj"]["well_selection_list"],
         "directories": {
-            "work": [str(Path(store_data["wrmXpress_gui_obj"]["mounted_volume"], "work"))],
-            "input": [str(Path(store_data["wrmXpress_gui_obj"]["mounted_volume"], "input"))],
-            "output": [str(Path(store_data["wrmXpress_gui_obj"]["mounted_volume"], "output"))],
+            "work": [
+                str(Path(store_data["wrmXpress_gui_obj"]["mounted_volume"], "work"))
+            ],
+            "input": [
+                str(Path(store_data["wrmXpress_gui_obj"]["mounted_volume"], "input"))
+            ],
+            "output": [
+                str(Path(store_data["wrmXpress_gui_obj"]["mounted_volume"], "output"))
+            ],
         },
     }
 
@@ -371,8 +387,7 @@ def prep_yaml(
 
 
 def get_diameters(mask, maskdiameter, circlediameter=None, squarediameter=None):
-    """Get the diameters for the mask type.
-    """
+    """Get the diameters for the mask type."""
     if mask == "circular":
         circlediameter = circlediameter if circlediameter is not None else maskdiameter
         squarediameter = "NA"
@@ -695,7 +710,6 @@ def create_figure_from_url(image_url, scale="gray"):
     return fig
 
 
-
 def zenodo_get_id(selected_plates, file_path):
     # Zenodo record ID (DOI can be used for reference but Zenodo ID is used for fetching)
     zenodo_record_id = "12760651"  # Replace with your Zenodo record ID
@@ -706,7 +720,7 @@ def zenodo_get_id(selected_plates, file_path):
         downloads_path.mkdir(parents=True, exist_ok=True)
     except Exception as e:
         print(f"Error creating Downloads directory: {e}")
-        try: 
+        try:
             downloads_path = Path.home() / "Downloads"
             downloads_path.mkdir(parents=True, exist_ok=True)
         except Exception as e:
