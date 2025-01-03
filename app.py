@@ -239,7 +239,9 @@ def background_callback(set_progress, n_clicks, store_data):
 
             wrmXpress_gui_obj.analysis_setup("run")
 
-        # return callback(set_progress, n_clicks, store)
+            return wrmXpress_gui_obj.run_analysis(set_progress)
+
+            # return callback(set_progress, n_clicks, store_data)
 
     except Exception as e:
         # Log the error to your output file or a dedicated log file
