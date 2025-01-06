@@ -837,7 +837,7 @@ class WrmXpressGui:
         """
         Executes the wrmXpress command as a subprocess and returns its output.
         """
-        print("Running wrmXpress.")
+        print("Running wrmXpress: Preview.")
         docker_output = ["Running wrmXpress."]
         try:
             process = subprocess.Popen(
@@ -845,6 +845,9 @@ class WrmXpressGui:
                 stdout=subprocess.PIPE,
                 stderr=subprocess.STDOUT,
                 text=True,
+                bufsize=1,
+                universal_newlines=True,  
+                env={**os.environ, 'PYTHONUNBUFFERED': '1'}  
             )
             stdout, _ = process.communicate()
             docker_output.append(stdout)
@@ -914,12 +917,17 @@ class WrmXpressGui:
         """
         Executes the wrmXpress command as a subprocess and prints its output to the terminal in real-time.
         """
-        print("Running wrmXpress.")
+        print("Running wrmXpress: Run.")
         docker_output = ["Running wrmXpress."]
 
         # Use subprocess.Popen to execute the command and capture the output line-by-line
         process = subprocess.Popen(
-            command_split, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True
+            command_split,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            text=True, bufsize=1,
+            universal_newlines=True,  
+            env={**os.environ, 'PYTHONUNBUFFERED': '1'}  
         )
 
         # Read and print the output line-by-line

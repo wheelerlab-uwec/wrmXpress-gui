@@ -236,11 +236,11 @@ def background_callback(set_progress, n_clicks, store_data):
             )
 
         if n_clicks:
-            # print("Preparing to run analysis")
-            # wrmXpress_gui_obj.setup_run_analysis(store_data["file_structure"])
-            # print("Running analysis")
-            # wrmXpress_gui_obj.run_analysis(set_progress)
-            return callback(set_progress, n_clicks, store_data)
+            print("Preparing to run analysis")
+            wrmXpress_gui_obj.setup_run_analysis(store_data["file_structure"])
+            print("Running analysis")
+            wrmXpress_gui_obj.run_analysis(set_progress)
+            # return callback(set_progress, n_clicks, store_data)
 
     except Exception as e:
         error_message = f"An error occurred: {str(e)}"
