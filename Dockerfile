@@ -25,19 +25,22 @@ RUN micromamba install -y -n base -f /tmp/env.yml && \
 
 ARG MAMBA_DOCKERFILE_ACTIVATE=1  
 
-# clone wrmxpress
-# ARG CACHEBUST=1
-# RUN echo ${CACHEBUST} && git clone --branch v2dev https://github.com/zamanianlab/wrmXpress.git
-COPY wrmXpress/ /wrmXpress/
+# clone wrmxpress and GUI
+ARG CACHEBUST=1
+RUN echo ${CACHEBUST} && cd /root/ && git clone --branch v2dev_gui https://github.com/zamanianlab/wrmXpress.git
+RUN echo ${CACHEBUST} && cd /root/ && git clone --branch v2dev_merge https://github.com/wheelerlab-uwec/wrmXpress-gui.git
+
+
+# COPY wrmXpress/ /wrmXpress/
 
 # copy gui files
-RUN mkdir app
-RUN mkdir assets
-COPY app/ app/
-COPY app.py .
-COPY assets/ assets/
+# RUN mkdir app
+# RUN mkdir assets
+# COPY app/ app/
+# COPY app.py .
+# COPY assets/ assets/
 
 EXPOSE 9000
 
 # The code to run when container is started:
-ENTRYPOINT ["/usr/local/bin/_entrypoint.sh", "python", "app.py"]
+ENTRYPOINT ["/usr/local/bin/_entrypoint.sh", "/bin/bash", "-c", "while true; do sleep 30; done"]
