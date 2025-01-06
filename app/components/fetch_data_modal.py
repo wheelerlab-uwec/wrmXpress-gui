@@ -5,7 +5,7 @@
 ########################################################################
 
 import dash_bootstrap_components as dbc
-from dash import callback, html
+from dash import callback, html, dcc
 from dash.dependencies import Input, Output
 
 from app.utils.callback_functions import zenodo_get_id
@@ -145,35 +145,9 @@ fetch_data_modal = dbc.Modal(
                     ]
                 ),
                 html.Br(),
-                html.H6("File Path to Save Fetch Examples:"),
                 dbc.Row(
-                    [
-                        dbc.Col(
-                            [
-                                html.I(
-                                    className="fa-solid fa-circle-info",  # Information symbol
-                                    id="file-path-to-save-fetch-examples-symbol",
-                                ),
-                                dbc.Tooltip(
-                                    "The data will be saved to your Downloads folder.",
-                                    target="file-path-to-save-fetch-examples-symbol",
-                                    placement="right",
-                                ),
-                            ],
-                            width=1,
-                        ),
-                        dbc.Col([
-                            dbc.Input(
-                                type="text",  # Text input
-                                id="file-path-to-save-fetch-examples",  # Input ID
-                                value="~/Downloads",  # Default value
-                                disabled=False,  # Make input field read-only
-                            ),
-                        ], width=5),
-
-                    ],
+                    [dbc.Col(dcc.Markdown("Data will be saved to `/home/downloads/`"))],
                 ),
-                html.Br(),
                 dbc.Row(
                     [
                         dbc.Alert(
@@ -257,14 +231,13 @@ def update_file_size_alert(value):
     ),  # Optionally update the link text or other outputs
     Input("confirm-fetch", "n_clicks"),  # Listen for Yes button click
     Input("overwrite-checklist", "value"),  # Listen for checklist value
-    Input("file-path-to-save-fetch-examples", "value"),  # Listen for file path value
     prevent_initial_call=True,
 )
-def fetch_data(confirm_click, value, file_path):
+def fetch_data(confirm_click, value):
     if confirm_click:
         # Only download files that are selected
         try:
-            result = zenodo_get_id(value, file_path)
+            result = zenodo_get_id(value)
             return result
                 
         except Exception as e:
