@@ -743,7 +743,7 @@ class WrmXpressGui:
         def generate_command(is_preview=False):
             """Generate the command split for wrmXpress based on preview flag."""
             file_prefix = f".{self.plate_name}" if is_preview else self.plate_name
-            command = f"python wrmXpress/wrapper.py {self.mounted_volume}{file_prefix}.yml {self.plate_name}"
+            command = f"python /root/wrmXpress/wrapper.py {self.mounted_volume}{file_prefix}.yml {self.plate_name}"
             return shlex.split(command)
 
         def generate_log_file(is_preview=False):
@@ -757,7 +757,7 @@ class WrmXpressGui:
 
         # Core logic
         self.command_message = (
-            f"```python wrmXpress/wrapper.py {self.plate_name}.yml {self.plate_name}```"
+            f"```python /root/wrmXpress/wrapper.py {self.plate_name}.yml {self.plate_name}```"
         )
         self.wrmxpress_preview_command_split = generate_command(is_preview=True)
         self.wrmxpress_command_split = generate_command()

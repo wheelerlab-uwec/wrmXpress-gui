@@ -111,10 +111,10 @@ def preamble_preview_imgxpress_selection(store):
     )
 
     # Command message
-    command_message = f"```python wrmXpress/wrapper.py {platename}.yml {platename}```"
+    command_message = f"```python /root/wrmXpress/wrapper.py {platename}.yml {platename}```"
 
     wrmxpress_command = (
-        f"python wrmXpress/wrapper.py {volume}/.{platename}.yml {platename}"
+        f"python /root/wrmXpress/wrapper.py {volume}/.{platename}.yml {platename}"
     )
     wrmxpress_command_split = shlex.split(wrmxpress_command)
     output_preview_log_file = Path(
@@ -174,10 +174,10 @@ def preamble_preview_avi_selection(store):
     )
 
     # Command message
-    command_message = f"```python wrmXpress/wrapper.py {platename}.yml {platename}```"
+    command_message = f"```python /root/wrmXpress/wrapper.py {platename}.yml {platename}```"
 
     wrmxpress_command = (
-        f"python wrmXpress/wrapper.py {volume}/.{platename}.yml {platename}"
+        f"python /root/wrmXpress/wrapper.py {volume}/.{platename}.yml {platename}"
     )
     wrmxpress_command_split = shlex.split(wrmxpress_command)
     output_preview_log_file = Path(
