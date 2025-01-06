@@ -410,7 +410,7 @@ def run_analysis(
             tracking_noisesize=store_data["wrmXpress_gui_obj"]["tracking_noisesize"],
             tracking_searchrange=store_data["wrmXpress_gui_obj"][
                 "tracking_searchrange"
-            ],
+            ], 
             tracking_memory=store_data["wrmXpress_gui_obj"]["tracking_memory"],
             tracking_adaptivestop=store_data["wrmXpress_gui_obj"][
                 "tracking_adaptivestop"
@@ -426,8 +426,8 @@ def run_analysis(
         )
         
         error_occured, error_message, _, _ = wrmXpress_gui_obj.validate()
-        print('error_occured', error_message)
         if error_occured:
+            print('error_occured', error_message)
             return (
                 "",
                 {},
