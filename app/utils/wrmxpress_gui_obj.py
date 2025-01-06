@@ -188,7 +188,7 @@ class WrmXpressGui:
             self.error_occurred = True
             self.error_messages.append("No pipeline selected.")
 
-        if self.pipeline_selection == "motility":
+        if  "motility" in self.pipeline_selection:
             defaults = {
                 "pyrscale": 0.5,
                 "levels": 5,
@@ -204,13 +204,13 @@ class WrmXpressGui:
                         f"{param} is missing. Default value ({default}) will be used."
                     )
 
-        if self.pipeline_selection == "segmentation" and self.cellpose_model_cellprofiler == "python" and not self.python_model_sigma:
+        if  "segmentation" in self.pipeline_selection and self.cellpose_model_cellprofiler == "python" and not self.python_model_sigma:
             self.warning_occurred = True
             self.warning_messages.append(
                 "Python model sigma is missing. Default value (0.25) will be used."
             )
 
-        if self.pipeline_selection == "tracking":
+        if  "tracking" in self.pipeline_selection:
             defaults = {
                 "tracking_diameter": 35,
                 "tracking_minmass": 1200,
@@ -325,7 +325,7 @@ class WrmXpressGui:
         if isinstance(self.well_selection_list, str):
             self.well_selection_list = [self.well_selection_list]
 
-        elif isinstance(self.well_selection_list, list):
+        elif isinstance(self.well_selection_list, list) and len(self.well_selection_list) == 96:
             self.well_selection_list = self.well_selection_list
 
         # if length of well selection is 96, then change to "All"
@@ -421,7 +421,7 @@ class WrmXpressGui:
         }
 
         # Update dictionary if pipeline_selection is "motility"
-        if self.pipeline_selection == "motility":
+        if "motility" in self.pipeline_selection:
             self.motility_run_dict.update(
                 {
                     "run": True,
@@ -444,7 +444,7 @@ class WrmXpressGui:
             "cellpose_model": "20220830_all",
             "pipeline": "wormsize_intensity_cellpose",
         }
-        if self.pipeline_selection == "cellprofiler":
+        if "cellprofiler" in self.pipeline_selection:
             self.cell_profile_dict.update(
                 {
                     "run": True,
@@ -468,7 +468,7 @@ class WrmXpressGui:
             "adaptivestop": 30,
         }
 
-        if self.pipeline_selection == "tracking":
+        if "tracking" in self.pipeline_selection:
             self.tracking_dict.update(
                 {
                     "run": True,
@@ -491,7 +491,7 @@ class WrmXpressGui:
             "wavelengths": ["All"],
         }
 
-        if self.pipeline_selection == "segmentation":
+        if  "segmentation" in self.pipeline_selection:
             update_dict = {
                 "run": True,
                 "model": self.cellpose_model_segmentation,
@@ -506,7 +506,7 @@ class WrmXpressGui:
 
             self.segmentation_dict.update(update_dict)
 
-    def create_yaml_dict(self):
+    def create_yaml_dict(self): 
         yml = {
             "imaging_mode": [self.imaging_mode],
             "file_structure": [self.file_structure],
@@ -564,7 +564,7 @@ class WrmXpressGui:
                 "motility": "optical_flow",
                 "raw": "raw",
             }
-            if self.pipeline_selection == "motility"
+            if  "motility" in self.pipeline_selection
             else {}
         )
 
@@ -574,19 +574,19 @@ class WrmXpressGui:
                 "segmentation": "segmentation",
                 "raw": "raw",
             }
-            if self.pipeline_selection == "segmentation"
+            if  "segmentation" in self.pipeline_selection
             else {}
         )
 
     def get_tracking_image_diagnostic_parameters(self):
         return (
             {"tracks": "tracks", "raw": "raw"}
-            if self.pipeline_selection == "tracking"
+            if "tracking" in self.pipeline_selection
             else {}
         )
 
     def get_cell_profile_image_diagnostic_parameters(self):
-        if self.pipeline_selection == "cellprofiler":
+        if "cellprofiler" in self.pipeline_selection:
             pipeline_mapping = {
                 "wormsize_intensity_cellpose": {
                     "raw": "raw",
@@ -731,66 +731,6 @@ class WrmXpressGui:
             else:
                 output_path.mkdir(parents=True, exist_ok=True)
 
-    def copy_files_to_input_directory(
-        self,
-        platename_input_dir,
-        htd_file,
-        img_dir,
-        plate_base,
-        wells,
-        platename,
-        file_types=None,
-    ):
-        """
-        Copies the input files to the specified input directory based on wells and file types.
-        """
-        # Default file types
-        if file_types is None:
-            file_types = [".tif", ".tiff", ".jpg", ".jpeg", ".png", ".bmp", ".avi"]
-
-        # Ensure wells is a list
-        wells = wells if isinstance(wells, list) else [wells]
-
-        # Copy the HTD file to the input directory if provided
-        if htd_file:
-            try:
-                shutil.copy(htd_file, platename_input_dir)
-            except Exception as e:
-                print(f"Failed to copy HTD file {htd_file}: {e}")
-                return
-
-        try:
-            # Get time points if HTD file exists, otherwise use a single directory
-            time_points = (
-                [item for item in Path(img_dir).iterdir() if item.is_dir()]
-                if htd_file
-                else [None]
-            )
-
-            # Iterate over time points, wells, and file types to copy files
-            for time_point in time_points:
-                for well in wells:
-                    for file_type in file_types:
-                        pattern = (
-                            f"{plate_base}_{well}*" if htd_file else f"{platename}_{well}*"
-                        )
-                        search_dir = (
-                            Path(img_dir, time_point) if time_point else Path(img_dir)
-                        )
-                        search_pattern = str(search_dir / f"{pattern}{file_type}")
-
-                        # Find matching files and copy them to the destination
-                        for file_path in glob.glob(search_pattern):
-                            dest_dir = (
-                                Path(platename_input_dir, time_point)
-                                if time_point
-                                else Path(platename_input_dir)
-                            )
-                            dest_dir.mkdir(parents=True, exist_ok=True)
-                            shutil.copy(file_path, dest_dir)
-        except Exception as e:
-            print(f"Error copying files to input directory: {e}")
-
     def analysis_setup(self, type_of_analysis):
         if type_of_analysis == "preview":
             self.run_preview_analysis(file_structure=self.file_structure)
@@ -827,8 +767,9 @@ class WrmXpressGui:
     # In[8]: Preview Analysis Methods
 
     def get_first_well(self):
-        
-        if len(self.well_selection_list) == 1:
+
+        if len(self.well_selection_list) == 1 and self.well_selection_list[0] != "All":
+            print("First well is not All")
             first_well = self.well_selection_list
         elif self.well_selection_list == ["All"]:
             first_well = "A01"
@@ -862,7 +803,6 @@ class WrmXpressGui:
             if self.first_well_already_run():
                 self._load_preview_image()
                 return
-
             # Prepare necessary files and commands for analysis
             self.prepare_preview_yaml()
             self.preamble_analysis(file_structure, first_well=True)
@@ -923,38 +863,38 @@ class WrmXpressGui:
         Checks if the first well has already been processed and a preview image exists.
         Returns True if the image is found, otherwise False.
         """
-        if self.pipeline_selection == "motility":
-            pipeline = "optical_flow"
+        pipeline = []
+        if  "motility" in self.pipeline_selection:
+            pipeline.append("optical_flow")
 
-        elif self.pipeline_selection == "segmentation":
-            pipeline = "segmentation"
+        if "segmentation" in self.pipeline_selection:
+            pipeline.append("segmentation")
 
-        elif self.pipeline_selection == "tracking":
-            pipeline = "tracking"
+        elif  "tracking" in self.pipeline_selection:
+            pipeline.append("tracking")
 
-        elif self.pipeline_selection == "cellprofiler":
-            pipeline = "cell-profile"
+        elif  "cellprofiler" in self.pipeline_selection:
+            pipeline.append("cellprofiler")
 
-        pipeline = Path(self.mounted_volume, "work", f"{pipeline}")
-        if not pipeline.exists():
-            return False
+        # pipeline = Path(self.mounted_volume, "work", f"{pipeline}")
+        # get a list of the different pipeline paths in work directory
+        pipeline = [Path(self.mounted_volume, "work", f"{pipeline}") for pipeline in pipeline]
 
         first_well = self.get_first_well()
         png_file_pattern = f"*{first_well}*.png"
+        for pipe in pipeline:
+            try:
 
-        try:
-            # search for the first matching .png file in the directory 
-            # self.mounted_volume/work/{pipeline}/*{first_well}*.png
+                # Search for the first matching .png file
+                first_well_image = next(pipe.glob(png_file_pattern), None)
 
-            # Search for the first matching .png file
-            first_well_image = next(pipeline.glob(png_file_pattern), None)
+                if first_well_image:
+                    self.preview_first_well_image_filepath = first_well_image
+                    return True
+            except Exception as e:
+                print(f"Error checking for first well: {e}")
 
-            if first_well_image:
-                self.preview_first_well_image_filepath = first_well_image
-                return True
-        except Exception as e:
-            print(f"Error checking for first well: {e}")
-
+            return False
         return False
 
     # In[8]: Run Analysis
