@@ -1,4 +1,4 @@
-name: wrmxpress_v2
+name: base
 channels:
   - conda-forge
   - bioconda

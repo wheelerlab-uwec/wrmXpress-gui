@@ -1,5 +1,6 @@
 # Use the official micromamba base image
-FROM --platform=linux/amd64 mambaorg/micromamba:jammy
+# build with docker build --platform=linux/amd64
+FROM mambaorg/micromamba:jammy
 
 # install mysql server and java
 USER 0
@@ -19,14 +20,15 @@ COPY --chown=$MAMBA_USER:$MAMBA_USER mm_wrmxpress_gui.yml /tmp/env.yml
 RUN micromamba config set extract_threads 1
 
 # install dependencies
-RUN micromamba install --yes --file /tmp/env.yml && \
+RUN micromamba install -y -n base -f /tmp/env.yml && \
     micromamba clean --all --yes
 
 ARG MAMBA_DOCKERFILE_ACTIVATE=1  
 
 # clone wrmxpress
-ARG CACHEBUST=1
-RUN echo ${CACHEBUST} && git clone --branch gui-backend https://github.com/zamanianlab/wrmXpress.git
+# ARG CACHEBUST=1
+# RUN echo ${CACHEBUST} && git clone --branch v2dev https://github.com/zamanianlab/wrmXpress.git
+COPY wrmXpress/ /wrmXpress/
 
 # copy gui files
 RUN mkdir app
