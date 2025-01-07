@@ -27,7 +27,7 @@ ARG MAMBA_DOCKERFILE_ACTIVATE=1
 
 # clone wrmxpress and GUI
 ARG CACHEBUST=1
-RUN echo ${CACHEBUST} && cd /root/ && git clone --branch v2dev_gui https://github.com/zamanianlab/wrmXpress.git
+RUN echo ${CACHEBUST} && cd /root/ && git clone --branch v2.0 https://github.com/zamanianlab/wrmXpress.git
 RUN echo ${CACHEBUST} && cd /root/ && git clone --branch v2dev_merge https://github.com/wheelerlab-uwec/wrmXpress-gui.git
 
 
