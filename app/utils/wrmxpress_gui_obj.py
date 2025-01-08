@@ -743,7 +743,7 @@ class WrmXpressGui:
         def generate_command(is_preview=False):
             """Generate the command split for wrmXpress based on preview flag."""
             file_prefix = f".{self.plate_name}" if is_preview else self.plate_name
-            command = f"python wrmXpress/wrapper.py {self.mounted_volume}{file_prefix}.yml {self.plate_name}"
+            command = f"python /root/wrmXpress/wrapper.py {self.mounted_volume}{file_prefix}.yml {self.plate_name}"
             return shlex.split(command)
 
         def generate_log_file(is_preview=False):
@@ -757,7 +757,7 @@ class WrmXpressGui:
 
         # Core logic
         self.command_message = (
-            f"```python wrmXpress/wrapper.py {self.plate_name}.yml {self.plate_name}```"
+            f"```python /root/wrmXpress/wrapper.py {self.plate_name}.yml {self.plate_name}```"
         )
         self.wrmxpress_preview_command_split = generate_command(is_preview=True)
         self.wrmxpress_command_split = generate_command()
@@ -841,7 +841,7 @@ class WrmXpressGui:
         """
         Executes the wrmXpress command as a subprocess and returns its output.
         """
-        print("Running wrmXpress.")
+        print("Running wrmXpress: Preview.")
         docker_output = ["Running wrmXpress."]
         try:
             process = subprocess.Popen(
@@ -849,6 +849,9 @@ class WrmXpressGui:
                 stdout=subprocess.PIPE,
                 stderr=subprocess.STDOUT,
                 text=True,
+                bufsize=1,
+                universal_newlines=True,  
+                env={**os.environ, 'PYTHONUNBUFFERED': '1'}  
             )
             stdout, _ = process.communicate()
             docker_output.append(stdout)
@@ -918,12 +921,17 @@ class WrmXpressGui:
         """
         Executes the wrmXpress command as a subprocess and prints its output to the terminal in real-time.
         """
-        print("Running wrmXpress.")
+        print("Running wrmXpress: Run.")
         docker_output = ["Running wrmXpress."]
 
         # Use subprocess.Popen to execute the command and capture the output line-by-line
         process = subprocess.Popen(
-            command_split, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True
+            command_split,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            text=True, bufsize=1,
+            universal_newlines=True,  
+            env={**os.environ, 'PYTHONUNBUFFERED': '1'}  
         )
 
         # Read and print the output line-by-line

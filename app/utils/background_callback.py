@@ -139,10 +139,10 @@ def preamble_run_wrmXpress_avi_selection(store):
     )
 
     # Command message
-    command_message = f"```python wrmXpress/wrapper.py {platename}.yml {platename}```"
+    command_message = f"```python /root/wrmXpress/wrapper.py {platename}.yml {platename}```"
 
     wrmxpress_command = (
-        f"python -u wrmXpress/wrapper.py {volume}/{platename}.yml {platename}"
+        f"python -u /root/wrmXpress/wrapper.py {volume}/{platename}.yml {platename}"
     )
     wrmxpress_command_split = shlex.split(wrmxpress_command)
     output_folder = Path(volume, "work", platename)
@@ -205,10 +205,10 @@ def preamble_run_wrmXpress_imagexpress_selection(store):
         platename=platename,
     )
     # Command message
-    command_message = f"```python wrmXpress/wrapper.py {platename}.yml {platename}```"
+    command_message = f"```python /root/wrmXpress/wrapper.py {platename}.yml {platename}```"
 
     wrmxpress_command = (
-        f"python -u wrmXpress/wrapper.py {volume}/{platename}.yml {platename}"
+        f"python -u /root/wrmXpress/wrapper.py {volume}/{platename}.yml {platename}"
     )
     wrmxpress_command_split = shlex.split(wrmxpress_command)
     output_folder = Path(volume, "work", platename)

@@ -538,22 +538,12 @@ def update_yaml_file(input_full_yaml, output_full_yaml, updates):
         yaml.dump(data, yaml_file, default_flow_style=False)
 
 
-def zenodo_get_id(selected_plates, file_path):
+def zenodo_get_id(selected_plates):
     # Zenodo record ID (DOI can be used for reference but Zenodo ID is used for fetching)
     zenodo_record_id = "12760651"  # Replace with your Zenodo record ID
 
-    # Determine the Downloads directory path
-    try:
-        downloads_path = Path(file_path)
-        downloads_path.mkdir(parents=True, exist_ok=True)
-    except Exception as e:
-        print(f"Error creating Downloads directory: {e}")
-        try:
-            downloads_path = Path.home() / "Downloads"
-            downloads_path.mkdir(parents=True, exist_ok=True)
-        except Exception as e:
-            print(f"Error creating Downloads directory: {e}")
-            return "Error creating Downloads directory"
+    downloads_path = Path("/home/", "downloads")
+    downloads_path.mkdir(parents=True, exist_ok=True)
 
     # Change the working directory to Downloads
     os.chdir(downloads_path)

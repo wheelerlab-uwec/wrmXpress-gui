@@ -1,5 +1,6 @@
 cache/
 wrmXpress/ 
+.gitconfig
 
 # IDE settings
 .vs
