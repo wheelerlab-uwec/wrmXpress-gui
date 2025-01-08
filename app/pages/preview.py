@@ -425,8 +425,8 @@ def run_analysis(
             well_selection_list=store_data["wrmXpress_gui_obj"]["well_selection_list"],
         )
         
-        error_occured, error_message, _, _ = wrmXpress_gui_obj.validate()
-        print('error_occured', error_message)
+        error_occured, _, _, _ = wrmXpress_gui_obj.validate()
+        
         if error_occured:
             return (
                 "",
