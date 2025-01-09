@@ -827,10 +827,6 @@ class WrmXpressGui:
         """
         Loads the preview image for the first well and creates a figure.
         """
-<<<<<<< Updated upstream
-=======
-        print(f"Loading preview image from: {self.preview_first_well_image_filepath}")
->>>>>>> Stashed changes
         fig = create_figure_from_filepath(self.preview_first_well_image_filepath)
         self.preview_first_well_figure = fig
         self.formatted_preview_first_well_path = (
