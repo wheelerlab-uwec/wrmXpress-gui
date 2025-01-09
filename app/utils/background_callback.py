@@ -1,8 +1,4 @@
-########################################################################
-####                                                                ####
-####                        Imports                                 ####
-####                                                                ####
-########################################################################
+# In[1]: Imports
 
 import pandas as pd
 from pathlib import Path
@@ -19,14 +15,10 @@ from app.utils.callback_functions import (
     create_figure_from_filepath,
 )
 
-########################################################################
-####                                                                ####
-####                       Function                                 ####
-####                                                                ####
-########################################################################
+# In[2]: Main Callback Function
 
 
-def callback(set_progress, n_clicks, store):
+def callback(set_progress, store):
     """
     This function is used for the callback function in the app.py file. The
     purpose of this function is to run the wrmXpress pipeline based on the
@@ -49,40 +41,36 @@ def callback(set_progress, n_clicks, store):
         pipeline_selection = store["wrmXpress_gui_obj"]["pipeline_selection"]
 
         # Check if the submit button has been clicked
-        if n_clicks:
-            if pipeline_selection == "tracking":
+        
+        # TODO: What if multiple pipelines are selected?
+        
+        if "motility" in pipeline_selection:
+            return motility_or_segment_run(store, set_progress)
+        
+        # TODO: lets get motility working first
 
-                return tracking_wrmXpress_run(store, set_progress)
+        elif "tracking" in pipeline_selection:
+            return tracking_wrmXpress_run(store, set_progress)
+        
+        elif "segmentation" in pipeline_selection:
+            return fecundity_run(store, set_progress)
+        
+        elif "cellprofiler" in pipeline_selection:
+            cell_profile_pipeline = store["wrmXpress_gui_obj"][
+                "cellprofiler_pipeline_selection"
+            ]
 
-            elif pipeline_selection == "motility":
-
-                return motility_or_segment_run(store, set_progress)
-
-            elif pipeline_selection == "segmentation":
-
-                return fecundity_run(store, set_progress)
-
-            elif pipeline_selection == "cellprofiler":
-
-                cell_profile_pipeline = store["wrmXpress_gui_obj"][
-                    "cellprofiler_pipeline_selection"
-                ]
-
-                if cell_profile_pipeline == "wormsize_intensity_cellpose":
-
-                    return cellprofiler_wormsize_intesity_cellpose_run(store, set_progress)
-
-                elif cell_profile_pipeline == "mf_celltox":
-
-                    return cellprofiler_mf_celltox_run(store, set_progress)
-
-                elif cell_profile_pipeline == "feeding":
-
-                    return cellprofiler_feeding_run(store, set_progress)
-
-                elif cell_profile_pipeline == "wormsize":
-
-                    return cellprofiler_wormsize_run(store, set_progress)
+            if cell_profile_pipeline == "wormsize_intensity_cellpose":
+                return cellprofiler_wormsize_intesity_cellpose_run(store, set_progress)
+            
+            elif cell_profile_pipeline == "mf_celltox":
+                return cellprofiler_mf_celltox_run(store, set_progress)
+            
+            elif cell_profile_pipeline == "feeding":
+                return cellprofiler_feeding_run(store, set_progress)
+            
+            elif cell_profile_pipeline == "wormsize":
+                return cellprofiler_wormsize_run(store, set_progress)
 
     except Exception as e:
         # Log the error to your output file or a dedicated log file
@@ -98,13 +86,7 @@ def callback(set_progress, n_clicks, store):
             None,
         )
 
-
-########################################################################
-####                                                                ####
-####                       app.py functions                         ####
-####                                                                ####
-########################################################################
-
+# In[3]: Helper Functions
 
 def preamble_run_wrmXpress_avi_selection(store):
     """

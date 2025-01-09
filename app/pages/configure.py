@@ -22,6 +22,24 @@ layout = configure_layout
 
 # In[3]: Callbacks
 
+@callback(
+        Output("motility-hr", "style"),
+        Output("segmentation-hr", "style"),
+        Input("pipeline-selection", "value"),
+)
+def update_hr_visibility(pipeline_selection):
+    """
+    Update the visibility of the horizontal rules based on the selected pipeline(s).
+    """
+    motility_hr_style = {"display": "none"}
+    segmentation_hr_style = {"display": "none"}
+
+    if "motility" in pipeline_selection and len(pipeline_selection) > 1:
+        motility_hr_style = {"display": "flex"}
+    if "segmentation" in pipeline_selection and "tracking" in pipeline_selection:
+        segmentation_hr_style = {"display": "flex"}
+
+    return motility_hr_style, segmentation_hr_style
 
 @callback(
     Output("pipeline-selection", "value"),

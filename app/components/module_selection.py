@@ -1,17 +1,9 @@
-########################################################################
-####                                                                ####
-####                             Imports                            ####
-####                                                                ####
-########################################################################
+# In[1]: Imports
 
 import dash_bootstrap_components as dbc
 from dash import html
 
-########################################################################
-####                                                                ####
-####                              Layout                            ####
-####                                                                ####
-########################################################################
+# In[2]: Module Selection
 
 module_selection = dbc.AccordionItem(
     dbc.Container(
@@ -301,7 +293,8 @@ module_selection = dbc.AccordionItem(
                                                     ],
                                                     style={"textAlign": "center"},
                                                 ),
-                                                html.Hr(),
+                                                html.Hr(id = "motility-hr",
+                                                        style = {"display": "none"}),
                                             ],
                                             id="motility_params",
                                             style={"display": "none"},
@@ -473,7 +466,7 @@ module_selection = dbc.AccordionItem(
                                                     ],
                                                     style={"textAlign": "center"},
                                                 ),
-                                                html.Hr(),
+                                                html.Hr(id = "segmentation-hr", style={"display": "none"}),
                                             ],
                                             id="segmentation_params",
                                             style={"display": "none"},
