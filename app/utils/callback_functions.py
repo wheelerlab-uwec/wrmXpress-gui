@@ -480,33 +480,70 @@ def copy_files_to_input_directory(
         print(f"Error copying files to input directory: {e}")
 
 
-def create_figure_from_filepath(img_path, scale="gray"):
+from PIL import Image
+import numpy as np
+import tifffile as tiff
+from skimage import exposure
+import plotly.express as px
+import cv2
+import imageio
+
+
+def create_figure_from_filepath(img_path, scale="gray", max_pixels=178956970):
     """
     This function creates a figure from the input file path.
+    If the image size exceeds `max_pixels`, it is resized.
     """
 
+    img = None
+
+    # Try opening the image with PIL
     try:
-        # Attempt to open with PIL first
         img = np.array(Image.open(img_path))
     except Exception as e:
-        print(f"Error opening {img_path} with PIL, trying with tifffile: {e}")
+        print(f"Error opening {img_path} with PIL: {e}")
+
+    # Try opening with OpenCV if PIL fails
+    if img is None:
+        try:
+            img = cv2.imread(str(img_path), cv2.IMREAD_UNCHANGED)  # Read image as-is
+            if img is not None:
+                img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)  # Convert BGR to RGB
+        except Exception as e:
+            print(f"Error opening {img_path} with OpenCV: {e}")
+
+    # Try opening with imageio if OpenCV fails
+    if img is None:
+        try:
+            img = np.array(imageio.imread(img_path))
+        except Exception as e:
+            print(f"Error opening {img_path} with imageio: {e}")
+
+    # Try opening with tifffile if all else fails
+    if img is None:
         try:
             img = tiff.imread(img_path)
-
-            # Check if the image is not in a compatible shape
+            # Handle 3D shape if necessary
             if len(img.shape) == 3 and img.shape[2] == 2:
-                # Assuming we can just take the first channel for visualization
                 img = img[:, :, 0]
-
-            # Rescale pixel values from 0 to 255 if necessary
             if img.dtype != np.uint8:
                 img = exposure.rescale_intensity(img, out_range=(0, 255)).astype(
                     np.uint8
                 )
-
         except Exception as e:
             print(f"Error opening {img_path} with tifffile: {e}")
             return None
+
+    # Check image size and resize if necessary
+    total_pixels = img.shape[0] * img.shape[1]
+    if total_pixels > max_pixels:
+        scaling_factor = (max_pixels / total_pixels) ** 0.5
+        new_size = (
+            int(img.shape[1] * scaling_factor),
+            int(img.shape[0] * scaling_factor),
+        )
+        print(f"Resizing image to {new_size} due to size {total_pixels} > {max_pixels}")
+        img = np.array(Image.fromarray(img).resize(new_size, Image.ANTIALIAS))
 
     # Proceed with creating the figure using plotly
     fig = px.imshow(img, color_continuous_scale=scale)

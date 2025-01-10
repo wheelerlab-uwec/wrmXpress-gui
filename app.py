@@ -243,7 +243,7 @@ def background_callback(set_progress, n_clicks, store_data):
             # print("Running analysis")
             # wrmXpress_gui_obj.run_analysis(set_progress)
 
-            return callback(set_progress, store_data)
+            return callback(set_progress, store_data, wrmXpress_gui_obj)
 
     except Exception as e:
         error_message = f"An error occurred: {str(e)}"

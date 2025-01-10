@@ -111,6 +111,16 @@ class WrmXpressGui:
         self.warning_occurred = False
         self.warning_messages = []
         self.check_cases = [None, "", " "]
+        self.output_files = []
+        self.output_files_exist = False
+
+        # set progress files
+        self.set_progress_running = False
+        self.set_progress_current_number = None
+        self.set_progress_total_number = None
+        self.set_progress_figure = None
+        self.set_progress_image_path = None
+        self.set_progress_docker_output = None
 
     # In[3]: Object Functions to stroe and retrieve data as dictionary and json for the GUI
     def to_dict(self):
@@ -562,7 +572,6 @@ class WrmXpressGui:
         return (
             {
                 "motility": "optical_flow",
-                "raw": "raw",
             }
             if  "motility" in self.pipeline_selection
             else {}
@@ -572,7 +581,6 @@ class WrmXpressGui:
         return (
             {
                 "segmentation": "segmentation",
-                "raw": "raw",
             }
             if  "segmentation" in self.pipeline_selection
             else {}
@@ -580,7 +588,7 @@ class WrmXpressGui:
 
     def get_tracking_image_diagnostic_parameters(self):
         return (
-            {"tracks": "tracks", "raw": "raw"}
+            {"tracks": "tracks"}
             if "tracking" in self.pipeline_selection
             else {}
         )
@@ -589,7 +597,6 @@ class WrmXpressGui:
         if "cellprofiler" in self.pipeline_selection:
             pipeline_mapping = {
                 "wormsize_intensity_cellpose": {
-                    "raw": "raw",
                     "straightened_worms": "straightened_worms",
                     "cp_masks": "cp_masks",
                 },
@@ -597,7 +604,6 @@ class WrmXpressGui:
                     "raw": "raw",
                 },
                 "wormsize": {
-                    "raw": "raw",
                     "straightened_worms": "straightened_worms",
                 },
                 "feeding": {
@@ -639,11 +645,23 @@ class WrmXpressGui:
 
         return params
 
+    def get_static_dx_image_diagnostic_parameters(self):
+        return {
+            "static_dx": "static_dx",
+        } if self.static_dx else {}
+    
+    def get_video_dx_image_diagnostic_parameters(self):
+        return {
+            "video_dx": "video_dx",
+        } if self.video_dx else {}
+    
     def get_image_diagnostic_parameters(self):
         motility_params = self.get_motility_image_diagnostic_parameters()
         segmentation_params = self.get_segmentation_image_diagnostic_parameters()
         tracking_params = self.get_tracking_image_diagnostic_parameters()
         cell_profile_params = self.get_cell_profile_image_diagnostic_parameters()
+        static_dx_params = self.get_static_dx_image_diagnostic_parameters()
+        video_dx_params = self.get_video_dx_image_diagnostic_parameters()
 
         # get the params that is not {}
 
@@ -652,6 +670,8 @@ class WrmXpressGui:
             **segmentation_params,
             **tracking_params,
             **cell_profile_params,
+            **static_dx_params,
+            **video_dx_params,
         }
 
         params = self.get_wavelengths_from_files(params)
@@ -899,6 +919,52 @@ class WrmXpressGui:
 
             return False
         return False
+
+    # In[9]: Aprés analysis
+
+    def check_for_output_files(self):
+        output_directory = Path(self.mounted_volume, "output")
+
+        # get the image diagnostics parameters
+        image_diagnostics_params = self.get_image_diagnostic_parameters()
+
+        # look in the output directory, image diagnostic directory for final image
+        for key, value in image_diagnostics_params.items():
+
+            pipeline_selection_dir = Path(output_directory, value)
+
+            # search for any files inside the pipeline selection directory
+            files = list(pipeline_selection_dir.glob("*"))
+            
+            # get a list of the files and not the directories
+            files = [file for file in files if file.is_file()]
+
+            if files:
+                # append files to the output_files list
+                self.output_files.extend(files)
+
+                self.output_files_exist = True
+
+    def sort_output_files(self):
+        # set static_dx and video_dx to the last files
+        static_dx_files = [file for file in self.output_files if "static_dx" in file.name]
+        video_dx_files = [file for file in self.output_files if "video_dx" in file.name]
+
+        # remove the static_dx and video_dx files from the output_files list
+        self.output_files = [
+            file
+            for file in self.output_files
+            if file not in static_dx_files and file not in video_dx_files
+        ]
+
+    def set_processing_arguments(self, current_number, total_number, figure, image_path):
+        self.set_progress_running = True
+        self.set_progress_current_number = current_number
+        self.set_progress_total_number = total_number
+        self.set_progress_figure = figure
+        self.set_progress_image_path = image_path
+    
+
 
     # In[8]: Run Analysis
 
