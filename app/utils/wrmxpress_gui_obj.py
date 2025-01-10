@@ -598,16 +598,16 @@ class WrmXpressGui:
             pipeline_mapping = {
                 "wormsize_intensity_cellpose": {
                     "straightened_worms": "straightened_worms",
-                    "cp_masks": "cp_masks",
+                    "cellprofiler": "cellprofiler",
                 },
                 "mf_celltox": {
                     "raw": "raw",
                 },
                 "wormsize": {
-                    "straightened_worms": "straightened_worms",
+                    # "straightened_worms": "straightened_worms", # when I ran this pipeline, I did not get straightened_worms in the output directory
                 },
                 "feeding": {
-                    "straightened_worms": "straightened_worms",
+                    # "straightened_worms": "straightened_worms", # when I ran this pipeline, I did not get straightened_worms in the output directory
                 },
             }
 
@@ -967,7 +967,13 @@ class WrmXpressGui:
     def get_output_file_path(self, selection):
         # print(self.output_files)
         returned_files = []
-
+        
+        if selection == "straightened_worms":
+            return self.get_straightened_worms_file_path()
+        
+        if selection in ['w1', 'w2', 'w3', 'w4']:
+            return self.get_wavelength_file_path(selection)
+        
         for file in self.output_files:
             if selection in str(file):
                 returned_files.append(file)
@@ -981,7 +987,48 @@ class WrmXpressGui:
         
         return returned_files
 
+    def get_straightened_worms_file_path(self):
+        # get the straightened_worms file path
+        # ensure output files exist
+        if self.output_files_exist:
+            # search the cellprofiler folder for a directory called "img"
+            cellprofiler_dir = Path(self.mounted_volume, "output", "cellprofiler")
+            img_dir = Path(cellprofiler_dir, "img")
 
+            # check if this directory exists
+            if img_dir.exists():
+                # get the first file in the img directory
+                straightened_worms_files = list(img_dir.glob("*"))
+                print(straightened_worms_files)
+                # ensure this first file has extension of png/tiff if not remove it
+                for file in straightened_worms_files:
+                    if file.suffix not in [".png", ".tiff", '.tif']:
+                        straightened_worms_files.remove(file)
+
+                return straightened_worms_files
+
+    # TODO: update this
+    def get_wavelength_file_path(self, selection):
+        # get the wavelength file path
+        # ensure output files exist
+        if self.output_files_exist:
+            # search the cellprofiler folder for a directory called "img"
+            cellprofiler_dir = Path(self.mounted_volume, "output", "static_dx")
+            img_dir = Path(cellprofiler_dir, "img")
+
+            # check if this directory exists
+            if img_dir.exists():
+                # get the first file in the img directory
+                wavelength_files = list(img_dir.glob(f"*{selection}*"))
+
+                # ensure this first file has extension of png/tiff if not remove it
+                for file in wavelength_files:
+                    if file.suffix not in [".png", ".tiff", '.tif']:
+                        wavelength_files.remove(file)
+
+                return wavelength_files
+            
+    
     # In[8]: Run Analysis
 
     def setup_run_analysis(self, file_structure):

@@ -40,13 +40,16 @@ def callback(set_progress, store, wrmXpress_gui_obj):
 
         # obtain the necessary data from the store
         # pipeline_selection = store["wrmXpress_gui_obj"]["pipeline_selection"]
+        
+        return run_wrmXpress_analysis(store, set_progress, wrmXpress_gui_obj)
+    
+        # TODO: # Update this if avi is selected and above method doesnt work
+        
+        # if store['file_structure'] == 'avi':
+        #     return run_avi_wrmXpress_analysis(store, set_progress, wrmXpress_gui_obj)
 
-        # TODO:
-        if store['file_structure'] == 'avi':
-            return None, True, True, "The avi file structure is not supported yet.", "The avi file structure is not supported yet.", None
-
-        elif store['file_structure'] == 'imagexpress':
-            return run_wrmXpress_analysis(store, set_progress, wrmXpress_gui_obj)
+        # elif store['file_structure'] == 'imagexpress':
+        #     return run_wrmXpress_analysis(store, set_progress, wrmXpress_gui_obj)
         # Check if the submit button has been clicked
 
         # TODO: What if multiple pipelines are selected?
@@ -93,13 +96,16 @@ def callback(set_progress, store, wrmXpress_gui_obj):
             None,
         )
 
-
 def run_wrmXpress_analysis(store, set_progress, wrmXpress_gui_obj):
     """
     The purpose of this function is to run the wrmXpress pipeline for imagexpress formatted files,
     regardless of the pipeline selection.
     """
-    new_store = preamble_run_wrmXpress_imagexpress_selection(store)
+    if store['file_structure'] == 'imagexpress':
+        new_store = preamble_run_wrmXpress_imagexpress_selection(store)
+    
+    elif store['file_structure'] == 'avi':
+        new_store = preamble_run_wrmXpress_avi_selection(store)
 
     # while not os.path.exists(new_store["output_folder"]):
     #     time.sleep(1)
@@ -209,8 +215,6 @@ def updated_running_wells(set_progress, line, store, docker_output, wrmXpress_gu
         )
 
 
-# In[3]: Helper Functions
-
 def preamble_run_wrmXpress_avi_selection(store):
     """
     The purpose of this function is to prepare the necessary files and directories for wrmXpress for avi files.
@@ -225,7 +229,11 @@ def preamble_run_wrmXpress_avi_selection(store):
     platename_input_dir = Path(input_dir, platename)
     full_yaml = Path(volume, platename + ".yml")
 
-    update_yaml_file(full_yaml, full_yaml, {"wells": store["wrmXpress_gui_obj"]["well_selection_list"]})
+    update_yaml_file(
+        full_yaml,
+        full_yaml,
+        {"wells": store["wrmXpress_gui_obj"]["well_selection_list"]},
+    )
 
     # clean and create directories
     clean_and_create_directories(
@@ -244,7 +252,9 @@ def preamble_run_wrmXpress_avi_selection(store):
     )
 
     # Command message
-    command_message = f"```python /root/wrmXpress/wrapper.py {platename}.yml {platename}```"
+    command_message = (
+        f"```python /root/wrmXpress/wrapper.py {platename}.yml {platename}```"
+    )
 
     wrmxpress_command = (
         f"python -u /root/wrmXpress/wrapper.py {volume}/{platename}.yml {platename}"
@@ -295,7 +305,9 @@ def preamble_run_wrmXpress_imagexpress_selection(store):
     # clean and create directories
     clean_and_create_directories(
         input_path=Path(volume, "input", platename),
-        work_path=Path(volume, "work"), # TODO: update this with the correct directory of pipeline selection
+        work_path=Path(
+            volume, "work"
+        ),  # TODO: update this with the correct directory of pipeline selection
         output_path=Path(volume, "output"),
     )
 
@@ -310,7 +322,9 @@ def preamble_run_wrmXpress_imagexpress_selection(store):
         platename=platename,
     )
     # Command message
-    command_message = f"```python /root/wrmXpress/wrapper.py {platename}.yml {platename}```"
+    command_message = (
+        f"```python /root/wrmXpress/wrapper.py {platename}.yml {platename}```"
+    )
 
     wrmxpress_command = (
         f"python -u /root/wrmXpress/wrapper.py {volume}/{platename}.yml {platename}"
@@ -336,6 +350,8 @@ def preamble_run_wrmXpress_imagexpress_selection(store):
     }
     return new_store
 
+
+# In[3]: Helper Functions
 
 def tracking_wrmXpress_run(store, set_progress):
     """
