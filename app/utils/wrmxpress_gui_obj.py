@@ -571,7 +571,7 @@ class WrmXpressGui:
     def get_motility_image_diagnostic_parameters(self):
         return (
             {
-                "motility": "optical_flow",
+                "optical_flow": "optical_flow",
             }
             if  "motility" in self.pipeline_selection
             else {}
@@ -964,6 +964,22 @@ class WrmXpressGui:
         self.set_progress_figure = figure
         self.set_progress_image_path = image_path
     
+    def get_output_file_path(self, selection):
+        # print(self.output_files)
+        returned_files = []
+
+        for file in self.output_files:
+            if selection in str(file):
+                returned_files.append(file)
+            
+        # check if any of the wells from self.well_selection_list is in the file name
+        if len(returned_files) >= 1:
+            for file in returned_files:
+                # first well in well selection list is in the file name
+                if self.well_selection_list[0] in str(file):
+                    return file
+        
+        return returned_files
 
 
     # In[8]: Run Analysis

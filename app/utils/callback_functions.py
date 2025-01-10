@@ -1,8 +1,4 @@
-########################################################################
-####                                                                ####
-####                             Imports                            ####
-####                                                                ####
-########################################################################
+# In[1]: Imports
 
 import pandas as pd
 from pathlib import Path
@@ -14,17 +10,14 @@ from PIL import Image
 import plotly.express as px
 import yaml
 import glob
+import imageio
+import cv2
 import tifffile as tiff
 from skimage import exposure
 from zenodo_get import zenodo_get
 import subprocess
 
-########################################################################
-####                                                                ####
-####                          Functions                             ####
-####                                                                ####
-########################################################################
-
+# In[2]: Helper functions
 
 def create_df_from_inputs(_rows, _cols):
     """
@@ -480,15 +473,6 @@ def copy_files_to_input_directory(
         print(f"Error copying files to input directory: {e}")
 
 
-from PIL import Image
-import numpy as np
-import tifffile as tiff
-from skimage import exposure
-import plotly.express as px
-import cv2
-import imageio
-
-
 def create_figure_from_filepath(img_path, scale="gray", max_pixels=178956970):
     """
     This function creates a figure from the input file path.
@@ -496,6 +480,7 @@ def create_figure_from_filepath(img_path, scale="gray", max_pixels=178956970):
     """
 
     img = None
+    img_extension = Path(img_path).suffix.lower()
 
     # Try opening the image with PIL
     try:
@@ -504,7 +489,7 @@ def create_figure_from_filepath(img_path, scale="gray", max_pixels=178956970):
         print(f"Error opening {img_path} with PIL: {e}")
 
     # Try opening with OpenCV if PIL fails
-    if img is None:
+    if img is None and img_extension not in [".tif", ".tiff"]:
         try:
             img = cv2.imread(str(img_path), cv2.IMREAD_UNCHANGED)  # Read image as-is
             if img is not None:
@@ -513,11 +498,11 @@ def create_figure_from_filepath(img_path, scale="gray", max_pixels=178956970):
             print(f"Error opening {img_path} with OpenCV: {e}")
 
     # Try opening with imageio if OpenCV fails
-    if img is None:
-        try:
-            img = np.array(imageio.imread(img_path))
-        except Exception as e:
-            print(f"Error opening {img_path} with imageio: {e}")
+    # if img is None:
+    #     try:
+    #         img = np.array(imageio.imread(img_path))
+    #     except Exception as e:
+    #         print(f"Error opening {img_path} with imageio: {e}")
 
     # Try opening with tifffile if all else fails
     if img is None:

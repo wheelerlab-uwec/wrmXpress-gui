@@ -120,11 +120,17 @@ def run_wrmXpress_analysis(store, set_progress, wrmXpress_gui_obj):
             docker_output.append(line)
             file.write(line)
             file.flush()
+            
+            try:
+                if len(re.findall(r"\b" + "|".join(new_store["wells"]) + r"\b", line)) == 1:
+                    updated_running_wells(set_progress, line, store, docker_output, wrmXpress_gui_obj)
 
-            if len(re.findall(r"\b" + "|".join(new_store["wells"]) + r"\b", line)) == 1:
-                updated_running_wells(set_progress, line, store, docker_output, wrmXpress_gui_obj)
+                
+            except Exception as e:
+                print(f"Error: {e}")
+                continue
 
-            elif wrmXpress_gui_obj.set_progress_running:
+            if wrmXpress_gui_obj.set_progress_running:
                 docker_output_formatted = "".join(docker_output)
                 set_progress(
                     (
