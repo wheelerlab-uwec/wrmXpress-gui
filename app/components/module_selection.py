@@ -89,10 +89,10 @@ module_selection = dbc.AccordionItem(
                                                                                 dbc.Select(
                                                                                     id="wavelengths",
                                                                                     options=[
-                                                                                        {
-                                                                                            "label": "All",
-                                                                                            "value": "All",
-                                                                                        },
+                                                                                        # {
+                                                                                        #     "label": "All",
+                                                                                        #     "value": "All",
+                                                                                        # },
                                                                                         {
                                                                                             "label": "w1",
                                                                                             "value": "w1",
@@ -110,7 +110,7 @@ module_selection = dbc.AccordionItem(
                                                                                             "value": "w4",
                                                                                         },
                                                                                     ],
-                                                                                    value="All",
+                                                                                    value="w1",
                                                                                     persistence=True,
                                                                                     persistence_type="memory",
                                                                                 ),
@@ -416,10 +416,10 @@ module_selection = dbc.AccordionItem(
                                                                             dbc.Select(
                                                                                 id="wavelengths-segmentation",
                                                                                 options=[
-                                                                                    {
-                                                                                        "label": "All",
-                                                                                        "value": "All",
-                                                                                    },
+                                                                                    # {
+                                                                                    #     "label": "All",
+                                                                                    #     "value": "All",
+                                                                                    # },
                                                                                     {
                                                                                         "label": "w1",
                                                                                         "value": "w1",
@@ -437,7 +437,7 @@ module_selection = dbc.AccordionItem(
                                                                                         "value": "w4",
                                                                                     },
                                                                                 ],
-                                                                                value="All",
+                                                                                value="w1",
                                                                                 persistence=True,
                                                                                 persistence_type="memory",
                                                                                 style={
@@ -570,10 +570,10 @@ module_selection = dbc.AccordionItem(
                                                                             dbc.Select(
                                                                                 id="wavelengths-cellprofiler",
                                                                                 options=[
-                                                                                    {
-                                                                                        "label": "All",
-                                                                                        "value": "All",
-                                                                                    },
+                                                                                    # {
+                                                                                    #     "label": "All",
+                                                                                    #     "value": "All",
+                                                                                    # },
                                                                                     {
                                                                                         "label": "w1",
                                                                                         "value": "w1",
@@ -591,7 +591,7 @@ module_selection = dbc.AccordionItem(
                                                                                         "value": "w4",
                                                                                     },
                                                                                 ],
-                                                                                value="All",
+                                                                                value="w1",
                                                                                 persistence=True,
                                                                                 persistence_type="memory",
                                                                                 style={
