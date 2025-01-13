@@ -14,7 +14,7 @@ module_selection = dbc.AccordionItem(
                         [
                             dbc.Row(
                                 [
-                                    html.H5("wrmXpress pipeline:"),
+                                    html.H5("wrmXpress pipeline"),
                                     dbc.Checklist(
                                         id="pipeline-selection",
                                         options=[
@@ -64,7 +64,7 @@ module_selection = dbc.AccordionItem(
                                     [
                                         html.Br(),
                                         html.H5(
-                                            "Parameters:",
+                                            "Parameters",
                                             id="pipeline-params-header",
                                             style={"display": "none"},
                                         ),
@@ -73,7 +73,7 @@ module_selection = dbc.AccordionItem(
                                                 dbc.Col(
                                                     [
                                                         html.H5(
-                                                            "Motility Parameters:",
+                                                            "Motility parameters",
                                                         ),
                                                         html.Div(
                                                             [
@@ -304,7 +304,7 @@ module_selection = dbc.AccordionItem(
                                                 dbc.Col(
                                                     [
                                                         html.H5(
-                                                            "Segmentation Parameters:",
+                                                            "Segmentation parameters",
                                                         ),
                                                         html.Div(
                                                             [
@@ -313,7 +313,7 @@ module_selection = dbc.AccordionItem(
                                                                         # cellpose model selection
                                                                         dbc.Col(
                                                                             html.P(
-                                                                                "Cellpose Model:"
+                                                                                "Cellpose model:"
                                                                             )
                                                                         ),
                                                                         dbc.Col(
@@ -352,7 +352,7 @@ module_selection = dbc.AccordionItem(
                                                                         # cellpose model type
                                                                         dbc.Col(
                                                                             html.P(
-                                                                                "Cellpose Model Type:"
+                                                                                "Segmentation type:"
                                                                             )
                                                                         ),
                                                                         dbc.Col(
@@ -476,7 +476,7 @@ module_selection = dbc.AccordionItem(
                                                 dbc.Col(
                                                     [
                                                         html.H5(
-                                                            "CellProfiler parameters:",
+                                                            "CellProfiler parameters",
                                                         ),
                                                         html.Div(
                                                             [
@@ -628,7 +628,7 @@ module_selection = dbc.AccordionItem(
                                                 dbc.Col(
                                                     [
                                                         html.H5(
-                                                            "Tracking Parameters:",
+                                                            "Tracking parameters",
                                                         ),
                                                         html.Div(
                                                             [
@@ -657,7 +657,7 @@ module_selection = dbc.AccordionItem(
                                                                     [
                                                                         dbc.Col(
                                                                             html.P(
-                                                                                "Minimum Mass:"
+                                                                                "Minimum mass:"
                                                                             )
                                                                         ),
                                                                         dbc.Col(
@@ -678,7 +678,7 @@ module_selection = dbc.AccordionItem(
                                                                     [
                                                                         dbc.Col(
                                                                             html.P(
-                                                                                "Noise Size:"
+                                                                                "Noise size:"
                                                                             )
                                                                         ),
                                                                         dbc.Col(
@@ -699,7 +699,7 @@ module_selection = dbc.AccordionItem(
                                                                     [
                                                                         dbc.Col(
                                                                             html.P(
-                                                                                "Search Range:"
+                                                                                "Search range:"
                                                                             )
                                                                         ),
                                                                         dbc.Col(
@@ -741,7 +741,7 @@ module_selection = dbc.AccordionItem(
                                                                     [
                                                                         dbc.Col(
                                                                             html.P(
-                                                                                "Adaptive Stop:"
+                                                                                "Adaptive stop:"
                                                                             )
                                                                         ),
                                                                         dbc.Col(
