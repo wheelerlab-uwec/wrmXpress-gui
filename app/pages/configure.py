@@ -177,6 +177,22 @@ def update_params_visibility(pipeline):
         tracking_params_style,
     )
 
+@callback(
+    Output("cellpose-model-cellprofiler", "disabled"),
+    Output("cellpose-model-cellprofiler", "value"),
+    Output("cellpose-model-cellprofiler", "placeholder"),
+    Input("cellprofiler-pipeline-selection", "value"),
+    prevent_initial_call=True
+)
+def toggle_cellpose_model_select(pipeline_value):
+    """
+    Update the ability to select a Cellpose model based on the selected CellProfiler pipeline.
+    """
+    if pipeline_value == "wormsize_intensity_cellpose":
+        return False, None, 'Choose a Cellpose model...', 
+    else:
+        return True, None, 'Cellpose model not needed for selected pipeline.'
+
 
 @callback(
     Output("store", "data"),

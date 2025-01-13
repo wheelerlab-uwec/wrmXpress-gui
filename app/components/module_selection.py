@@ -476,7 +476,7 @@ module_selection = dbc.AccordionItem(
                                                 dbc.Col(
                                                     [
                                                         html.H5(
-                                                            "Cellprofiler Parameters:",
+                                                            "CellProfiler parameters:",
                                                         ),
                                                         html.Div(
                                                             [
@@ -485,7 +485,7 @@ module_selection = dbc.AccordionItem(
                                                                         dbc.Col(
                                                                             [
                                                                                 html.P(
-                                                                                    "Cellprofiler pipeline:"
+                                                                                    "CellProfiler pipeline:"
                                                                                 ),
                                                                             ]
                                                                         ),
@@ -530,6 +530,8 @@ module_selection = dbc.AccordionItem(
                                                                         dbc.Col(
                                                                             dbc.Select(
                                                                                 id="cellpose-model-cellprofiler",
+                                                                                disabled=False,
+                                                                                placeholder='Choose a Cellpose model...',
                                                                                 options=[
                                                                                     {
                                                                                         "label": "celegans_20220830",
@@ -548,11 +550,11 @@ module_selection = dbc.AccordionItem(
                                                                                         "value": "strongyle_eggs_20241226",
                                                                                     },
                                                                                 ],
-                                                                                value="celegans_20220830",
+                                                                                value=None,
                                                                                 persistence=True,
                                                                                 persistence_type="memory",
                                                                                 style={
-                                                                                    "display": "flex"
+                                                                                    "display": "flex",
                                                                                 },
                                                                             ),
                                                                         ),

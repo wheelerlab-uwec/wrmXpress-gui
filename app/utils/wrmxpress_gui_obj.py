@@ -192,6 +192,13 @@ class WrmXpressGui:
                 self.error_messages.append(
                     "The number of y sites for the multi-site plate is missing."
                 )
+    
+    def validate_cellprofiler_cellpose_combos(self):
+        if self.cellprofiler_pipeline_selection == 'wormsize_intensity_cellpose' and self.cellpose_model_cellprofiler is None:
+            self.error_occurred = True
+            self.error_messages.append(
+                "A Cellpose model is required for the selected pipeline."
+            )
 
     def validate_pipeline_parameters(self):
         if not self.pipeline_selection:
@@ -310,6 +317,7 @@ class WrmXpressGui:
         self.validate_mask_parameters()
         self.validate_multi_well_mode()
         self.validate_multi_site_mode()
+        self.validate_cellprofiler_cellpose_combos()
         self.validate_pipeline_parameters()
         self.validate_static_dx_mode()
         self.validate_video_dx_mode()
