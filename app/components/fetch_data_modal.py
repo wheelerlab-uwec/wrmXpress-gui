@@ -26,20 +26,21 @@ fetch_data_modal = dbc.Modal(
                         # Display an alert message above the checklist with the Zenodo link
                         dbc.Alert(
                             [
-                                "Please select your plates below or visit the ",
+                                "Please select your plates below. Visit the ",
                                 html.A(
                                     "Zenodo link",
                                     href="https://zenodo.org/records/12760651",
                                     target="_blank",  # Opens the link in a new tab
                                     style={
                                         "color": "#007bff"
-                                    },  # Customize the link color
+                                    },  
                                 ),
                                 " for more information.",
                             ],
                             color="light",  # You can change the color to 'warning', 'danger', 'success', etc.
                             dismissable=True,  # Allow the alert to be dismissed
                         ),
+                        dcc.Markdown('Data will be saved to `/home/downloads/`'),
                         dbc.Checklist(
                             options=[
                                 {
@@ -146,9 +147,6 @@ fetch_data_modal = dbc.Modal(
                 ),
                 html.Br(),
                 dbc.Row(
-                    [dbc.Col(dcc.Markdown("Data will be saved to `/home/downloads/`"))],
-                ),
-                dbc.Row(
                     [
                         dbc.Alert(
                             children=[
@@ -156,25 +154,26 @@ fetch_data_modal = dbc.Modal(
                                     [
                                         dbc.Col(
                                             [
-                                                "Zenodo File Size (GB):",  # Text displaying the file size label
+                                                "Compressed download size (GB):", 
                                             ],
-                                            width=3,
+                                            width=4,
+                                            className="d-flex align-items-center",
+
                                         ),
                                         dbc.Col(
                                             [
                                                 dbc.Input(
-                                                    type="number",  # Text input
-                                                    id="zenodo-file-size-input",  # Input ID
-                                                    disabled=True,  # Make input field read-only
+                                                    type="number",  
+                                                    id="zenodo-file-size-input", 
+                                                    disabled=True,  
                                                 ),
                                             ],
-                                            width=4,
+                                            width=2,
                                         ),
                                     ]
                                 ),
                             ],
                             color="light",
-                            dismissable=True,
                         ),
                     ]
                 ),
@@ -226,9 +225,6 @@ def update_file_size_alert(value):
 
 
 @callback(
-    Output(
-        "fetch-data-link", "children"
-    ),  # Optionally update the link text or other outputs
     Input("confirm-fetch", "n_clicks"),  # Listen for Yes button click
     Input("overwrite-checklist", "value"),  # Listen for checklist value
     prevent_initial_call=True,
@@ -238,8 +234,6 @@ def fetch_data(confirm_click, value):
         # Only download files that are selected
         try:
             result = zenodo_get_id(value)
-            return result
                 
         except Exception as e:
-            return f"Error: {str(e)}"
-    return "Fetch Example Data"
+             print(f"Error: {str(e)}")

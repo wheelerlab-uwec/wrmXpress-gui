@@ -573,9 +573,14 @@ def zenodo_get_id(selected_plates):
     # Loop over selected plates and download specific files
     for plate in selected_plates:
         # Construct the glob pattern for each plate
-        file_pattern = (
-            f"{plate}.zip"  # Adjust the pattern if needed (e.g., for all .zip files)
-        )
+        if plate == "20220527-p02-KTR" or plate == "20220622-p02-KTR":
+            file_pattern = (
+                f"{plate}.avi"
+            )
+        else:
+            file_pattern = (
+                f"{plate}.zip"
+            )
 
         print(f"Attempting to download file: {file_pattern}")  # For debugging purposes
 

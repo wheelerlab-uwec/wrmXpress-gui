@@ -62,14 +62,13 @@ sidebar = html.Div(
             [
                 html.Div(
                     [
-                        dbc.Nav(
-                            children=dbc.NavLink(
-                                "Fetch Example Data",
-                                id="fetch-data-link",  # Add an id to the NavLink
+                            dbc.Button(
+                                html.Img(src="assets/zenodo-white-border.svg",
+                                         style={"width": "95%"}),
+                                id="fetch-data-link",
+                                style={"width": "90%"},
                             ),
-                            pills=True,
-                            vertical=True,
-                        ),
+
                         # Tooltip for the NavLink
                         dbc.Tooltip(
                             "Click to fetch example data from Zenodo and download it to your Downloads folder.",
