@@ -141,6 +141,8 @@ def update_preview_image(n_clicks, store):
     if n_clicks >= 1:
         if file_structure == "imagexpress":
             # assumes IX-like file structure
+            # with stitching function in wrmXpress 2.0.0, the first well won't be found because stitching happens after this button is clicked
+            # s1 will show and stitching will happen after the button is clicked and before the dx image is shown
             img_path = Path(
                 volume, f"{platename}/TimePoint_1/{plate_base}_{first_well}.TIF"
             )
