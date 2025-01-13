@@ -194,7 +194,7 @@ class WrmXpressGui:
                 )
     
     def validate_cellprofiler_cellpose_combos(self):
-        if self.cellprofiler_pipeline_selection == 'wormsize_intensity_cellpose' and self.cellpose_model_cellprofiler is None:
+        if "cellprofiler" in self.pipeline_selection and self.cellprofiler_pipeline_selection == 'wormsize_intensity_cellpose' and self.cellpose_model_cellprofiler is None:
             self.error_occurred = True
             self.error_messages.append(
                 "A Cellpose model is required for the selected pipeline."
