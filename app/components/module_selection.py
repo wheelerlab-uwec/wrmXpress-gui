@@ -337,7 +337,7 @@ module_selection = dbc.AccordionItem(
                                                                                         "value": "strongyle_eggs_20241226",
                                                                                     },
                                                                                 ],
-                                                                                value="20220830_all",
+                                                                                value="celegans_20220830",
                                                                                 persistence=True,
                                                                                 persistence_type="memory",
                                                                                 style={
@@ -532,23 +532,23 @@ module_selection = dbc.AccordionItem(
                                                                                 id="cellpose-model-cellprofiler",
                                                                                 options=[
                                                                                     {
-                                                                                        "label": "20220830_all",
-                                                                                        "value": "20220830_all",
+                                                                                        "label": "celegans_20220830",
+                                                                                        "value": "celegans_20220830",
                                                                                     },
                                                                                     {
-                                                                                        "label": "CP_20220801_scratch",
-                                                                                        "value": "CP_20220801_scratch",
+                                                                                        "label": "celegans_pharynx_20230203",
+                                                                                        "value": "celegans_pharynx_20230203",
                                                                                     },
                                                                                     {
-                                                                                        "label": "CP_20220803_LC4",
-                                                                                        "value": "CP_20220803_LC4",
+                                                                                        "label": "mf_20241112",
+                                                                                        "value": "mf_20241112",
                                                                                     },
                                                                                     {
-                                                                                        "label": "CP_20230203_155226_pharynx3",
-                                                                                        "value": "CP_20230203_155226_pharynx3",
+                                                                                        "label": "strongyle_eggs_20241226",
+                                                                                        "value": "strongyle_eggs_20241226",
                                                                                     },
                                                                                 ],
-                                                                                value="20220830_all",
+                                                                                value="celegans_20220830",
                                                                                 persistence=True,
                                                                                 persistence_type="memory",
                                                                                 style={

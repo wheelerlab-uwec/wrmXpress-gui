@@ -84,10 +84,13 @@ def update_analysis_preview_image(selection, nclicks, store):
             return None, True, False, False, False, True, False, f"```{str(e)}```"
 
         if nclicks:
-            img_path = Path(
-                    f"{volume}/work/{selection}/{plate_base}_{wells[0]}_{wavelength}.png"
-                )
-
+            if selection == 'straightened_worms':
+                img_path = Path(
+                    f"{volume}/output/cellprofiler/img/{plate_base}_{wells[0]}_{wavelength}.tiff")
+            else:
+                img_path = Path(
+                        f"{volume}/work/{selection}/{plate_base}_{wells[0]}_{wavelength}.png"
+                    )
             if os.path.exists(img_path):
                 scale = "inferno" if selection == "optical_flow" else "gray"
                 fig = create_figure_from_filepath(img_path, scale=scale)
@@ -102,7 +105,7 @@ def update_analysis_preview_image(selection, nclicks, store):
                     f"```{img_path}```",
                 )
             else:
-                print(f"{img_path} does not exist")
+                return None, True, False, False, False, True, True, f"```{img_path}``` does not exist",
         return None, True, False, False, False, True, False, None
     except Exception as e:
         return None, True, False, False, False, True, False, f"```{str(e)}```"

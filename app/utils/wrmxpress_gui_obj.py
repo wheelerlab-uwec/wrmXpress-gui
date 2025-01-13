@@ -597,8 +597,8 @@ class WrmXpressGui:
         if "cellprofiler" in self.pipeline_selection:
             pipeline_mapping = {
                 "wormsize_intensity_cellpose": {
-                    "straightened_worms": "straightened_worms",
-                    "cellprofiler": "cellprofiler",
+                    "Straightened worms": "straightened_worms",
+                    "Cellpose masks": "cellprofiler",
                 },
                 "mf_celltox": {
                     "raw": "raw",
