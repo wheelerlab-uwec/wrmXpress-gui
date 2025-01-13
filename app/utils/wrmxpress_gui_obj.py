@@ -688,7 +688,7 @@ class WrmXpressGui:
         image_directory = Path(self.mounted_volume, self.plate_name)
         input_directory = Path(self.mounted_volume, "input")
         platename_input_directory = Path(input_directory, self.plate_name)
-        work_directory = Path(self.mounted_volume, "work", self.plate_name)
+        work_directory = Path(self.mounted_volume, "work")
         output_directory = Path(self.mounted_volume, "output")
 
         # Clean and create directories
