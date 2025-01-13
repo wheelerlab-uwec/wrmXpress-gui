@@ -571,7 +571,7 @@ class WrmXpressGui:
     def get_motility_image_diagnostic_parameters(self):
         return (
             {
-                "Flow cloud": "optical_flow",
+                "Optical flow": "optical_flow",
             }
             if  "motility" in self.pipeline_selection
             else {}
@@ -580,7 +580,7 @@ class WrmXpressGui:
     def get_segmentation_image_diagnostic_parameters(self):
         return (
             {
-                "Segmented objects": "segmentation",
+                "Segmentation": "segmentation",
             }
             if  "segmentation" in self.pipeline_selection
             else {}
@@ -830,7 +830,6 @@ class WrmXpressGui:
 
             # Run wrmXpress using the prepared command
             docker_output = self._run_wrmxpress_subprocess(self.wrmxpress_preview_command_split, self.output_preview_log_file)
-            print(docker_output)
 
             # Check again if the first well has been processed after running the command
             if self.first_well_already_run():

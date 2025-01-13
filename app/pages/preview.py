@@ -75,6 +75,7 @@ def update_analysis_preview_image(selection, nclicks, store):
         volume = store["wrmXpress_gui_obj"]["mounted_volume"]
         platename = store["wrmXpress_gui_obj"]["plate_name"]
         wells = store["wrmXpress_gui_obj"]["well_selection_list"]
+        wavelength = store["wrmXpress_gui_obj"]["wavelengths"]
 
         try:
             plate_base = platename.split("_", 1)[0]
@@ -82,84 +83,13 @@ def update_analysis_preview_image(selection, nclicks, store):
         except Exception as e:
             return None, True, False, False, False, True, False, f"```{str(e)}```"
 
-        pipeline_selection = store["wrmXpress_gui_obj"]["pipeline_selection"]
-
         if nclicks:
-            if pipeline_selection == "motility":
-                if selection == "raw":
-                    selection = ""
-                elif selection == "segment":
-                    selection = "_binary"
-                else:
-                    selection = f"_{selection}"
-
-                img_path = Path(
-                    f"{volume}/work/{platename}/{wells[0]}/img/{platename}_{wells[0]}{selection}.png"
+            img_path = Path(
+                    f"{volume}/work/{selection}/{plate_base}_{wells[0]}_{wavelength}.png"
                 )
-            elif pipeline_selection == "fecundity":
-                if selection == "raw":
-                    selection = ""
-                else:
-                    selection = f"_{selection}"
-
-                img_path = Path(
-                    f"{volume}/work/{platename}/{wells[0]}/img/{platename}_{wells[0]}{selection}.png"
-                )
-            elif pipeline_selection == "tracking":
-                if selection == "raw":
-                    selection = ""
-                else:
-                    selection = f"_{selection}"
-
-                img_path = Path(
-                    f"{volume}/work/{platename}/{wells[0]}/img/{platename}_{wells[0]}{selection}.png"
-                )
-            elif pipeline_selection == "wormsize_intensity_cellpose":
-                if selection == "raw":
-                    img_path = Path(
-                        f"{volume}/work/{platename}/{wells[0]}/img/{platename}_{wells[0]}.png"
-                    )
-                elif selection == "straightened_worms":
-                    img_path = Path(
-                        f"{volume}/output/straightened_worms/{plate_base}_{wells[0]}.tiff"
-                    )
-                elif selection == "cp_masks":
-                    img_path = Path(
-                        f"{volume}/input/{platename}/TimePoint_1/{plate_base}_{wells[0]}_cp_masks.png"
-                    )
-            elif pipeline_selection == "mf_celltox":
-                if selection == "raw":
-                    img_path = Path(
-                        f"{volume}/work/{platename}/{wells[0]}/img/{platename}_{wells[0]}.png"
-                    )
-            elif pipeline_selection == "wormsize":
-                if selection == "raw":
-                    img_path = Path(
-                        f"{volume}/work/{platename}/{wells[0]}/img/{platename}_{wells[0]}.png"
-                    )
-                elif selection == "straightened_worms":
-                    img_path = Path(
-                        f"{volume}/output/straightened_worms/{plate_base}_{wells[0]}.tiff"
-                    )
-            elif pipeline_selection == "feeding":
-                if selection == "raw":
-                    img_path = Path(
-                        f"{volume}/work/{platename}/{wells[0]}/img/{platename}_{wells[0]}.png"
-                    )
-                elif selection == "straightened_worms":
-                    img_path = Path(
-                        f"{volume}/output/straightened_worms/{plate_base}_{wells[0]}.tiff"
-                    )
-                elif selection.startswith("wavelength_"):
-                    selection = selection.split("_", 1)[-1]
-                    img_path = Path(
-                        f"{volume}/work/{platename}/{wells[0]}/img/{platename}_{wells[0]}_{selection}.png"
-                    )
-            else:
-                return None, True, False, False, False, True, False, None
 
             if os.path.exists(img_path):
-                scale = "inferno" if selection == "_motility" else "gray"
+                scale = "inferno" if selection == "optical_flow" else "gray"
                 fig = create_figure_from_filepath(img_path, scale=scale)
                 return (
                     fig,
@@ -171,6 +101,8 @@ def update_analysis_preview_image(selection, nclicks, store):
                     True,
                     f"```{img_path}```",
                 )
+            else:
+                print(f"{img_path} does not exist")
         return None, True, False, False, False, True, False, None
     except Exception as e:
         return None, True, False, False, False, True, False, f"```{str(e)}```"
@@ -339,7 +271,7 @@ def get_options_preview(nclicks, store_data):
     Output("analysis-preview", "figure"),
     Output("resolving-error-issue-preview", "is_open"),
     Output("resolving-error-issue-preview", "children"),
-    # Output("preview-change-img-button", "disabled"),
+    Output("preview-change-img-button", "disabled"),
     Input("submit-val", "n_clicks"),
     State("store", "data"),
     prevent_initial_call=True,
@@ -446,8 +378,9 @@ def run_analysis(
                 wrmXpress_gui_obj.preview_first_well_figure,
                 False,
                 "",
+                False
             )
             # return preview_callback_functions(store_data)
 
     except Exception as e:
-        return f"```{str(e)}```", {}, True, f"```{str(e)}```"
+        return f"```{str(e)}```", {}, True, f"```{str(e)}```", True
