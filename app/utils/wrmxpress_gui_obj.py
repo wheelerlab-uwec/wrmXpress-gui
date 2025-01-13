@@ -571,7 +571,7 @@ class WrmXpressGui:
     def get_motility_image_diagnostic_parameters(self):
         return (
             {
-                "optical_flow": "optical_flow",
+                "Flow cloud": "optical_flow",
             }
             if  "motility" in self.pipeline_selection
             else {}
@@ -580,7 +580,7 @@ class WrmXpressGui:
     def get_segmentation_image_diagnostic_parameters(self):
         return (
             {
-                "segmentation": "segmentation",
+                "Segmented objects": "segmentation",
             }
             if  "segmentation" in self.pipeline_selection
             else {}
@@ -588,7 +588,7 @@ class WrmXpressGui:
 
     def get_tracking_image_diagnostic_parameters(self):
         return (
-            {"tracks": "tracks"}
+            {"Tracks": "tracks"}
             if "tracking" in self.pipeline_selection
             else {}
         )
@@ -773,7 +773,7 @@ class WrmXpressGui:
                 if is_preview
                 else f"{self.plate_name}.log"
             )
-            return Path(self.mounted_volume, "work", self.plate_name, log_file_name)
+            return Path(self.mounted_volume, "work", log_file_name)
 
         # Core logic
         self.command_message = (
@@ -829,7 +829,8 @@ class WrmXpressGui:
             self.prepare_wrmxpress_command()
 
             # Run wrmXpress using the prepared command
-            docker_output = self._run_wrmxpress_subprocess(self.wrmxpress_preview_command_split)
+            docker_output = self._run_wrmxpress_subprocess(self.wrmxpress_preview_command_split, self.output_preview_log_file)
+            print(docker_output)
 
             # Check again if the first well has been processed after running the command
             if self.first_well_already_run():
@@ -853,27 +854,32 @@ class WrmXpressGui:
             f"```{self.preview_first_well_image_filepath}```"
         )
 
-    def _run_wrmxpress_subprocess(self, command_split):
+    def _run_wrmxpress_subprocess(self, command_split, log_file):
         """
         Executes the wrmXpress command as a subprocess and returns its output.
         """
-        print("Running wrmXpress: Preview.")
-        docker_output = ["Running wrmXpress."]
         try:
-            process = subprocess.Popen(
-                command_split,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.STDOUT,
-                text=True,
-                bufsize=1,
-                universal_newlines=True,  
-                env={**os.environ, 'PYTHONUNBUFFERED': '1'}  
-            )
-            stdout, _ = process.communicate()
-            docker_output.append(stdout)
+            print("Running wrmXpress: Preview.")
+            docker_output = ["Running wrmXpress: Preview."]
+            with open(log_file, "w") as file:
+                process = subprocess.Popen(
+                    command_split,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.STDOUT,
+                    text=True,
+                    bufsize=1,
+                    universal_newlines=True,  
+                    env={**os.environ, 'PYTHONUNBUFFERED': '1'}  
+                )
+                # stdout, _ = process.communicate()
+                # docker_output.append(stdout)
+                for line in iter(process.stdout.readline, ""):
+                    docker_output.append(line)
+                    file.write(line)
+                    file.flush()
 
-            if process.returncode != 0:
-                raise RuntimeError(f"wrmXpress failed: {stdout}")
+                if process.returncode != 0:
+                    raise RuntimeError(f"wrmXpress failed: {stdout}")
 
         except Exception as e:
             docker_output.append(f"Error: {str(e)}")

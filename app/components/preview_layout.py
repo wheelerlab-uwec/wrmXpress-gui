@@ -146,42 +146,42 @@ preview_layout = dbc.ModalBody(
                                                 "margin-top": "10px",
                                             },
                                         ),
-                                        # dbc.Row(
-                                        #     [
-                                        #         dbc.Col(
-                                        #             dcc.Dropdown(
-                                        #                 id="preview-dropdown",  # Dropdown for preview
-                                        #                 placeholder="Select diagnostic image to preview...",  # Placeholder for the dropdown
-                                        #                 style={
-                                        #                     "textAlign": "left",
-                                        #                     "margin-bottom": "10px",
-                                        #                     "margin-top": "10px",
-                                        #                     "text-align": "left",
-                                        #                 },
-                                        #             ),
-                                        #             width=8,
-                                        #         ),
-                                        #         dbc.Col(
-                                        #             dbc.Button(
-                                        #                 "Load image",  # Button to load image
-                                        #                 id="preview-change-img-button",
-                                        #                 color="primary",  # Color of the button (wrmXpress) blue
-                                        #                 disabled=True,  # Whether the button is disabled
-                                        #                 n_clicks=0,  # Number of times the button has been clicked
-                                        #                 style={
-                                        #                     "margin-bottom": "10px",
-                                        #                     "margin-top": "10px",
-                                        #                     "text-align": "center",
-                                        #                 },
-                                        #             ),
-                                        #             width=4,
-                                        #         ),
-                                        #     ],
-                                        #     style={
-                                        #         "margin-bottom": "10px",
-                                        #         "margin-top": "10px",
-                                        #     },
-                                        # ),
+                                        dbc.Row(
+                                            [
+                                                dbc.Col(
+                                                    dcc.Dropdown(
+                                                        id="preview-dropdown",  # Dropdown for preview
+                                                        placeholder="Select diagnostic image to preview...",  # Placeholder for the dropdown
+                                                        style={
+                                                            "textAlign": "left",
+                                                            "margin-bottom": "10px",
+                                                            "margin-top": "10px",
+                                                            "text-align": "left",
+                                                        },
+                                                    ),
+                                                    width=8,
+                                                ),
+                                                dbc.Col(
+                                                    dbc.Button(
+                                                        "Load image",  # Button to load image
+                                                        id="preview-change-img-button",
+                                                        color="primary",  # Color of the button (wrmXpress) blue
+                                                        disabled=True,  # Whether the button is disabled
+                                                        n_clicks=0,  # Number of times the button has been clicked
+                                                        style={
+                                                            "margin-bottom": "10px",
+                                                            "margin-top": "10px",
+                                                            "text-align": "center",
+                                                        },
+                                                    ),
+                                                    width=4,
+                                                ),
+                                            ],
+                                            style={
+                                                "margin-bottom": "10px",
+                                                "margin-top": "10px",
+                                            },
+                                        ),
                                         dbc.Row(
                                             [
                                                 dbc.Row(
