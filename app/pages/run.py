@@ -7,7 +7,7 @@ import dash
 from dash.long_callback import DiskcacheLongCallbackManager
 
 # importing utils
-from app.utils.callback_functions import send_ctrl_c, create_figure_from_filepath
+from app.utils.callback_functions import send_ctrl_c, create_figure_from_filepath, construct_img_path
 from app.components.run_layout import run_layout
 from app.utils.wrmxpress_gui_obj import WrmXpressGui
 
@@ -59,171 +59,54 @@ def cancel_analysis(n_clicks):
 )
 def load_analysis_img(selection, n_clicks, store_data):
     """
-    This function loads the analysis image based on the selection.
+    Load and display the analysis image based on the user's selection.
     """
-    # Check to see if store exists
+    # print("selection", selection)
+
     if not store_data:
+        # Store data is None or invalid.
         return {}, "", True, False, True, True, True, False
 
-    scale = "gray"
-    # TODO: Fix this function to work with the new file structure
-    # and the selection of the analysis dropdown
-    if n_clicks:
-        # get the store from the data
-        wrmXpress_gui_obj = WrmXpressGui(
-            file_structure=store_data["wrmXpress_gui_obj"]["file_structure"],
-            imaging_mode=store_data["wrmXpress_gui_obj"]["imaging_mode"],
-            multi_well_row=store_data["wrmXpress_gui_obj"]["multi_well_row"],
-            multi_well_col=store_data["wrmXpress_gui_obj"]["multi_well_col"],
-            multi_well_detection=store_data["wrmXpress_gui_obj"]["multi_well_detection"],
-            x_sites=store_data["wrmXpress_gui_obj"]["x_sites"],
-            y_sites=store_data["wrmXpress_gui_obj"]["y_sites"],
-            stitch_switch=store_data["wrmXpress_gui_obj"]["stitch_switch"],
-            well_col=store_data["wrmXpress_gui_obj"]["well_col"],
-            well_row=store_data["wrmXpress_gui_obj"]["well_row"],
-            mask=store_data["wrmXpress_gui_obj"]["mask"],
-            mask_diameter=store_data["wrmXpress_gui_obj"]["mask_diameter"],
-            pipeline_selection=store_data["wrmXpress_gui_obj"]["pipeline_selection"],
-            wavelengths=store_data["wrmXpress_gui_obj"]["wavelengths"],
-            pyrscale=store_data["wrmXpress_gui_obj"]["pyrscale"],
-            levels=store_data["wrmXpress_gui_obj"]["levels"],
-            winsize=store_data["wrmXpress_gui_obj"]["winsize"],
-            iterations=store_data["wrmXpress_gui_obj"]["iterations"],
-            poly_n=store_data["wrmXpress_gui_obj"]["poly_n"],
-            poly_sigma=store_data["wrmXpress_gui_obj"]["poly_sigma"],
-            flags=store_data["wrmXpress_gui_obj"]["flags"],
-            cellpose_model_segmentation=store_data["wrmXpress_gui_obj"][
-                "cellpose_model_segmentation"
-            ],
-            cellpose_model_type_segmentation=store_data["wrmXpress_gui_obj"][
-                "cellpose_model_type_segmentation"
-            ],
-            python_model_sigma=store_data["wrmXpress_gui_obj"]["python_model_sigma"],
-            wavelengths_segmentation=store_data["wrmXpress_gui_obj"][
-                "wavelengths_segmentation"
-            ],
-            cellprofiler_pipeline_selection=store_data["wrmXpress_gui_obj"][
-                "cellprofiler_pipeline_selection"
-            ],
-            cellpose_model_cellprofiler=store_data["wrmXpress_gui_obj"][
-                "cellpose_model_cellprofiler"
-            ],
-            wavelengths_cellprofiler=store_data["wrmXpress_gui_obj"][
-                "wavelengths_cellprofiler"
-            ],
-            tracking_diameter=store_data["wrmXpress_gui_obj"]["tracking_diameter"],
-            tracking_minmass=store_data["wrmXpress_gui_obj"]["tracking_minmass"],
-            tracking_noisesize=store_data["wrmXpress_gui_obj"]["tracking_noisesize"],
-            tracking_searchrange=store_data["wrmXpress_gui_obj"]["tracking_searchrange"],
-            tracking_memory=store_data["wrmXpress_gui_obj"]["tracking_memory"],
-            tracking_adaptivestop=store_data["wrmXpress_gui_obj"]["tracking_adaptivestop"],
-            static_dx=store_data["wrmXpress_gui_obj"]["static_dx"],
-            static_dx_rescale=store_data["wrmXpress_gui_obj"]["static_dx_rescale"],
-            video_dx=store_data["wrmXpress_gui_obj"]["video_dx"],
-            video_dx_format=store_data["wrmXpress_gui_obj"]["video_dx_format"],
-            video_dx_rescale=store_data["wrmXpress_gui_obj"]["video_dx_rescale"],
-            mounted_volume=store_data["wrmXpress_gui_obj"]["mounted_volume"],
-            plate_name=store_data["wrmXpress_gui_obj"]["plate_name"],
-            well_selection_list=store_data["wrmXpress_gui_obj"]["well_selection_list"],
-        )
+    # Extract necessary fields from store_data
+    gui_obj = store_data.get("wrmXpress_gui_obj", {})
+    volume = gui_obj.get("mounted_volume")
+    platename = gui_obj.get("plate_name")
+    wells = gui_obj.get("well_selection_list", [])
+    wavelength = gui_obj.get("wavelengths")
 
-        # print(selection)
-        if selection == "optical_flow":
-            scale = "inferno"
-
-        wrmXpress_gui_obj.check_for_output_files()
-
-        if wrmXpress_gui_obj.output_files_exist:
-
-            # get the wrmXpress_gui_obj.output_file path for the file that contains selection
-            img_paths = wrmXpress_gui_obj.get_output_file_path(selection)
-            if len(img_paths) >= 1:
-                fig = create_figure_from_filepath(img_paths[0], scale)
-                return (
-                    fig,
-                    f"```{str(img_paths[0])}```",
-                    False,
-                    True,
-                    False,
-                    False,
-                    False,
-                    True,
-                )
-
+    if not volume or not platename:
+        # Mounted volume or plate name is missing.
         return {}, "", True, False, True, True, True, False
-    else:
+
+    if not n_clicks:
+        # No clicks detected
         return None, None, True, False, False, False, True, False
-
-    """
+    
     try:
-        # Get the store data
-        volume = store["wrmXpress_gui_obj"]["mounted_volume"]
-        platename = store["wrmXpress_gui_obj"]["plate_name"]
-
-        # Handle NoneType for platename
-        if platename is None:
-            return {}, "", True, False, True, True, True, False
-
+        # Derive plate_base and construct the image path
         plate_base = platename.split("_", 1)[0]
-        wells = store["wrmXpress_gui_obj"]["well_selection_list"]
+        img_path = construct_img_path(volume, selection, plate_base, wells, wavelength)
 
-        img_path = None
-        scale = "gray"
-        # check to see if selection option exists in output thumbs folder
-        if n_clicks:
-
-            if selection == "straightened_worms":
-
-                path_to_straightened_worms = Path(volume, "output/straightened_worms/")
-                pattern = f"{plate_base}*{wells[0]}*.tiff"
-                all_files = list(path_to_straightened_worms.glob(pattern))
-                # Filter files to find those corresponding to the first well in the list
-                straightened_worm_files = []
-                for file_path in all_files:
-                    if file_path.name.startswith(
-                        f"{plate_base}_{wells[0]}"
-                    ) or file_path.name.startswith(f"{plate_base}-{wells[0]}"):
-                        straightened_worm_files.append(file_path)
-
-                if straightened_worm_files:
-                    img_path = straightened_worm_files[0]  # Use the first matching file
-
-            elif selection.startswith("wavelength_"):
-                selection = selection.split("_", 1)[1]
-                img_path = Path(volume, f"output/thumbs/{platename}_{selection}.png")
-
-            elif selection == "motility":
-                selection = "_motility"
-                scale = "inferno"
-                img_path = Path(volume, f"output/thumbs/{platename}{selection}.png")
-
-            elif selection == "raw":
-                selection = ""
-                img_path = Path(volume, f"output/thumbs/{platename}{selection}.png")
-
-            elif selection == "segment":
-                selection = "_binary"
-                img_path = Path(volume, f"output/thumbs/{platename}{selection}.png")
-
-            else:
-                selection = f"_{selection}"
-                img_path = Path(volume, f"output/thumbs/{platename}{selection}.png")
-
-            # check to see if the img exists
-            if os.path.exists(img_path):
-                fig = create_figure_from_filepath(img_path, scale)
-
-                return fig, f"```{img_path}```", False, True, False, False, False, True
-
-            else:
-                return None, None, False, False, False, False, True, False
-
+        if img_path and img_path.exists():
+            # print(f"Image path found: {img_path}")"
+            scale = "inferno" if selection == "optical_flow" else "gray"
+            fig = create_figure_from_filepath(img_path, scale)
+            return (
+                fig,
+                f"```{str(img_path)}```",
+                False,
+                True,
+                False,
+                False,
+                False,
+                True,
+            )
         else:
-            return None, None, True, False, False, False, True, False
-
-    except KeyError:
-        return None, None, True, False, True, True, True, False
-    """
+            print(f"File does not exist or path is invalid: {img_path}")
+            return {}, "", True, False, True, True, True, False
+    except Exception as e:
+        print(f"Error during processing: {e}")
+        return {}, "", True, False, True, True, True, False
 
 
 @callback(
@@ -305,6 +188,9 @@ def get_options_analysis(nclicks, store_data):
     selection_dict = wrmXpress_gui_obj.get_image_diagnostic_parameters()
 
     if nclicks is not None:
-        return selection_dict
+        options = [
+            {"label": key, "value": value} for key, value in selection_dict.items()
+        ]
+        return options
     else:
-        return {}
+        return {"raw": "raw"}

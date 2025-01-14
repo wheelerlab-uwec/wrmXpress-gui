@@ -600,3 +600,17 @@ def zenodo_get_id(selected_plates):
             print(f"Error downloading {plate}: {str(e)}")
 
     return "Download complete!"
+
+
+def construct_img_path(volume, selection, plate_base, wells, wavelength):
+    """Construct the image path based on selection."""
+    if selection == "straightened_worms":
+        return Path(
+            f"{volume}/output/cellprofiler/img/{plate_base}_{wells[0]}_{wavelength}.tiff"
+        )
+    selection_normalized = "_".join(selection.lower().split())
+    base_path = Path(
+        f"{volume}/output/{selection_normalized}/{plate_base}_{wavelength}"
+    )
+    # Attempt to find a valid file with supported extensions
+    return next(base_path.parent.glob(f"{base_path.stem}.*"), None)

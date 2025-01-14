@@ -53,35 +53,7 @@ def callback(set_progress, store, wrmXpress_gui_obj):
         # Check if the submit button has been clicked
 
         # TODO: What if multiple pipelines are selected?
-        """
-        if "motility" in pipeline_selection:
-            return motility_or_segment_run(store, set_progress, wrmXpress_gui_obj)
 
-        elif "segmentation" in pipeline_selection:
-            return fecundity_run(store, set_progress, wrmXpress_gui_obj)
-
-        # TODO: lets get motility working first
-
-        elif "tracking" in pipeline_selection:
-            return tracking_wrmXpress_run(store, set_progress)
-
-        elif "cellprofiler" in pipeline_selection:
-            cell_profile_pipeline = store["wrmXpress_gui_obj"][
-                "cellprofiler_pipeline_selection"
-            ]
-
-            if cell_profile_pipeline == "wormsize_intensity_cellpose":
-                return cellprofiler_wormsize_intesity_cellpose_run(store, set_progress)
-
-            elif cell_profile_pipeline == "mf_celltox":
-                return cellprofiler_mf_celltox_run(store, set_progress)
-
-            elif cell_profile_pipeline == "feeding":
-                return cellprofiler_feeding_run(store, set_progress)
-
-            elif cell_profile_pipeline == "wormsize":
-                return cellprofiler_wormsize_run(store, set_progress)
-        """
     except Exception as e:
         # Log the error to your output file or a dedicated log file
         error_message = f"An error occurred: {str(e)}"
@@ -133,7 +105,7 @@ def run_wrmXpress_analysis(store, set_progress, wrmXpress_gui_obj):
 
                 
             except Exception as e:
-                print(f"Error: {e}")
+                # print(f"Error: {e}") error is likely due to the line not containing the necessary information for processing
                 continue
 
             if wrmXpress_gui_obj.set_progress_running:
@@ -349,6 +321,25 @@ def preamble_run_wrmXpress_imagexpress_selection(store):
         "tracking_well": tracking_well,
     }
     return new_store
+
+
+def updated_thumbnail_generation(wrmXpress_gui_obj, docker_output):
+    """
+    The purpose of this function is to update the thumbnail generation for the wrmXpress pipeline.
+    """
+    wrmXpress_gui_obj.sort_output_files()
+    output_figure_path = wrmXpress_gui_obj.output_files[0]
+    fig_1 = create_figure_from_filepath(output_figure_path)
+    docker_output.append("Thumbnail generation completed successfully.")
+    docker_output_formatted = "".join(docker_output)
+    return (
+        fig_1,
+        False,
+        False,
+        "",
+        f"```{docker_output_formatted}```",
+        f"```{output_figure_path}```",
+    )
 
 
 # In[3]: Helper Functions
@@ -1457,22 +1448,6 @@ def process_info_and_percent(
                 )
             )
 
-def updated_thumbnail_generation(wrmXpress_gui_obj, docker_output):
-
-    # TODO: Implement way to specify the figure to be returned rather than just the first one
-    wrmXpress_gui_obj.sort_output_files()
-    output_figure_path = wrmXpress_gui_obj.output_files[0]
-    fig_1 = create_figure_from_filepath(output_figure_path)
-    docker_output.append("Thumbnail generation completed successfully.")
-    docker_output_formatted = "".join(docker_output)
-    return (
-        fig_1,
-        False,
-        False,
-        "",
-        f"```{docker_output_formatted}```",
-        f"```{output_figure_path}```",
-    )
 
 def handle_thumbnail_generation(volume, platename, docker_output, output_file, pipeline=""):
     

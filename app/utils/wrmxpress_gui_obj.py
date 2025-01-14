@@ -192,7 +192,7 @@ class WrmXpressGui:
                 self.error_messages.append(
                     "The number of y sites for the multi-site plate is missing."
                 )
-    
+
     def validate_cellprofiler_cellpose_combos(self):
         if "cellprofiler" in self.pipeline_selection and self.cellprofiler_pipeline_selection == 'wormsize_intensity_cellpose' and self.cellpose_model_cellprofiler is None:
             self.error_occurred = True
@@ -657,12 +657,12 @@ class WrmXpressGui:
         return {
             "static_dx": "static_dx",
         } if self.static_dx else {}
-    
+
     def get_video_dx_image_diagnostic_parameters(self):
         return {
             "video_dx": "video_dx",
         } if self.video_dx else {}
-    
+
     def get_image_diagnostic_parameters(self):
         motility_params = self.get_motility_image_diagnostic_parameters()
         segmentation_params = self.get_segmentation_image_diagnostic_parameters()
@@ -682,7 +682,8 @@ class WrmXpressGui:
             **video_dx_params,
         }
 
-        params = self.get_wavelengths_from_files(params)
+        if self.file_structure == "imagexpress":
+            params = self.get_wavelengths_from_files(params)
 
         return {
             **params,
@@ -937,26 +938,36 @@ class WrmXpressGui:
 
     def check_for_output_files(self):
         output_directory = Path(self.mounted_volume, "output")
+        plate_base = self.plate_name.split("_", 1)[0]
 
-        # get the image diagnostics parameters
-        image_diagnostics_params = self.get_image_diagnostic_parameters()
+        # Derive selected pipelines
+        selected_pipelines = [
+            "optical_flow" if p == "motility" else p for p in self.pipeline_selection
+        ]
+        if self.static_dx:
+            selected_pipelines.append("static_dx")
+        if self.video_dx:
+            selected_pipelines.append("video_dx")
 
-        # look in the output directory, image diagnostic directory for final image
-        for key, value in image_diagnostics_params.items():
+        # Initialize output files if not already done
+        self.output_files_exist = False
+        self.output_files = []
 
-            pipeline_selection_dir = Path(output_directory, value)
+        # Search for output files in the specified pipelines
+        for pipeline in selected_pipelines:
+            pipeline_dir = Path(output_directory, pipeline)
+            if not pipeline_dir.exists():
+                continue  # Skip if the directory doesn't exist
 
-            # search for any files inside the pipeline selection directory
-            files = list(pipeline_selection_dir.glob("*"))
-            
-            # get a list of the files and not the directories
-            files = [file for file in files if file.is_file()]
+            # Collect PNG and TIF files
+            files = list(pipeline_dir.glob("*.PNG")) + list(pipeline_dir.glob("*.TIF"))
 
-            if files:
-                # append files to the output_files list
-                self.output_files.extend(files)
+            # Check for plate_base consistency in file names
+            matching_files = [file for file in files if plate_base in file.name]
 
+            if matching_files:
                 self.output_files_exist = True
+                self.output_files.extend(matching_files)
 
     def sort_output_files(self):
         # set static_dx and video_dx to the last files
@@ -976,28 +987,28 @@ class WrmXpressGui:
         self.set_progress_total_number = total_number
         self.set_progress_figure = figure
         self.set_progress_image_path = image_path
-    
+
     def get_output_file_path(self, selection):
         # print(self.output_files)
         returned_files = []
-        
+
         if selection == "straightened_worms":
             return self.get_straightened_worms_file_path()
-        
+
         if selection in ['w1', 'w2', 'w3', 'w4']:
             return self.get_wavelength_file_path(selection)
-        
+
         for file in self.output_files:
             if selection in str(file):
                 returned_files.append(file)
-            
+
         # check if any of the wells from self.well_selection_list is in the file name
         if len(returned_files) >= 1:
             for file in returned_files:
                 # first well in well selection list is in the file name
                 if self.well_selection_list[0] in str(file):
                     return file
-        
+
         return returned_files
 
     def get_straightened_worms_file_path(self):
@@ -1040,8 +1051,7 @@ class WrmXpressGui:
                         wavelength_files.remove(file)
 
                 return wavelength_files
-            
-    
+
     # In[8]: Run Analysis
 
     def setup_run_analysis(self, file_structure):
@@ -1142,6 +1152,7 @@ class WrmXpressGui:
 
         return docker_output
         """
+
 
 """
     def _run_wrmxpress_subprocess_analysis(self, command_split, set_progress):
