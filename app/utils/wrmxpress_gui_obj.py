@@ -194,7 +194,11 @@ class WrmXpressGui:
                 )
 
     def validate_cellprofiler_cellpose_combos(self):
-        if "cellprofiler" in self.pipeline_selection and self.cellprofiler_pipeline_selection == 'wormsize_intensity_cellpose' and self.cellpose_model_cellprofiler is None:
+        if (
+            "cellprofiler" in self.pipeline_selection
+            and self.cellprofiler_pipeline_selection == "wormsize_intensity_cellpose"
+            and self.cellpose_model_cellprofiler is None
+        ):
             self.error_occurred = True
             self.error_messages.append(
                 "A Cellpose model is required for the selected pipeline."
@@ -205,7 +209,7 @@ class WrmXpressGui:
             self.error_occurred = True
             self.error_messages.append("No pipeline selected.")
 
-        if  "motility" in self.pipeline_selection:
+        if "motility" in self.pipeline_selection:
             defaults = {
                 "pyrscale": 0.5,
                 "levels": 5,
@@ -221,13 +225,17 @@ class WrmXpressGui:
                         f"{param} is missing. Default value ({default}) will be used."
                     )
 
-        if  "segmentation" in self.pipeline_selection and self.cellpose_model_cellprofiler == "python" and not self.python_model_sigma:
+        if (
+            "segmentation" in self.pipeline_selection
+            and self.cellpose_model_cellprofiler == "python"
+            and not self.python_model_sigma
+        ):
             self.warning_occurred = True
             self.warning_messages.append(
                 "Python model sigma is missing. Default value (0.25) will be used."
             )
 
-        if  "tracking" in self.pipeline_selection:
+        if "tracking" in self.pipeline_selection:
             defaults = {
                 "tracking_diameter": 35,
                 "tracking_minmass": 1200,
@@ -293,21 +301,29 @@ class WrmXpressGui:
     def validate_avi_mode(self):
         if self.file_structure == "avi":
             avi_folder_path = Path(self.mounted_volume, self.plate_name)
-            avi_pattern = f"{self.plate_name}_"
-            matched_files_avi = list(avi_folder_path.glob(avi_pattern + "*.avi"))
+            if self.imaging_mode == "single-well":
+                avi_pattern = f"{self.plate_name}_"
+                matched_files_avi = list(avi_folder_path.glob(avi_pattern + "*.avi"))
 
-            if not matched_files_avi:
-                self.error_occurred = True
-                self.error_messages.append("No AVI files found in the Plate/Folder.")
-
-            for well in self.well_selection_list:
-                pattern = f"{self.plate_name}_{well}"
-                matched_files = list(avi_folder_path.glob(pattern + "*.avi"))
-                if not matched_files:
+                if not matched_files_avi:
                     self.error_occurred = True
                     self.error_messages.append(
-                        f"No images found for well {well}. This may result in unexpected errors or results."
+                        "No AVI files found in the Plate/Folder."
                     )
+
+                for well in self.well_selection_list:
+                    pattern = f"{self.plate_name}_{well}"
+                    matched_files = list(avi_folder_path.glob(pattern + "*.avi"))
+                    if not matched_files:
+                        self.error_occurred = True
+                        self.error_messages.append(
+                            f"No images found for well {well}. This may result in unexpected errors or results."
+                        )
+            if self.imaging_mode == "multi-well":
+                avi = f"{self.plate_name}.avi"
+                if not os.path.exists(Path(avi_folder_path, avi)):
+                    self.error_occurred = True
+                    self.error_messages.append("No AVI file found in the Plate/Folder.")
 
     def validate(self):
         self.validate_volume()
@@ -343,7 +359,10 @@ class WrmXpressGui:
         if isinstance(self.well_selection_list, str):
             self.well_selection_list = [self.well_selection_list]
 
-        elif isinstance(self.well_selection_list, list) and len(self.well_selection_list) == 96:
+        elif (
+            isinstance(self.well_selection_list, list)
+            and len(self.well_selection_list) == 96
+        ):
             self.well_selection_list = self.well_selection_list
 
         # if length of well selection is 96, then change to "All"
@@ -509,7 +528,7 @@ class WrmXpressGui:
             "wavelengths": ["All"],
         }
 
-        if  "segmentation" in self.pipeline_selection:
+        if "segmentation" in self.pipeline_selection:
             update_dict = {
                 "run": True,
                 "model": self.cellpose_model_segmentation,
@@ -524,7 +543,7 @@ class WrmXpressGui:
 
             self.segmentation_dict.update(update_dict)
 
-    def create_yaml_dict(self): 
+    def create_yaml_dict(self):
         yml = {
             "imaging_mode": [self.imaging_mode],
             "file_structure": [self.file_structure],
@@ -581,7 +600,7 @@ class WrmXpressGui:
             {
                 "Optical flow": "optical_flow",
             }
-            if  "motility" in self.pipeline_selection
+            if "motility" in self.pipeline_selection
             else {}
         )
 
@@ -590,16 +609,12 @@ class WrmXpressGui:
             {
                 "Segmentation": "segmentation",
             }
-            if  "segmentation" in self.pipeline_selection
+            if "segmentation" in self.pipeline_selection
             else {}
         )
 
     def get_tracking_image_diagnostic_parameters(self):
-        return (
-            {"Tracks": "tracks"}
-            if "tracking" in self.pipeline_selection
-            else {}
-        )
+        return {"Tracks": "tracks"} if "tracking" in self.pipeline_selection else {}
 
     def get_cell_profile_image_diagnostic_parameters(self):
         if "cellprofiler" in self.pipeline_selection:
@@ -654,14 +669,22 @@ class WrmXpressGui:
         return params
 
     def get_static_dx_image_diagnostic_parameters(self):
-        return {
-            "static_dx": "static_dx",
-        } if self.static_dx else {}
+        return (
+            {
+                "static_dx": "static_dx",
+            }
+            if self.static_dx
+            else {}
+        )
 
     def get_video_dx_image_diagnostic_parameters(self):
-        return {
-            "video_dx": "video_dx",
-        } if self.video_dx else {}
+        return (
+            {
+                "video_dx": "video_dx",
+            }
+            if self.video_dx
+            else {}
+        )
 
     def get_image_diagnostic_parameters(self):
         motility_params = self.get_motility_image_diagnostic_parameters()
@@ -713,6 +736,9 @@ class WrmXpressGui:
         if file_structure == "imagexpress":
             plate_base = self.plate_name.split("_", 1)[0]
             htd_file = Path(image_directory, f"{plate_base}.HTD")
+        elif file_structure == "avi":
+            plate_base = self.plate_name
+            htd_file = None
 
         # Determine wells to copy
         wells_to_process = (
@@ -727,6 +753,7 @@ class WrmXpressGui:
             plate_base=plate_base,
             wells=wells_to_process,
             platename=self.plate_name,
+            file_structure=self.file_structure,
         )
 
     def clean_and_create_directories(self, input_path, work_path, output_path=None):
@@ -785,9 +812,7 @@ class WrmXpressGui:
             return Path(self.mounted_volume, "work", log_file_name)
 
         # Core logic
-        self.command_message = (
-            f"```python /root/wrmXpress/wrapper.py {self.plate_name}.yml {self.plate_name}```"
-        )
+        self.command_message = f"```python /root/wrmXpress/wrapper.py {self.plate_name}.yml {self.plate_name}```"
         self.wrmxpress_preview_command_split = generate_command(is_preview=True)
         self.wrmxpress_command_split = generate_command()
         self.output_preview_log_file = generate_log_file(is_preview=True)
@@ -799,7 +824,7 @@ class WrmXpressGui:
 
         if len(self.well_selection_list) == 1 and self.well_selection_list[0] != "All":
             print("First well is not All")
-            first_well = self.well_selection_list
+            first_well = self.well_selection_list[0]
         elif self.well_selection_list == ["All"]:
             first_well = "A01"
         else:
@@ -838,7 +863,9 @@ class WrmXpressGui:
             self.prepare_wrmxpress_command()
 
             # Run wrmXpress using the prepared command
-            docker_output = self._run_wrmxpress_subprocess(self.wrmxpress_preview_command_split, self.output_preview_log_file)
+            docker_output = self._run_wrmxpress_subprocess(
+                self.wrmxpress_preview_command_split, self.output_preview_log_file
+            )
 
             # Check again if the first well has been processed after running the command
             if self.first_well_already_run():
@@ -876,8 +903,8 @@ class WrmXpressGui:
                     stderr=subprocess.STDOUT,
                     text=True,
                     bufsize=1,
-                    universal_newlines=True,  
-                    env={**os.environ, 'PYTHONUNBUFFERED': '1'}  
+                    universal_newlines=True,
+                    env={**os.environ, "PYTHONUNBUFFERED": "1"},
                 )
                 # stdout, _ = process.communicate()
                 # docker_output.append(stdout)
@@ -901,21 +928,23 @@ class WrmXpressGui:
         Returns True if the image is found, otherwise False.
         """
         pipeline = []
-        if  "motility" in self.pipeline_selection:
+        if "motility" in self.pipeline_selection:
             pipeline.append("optical_flow")
 
         if "segmentation" in self.pipeline_selection:
             pipeline.append("segmentation")
 
-        elif  "tracking" in self.pipeline_selection:
+        elif "tracking" in self.pipeline_selection:
             pipeline.append("tracking")
 
-        elif  "cellprofiler" in self.pipeline_selection:
+        elif "cellprofiler" in self.pipeline_selection:
             pipeline.append("cellprofiler")
 
         # pipeline = Path(self.mounted_volume, "work", f"{pipeline}")
         # get a list of the different pipeline paths in work directory
-        pipeline = [Path(self.mounted_volume, "work", f"{pipeline}") for pipeline in pipeline]
+        pipeline = [
+            Path(self.mounted_volume, "work", f"{pipeline}") for pipeline in pipeline
+        ]
 
         first_well = self.get_first_well()
         png_file_pattern = f"*{first_well}*.png"
@@ -971,7 +1000,9 @@ class WrmXpressGui:
 
     def sort_output_files(self):
         # set static_dx and video_dx to the last files
-        static_dx_files = [file for file in self.output_files if "static_dx" in file.name]
+        static_dx_files = [
+            file for file in self.output_files if "static_dx" in file.name
+        ]
         video_dx_files = [file for file in self.output_files if "video_dx" in file.name]
 
         # remove the static_dx and video_dx files from the output_files list
@@ -981,7 +1012,9 @@ class WrmXpressGui:
             if file not in static_dx_files and file not in video_dx_files
         ]
 
-    def set_processing_arguments(self, current_number, total_number, figure, image_path):
+    def set_processing_arguments(
+        self, current_number, total_number, figure, image_path
+    ):
         self.set_progress_running = True
         self.set_progress_current_number = current_number
         self.set_progress_total_number = total_number
@@ -995,7 +1028,7 @@ class WrmXpressGui:
         if selection == "straightened_worms":
             return self.get_straightened_worms_file_path()
 
-        if selection in ['w1', 'w2', 'w3', 'w4']:
+        if selection in ["w1", "w2", "w3", "w4"]:
             return self.get_wavelength_file_path(selection)
 
         for file in self.output_files:
@@ -1026,7 +1059,7 @@ class WrmXpressGui:
                 print(straightened_worms_files)
                 # ensure this first file has extension of png/tiff if not remove it
                 for file in straightened_worms_files:
-                    if file.suffix not in [".png", ".tiff", '.tif']:
+                    if file.suffix not in [".png", ".tiff", ".tif"]:
                         straightened_worms_files.remove(file)
 
                 return straightened_worms_files
@@ -1047,7 +1080,7 @@ class WrmXpressGui:
 
                 # ensure this first file has extension of png/tiff if not remove it
                 for file in wavelength_files:
-                    if file.suffix not in [".png", ".tiff", '.tif']:
+                    if file.suffix not in [".png", ".tiff", ".tif"]:
                         wavelength_files.remove(file)
 
                 return wavelength_files
@@ -1061,7 +1094,9 @@ class WrmXpressGui:
 
     def run_analysis(self, set_progress):
         # Run wrmXpress using the prepared command
-        docker_output = self._run_wrmxpress_subprocess_analysis(self.wrmxpress_command_split, set_progress)
+        docker_output = self._run_wrmxpress_subprocess_analysis(
+            self.wrmxpress_command_split, set_progress
+        )
 
         return docker_output
 
@@ -1077,9 +1112,10 @@ class WrmXpressGui:
             command_split,
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
-            text=True, bufsize=1,
-            universal_newlines=True,  
-            env={**os.environ, 'PYTHONUNBUFFERED': '1'}  
+            text=True,
+            bufsize=1,
+            universal_newlines=True,
+            env={**os.environ, "PYTHONUNBUFFERED": "1"},
         )
 
         # Read and print the output line-by-line

@@ -40,11 +40,11 @@ def callback(set_progress, store, wrmXpress_gui_obj):
 
         # obtain the necessary data from the store
         # pipeline_selection = store["wrmXpress_gui_obj"]["pipeline_selection"]
-        
+
         return run_wrmXpress_analysis(store, set_progress, wrmXpress_gui_obj)
-    
+
         # TODO: # Update this if avi is selected and above method doesnt work
-        
+
         # if store['file_structure'] == 'avi':
         #     return run_avi_wrmXpress_analysis(store, set_progress, wrmXpress_gui_obj)
 
@@ -68,15 +68,16 @@ def callback(set_progress, store, wrmXpress_gui_obj):
             None,
         )
 
+
 def run_wrmXpress_analysis(store, set_progress, wrmXpress_gui_obj):
     """
     The purpose of this function is to run the wrmXpress pipeline for imagexpress formatted files,
     regardless of the pipeline selection.
     """
-    if store['file_structure'] == 'imagexpress':
+    if store["file_structure"] == "imagexpress":
         new_store = preamble_run_wrmXpress_imagexpress_selection(store)
-    
-    elif store['file_structure'] == 'avi':
+
+    elif store["file_structure"] == "avi":
         new_store = preamble_run_wrmXpress_avi_selection(store)
 
     # while not os.path.exists(new_store["output_folder"]):
@@ -98,12 +99,16 @@ def run_wrmXpress_analysis(store, set_progress, wrmXpress_gui_obj):
             docker_output.append(line)
             file.write(line)
             file.flush()
-            
-            try:
-                if len(re.findall(r"\b" + "|".join(new_store["wells"]) + r"\b", line)) == 1:
-                    updated_running_wells(set_progress, line, store, docker_output, wrmXpress_gui_obj)
 
-                
+            try:
+                if (
+                    len(re.findall(r"\b" + "|".join(new_store["wells"]) + r"\b", line))
+                    == 1
+                ):
+                    updated_running_wells(
+                        set_progress, line, store, docker_output, wrmXpress_gui_obj
+                    )
+
             except Exception as e:
                 # print(f"Error: {e}") error is likely due to the line not containing the necessary information for processing
                 continue
@@ -180,10 +185,7 @@ def updated_running_wells(set_progress, line, store, docker_output, wrmXpress_gu
         )
 
         wrmXpress_gui_obj.set_processing_arguments(
-            current_number, 
-            total_number, 
-            fig, 
-            img_path
+            current_number, total_number, fig, img_path
         )
 
 
@@ -221,6 +223,7 @@ def preamble_run_wrmXpress_avi_selection(store):
         wells=wells,
         plate_base=None,
         platename=platename,
+        file_structure=store["file_structure"],
     )
 
     # Command message
@@ -292,6 +295,7 @@ def preamble_run_wrmXpress_imagexpress_selection(store):
         wells=wells,
         plate_base=plate_base,
         platename=platename,
+        file_structure=store["file_structure"],
     )
     # Command message
     command_message = (
@@ -344,6 +348,7 @@ def updated_thumbnail_generation(wrmXpress_gui_obj, docker_output):
 
 # In[3]: Helper Functions
 
+
 def tracking_wrmXpress_run(store, set_progress):
     """
     The purpose of this function is to run wrmXpress for tracking and return the figure, open status, and command message.
@@ -385,7 +390,9 @@ def motility_or_segment_run(store, set_progress, wrmXpress_gui_obj):
 
         elif file_structure == "imagexpress":
             new_store = preamble_run_wrmXpress_imagexpress_selection(store)
-            return run_wrmXpress_imagexpress_selection_motility(new_store, set_progress, store, wrmXpress_gui_obj)
+            return run_wrmXpress_imagexpress_selection_motility(
+                new_store, set_progress, store, wrmXpress_gui_obj
+            )
 
     except Exception as e:
         # Log the error to your output file or a dedicated log file
@@ -454,12 +461,7 @@ def fecundity_run(store, set_progress, wrmXpress_gui_obj):
                 # the line looks something like "{well} {number}/{total number of wells}"
                 if len(re.findall(r"\b" + "|".join(wells) + r"\b", line)) == 1:
 
-                    updated_running_wells(
-                        set_progress, 
-                        line, 
-                        store, 
-                        docker_output
-                        )
+                    updated_running_wells(set_progress, line, store, docker_output)
                 # if "Running" in line:
 
                 #     process_running_wells(
@@ -477,26 +479,34 @@ def fecundity_run(store, set_progress, wrmXpress_gui_obj):
 
             if process.returncode == 0:
 
-                print("wrmXpress process successful.")  
+                print("wrmXpress process successful.")
 
                 # check for output files
                 wrmXpress_gui_obj.check_for_output_files()
 
                 if wrmXpress_gui_obj.output_files_exist:
-                    return updated_thumbnail_generation(wrmXpress_gui_obj, docker_output)
-                
+                    return updated_thumbnail_generation(
+                        wrmXpress_gui_obj, docker_output
+                    )
+
                 # TODO: Implement thumbnail generation
                 return handle_thumbnail_generation(
-                    volume, platename, docker_output, output_file, pipeline="segmentation"
+                    volume,
+                    platename,
+                    docker_output,
+                    output_file,
+                    pipeline="segmentation",
                 )
 
             else:
                 print("wrmXpress process failed.")
                 wrmXpress_gui_obj.check_for_output_files()
-                
+
                 if wrmXpress_gui_obj.output_files_exist:
-                    return updated_thumbnail_generation(wrmXpress_gui_obj, docker_output)
-                
+                    return updated_thumbnail_generation(
+                        wrmXpress_gui_obj, docker_output
+                    )
+
                 # TODO: Implement failure handling
                 return handle_failure(docker_output, output_file)
 
@@ -1096,7 +1106,9 @@ def run_wrmXpress_avi_selection_motility(new_store, set_progress):
             return handle_failure(docker_output, log_file_path)
 
 
-def run_wrmXpress_imagexpress_selection_motility(new_store, set_progress, store, wrmXpress_gui_obj):
+def run_wrmXpress_imagexpress_selection_motility(
+    new_store, set_progress, store, wrmXpress_gui_obj
+):
     wrmxpress_command_split = new_store["wrmxpress_command_split"]
     output_folder = new_store["output_folder"]
     output_file = new_store["output_file"]
@@ -1133,12 +1145,7 @@ def run_wrmXpress_imagexpress_selection_motility(new_store, set_progress, store,
             # the line looks something like "{well} {number}/{total number of wells}"
             if len(re.findall(r"\b" + "|".join(wells) + r"\b", line)) == 1:
 
-                updated_running_wells(
-                    set_progress,
-                    line, 
-                    store, 
-                    docker_output
-                )
+                updated_running_wells(set_progress, line, store, docker_output)
 
             # Process 'Running' lines to update progress
             # if "Running" in line:
@@ -1449,10 +1456,12 @@ def process_info_and_percent(
             )
 
 
-def handle_thumbnail_generation(volume, platename, docker_output, output_file, pipeline=""):
-    
+def handle_thumbnail_generation(
+    volume, platename, docker_output, output_file, pipeline=""
+):
+
     output_path_base = Path(volume, "output", pipeline)
-    print('output_path_base', output_path_base)
+    print("output_path_base", output_path_base)
     file_paths = list(
         output_path_base.parent.rglob(output_path_base.name + "*[._][pP][nN][gG]")
     )

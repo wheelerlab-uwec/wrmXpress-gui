@@ -19,6 +19,7 @@ import subprocess
 
 # In[2]: Helper functions
 
+
 def create_df_from_inputs(_rows, _cols):
     """
     This function creates a dataframe from the input rows and columns.
@@ -432,6 +433,7 @@ def copy_files_to_input_directory(
     plate_base,
     wells,
     platename,
+    file_structure,
     file_types=None,
 ):
     """
@@ -447,28 +449,41 @@ def copy_files_to_input_directory(
         shutil.copy(htd_file, platename_input_dir)
 
     try:
-        time_points = (
-            [item for item in os.listdir(img_dir) if os.path.isdir(Path(img_dir, item))]
-            if htd_file
-            else [None]
-        )
-        for time_point in time_points:
-            for well in wells:
-                for file_type in file_types:
-                    pattern = (
-                        f"{plate_base}_{well}*" if htd_file else f"{platename}_{well}*"
-                    )
-                    search_pattern = Path(
-                        img_dir, time_point if time_point else "", pattern + file_type
-                    )
-                    for file_path in glob.glob(str(search_pattern)):
-                        dest_dir = (
-                            Path(platename_input_dir, time_point)
-                            if time_point
-                            else platename_input_dir
+        if file_structure == "imagexpress":
+            time_points = (
+                [
+                    item
+                    for item in os.listdir(img_dir)
+                    if os.path.isdir(Path(img_dir, item))
+                ]
+                if htd_file
+                else [None]
+            )
+            for time_point in time_points:
+                for well in wells:
+                    for file_type in file_types:
+                        pattern = (
+                            f"{plate_base}_{well}*"
+                            if htd_file
+                            else f"{platename}_{well}*"
                         )
-                        dest_dir.mkdir(parents=True, exist_ok=True)
-                        shutil.copy(file_path, dest_dir)
+                        search_pattern = Path(
+                            img_dir,
+                            time_point if time_point else "",
+                            pattern + file_type,
+                        )
+                        for file_path in glob.glob(str(search_pattern)):
+                            dest_dir = (
+                                Path(platename_input_dir, time_point)
+                                if time_point
+                                else platename_input_dir
+                            )
+                            dest_dir.mkdir(parents=True, exist_ok=True)
+                            shutil.copy(file_path, dest_dir)
+        elif file_structure == "avi":
+            dest_dir = platename_input_dir
+            dest_dir.mkdir(parents=True, exist_ok=True)
+            shutil.copy(Path(img_dir, f"{plate_base}.avi"), dest_dir)
     except Exception as e:
         print(f"Error copying files to input directory: {e}")
 
@@ -574,13 +589,9 @@ def zenodo_get_id(selected_plates):
     for plate in selected_plates:
         # Construct the glob pattern for each plate
         if plate == "20220527-p02-KTR" or plate == "20220622-p02-KTR":
-            file_pattern = (
-                f"{plate}.avi"
-            )
+            file_pattern = f"{plate}.avi"
         else:
-            file_pattern = (
-                f"{plate}.zip"
-            )
+            file_pattern = f"{plate}.zip"
 
         print(f"Attempting to download file: {file_pattern}")  # For debugging purposes
 

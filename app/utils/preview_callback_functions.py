@@ -108,10 +108,13 @@ def preamble_preview_imgxpress_selection(store):
         plate_base=plate_base,
         wells=first_well,
         platename=platename,
+        file_structure=store["file_structure"],
     )
 
     # Command message
-    command_message = f"```python /root/wrmXpress/wrapper.py {platename}.yml {platename}```"
+    command_message = (
+        f"```python /root/wrmXpress/wrapper.py {platename}.yml {platename}```"
+    )
 
     wrmxpress_command = (
         f"python /root/wrmXpress/wrapper.py {volume}/.{platename}.yml {platename}"
@@ -171,10 +174,13 @@ def preamble_preview_avi_selection(store):
         wells=first_well,
         plate_base=None,
         platename=platename,
+        file_structure=store["file_structure"],
     )
 
     # Command message
-    command_message = f"```python /root/wrmXpress/wrapper.py {platename}.yml {platename}```"
+    command_message = (
+        f"```python /root/wrmXpress/wrapper.py {platename}.yml {platename}```"
+    )
 
     wrmxpress_command = (
         f"python /root/wrmXpress/wrapper.py {volume}/.{platename}.yml {platename}"
