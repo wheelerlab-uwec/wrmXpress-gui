@@ -271,7 +271,7 @@ class WrmXpressGui:
 
             if not htd_files and not HTD_files:
                 self.error_occurred = True
-                self.error_messages.append("No .HTD file found in the Plate/Folder.")
+                self.error_messages.append("No .HTD file found in the Plate/Folder with ImageXpress file structure. You may have selected the wrong file structure.")
 
             # Validate subdirectories
             subdirectories = [x for x in platename_path.iterdir() if x.is_dir()]

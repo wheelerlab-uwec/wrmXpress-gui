@@ -169,8 +169,9 @@ def update_preview_image(n_clicks, store):
 
         elif file_structure == "avi":
             # assumes AVI-like file structure
+            # TODO: this shows the entire AVI; if cropping is selected, it won't show the cropped well
             img_path = Path(
-                volume, "input", f"{platename}/TimePoint_1/{platename}_{first_well}.TIF"
+                volume, "input", f"{platename}/TimePoint_1/{platename}_{first_well}_w1.TIF"
             )
 
             # Should try and figure out an alternative to this
