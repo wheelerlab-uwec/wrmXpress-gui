@@ -691,8 +691,8 @@ class WrmXpressGui:
         segmentation_params = self.get_segmentation_image_diagnostic_parameters()
         tracking_params = self.get_tracking_image_diagnostic_parameters()
         cell_profile_params = self.get_cell_profile_image_diagnostic_parameters()
-        static_dx_params = self.get_static_dx_image_diagnostic_parameters()
-        video_dx_params = self.get_video_dx_image_diagnostic_parameters()
+        # static_dx_params = self.get_static_dx_image_diagnostic_parameters()
+        # video_dx_params = self.get_video_dx_image_diagnostic_parameters()
 
         # get the params that is not {}
 
@@ -701,8 +701,8 @@ class WrmXpressGui:
             **segmentation_params,
             **tracking_params,
             **cell_profile_params,
-            **static_dx_params,
-            **video_dx_params,
+            # **static_dx_params,
+            # **video_dx_params,
         }
 
         if self.file_structure == "imagexpress":
