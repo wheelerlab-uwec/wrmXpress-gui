@@ -58,12 +58,12 @@ image_transformations = dbc.AccordionItem(
                         [
                             html.H6("Diameter (portion of image height)"),
                             dbc.Input(
-                                id="mask-diameter",  # Input values for rows per image
+                                id="mask-diameter", 
                                 placeholder="0",
                                 type="number",
                                 min=0,
                                 max=1,
-                                step=0.1,
+                                # step=0.1,
                                 persistence=True,
                                 persistence_type="memory",
                             ),
@@ -79,6 +79,6 @@ image_transformations = dbc.AccordionItem(
             )
         )
     ],
-    id="image-transformations,  # id of accordian item",
+    id="image-transformations",
     title="Image Transformations",  # Title of accordian item
 )
