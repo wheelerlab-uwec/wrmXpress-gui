@@ -274,6 +274,9 @@ def prep_yaml(store_data):
     trackingrun_dict = (
         {
             "run": True,
+            "wavelengths": get_default_value(
+                store_data["wrmXpress_gui_obj"]["wavelengths_tracking"], ["All"]
+            ),
             "diameter": get_default_value(
                 store_data["wrmXpress_gui_obj"]["tracking_diameter"], 35
             ),
@@ -296,6 +299,7 @@ def prep_yaml(store_data):
         if store_data["wrmXpress_gui_obj"]["pipeline_selection"] == "tracking"
         else {
             "run": False,
+            "wavelengths": ["All"],
             "diameter": 35,
             "minmass": 1200,
             "noisesize": 2,

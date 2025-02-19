@@ -221,7 +221,7 @@ def preamble_run_wrmXpress_avi_selection(store):
         htd_file=None,
         img_dir=img_dir,
         wells=wells,
-        plate_base=None,
+        plate_base=platename,
         platename=platename,
         file_structure=store["file_structure"],
     )

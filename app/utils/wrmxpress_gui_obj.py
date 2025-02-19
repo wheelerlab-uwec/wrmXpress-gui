@@ -49,6 +49,7 @@ class WrmXpressGui:
         cellprofiler_pipeline_selection,
         cellpose_model_cellprofiler,
         wavelengths_cellprofiler,
+        wavelengths_tracking,
         tracking_diameter,
         tracking_minmass,
         tracking_noisesize,
@@ -92,6 +93,7 @@ class WrmXpressGui:
         self.cellprofiler_pipeline_selection = cellprofiler_pipeline_selection
         self.cellpose_model_cellprofiler = cellpose_model_cellprofiler
         self.wavelengths_cellprofiler = wavelengths_cellprofiler
+        self.wavelengths_tracking = wavelengths_tracking
         self.tracking_diameter = tracking_diameter
         self.tracking_minmass = tracking_minmass
         self.tracking_noisesize = tracking_noisesize
@@ -236,6 +238,7 @@ class WrmXpressGui:
             )
 
         if "tracking" in self.pipeline_selection:
+            
             defaults = {
                 "tracking_diameter": 35,
                 "tracking_minmass": 1200,
@@ -250,6 +253,21 @@ class WrmXpressGui:
                     self.warning_messages.append(
                         f"{param} is missing. Default value ({default}) will be used."
                     )
+            
+            try:
+                tracking_diameter = self.tracking_diameter if self.tracking_diameter is not None else defaults["tracking_diameter"]
+                tracking_noisesize = self.tracking_noisesize if self.tracking_noisesize is not None else defaults["tracking_noisesize"]
+
+                if int(tracking_diameter) <= int(tracking_noisesize):
+                    self.error_occurred = True
+                    self.error_messages.append(
+                        "Tracking diameter must be greater than tracking noise size."
+                    )
+            except TypeError:
+                self.error_occurred = True
+                self.error_messages.append(
+                    "Invalid type for tracking diameter or tracking noise size."
+                )
 
     def validate_avi_pipeline_parameters(self):
         if self.file_structure == "avi" and self.pipeline_selection not in [
@@ -301,24 +319,24 @@ class WrmXpressGui:
     def validate_avi_mode(self):
         if self.file_structure == "avi":
             avi_folder_path = Path(self.mounted_volume, self.plate_name)
-            if self.imaging_mode == "single-well":
-                avi_pattern = f"{self.plate_name}_"
-                matched_files_avi = list(avi_folder_path.glob(avi_pattern + "*.avi"))
+            # if self.imaging_mode == "single-well":
+            #     avi_pattern = f"{self.plate_name}_"
+            #     matched_files_avi = list(avi_folder_path.glob(avi_pattern + "*.avi"))
 
-                if not matched_files_avi:
-                    self.error_occurred = True
-                    self.error_messages.append(
-                        "No AVI files found in the Plate/Folder."
-                    )
+            #     if not matched_files_avi:
+            #         self.error_occurred = True
+            #         self.error_messages.append(
+            #             "No AVI files found in the Plate/Folder."
+            #         )
 
-                for well in self.well_selection_list:
-                    pattern = f"{self.plate_name}_{well}"
-                    matched_files = list(avi_folder_path.glob(pattern + "*.avi"))
-                    if not matched_files:
-                        self.error_occurred = True
-                        self.error_messages.append(
-                            f"No images found for well {well}. This may result in unexpected errors or results."
-                        )
+            #     for well in self.well_selection_list:
+            #         pattern = f"{self.plate_name}_{well}"
+            #         matched_files = list(avi_folder_path.glob(pattern + "*.avi"))
+            #         if not matched_files:
+            #             self.error_occurred = True
+            #             self.error_messages.append(
+            #                 f"No images found for well {well}. This may result in unexpected errors or results."
+            #             )
             if self.imaging_mode == "multi-well":
                 avi = f"{self.plate_name}.avi"
                 if not os.path.exists(Path(avi_folder_path, avi)):
@@ -497,6 +515,7 @@ class WrmXpressGui:
     def prep_tracking_dict(self):
         self.tracking_dict = {
             "run": False,
+            "wavelengths": ["All"],
             "diameter": 35,
             "minmass": 1200,
             "noisesize": 2,
@@ -509,6 +528,7 @@ class WrmXpressGui:
             self.tracking_dict.update(
                 {
                     "run": True,
+                    "wavelengths": [self.wavelengths_tracking],
                     "diameter": get_default_value(self.tracking_diameter, 35),
                     "minmass": get_default_value(self.tracking_minmass, 1200),
                     "noisesize": get_default_value(self.tracking_noisesize, 2),
@@ -754,6 +774,7 @@ class WrmXpressGui:
             wells=wells_to_process,
             platename=self.plate_name,
             file_structure=self.file_structure,
+            
         )
 
     def clean_and_create_directories(self, input_path, work_path, output_path=None):
@@ -906,15 +927,13 @@ class WrmXpressGui:
                     universal_newlines=True,
                     env={**os.environ, "PYTHONUNBUFFERED": "1"},
                 )
-                # stdout, _ = process.communicate()
-                # docker_output.append(stdout)
                 for line in iter(process.stdout.readline, ""):
                     docker_output.append(line)
                     file.write(line)
                     file.flush()
 
                 if process.returncode != 0:
-                    raise RuntimeError(f"wrmXpress failed: {stdout}")
+                    raise RuntimeError(f"wrmXpress failed: {docker_output[-1]}")
 
         except Exception as e:
             docker_output.append(f"Error: {str(e)}")

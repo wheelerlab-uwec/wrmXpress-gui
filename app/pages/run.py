@@ -168,6 +168,9 @@ def get_options_analysis(nclicks, store_data):
         wavelengths_cellprofiler=store_data["wrmXpress_gui_obj"][
             "wavelengths_cellprofiler"
         ],
+        wavelengths_tracking=store_data["wrmXpress_gui_obj"][
+            "wavelengths_tracking"
+        ],
         tracking_diameter=store_data["wrmXpress_gui_obj"]["tracking_diameter"],
         tracking_minmass=store_data["wrmXpress_gui_obj"]["tracking_minmass"],
         tracking_noisesize=store_data["wrmXpress_gui_obj"]["tracking_noisesize"],

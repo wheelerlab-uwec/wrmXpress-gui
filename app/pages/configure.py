@@ -224,6 +224,7 @@ def toggle_cellpose_model_select(pipeline_value):
     Input("cellprofiler-pipeline-selection", "value"),
     Input("cellpose-model-cellprofiler", "value"),
     Input("wavelengths-cellprofiler", "value"),
+    Input("wavelengths-tracking", "value"),
     Input("tracking-diameter", "value"),
     Input("tracking-minmass", "value"),
     Input("tracking-noisesize", "value"),
@@ -269,6 +270,7 @@ def store_values(
     cellprofiler_pipeline_selection,
     cellpose_model_cellprofiler,
     wavelengths_cellprofiler,
+    wavelengths_tracking,
     tracking_diameter,
     tracking_minmass,
     tracking_noisesize,
@@ -316,6 +318,7 @@ def store_values(
         cellprofiler_pipeline_selection,
         cellpose_model_cellprofiler,
         wavelengths_cellprofiler,
+        wavelengths_tracking,
         tracking_diameter,
         tracking_minmass,
         tracking_noisesize,
@@ -484,6 +487,9 @@ def save_configuration_upon_clicking_finalize_button(  # function to save the ya
                 ],
                 wavelengths_cellprofiler=store_data["wrmXpress_gui_obj"][
                     "wavelengths_cellprofiler"
+                ],
+                wavelengths_tracking=store_data["wrmXpress_gui_obj"][
+                    "wavelengths_tracking"
                 ],
                 tracking_diameter=store_data["wrmXpress_gui_obj"]["tracking_diameter"],
                 tracking_minmass=store_data["wrmXpress_gui_obj"]["tracking_minmass"],

@@ -521,47 +521,6 @@ module_selection = dbc.AccordionItem(
                                                                 ),
                                                                 dbc.Row(
                                                                     [
-                                                                        # cellpose model selection
-                                                                        dbc.Col(
-                                                                            html.P(
-                                                                                "Cellpose Model:"
-                                                                            )
-                                                                        ),
-                                                                        dbc.Col(
-                                                                            dbc.Select(
-                                                                                id="cellpose-model-cellprofiler",
-                                                                                disabled=False,
-                                                                                placeholder='Choose a Cellpose model...',
-                                                                                options=[
-                                                                                    {
-                                                                                        "label": "celegans_20220830",
-                                                                                        "value": "celegans_20220830",
-                                                                                    },
-                                                                                    {
-                                                                                        "label": "celegans_pharynx_20230203",
-                                                                                        "value": "celegans_pharynx_20230203",
-                                                                                    },
-                                                                                    {
-                                                                                        "label": "mf_20241112",
-                                                                                        "value": "mf_20241112",
-                                                                                    },
-                                                                                    {
-                                                                                        "label": "strongyle_eggs_20241226",
-                                                                                        "value": "strongyle_eggs_20241226",
-                                                                                    },
-                                                                                ],
-                                                                                value=None,
-                                                                                persistence=True,
-                                                                                persistence_type="memory",
-                                                                                style={
-                                                                                    "display": "flex",
-                                                                                },
-                                                                            ),
-                                                                        ),
-                                                                    ],
-                                                                ),
-                                                                dbc.Row(
-                                                                    [
                                                                         # cellpose wavelength selection
                                                                         dbc.Col(
                                                                             html.P(
@@ -603,6 +562,47 @@ module_selection = dbc.AccordionItem(
                                                                         ),
                                                                     ],
                                                                 ),
+                                                                dbc.Row(
+                                                                    [
+                                                                        # cellpose model selection
+                                                                        dbc.Col(
+                                                                            html.P(
+                                                                                "Cellpose Model:"
+                                                                            )
+                                                                        ),
+                                                                        dbc.Col(
+                                                                            dbc.Select(
+                                                                                id="cellpose-model-cellprofiler",
+                                                                                disabled=False,
+                                                                                placeholder='Choose a Cellpose model...',
+                                                                                options=[
+                                                                                    {
+                                                                                        "label": "celegans_20220830",
+                                                                                        "value": "celegans_20220830",
+                                                                                    },
+                                                                                    {
+                                                                                        "label": "celegans_pharynx_20230203",
+                                                                                        "value": "celegans_pharynx_20230203",
+                                                                                    },
+                                                                                    {
+                                                                                        "label": "mf_20241112",
+                                                                                        "value": "mf_20241112",
+                                                                                    },
+                                                                                    {
+                                                                                        "label": "strongyle_eggs_20241226",
+                                                                                        "value": "strongyle_eggs_20241226",
+                                                                                    },
+                                                                                ],
+                                                                                value=None,
+                                                                                persistence=True,
+                                                                                persistence_type="memory",
+                                                                                style={
+                                                                                    "display": "flex",
+                                                                                },
+                                                                            ),
+                                                                        ),
+                                                                    ],
+                                                                ),
                                                             ]
                                                         ),
                                                         html.Br(),
@@ -632,6 +632,49 @@ module_selection = dbc.AccordionItem(
                                                         ),
                                                         html.Div(
                                                             [
+                                                                dbc.Row(
+                                                                    [
+                                                                        # cellpose wavelength selection
+                                                                        dbc.Col(
+                                                                            html.P(
+                                                                                "Wavelength:"
+                                                                            )
+                                                                        ),
+                                                                        dbc.Col(
+                                                                            dbc.Select(
+                                                                                id="wavelengths-tracking",
+                                                                                options=[
+                                                                                    # {
+                                                                                    #     "label": "All",
+                                                                                    #     "value": "All",
+                                                                                    # },
+                                                                                    {
+                                                                                        "label": "w1",
+                                                                                        "value": "w1",
+                                                                                    },
+                                                                                    {
+                                                                                        "label": "w2",
+                                                                                        "value": "w2",
+                                                                                    },
+                                                                                    {
+                                                                                        "label": "w3",
+                                                                                        "value": "w3",
+                                                                                    },
+                                                                                    {
+                                                                                        "label": "w4",
+                                                                                        "value": "w4",
+                                                                                    },
+                                                                                ],
+                                                                                value="w1",
+                                                                                persistence=True,
+                                                                                persistence_type="memory",
+                                                                                style={
+                                                                                    "display": "flex"
+                                                                                },
+                                                                            ),
+                                                                        ),
+                                                                    ],
+                                                                ),
                                                                 dbc.Row(
                                                                     [
                                                                         dbc.Col(
