@@ -40,8 +40,18 @@ Compatible with the following pipelines:
 - [Motility](configuration/pipelines/motility.md)
 - [Tracking](configuration/pipelines/tracking.md)
 
+### Single AVI per well
+
 Some pipelines accept AVI video files instead TIF files within time point folders. The root plate folder should contain the AVI files in the format `{plate name}_{well}.AVI`, as below:
 
 ![AVI structure](img/avi_structure.png){: style="width:75%"}
 
-In this case, the AVI file structure needs to be selected in [instrument settings](configuration/instrument_settings.md). During analysis, the files may be rearranged to include the time point/TIF structure described above. If so, it is recommended that subsequent analyses should  maintain the reorganized structure and adjust the configuration selections accordingly.
+In this case, the AVI file structure needs to be selected in Configure - [Instrument Settings](configuration/instrument_settings.md). During analysis, the files may be rearranged to include the time point/TIF structure described above. If so, it is recommended that subsequent analyses should  maintain the reorganized structure and adjust the configuration selections accordingly.
+
+### Single AVI per plate
+
+Alternatively, an AVI file of an entire plate can be provided, and wrmXpress can crop wells and analyze them individually. In this case, the roote plate folder should contain a single AVI file in the format `{plate name}.AVI`, as below:
+
+![AVI structure](img/avi_structure_plate.png){: style="width:75%"}
+
+In this case, the file structure should be set to AVI and the imaging mode should be set to Multi Well in Configure - [Instrument Settings](configuration/instrument_settings.md). In plate format, include the number of columns and the wells in the plate. The plate will then be cropped in accordance with these settings. After cropping, the files will be rearranged to include the time point/TIF structure described above.

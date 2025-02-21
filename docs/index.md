@@ -24,7 +24,7 @@ Some pipelines require specific experimental procedures to generate the proper d
 
 For large high-throughput analyses, wrmXpress can be run using a command-line interface and is deployable to high-throughput or high-performance remote computer clusters. If running small to medium sized analyses (i.e., 96 wells or less), wrmXpress can also be run using a graphical-user interface (GUI) on any computer operating system (Windows, MacOS, Linux) with Docker Desktop. This documentation is oriented toward users of the GUI and includes screenshots and videos of GUI configuration and usage.
 
-### Installation of the GUI
+### Installing and starting the GUI
 
 /// note | Prerequisites
 Before starting, download and install [Docker Desktop](https://www.docker.com/products/docker-desktop/)
@@ -58,14 +58,14 @@ The GUI is deployed via Docker Desktop and is run in any modern browser (i.e., C
     It may take 15-30 seconds for the GUI to start. Refresh the page if the GUI is not showing up in your browser.
     ///
 
-8. Follow the guidance in below to configure and run your analysis.
+8. Follow the guidance below to configure and run your analysis.
 
 ## Quick start
 
 To configure and run analyses, use the navigation column at left-hand side of the GUI. Full documentation for the Configure, Metadata, Preview, and Run steps can be found in the corresponding sections of this documentation site.
 
 1. **Configure** allows you to select relevant experimental and imaging parameters, as well as select the pipeline that you wish to run. Note that some selections will clash and be disallowed - you should see relevant warnings/errors if so.
-2. **Metadata** allows you to include well-based metadata. Each metadata type (i.e., concentration, treatment, time point, etc.) will be saved in a separate CSV with the same numbers of rows/columns selected in Configure - [Run-Time Settings](configuration/runtime.md).
+2. **Metadata** allows you to include well-based metadata. Each metadata type (i.e., concentration, treatment, time point, etc.) will be saved in a separate CSV with the same number of rows/columns selected in Configure - [Run-Time Settings](configuration/runtime.md).
 Custom metadata types can be added. Metadata will be merged with raw output after completing the analysis. Metadata is not required for a pipeline to run.
 3. **Preview** will allow you to preview the output of the pipeline's analysis on well A01 (or on the first well selected).
 4. **Run** is where the final pipeline will be run on all of the selected wells. Logs are written dynamically to the screen but also to the working directory.
@@ -73,6 +73,10 @@ Custom metadata types can be added. Metadata will be merged with raw output afte
 ### Video walkthrough
 
 <div style="padding:49.12% 0 0 0;position:relative;"><iframe src="https://player.vimeo.com/video/986779390?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479" frameborder="0" allow="autoplay; fullscreen; picture-in-picture; clipboard-write" style="position:absolute;top:0;left:0;width:100%;height:100%;" title="wrmXpress GUI Walkthrough"></iframe></div><script src="https://player.vimeo.com/api/player.js"></script>
+
+### Example data
+
+Validated example data can be downloaded in the GUI by clicking Zenodo button at the bottom left-hand corner of the interface. In the popup, select the plates to download. After downloading, move the plate folder into the working directory set in step 1 of the [installation/startup instructions above]()
 
 ## Developers
 
