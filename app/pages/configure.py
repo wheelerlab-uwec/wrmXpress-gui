@@ -269,7 +269,7 @@ def store_values(
     poly_sigma,
     flags,
     cellpose_model_segmentation,
-    cellpose_model_type_segmentation,
+    type_segmentation,
     python_model_sigma,
     wavelengths_segmentation,
     cellprofiler_pipeline_selection,
@@ -317,7 +317,7 @@ def store_values(
         poly_sigma,
         flags,
         cellpose_model_segmentation,
-        cellpose_model_type_segmentation,
+        type_segmentation,
         python_model_sigma,
         wavelengths_segmentation,
         cellprofiler_pipeline_selection,
@@ -475,8 +475,8 @@ def save_configuration_upon_clicking_finalize_button(  # function to save the ya
                 cellpose_model_segmentation=store_data["wrmXpress_gui_obj"][
                     "cellpose_model_segmentation"
                 ],
-                cellpose_model_type_segmentation=store_data["wrmXpress_gui_obj"][
-                    "cellpose_model_type_segmentation"
+                type_segmentation=store_data["wrmXpress_gui_obj"][
+                    "type_segmentation"
                 ],
                 python_model_sigma=store_data["wrmXpress_gui_obj"][
                     "python_model_sigma"

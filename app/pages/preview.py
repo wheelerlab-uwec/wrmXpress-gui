@@ -230,8 +230,8 @@ def get_options_preview(nclicks, store_data):
         cellpose_model_segmentation=store_data["wrmXpress_gui_obj"][
             "cellpose_model_segmentation"
         ],
-        cellpose_model_type_segmentation=store_data["wrmXpress_gui_obj"][
-            "cellpose_model_type_segmentation"
+        type_segmentation=store_data["wrmXpress_gui_obj"][
+            "type_segmentation"
         ],
         python_model_sigma=store_data["wrmXpress_gui_obj"]["python_model_sigma"],
         wavelengths_segmentation=store_data["wrmXpress_gui_obj"][
@@ -330,8 +330,8 @@ def run_analysis(
             cellpose_model_segmentation=store_data["wrmXpress_gui_obj"][
                 "cellpose_model_segmentation"
             ],
-            cellpose_model_type_segmentation=store_data["wrmXpress_gui_obj"][
-                "cellpose_model_type_segmentation"
+            type_segmentation=store_data["wrmXpress_gui_obj"][
+                "type_segmentation"
             ],
             python_model_sigma=store_data["wrmXpress_gui_obj"]["python_model_sigma"],
             wavelengths_segmentation=store_data["wrmXpress_gui_obj"][

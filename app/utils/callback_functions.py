@@ -195,7 +195,7 @@ def prep_yaml(store_data):
 
     if (
         store_data["wrmXpress_gui_obj"]["pipeline_selection"] == "segmentation"
-        and store_data["wrmXpress_gui_obj"]["cellpose_model_type_segmentation"]
+        and store_data["wrmXpress_gui_obj"]["type_segmentation"]
         == "python"
     ):
         segmentation_dict = {
@@ -205,7 +205,7 @@ def prep_yaml(store_data):
                 "20220830_all",
             ),
             "model_type": get_default_value(
-                store_data["wrmXpress_gui_obj"]["cellpose_model_type_segmentation"],
+                store_data["wrmXpress_gui_obj"]["type_segmentation"],
                 "cellpose",
             ),
             "sigma": get_default_value(
@@ -227,7 +227,7 @@ def prep_yaml(store_data):
                     "20220830_all",
                 ),
                 "model_type": get_default_value(
-                    store_data["wrmXpress_gui_obj"]["cellpose_model_type_segmentation"],
+                    store_data["wrmXpress_gui_obj"]["type_segmentation"],
                     "cellpose",
                 ),
                 "sigma": 0.25,

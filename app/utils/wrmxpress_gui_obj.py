@@ -43,7 +43,7 @@ class WrmXpressGui:
         poly_sigma,
         flags,
         cellpose_model_segmentation,
-        cellpose_model_type_segmentation,
+        type_segmentation,
         python_model_sigma,
         wavelengths_segmentation,
         cellprofiler_pipeline_selection,
@@ -87,7 +87,7 @@ class WrmXpressGui:
         self.poly_sigma = poly_sigma
         self.flags = flags
         self.cellpose_model_segmentation = cellpose_model_segmentation
-        self.cellpose_model_type_segmentation = cellpose_model_type_segmentation
+        self.type_segmentation = type_segmentation
         self.python_model_sigma = python_model_sigma
         self.wavelengths_segmentation = wavelengths_segmentation
         self.cellprofiler_pipeline_selection = cellprofiler_pipeline_selection
@@ -229,12 +229,12 @@ class WrmXpressGui:
 
         if (
             "segmentation" in self.pipeline_selection
-            and self.cellpose_model_cellprofiler == "python"
+            and self.type_segmentation == "python"
             and not self.python_model_sigma
         ):
             self.warning_occurred = True
             self.warning_messages.append(
-                "Python model sigma is missing. Default value (0.25) will be used."
+                "Python model sigma wasn't set. Default value (0.25) will be used."
             )
 
         if "tracking" in self.pipeline_selection:
@@ -552,11 +552,11 @@ class WrmXpressGui:
             update_dict = {
                 "run": True,
                 "model": self.cellpose_model_segmentation,
-                "model_type": self.cellpose_model_type_segmentation,
+                "model_type": self.type_segmentation,
                 "wavelengths": [self.wavelengths_segmentation],
             }
 
-            if self.cellpose_model_segmentation == "python":
+            if self.type_segmentation == "python":
                 update_dict["model_sigma"] = get_default_value(
                     self.python_model_sigma, 0.25
                 )
@@ -875,9 +875,9 @@ class WrmXpressGui:
         """
         try:
             # Check if the first well has already been analyzed
-            if self.first_well_already_run():
-                self._load_preview_image()
-                return
+            # if self.first_well_already_run():
+            #     self._load_preview_image()
+            #     return
             # Prepare necessary files and commands for analysis
             self.prepare_preview_yaml()
             self.preamble_analysis(file_structure, first_well=True)
@@ -932,7 +932,8 @@ class WrmXpressGui:
                     file.write(line)
                     file.flush()
 
-                if process.returncode != 0:
+                if process.returncode != 0 and process.returncode is not None:
+                    print(process.returncode)
                     raise RuntimeError(f"wrmXpress failed: {docker_output[-1]}")
 
         except Exception as e:

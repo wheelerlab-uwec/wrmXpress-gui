@@ -186,10 +186,10 @@ def background_callback(set_progress, n_clicks, store_data):
             cellpose_model_segmentation=store_data["wrmXpress_gui_obj"][
                 "cellpose_model_segmentation"
             ],
-            cellpose_model_type_segmentation=store_data["wrmXpress_gui_obj"][
-                "cellpose_model_type_segmentation"
+            type_segmentation=store_data["wrmXpress_gui_obj"][
+                "type_segmentation"
             ],
-            python_model_sigma=store_data["wrmXpress_gui_obj"]["python_model_sigma"],
+            python_model_sigma=store_data["wrmXpress_gui_obj"]["python-model-sigma"],
             wavelengths_segmentation=store_data["wrmXpress_gui_obj"][
                 "wavelengths_segmentation"
             ],

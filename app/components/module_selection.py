@@ -364,7 +364,7 @@ module_selection = dbc.AccordionItem(
                                                                     [
                                                                         dbc.Col(
                                                                             html.P(
-                                                                                "Python Model Sigma:"
+                                                                                "Python model sigma:"
                                                                             )
                                                                         ),
                                                                         dbc.Col(
