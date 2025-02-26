@@ -512,7 +512,7 @@ def fecundity_run(store, set_progress, wrmXpress_gui_obj):
 
     except Exception as e:
         # Log the error to your output file or a dedicated log file
-        error_message = f"An error occurred: {str(e)}"
+        error_message = f"An error occurred (this): {str(e)}"
 
         # Return an error indication to the callback
         return (

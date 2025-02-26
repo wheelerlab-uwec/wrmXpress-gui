@@ -62,13 +62,14 @@ sidebar = html.Div(
             [
                 html.Div(
                     [
-                            dbc.Button(
-                                html.Img(src="assets/zenodo-white-border.svg",
-                                         style={"width": "95%"}),
-                                id="fetch-data-link",
-                                style={"width": "90%"},
+                        dbc.Button(
+                            html.Img(
+                                src="assets/zenodo-white-border.svg",
+                                style={"width": "95%"},
                             ),
-
+                            id="fetch-data-link",
+                            style={"width": "90%"},
+                        ),
                         # Tooltip for the NavLink
                         dbc.Tooltip(
                             "Click to fetch example data from Zenodo and download it to your Downloads folder.",
@@ -186,10 +187,8 @@ def background_callback(set_progress, n_clicks, store_data):
             cellpose_model_segmentation=store_data["wrmXpress_gui_obj"][
                 "cellpose_model_segmentation"
             ],
-            type_segmentation=store_data["wrmXpress_gui_obj"][
-                "type_segmentation"
-            ],
-            python_model_sigma=store_data["wrmXpress_gui_obj"]["python-model-sigma"],
+            type_segmentation=store_data["wrmXpress_gui_obj"]["type_segmentation"],
+            python_model_sigma=store_data["wrmXpress_gui_obj"]["python_model_sigma"],
             wavelengths_segmentation=store_data["wrmXpress_gui_obj"][
                 "wavelengths_segmentation"
             ],
@@ -228,7 +227,7 @@ def background_callback(set_progress, n_clicks, store_data):
         error_occured, _, _, _ = wrmXpress_gui_obj.validate()
 
         if error_occured:
-            
+
             return (
                 {},
                 True,
@@ -239,7 +238,7 @@ def background_callback(set_progress, n_clicks, store_data):
             )
 
         if n_clicks:
-            
+
             # print("Preparing to run analysis")
             # wrmXpress_gui_obj.setup_run_analysis(store_data["file_structure"])
             # print("Running analysis")
@@ -248,7 +247,7 @@ def background_callback(set_progress, n_clicks, store_data):
             return callback(set_progress, store_data, wrmXpress_gui_obj)
 
     except Exception as e:
-        error_message = f"An error occurred: {str(e)}"
+        error_message = f"An error occurred (this one): {str(e)}"
         print(error_message)
         return (
             {},
