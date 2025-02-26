@@ -20,6 +20,10 @@ The following parameters can be adjusted:
 
 ### Cellpose models
 
+/// warning | Custom worm models
+Performance of Cellpose segmentation will vary based on the magnification used to take the images. If you are interested in training your own Cellpose model, please reach out to the [wrmXpress developers](../../index.md#getting-support).
+///
+
 wrmXpress currently ships models trained on the following data:
 
 - *Caenorhabditis elegans* (all stages)

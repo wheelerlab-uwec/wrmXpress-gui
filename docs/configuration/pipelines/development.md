@@ -9,7 +9,7 @@ Detailed procedures for preparing and imaging *Caenorhabditis elegans* phenotype
 There are two CellProfiler pipelines that support analysis of development: Worm size and intensity (Cellpose) and *C. elegans* size. The first pipeline utilizes Cellpose for segementation of worms. The second pipeline uses generic image transformations for segmentation. wrmXpress ships with a Cellpose model that has been trained on thousands of images of drug-treated and untreated *C. elegans* throughout development. Both pipelines utilize a Worm Toolbox model to estimate morphological features from images. The first pipeline performs much better for mixed populations of worms.
 
 /// warning | Custom worm models
-Performance of both pipelines will very based on the magnification used to take the images. If you are interested in training your own Cellpose model, please reach out to the [wrmXpress developers](../../index.md#getting-support).
+Performance of both pipelines will vary based on the magnification used to take the images. If you are interested in training your own Cellpose model, please reach out to the [wrmXpress developers](../../index.md#getting-support).
 ///
 
 In Pipeline Selection, choose CellProfiler and select the pipeline of choice (either *C. elegans* size and intensity (Cellpose) or *C. elegans* size). If using a pipeline that segments worms with a Cellpose model, select the appropriate model in the dropdown.
