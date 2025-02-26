@@ -13,11 +13,11 @@ wrmXpress is a suite of tools to analyze images and videos of free-living and pa
 
 - [Optical Flow (Motility)](configuration/pipelines/optical_flow.md)
 - [Segmentation](configuration/pipelines/segmentation.md)
-  - Segmentation is used for fecundity experiments or to estimate the number of worms in a well to assist in normalization of optical flow data
-- [Custom CellProfiler pipelines]:
-  - [Viability](configuration/pipelines/viability.md)
-  - [Feeding](configuration/pipelines/feeding.md)
-  - [Development](configuration/pipelines/development.md)
+    - Segmentation is used for fecundity experiments or to estimate the number of worms in a well to assist in normalization of optical flow data
+- Custom CellProfiler pipelines:
+    - [Viability](configuration/pipelines/viability.md)
+    - [Feeding](configuration/pipelines/feeding.md)
+    - [Development](configuration/pipelines/development.md)
 - [Tracking](configuration/pipelines/tracking.md)
 
 Some pipelines require specific experimental procedures to generate the proper data (i.e., the Feeding pipline requires images of worms that have been fed fluorescent dyes), while other pipelines are generalizable across multiple worm species, stages, and imaging environments. Detailed documentation for each pipeline can be found at the corresponding links above.

@@ -11,11 +11,12 @@ nav:
     - Instrument Settings: configuration/instrument_settings.md
     - Image Transformations: configuration/image_transformations.md
     - Pipeline Selection:
-      - Motility: configuration/pipelines/motility.md
-      - Development: configuration/pipelines/development.md
-      - Fecundity: configuration/pipelines/segmentation.md
-      - Viability: configuration/pipelines/viability.md
-      - Feeding: configuration/pipelines/feeding.md
+      - Motility: configuration/pipelines/optical_flow.md
+      - Segmentation:  configuration/pipelines/segmentation.md
+      - CellProfiler pipelines:
+        - Development: configuration/pipelines/development.md
+        - Viability: configuration/pipelines/viability.md
+        - Feeding: configuration/pipelines/feeding.md
       - Tracking: configuration/pipelines/tracking.md
     - Run Diagnostics: configuration/dx.md
     - Run-Time Settings: configuration/runtime.md
