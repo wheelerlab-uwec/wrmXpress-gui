@@ -7,6 +7,7 @@ import signal
 import shutil
 import numpy as np
 from PIL import Image
+import warnings
 import plotly.express as px
 import yaml
 import glob
@@ -501,9 +502,18 @@ def create_figure_from_filepath(img_path, scale="gray", max_pixels=178956970):
     img = None
     img_extension = Path(img_path).suffix.lower()
 
+    warnings.filterwarnings("ignore", category=Image.DecompressionBombWarning)
+    Image.MAX_IMAGE_PIXELS = 1000000000  # Increase the limit to 1 billion pixels
+    
     # Try opening the image with PIL
     try:
-        img = np.array(Image.open(img_path))
+        img = Image.open(img_path)
+        # Calculate thumbnail size to limit memory use but maintain aspect ratio
+        if img.width * img.height > max_pixels:
+            scale = (max_pixels / (img.width * img.height)) ** 0.5
+            thumbnail_size = (int(img.width * scale), int(img.height * scale))
+            img.thumbnail(thumbnail_size, Image.LANCZOS)
+        img = np.array(img)
     except Exception as e:
         print(f"Error opening {img_path} with PIL: {e}")
 
