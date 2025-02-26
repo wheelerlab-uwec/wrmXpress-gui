@@ -34,6 +34,11 @@ wrmXpress can be used with a variety of data structures. Some pipelines require 
 - Data is structured as TIFF files in TimePoint folders ([see more](../data_organization.md)).
 - Each TIFF image includes more than 1 well.
 - Input the number of wells in each row/column of the image (integers).
+- For Plate format, input the total number of rows/cols on the plate
+
+/// Note | 384-well plates
+The Multi Well functionality is designed for 384-well plates. These have 24 columns and 16 wells, and imaging often occurs in 2 wells per row/column in each image.
+///
 
 ### ImageXpress + Multi Site
 
@@ -78,8 +83,10 @@ wrmXpress can be used with a variety of data structures. Some pipelines require 
 
 - Videos are stored in AVI containers ([see more](../data_organization.md)).
 - Each AVI video includes more than 1 well (i.e., an entire plate).
-- Input the number of wells in each row/column of the video (integers).
+- Set the Plate format to the true number of columns and rows (i.e., 12 and 8 or 6 and 4)
+- Set the Rows/Columns per image to 1
 - The Grid cropping option will split the video into a grid of `rows` and `columns` based on user input. More cropping options may be developed in the future.
+    - For Grid cropping, it's important to pre-crop images so that the edges of the plate are removed. Grid cropping will simply crop equivalent rectangles based on the number of rows and columns.
 - Potential naming patterns:
     - `{plate name}.avi`
 

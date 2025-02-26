@@ -11,7 +11,7 @@ Back-end: ![GitHub Release](https://img.shields.io/github/v/release/zamanianlab/
 
 wrmXpress is a suite of tools to analyze images and videos of free-living and parasitic flatworms and nematodes. It is designed to work out-of-the-box with data generated with a Molecular Devices ImageXpress high-content imager, but will work with any image type that is organized in an idiosyncratic manner (described in [Data Organization](data_organization.md)). Analytical pipelines featured in wrmXpress include:
 
-- [Motility](configuration/pipelines/motility.md)
+- [Optical Flow (Motility)](configuration/pipelines/optical_flow.md)
 - [Fecundity](configuration/pipelines/fecundity.md)
 - [Toxicity](configuration/pipelines/toxicity.md)
 - [Feeding](configuration/pipelines/feeding.md)

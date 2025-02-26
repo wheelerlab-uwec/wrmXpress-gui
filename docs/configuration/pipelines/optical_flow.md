@@ -1,4 +1,4 @@
-# Motility
+# Optical Flow (Motility)
 
 /// note | Experimental protocols
 Detailed procedures for preparing and recording videos of filarial nematode microfilariae or adults can be found at the following links:
@@ -10,7 +10,7 @@ Detailed procedures for preparing and recording videos of filarial nematode micr
 
 ## Configuration of the GUI
 
-Motility in wrmXpress is measured using Farneback's dense optical flow algorithm implemented by [OpenCV](https://docs.opencv.org/4.6.0/dc/d6b/group__video__track.html#ga5d10ebbd59fe09c5f650289ec0ece5af). This is a departure from other published tools for measuring worm motility, which use the Lucas-Kanade algorithm that focuses on keypoints. Motility can run on data in the ImageXpress file structure or the AVI file structure (see [Expected input](#expected-input) below).
+Motility in wrmXpress is measured using Farneback's dense optical flow algorithm implemented by [OpenCV](https://docs.opencv.org/4.6.0/dc/d6b/group__video__track.html#ga5d10ebbd59fe09c5f650289ec0ece5af). This is in contrast to other published tools for measuring worm motility, which use the Lucas-Kanade algorithm that focuses on keypoints. Motility can run on data in the ImageXpress file structure or the AVI file structure (see [Expected input](#expected-input) below).
 
 In Pipeline Selection, choose Optical Flow. Additionally, the OpenCV function includes six parameters that can be adjusted. The following is taken directly from the OpenCV docs:
 
@@ -45,7 +45,7 @@ In the case of AVIs, the directory structure should look like this:
 In this experiment, the plate directory (`20240307-p01-RVH`) has 6 videos, 1 video for each well.
 ///
 
-If the AVI includes multiple wells per videos, then the plate directory should include a single AVI with the same plate name.
+If the AVI includes multiple wells per video, then the plate directory should include a single AVI with the same plate name.
 
 In [Instrument Settings](../instrument_settings.md), choose AVI + Single Well or AVI + Multi Well as the File Structure.
 
@@ -78,4 +78,4 @@ In [Instrument Settings](../instrument_settings.md), choose AVI + Single Well or
 
 ## Expected output
 
-A CSV file with at least three columns: Well, Total Motility, and Worm Area. Variation in the number of worms per well can be corrected for by dividing the motility value by the area value. If using Metadata, there will be an additional column for each provided metadata CSV.
+A CSV file with at least two columns: Well and Total Motility. Variation in the number of worms per well can be corrected for by dividing the motility value by the area value, which can be calculated with the Segementation pipeline. If using Metadata, there will be an additional column for each provided metadata CSV.
