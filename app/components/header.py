@@ -20,9 +20,10 @@ header = dbc.Row(
             [
                 html.A(
                     html.I(
-                        className="fa-solid fa-prescription",  # Prescription Symbol
-                        id="rx-symbol",
+                        className="fa-solid fa-book",  # Book Symbol
+                        id="book-symbol",
                     ),
+                    href="https://wrmxpress-gui.readthedocs.io/latest/",  # Link to wrmXpress-gui documentation
                 )
             ],
             width="auto",
@@ -59,6 +60,18 @@ header = dbc.Row(
                         id="twitter-symbol",
                     ),
                     href="https://twitter.com/wheeler_worm",  # Link to wheeler worm twitter page
+                )
+            ],
+            width="auto",
+        ),
+        dbc.Col(
+            [
+                html.A(
+                    html.I(
+                        className="fa-solid fa-z",
+                        id="zenodo-symbol",
+                    ),
+                    href="https://zenodo.org/records/12760651",  # Link to zenodo page
                 )
             ],
             width="auto",

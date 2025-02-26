@@ -51,10 +51,7 @@ metadata_checklist = dbc.Form(
     ]
 )
 
-selection_table = html.Div(
-    # initializing selection table id which will be populated in later
-    id="well-selection-table"
-)
+
 
 metadata_layout = dbc.Container(
     [
@@ -64,30 +61,42 @@ metadata_layout = dbc.Container(
                     [
                         dbc.Col(
                             [
+                                dbc.Button(
+                                    "Select all",  # Select All button
+                                    id="select-all-metadata-tables",
+                                    className="me-2",
+                                    color="primary",
+                                ),
+                            ],
+                            width=2,
+                        ),
+                        dbc.Col(
+                            [
+                                dbc.Button(
+                                    "Deselect all",  # Deselect All button
+                                    id="deselect-all-metadata-tables",
+                                    className="me-2",
+                                    color="primary",
+                                ),
+                            ],
+                            width={"size": 2, "offset": 0},
+                        ),
+                    ]
+                ),
+                html.Br(),
+                dbc.Row(
+                    [
+                        dbc.Col(
+                            [
                                 metadata_checklist,  # Metadata checklist, see metadata_components.py
                                 html.Br(),
                                 dbc.Row(
                                     [
-                                        # Label for Plate Format
                                         dbc.Col(
                                             html.H6(
-                                                "Add new table:"  # Label for adding new table
-                                            )
-                                        ),
-                                    ],
-                                    align="center",  # Align the label to the center
-                                ),
-                                dbc.Row(
-                                    [
-                                        # First Column: Input for Total Number of Columns
-                                        dbc.Col(
-                                            dbc.Button(
-                                                "+",  # Add button
-                                                id="add-metadata-table-button",
-                                                className="me-2",
+                                                "Add custom metadata:" 
                                             ),
-                                            width="auto",  # Width of the column
-                                            className="pe-0",
+                                            width=5,
                                         ),
                                         dbc.Col(
                                             # Add an editable input box here
@@ -97,39 +106,19 @@ metadata_layout = dbc.Container(
                                                 value="",
                                                 disabled=False,  # Enable the input box
                                             ),
-                                            width="auto",
-                                            className="ps-0",
+                                            width=3,
+                                            # className="ps-0",
+                                        ),
+                                        dbc.Col(
+                                            dbc.Button(
+                                                "+",  # Add button
+                                                id="add-metadata-table-button",
+                                                # className="me-2",
+                                            ),
                                         ),
                                     ],
-                                    align="center",  # Align the input box to the center
-                                ),
-                                html.Br(),
-                                dbc.Row(
-                                    [
-                                        dbc.Col(
-                                            [
-                                                dbc.Button(
-                                                    "Select all",  # Select All button
-                                                    id="select-all-metadata-tables",
-                                                    className="me-2",
-                                                    color="primary",
-                                                ),
-                                            ],
-                                            width=True,
-                                        ),
-                                        dbc.Col(
-                                            [
-                                                dbc.Button(
-                                                    "Deselect all",  # Deselect All button
-                                                    id="deselect-all-metadata-tables",
-                                                    className="me-2",
-                                                    color="primary",
-                                                ),
-                                            ],
-                                            width={"size": True, "offset": 0},
-                                        ),
-                                    ]
-                                ),
+                                    align="center",
+                                    ),
                                 html.Br(),
                                 dbc.Row(
                                     [

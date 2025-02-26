@@ -1,8 +1,4 @@
-########################################################################
-####                                                                ####
-####                             Imports                            ####
-####                                                                ####
-########################################################################
+# In[1]: Imports
 
 import dash
 from waitress import serve
@@ -13,7 +9,9 @@ from dash.dependencies import Input, Output, State
 # Importing Components
 from app.utils.styling import CONTENT_STYLE, SIDEBAR_STYLE
 from app.components.header import header
+from app.components.fetch_data_modal import fetch_data_modal
 from app.utils.background_callback import callback
+from app.utils.wrmxpress_gui_obj import WrmXpressGui
 
 # Diskcache
 import diskcache
@@ -30,11 +28,7 @@ app = Dash(
     suppress_callback_exceptions=True,
 )
 
-########################################################################
-####                                                                ####
-####                             LAYOUT                             ####
-####                                                                ####
-########################################################################
+# In[2]: App Layout
 
 sidebar = html.Div(
     [
@@ -62,7 +56,29 @@ sidebar = html.Div(
                     vertical=True,  # Style of the navigation
                 )
                 for page in dash.page_registry.values()  # Iterate through each page
-            ]
+            ],
+        ),
+        dbc.Row(
+            [
+                html.Div(
+                    [
+                            dbc.Button(
+                                html.Img(src="assets/zenodo-white-border.svg",
+                                         style={"width": "95%"}),
+                                id="fetch-data-link",
+                                style={"width": "90%"},
+                            ),
+
+                        # Tooltip for the NavLink
+                        dbc.Tooltip(
+                            "Click to fetch example data from Zenodo and download it to your Downloads folder.",
+                            target="fetch-data-link",  # Associate tooltip with the NavLink ID
+                            placement="top",  # Position the tooltip (optional)
+                        ),
+                    ]
+                ),
+            ],
+            style={"position": "fixed", "bottom": 10},
         ),
     ],
     style=SIDEBAR_STYLE,  # Style of the sidebar, see styling.py
@@ -80,14 +96,11 @@ app.layout = html.Div(
             ],
             style=CONTENT_STYLE,  # Style of the content, see styling.py
         ),
+        fetch_data_modal,  # Fetch data modal, see fetch_data_modal.py
     ]
 )
 
-########################################################################
-####                                                                ####
-####                           Callbacks                            ####
-####                                                                ####
-########################################################################
+# In[3]: Callbacks
 
 
 @app.callback(
@@ -129,36 +142,114 @@ app.layout = html.Div(
     allow_duplicate=True,
     background=True,
 )
-def background_callback(set_progress, n_clicks, store):
+def background_callback(set_progress, n_clicks, store_data):
     """
     This function runs the wrmXpress analysis in the background.
-    =========================================================================================
-    Arguments:
-        - set_progress : function : The function to set the progress
-            +- progress bar value : int : The progress bar value
-            +- progress bar max : int : The progress bar max
-            +- image analysis preview : dict : The image analysis preview
-            +- progress message run page for analysis : str : The progress message run page for analysis
-            +- progress message run page markdown : str : The progress message run page markdown
-        - n_clicks : int : The number of clicks of the submit button on the run page
-        - store : dict : The store data
-            +- this data is generated from the configure page. see app/pages/configure.py for more details
-    =========================================================================================
-    Returns:
-        - callback : function : The callback function defined in app/utils/background_callback.py
-            +- set progress : function : The set progress function defined above
-            +- n_clicks : int : The number of clicks from the submit button on the run page
-            +- store : dict : The store data defined above
-    =========================================================================================
     """
+
     try:
-        return callback(set_progress, n_clicks, store)
+
+        if not store_data:
+            return (
+                {},
+                True,
+                True,
+                "No Configuration Found. Please go to the Configuration Page to set the configuration.",
+                None,
+                None,
+            )
+
+        wrmXpress_gui_obj = WrmXpressGui(
+            file_structure=store_data["wrmXpress_gui_obj"]["file_structure"],
+            imaging_mode=store_data["wrmXpress_gui_obj"]["imaging_mode"],
+            multi_well_row=store_data["wrmXpress_gui_obj"]["multi_well_row"],
+            multi_well_col=store_data["wrmXpress_gui_obj"]["multi_well_col"],
+            multi_well_detection=store_data["wrmXpress_gui_obj"][
+                "multi_well_detection"
+            ],
+            x_sites=store_data["wrmXpress_gui_obj"]["x_sites"],
+            y_sites=store_data["wrmXpress_gui_obj"]["y_sites"],
+            stitch_switch=store_data["wrmXpress_gui_obj"]["stitch_switch"],
+            well_col=store_data["wrmXpress_gui_obj"]["well_col"],
+            well_row=store_data["wrmXpress_gui_obj"]["well_row"],
+            mask=store_data["wrmXpress_gui_obj"]["mask"],
+            mask_diameter=store_data["wrmXpress_gui_obj"]["mask_diameter"],
+            pipeline_selection=store_data["wrmXpress_gui_obj"]["pipeline_selection"],
+            wavelengths=store_data["wrmXpress_gui_obj"]["wavelengths"],
+            pyrscale=store_data["wrmXpress_gui_obj"]["pyrscale"],
+            levels=store_data["wrmXpress_gui_obj"]["levels"],
+            winsize=store_data["wrmXpress_gui_obj"]["winsize"],
+            iterations=store_data["wrmXpress_gui_obj"]["iterations"],
+            poly_n=store_data["wrmXpress_gui_obj"]["poly_n"],
+            poly_sigma=store_data["wrmXpress_gui_obj"]["poly_sigma"],
+            flags=store_data["wrmXpress_gui_obj"]["flags"],
+            cellpose_model_segmentation=store_data["wrmXpress_gui_obj"][
+                "cellpose_model_segmentation"
+            ],
+            type_segmentation=store_data["wrmXpress_gui_obj"][
+                "type_segmentation"
+            ],
+            python_model_sigma=store_data["wrmXpress_gui_obj"]["python-model-sigma"],
+            wavelengths_segmentation=store_data["wrmXpress_gui_obj"][
+                "wavelengths_segmentation"
+            ],
+            cellprofiler_pipeline_selection=store_data["wrmXpress_gui_obj"][
+                "cellprofiler_pipeline_selection"
+            ],
+            cellpose_model_cellprofiler=store_data["wrmXpress_gui_obj"][
+                "cellpose_model_cellprofiler"
+            ],
+            wavelengths_cellprofiler=store_data["wrmXpress_gui_obj"][
+                "wavelengths_cellprofiler"
+            ],
+            wavelengths_tracking=store_data["wrmXpress_gui_obj"][
+                "wavelengths_tracking"
+            ],
+            tracking_diameter=store_data["wrmXpress_gui_obj"]["tracking_diameter"],
+            tracking_minmass=store_data["wrmXpress_gui_obj"]["tracking_minmass"],
+            tracking_noisesize=store_data["wrmXpress_gui_obj"]["tracking_noisesize"],
+            tracking_searchrange=store_data["wrmXpress_gui_obj"][
+                "tracking_searchrange"
+            ],
+            tracking_memory=store_data["wrmXpress_gui_obj"]["tracking_memory"],
+            tracking_adaptivestop=store_data["wrmXpress_gui_obj"][
+                "tracking_adaptivestop"
+            ],
+            static_dx=store_data["wrmXpress_gui_obj"]["static_dx"],
+            static_dx_rescale=store_data["wrmXpress_gui_obj"]["static_dx_rescale"],
+            video_dx=store_data["wrmXpress_gui_obj"]["video_dx"],
+            video_dx_format=store_data["wrmXpress_gui_obj"]["video_dx_format"],
+            video_dx_rescale=store_data["wrmXpress_gui_obj"]["video_dx_rescale"],
+            mounted_volume=store_data["wrmXpress_gui_obj"]["mounted_volume"],
+            plate_name=store_data["wrmXpress_gui_obj"]["plate_name"],
+            well_selection_list=store_data["wrmXpress_gui_obj"]["well_selection_list"],
+        )
+
+        error_occured, _, _, _ = wrmXpress_gui_obj.validate()
+
+        if error_occured:
+            
+            return (
+                {},
+                True,
+                True,
+                "A configuration error has occurred. Please return to the Configuration Page to fix the error.",
+                None,
+                None,
+            )
+
+        if n_clicks:
+            
+            # print("Preparing to run analysis")
+            # wrmXpress_gui_obj.setup_run_analysis(store_data["file_structure"])
+            # print("Running analysis")
+            # wrmXpress_gui_obj.run_analysis(set_progress)
+
+            return callback(set_progress, store_data, wrmXpress_gui_obj)
 
     except Exception as e:
-        # Log the error to your output file or a dedicated log file
         error_message = f"An error occurred: {str(e)}"
-
-        # Return an error indication to the callback
+        print(error_message)
         return (
             {},
             True,
@@ -169,11 +260,27 @@ def background_callback(set_progress, n_clicks, store):
         )
 
 
-########################################################################
-####                                                                ####
-####                        RUNNING SERVER                          ####
-####                                                                ####
-########################################################################
+# Add callbacks for handling the modal and fetch operation
+@app.callback(
+    Output("fetch-data-modal", "is_open"),  # Controls the modal visibility
+    [
+        Input("fetch-data-link", "n_clicks"),
+        Input("confirm-fetch", "n_clicks"),
+        Input("cancel-fetch", "n_clicks"),
+    ],
+    [State("fetch-data-modal", "is_open")],
+)
+def toggle_modal(fetch_click, confirm_click, cancel_click, is_open):
+    # Open the modal on fetch-data-link click
+    if fetch_click and not is_open:
+        return True
+    # Close the modal on Yes or No button click
+    if confirm_click or cancel_click:
+        return False
+    return is_open
+
+
+# In[4]: Run the app
 
 if __name__ == "__main__":
     # for dev/debugging

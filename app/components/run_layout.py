@@ -29,7 +29,7 @@ run_layout = dbc.ModalBody(
                                         dbc.Row(
                                             [
                                                 html.H4(
-                                                    "Configuration Summary",
+                                                    "Run Logs",
                                                     style={"text-align": "center"},
                                                 ),
                                             ],

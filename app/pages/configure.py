@@ -1,8 +1,4 @@
-########################################################################
-####                                                                ####
-####                             Imports                            ####
-####                                                                ####
-########################################################################
+# In[1]: Imports
 
 import dash
 from dash import callback, html, Input, Output, State, dash_table
@@ -15,23 +11,55 @@ import dash_bootstrap_components as dbc
 # Importing Components and functions
 from app.utils.callback_functions import create_df_from_inputs, prep_yaml
 from app.components.configure_layout import configure_layout
+from app.utils.wrmxpress_gui_obj import WrmXpressGui
 
 # Registering this page
 dash.register_page(__name__)
 
-########################################################################
-####                                                                ####
-####                             Layout                             ####
-####                                                                ####
-########################################################################
+# In[2]: Configure Page Layout
 
 layout = configure_layout
 
-########################################################################
-####                                                                ####
-####                              Callback                          ####
-####                                                                ####
-########################################################################
+# In[3]: Callbacks
+
+@callback(
+        Output("motility-hr", "style"),
+        Output("segmentation-hr", "style"),
+        Input("pipeline-selection", "value"),
+)
+def update_hr_visibility(pipeline_selection):
+    """
+    Update the visibility of the horizontal rules based on the selected pipeline(s).
+    """
+    motility_hr_style = {"display": "none"}
+    segmentation_hr_style = {"display": "none"}
+
+    if "motility" in pipeline_selection and len(pipeline_selection) > 1:
+        motility_hr_style = {"display": "flex"}
+    if "segmentation" in pipeline_selection and "tracking" in pipeline_selection:
+        segmentation_hr_style = {"display": "flex"}
+
+    return motility_hr_style, segmentation_hr_style
+
+@callback(
+    Output("pipeline-selection", "value"),
+    Input("pipeline-selection", "value"),
+    prevent_initial_call=True,
+)
+def handle_pipeline_selections(pipeline_selection):
+    """
+    Manage pipeline selections to enforce mutual exclusivity for 'CellProfiler':
+    - If 'CellProfiler' is selected and another pipeline is chosen, deselect 'CellProfiler'.
+    - If another pipeline is selected and 'CellProfiler' is chosen, deselect the other pipelines.
+    """
+    
+    if "cellprofiler" in pipeline_selection:
+        if 'cellprofiler' == pipeline_selection[-1]:
+            return 'cellprofiler'
+        else:
+            return pipeline_selection[:-1]
+    else:
+        return pipeline_selection
 
 
 @callback(
@@ -42,27 +70,29 @@ layout = configure_layout
         Output("mask-options-row", "style"),
         Output("static-dx-rescale", "style"),
         Output("video-dx-options", "style"),
+        Output("python-model-sigma-row", "style"),
+        Output("cellpose-model-segmentation-row", "style")
     ],
     [
         Input("imaging-mode", "value"),
-        Input("file-structure", "value"),
+        # Input("file-structure", "value"),
         Input("mask", "value"),
         Input("static-dx", "value"),
         Input("video-dx", "value"),
+        Input("type-segmentation", "value"),
     ],
 )
 # appearing selections upon meeting certain critera
-def update_options_visibility(imaging_mode, file_structure, mask, static_dx, video_dx):
+def update_options_visibility(
+    imaging_mode,
+    # file_structure,
+    mask,
+    static_dx,
+    video_dx,
+    segmentation_type,
+):
     """
     This function will display the multi-well options and additional options based on the imaging mode and file structure selected.
-    =======================================================================================================
-    Arguments:
-        - imaging_mode : str : The imaging mode selected
-        - file_structure : str : The file structure selected
-    =======================================================================================================
-    Returns:
-        - multi_well_options_style : dict : The style for the multi-well options
-        - additional_options_style : dict : The style for the additional options
     """
     multi_well_options_style = {"display": "none"}
     additional_options_style = {"display": "none"}
@@ -70,14 +100,17 @@ def update_options_visibility(imaging_mode, file_structure, mask, static_dx, vid
     mask_options_style = {"display": "none"}
     static_dx_options_style = {"display": "none"}
     video_dx_options_style = {"display": "none"}
+    python_model_sigma_row = {"display": "none"}
+    cellpose_model_segmentation_row = {"display": "flex"}
 
     if imaging_mode == "multi-well":  # if multi-well is selected
         # display the multi-well options
         multi_well_options_style = {"display": "flex"}
+        additional_options_style = {"display": "flex"}
 
-        if file_structure == "avi":  # if avi is selected
-            # display the additional options
-            additional_options_style = {"display": "flex"}
+        # if file_structure == "avi":  # if avi is selected
+        #     # display the additional options
+        #     additional_options_style = {"display": "flex"}
 
     elif imaging_mode == "multi-site":
         multi_site_options_style = {"display": "flex"}
@@ -91,6 +124,11 @@ def update_options_visibility(imaging_mode, file_structure, mask, static_dx, vid
     if video_dx:
         video_dx_options_style = {"display": "flex"}
 
+    if segmentation_type == "python":
+        python_model_sigma_row = {"display": "flex"}
+        cellpose_model_segmentation_row = {"display": "none"}
+
+
     return (
         multi_well_options_style,
         additional_options_style,
@@ -98,200 +136,222 @@ def update_options_visibility(imaging_mode, file_structure, mask, static_dx, vid
         mask_options_style,
         static_dx_options_style,
         video_dx_options_style,
-    )  # return the styles
-
-
-@callback(Output("pipeline-params", "children"), Input("pipeline-selection", "value"))
-def update_params_visibility(pipeline):
-
-    params_pane = None
-
-    if pipeline == "motility":
-        params_pane = html.Div(
-            [
-                dbc.Row(
-                    [
-                        dbc.Col(html.P("Wavelength:")),
-                        dbc.Col(
-                            dbc.Input(
-                                id="wavelengths",
-                                placeholder="Wavelength",
-                                type="text",
-                                persistence=True,
-                                persistence_type="memory",
-                                style={"display": "flex"},
-                            ),
-                        ),
-                    ]
-                ),
-                dbc.Row(
-                    [
-                        dbc.Col(html.P("pyrScale:")),
-                        dbc.Col(
-                            dbc.Input(
-                                id="pyrscale",
-                                placeholder="0.5",
-                                type="number",
-                                persistence=True,
-                                persistence_type="memory",
-                                style={"display": "flex"},
-                            ),
-                        ),
-                    ]
-                ),
-                dbc.Row(
-                    [
-                        dbc.Col(html.P("Levels:")),
-                        dbc.Col(
-                            dbc.Input(
-                                id="levels",
-                                placeholder="5",
-                                type="number",
-                                persistence=True,
-                                persistence_type="memory",
-                                style={"display": "flex"},
-                            ),
-                        ),
-                    ]
-                ),
-                dbc.Row(
-                    [
-                        dbc.Col(html.P("Window size:")),
-                        dbc.Col(
-                            dbc.Input(
-                                id="winsize",
-                                placeholder="20",
-                                type="number",
-                                persistence=True,
-                                persistence_type="memory",
-                                style={"display": "flex"},
-                            ),
-                        ),
-                    ]
-                ),
-                dbc.Row(
-                    [
-                        dbc.Col(html.P("Iterations:")),
-                        dbc.Col(
-                            dbc.Input(
-                                id="iterations",
-                                placeholder="7",
-                                type="number",
-                                persistence=True,
-                                persistence_type="memory",
-                                style={"display": "flex"},
-                            ),
-                        ),
-                    ]
-                ),
-                dbc.Row(
-                    [
-                        dbc.Col(html.P("Poly N:")),
-                        dbc.Col(
-                            dbc.Input(
-                                id="poly_n",
-                                placeholder="5",
-                                type="number",
-                                persistence=True,
-                                persistence_type="memory",
-                                style={"display": "flex"},
-                            ),
-                        ),
-                    ]
-                ),
-                dbc.Row(
-                    [
-                        dbc.Col(html.P("Poly Sigma:")),
-                        dbc.Col(
-                            dbc.Input(
-                                id="poly_sigma",
-                                placeholder="1.1",
-                                step=0.1,
-                                type="number",
-                                persistence=True,
-                                persistence_type="memory",
-                                style={"display": "flex"},
-                            ),
-                        ),
-                    ]
-                ),
-                dbc.Row(
-                    [
-                        dbc.Col(html.P("Flags:")),
-                        dbc.Col(
-                            dbc.Input(
-                                id="flags",
-                                placeholder="0",
-                                type="number",
-                                persistence=True,
-                                persistence_type="memory",
-                                style={"display": "flex"},
-                            ),
-                        ),
-                    ]
-                ),
-            ]
-        )
-
-    return params_pane
+        python_model_sigma_row,
+        cellpose_model_segmentation_row
+    )  
 
 
 @callback(
-    # Storing values of inputs to be used in different pages
+    # Output("pipeline-params-header", "style"),
+    Output("motility_params", "style"),
+    Output("segmentation_params", "style"),
+    Output("cellprofiler_params", "style"),
+    Output("tracking_params", "style"),
+    Input("pipeline-selection", "value"),
+)
+def update_params_visibility(pipeline):
+    """
+    Update the visibility of parameter sections based on the selected pipeline(s).
+    """
+    # Default all styles to hidden
+    # header_style = {"display": "none"}
+    motility_params_style = {"display": "none"}
+    segmentation_params_style = {"display": "none"}
+    cellprofiler_params_style = {"display": "none"}
+    tracking_params_style = {"display": "none"}
+
+    # Show the header if any pipeline is selected
+    # if pipeline:
+    #     header_style = {"display": "flex"}
+
+    # Update styles based on the selected pipelines
+    if "motility" in pipeline:
+        motility_params_style = {"display": "flex"}
+    if "segmentation" in pipeline:
+        segmentation_params_style = {"display": "flex"}
+    if "cellprofiler" in pipeline:
+        cellprofiler_params_style = {"display": "flex"}
+    if "tracking" in pipeline:
+        tracking_params_style = {"display": "flex"}
+
+    return (
+        # header_style,
+        motility_params_style,
+        segmentation_params_style,
+        cellprofiler_params_style,
+        tracking_params_style,
+    )
+
+@callback(
+    Output("cellpose-model-cellprofiler", "disabled"),
+    Output("cellpose-model-cellprofiler", "value"),
+    Output("cellpose-model-cellprofiler", "placeholder"),
+    Input("cellprofiler-pipeline-selection", "value"),
+    prevent_initial_call=True
+)
+def toggle_cellpose_model_select(pipeline_value):
+    """
+    Update the ability to select a Cellpose model based on the selected CellProfiler pipeline.
+    """
+    if pipeline_value == "wormsize_intensity_cellpose":
+        return False, None, 'Choose a Cellpose model...', 
+    else:
+        return True, None, 'Cellpose model not needed for selected pipeline.'
+
+
+@callback(
     Output("store", "data"),
+    Input("file-structure", "value"),
+    Input("imaging-mode", "value"),
+    Input("multi-well-row", "value"),
+    Input("multi-well-col", "value"),
+    Input("multi-well-detection", "value"),
+    Input("x-sites", "value"),
+    Input("y-sites", "value"),
+    Input("stitch-switch", "value"),
     Input("well-col", "value"),
     Input("well-row", "value"),
+    Input("mask", "value"),
+    Input("mask-diameter", "value"),
+    Input("pipeline-selection", "value"),
+    Input("wavelengths", "value"),
+    Input("pyrscale", "value"),
+    Input("levels", "value"),
+    Input("winsize", "value"),
+    Input("iterations", "value"),
+    Input("poly_n", "value"),
+    Input("poly_sigma", "value"),
+    Input("flags", "value"),
+    Input("cellpose-model-segmentation", "value"),
+    Input("type-segmentation", "value"),
+    Input("python-model-sigma", "value"),
+    Input("wavelengths-segmentation", "value"),
+    Input("cellprofiler-pipeline-selection", "value"),
+    Input("cellpose-model-cellprofiler", "value"),
+    Input("wavelengths-cellprofiler", "value"),
+    Input("wavelengths-tracking", "value"),
+    Input("tracking-diameter", "value"),
+    Input("tracking-minmass", "value"),
+    Input("tracking-noisesize", "value"),
+    Input("tracking-searchrange", "value"),
+    Input("tracking-memory", "value"),
+    Input("tracking-adaptivestop", "value"),
+    Input("static-dx", "value"),
+    Input("static-dx-rescale-input", "value"),
+    Input("video-dx", "value"),
+    Input("video-dx-format", "value"),
+    Input("video-dx-rescale", "value"),
     Input("mounted-volume", "value"),
     Input("plate-name", "value"),
     Input("well-selection-list", "children"),
-    Input("well-selection-list", "children"),
-    Input("imaging-mode", "value"),
-    Input("file-structure", "value"),
-    Input("pipeline-selection", "value"),
-    # Input("circ-or-square-img-masking", 'value'), # Image masking
+    prevent_initial_call=True,
 )
-# storing values of inputs to be used in different pages
 def store_values(
-    cols,
-    rows,
-    mounter,
-    platename,
-    well_selection,
-    wells,
-    imgaging_mode,
-    file_sturcture,
+    file_structure,
+    imaging_mode,
+    multi_well_row,
+    multi_well_col,
+    multi_well_detection,
+    x_sites,
+    y_sites,
+    stitch_switch,
+    well_col,
+    well_row,
+    mask,
+    mask_diameter,
     pipeline_selection,
-    # img_masking, # Image masking
+    wavelengths,
+    pyrscale,
+    levels,
+    winsize,
+    iterations,
+    poly_n,
+    poly_sigma,
+    flags,
+    cellpose_model_segmentation,
+    type_segmentation,
+    python_model_sigma,
+    wavelengths_segmentation,
+    cellprofiler_pipeline_selection,
+    cellpose_model_cellprofiler,
+    wavelengths_cellprofiler,
+    wavelengths_tracking,
+    tracking_diameter,
+    tracking_minmass,
+    tracking_noisesize,
+    tracking_searchrange,
+    tracking_memory,
+    tracking_adaptivestop,
+    static_dx,
+    static_dx_rescale,
+    video_dx,
+    video_dx_format,
+    video_dx_rescale,
+    mounted_volume,
+    plate_name,
+    well_selection_list,
 ):
     """
-    This function will store the values of the inputs to be used in different pages.
-    =======================================================================================================
-    Arguments:
-        - cols : int : The number of columns
-        - rows : int : The number of rows
-        - mounter : str : The mounted volume
-        - platename : str : The plate name
-        - well_selection : list : The list of wells selected
-        - wells : list : The list of wells
-        - imgaging_mode : str : The imaging mode
-        - file_sturcture : str : The file structure
-        - pipeline_selection : str : The pipeline selection
-    =======================================================================================================
-    Returns:
-        - dict : The values of the inputs to be used in different pages
+    This function will store the wrmXpress gui object for the rest of the application.
     """
-    # storing and returning the values of the inputs to be used in different pages
+    wrmXpress_gui_obj = WrmXpressGui(
+        file_structure,
+        imaging_mode,
+        multi_well_row,
+        multi_well_col,
+        multi_well_detection,
+        x_sites,
+        y_sites,
+        stitch_switch,
+        well_col,
+        well_row,
+        mask,
+        mask_diameter,
+        pipeline_selection,
+        wavelengths,
+        pyrscale,
+        levels,
+        winsize,
+        iterations,
+        poly_n,
+        poly_sigma,
+        flags,
+        cellpose_model_segmentation,
+        type_segmentation,
+        python_model_sigma,
+        wavelengths_segmentation,
+        cellprofiler_pipeline_selection,
+        cellpose_model_cellprofiler,
+        wavelengths_cellprofiler,
+        wavelengths_tracking,
+        tracking_diameter,
+        tracking_minmass,
+        tracking_noisesize,
+        tracking_searchrange,
+        tracking_memory,
+        tracking_adaptivestop,
+        static_dx,
+        static_dx_rescale,
+        video_dx,
+        video_dx_format,
+        video_dx_rescale,
+        mounted_volume,
+        plate_name,
+        well_selection_list,
+    )
+
+    serialized_obj = wrmXpress_gui_obj.to_dict()
+
     return {
-        "cols": cols,
-        "rows": rows,
-        "mount": mounter,
-        "platename": platename,
-        "wells": well_selection,
-        "wells": wells,
-        "img_mode": imgaging_mode,
-        "file_structure": file_sturcture,
+        "cols": well_col,
+        "rows": well_row,
+        "mount": mounted_volume,
+        "platename": plate_name,
+        "wells": well_selection_list,
+        "img_mode": imaging_mode,
+        "file_structure": file_structure,
         "pipeline_selection": pipeline_selection,
-        #'img_masking': img_masking, # Image masking
+        "wrmXpress_gui_obj": serialized_obj,
     }
 
 
@@ -303,13 +363,6 @@ def store_values(
 def update_table(rows, cols):
     """
     This function will create a selection table based on the dimensions of rows and columns selected.
-    =======================================================================================================
-    Arguments:
-        - rows : int : The number of rows
-        - cols : int : The number of columns
-    =======================================================================================================
-    Returns:
-        - well_selection : dash_table.DataTable : The selection table
     """
     # default values for rows and columns
     default_cols = 12
@@ -343,12 +396,6 @@ def update_table(rows, cols):
 def update_wells(table_contents):  # list of cells from selection table
     """
     This function will populate the list of wells to be analyzed.
-    =======================================================================================================
-    Arguments:
-        - table_contents : list : The list of cells from the selection table
-    =======================================================================================================
-    Returns:
-        - list : The sorted list of wells to be analyzed
     """
     values_list = [list(d.values()) for d in table_contents]
     flattened_list = list(itertools.chain.from_iterable(values_list))
@@ -373,230 +420,115 @@ def update_wells(table_contents):  # list of cells from selection table
         Output("resolving-error-issue-configure", "color"),
     ],
     Input("finalize-configure-button", "n_clicks"),
-    State("imaging-mode", "value"),
-    State("file-structure", "value"),
-    State("multi-well-row", "value"),
-    State("multi-well-col", "value"),
-    State("multi-well-detection", "value"),
-    State("x-sites", "value"),
-    State("y-sites", "value"),
-    State("stitch-switch", "value"),
-    State("mask", "value"),
-    State("mask-diameter", "value"),
-    State("species", "value"),
-    State("stages", "value"),
-    State("plate-name", "value"),
-    State("mounted-volume", "value"),
-    State("well-selection-list", "children"),
-    State("pipeline-selection", "value"),
-    State("static-dx", "value"),
-    State("static-dx-rescale", "value"),
-    State("video-dx", "value"),
-    State("video-dx-format", "value"),
-    State("video-dx-rescale", "value"),
-    State("wavelengths", "value"),
-    State("pyrscale", "value"),
-    State("levels", "value"),
-    State("winsize", "value"),
-    State("iterations", "value"),
-    State("poly_n", "value"),
-    State("poly_sigma", "value"),
-    State("flags", "value"),
+    State("store", "data"),
     prevent_initial_call=True,
     allow_duplicate=True,
 )
 # saving the yaml file from the sections in the configuration page
-def run_analysis(  # function to save the yaml file from the sections in the configuration page
+def save_configuration_upon_clicking_finalize_button(  # function to save the yaml file from the sections in the configuration page
     nclicks,
-    imagingmode,
-    filestructure,
-    multiwellrows,
-    multiwellcols,
-    multiwelldetection,
-    xsites,
-    ysites,
-    stitchswitch,
-    mask,
-    maskdiameter,
-    species,
-    stages,
-    platename,
-    volume,
-    wells,
-    pipeline,
-    staticdx,
-    staticdxrescale,
-    videodx,
-    videodxformat,
-    videodxrescale,
-    wavelength,
-    pyrscale,
-    levels,
-    winsize,
-    iterations,
-    poly_n,
-    poly_sigma,
-    flags,
+    store_data,
 ):
 
     if nclicks:
 
         # try to catch any errors that may occur
         # return an error message if an error occurs
+        # try: will include something here later
         try:
             # initializing the first error message
-            error_messages = [
+            initial_error_messages = [
                 "While finalizing the configuration, the following errors were found:"
             ]
-            error_occured = False  # initializing the error flag
+            initial_minor_error_messages = [
+                "Warning: when finalizing the configuration, the following values were not set. The default will be used."
+            ]
 
-            # checks volume and plate names to ensure they are adequately named
-            check_cases = [None, "", " "]
+            # create a wrmXpress gui object from the stored data and use the validate method to check for errors
 
-            if imagingmode == "multi-well":
-                if (
-                    multiwellrows == None
-                    or multiwellrows == ""
-                    or multiwellcols == None
-                    or multiwellcols == ""
-                ):
-                    error_occured = True
-                    error_messages.append(
-                        "The number of rows and columns for the multi-well plate is missing."
-                    )
+            wrmXpress_gui_obj = WrmXpressGui(
+                file_structure=store_data["wrmXpress_gui_obj"]["file_structure"],
+                imaging_mode=store_data["wrmXpress_gui_obj"]["imaging_mode"],
+                multi_well_row=store_data["wrmXpress_gui_obj"]["multi_well_row"],
+                multi_well_col=store_data["wrmXpress_gui_obj"]["multi_well_col"],
+                multi_well_detection=store_data["wrmXpress_gui_obj"][
+                    "multi_well_detection"
+                ],
+                x_sites=store_data["wrmXpress_gui_obj"]["x_sites"],
+                y_sites=store_data["wrmXpress_gui_obj"]["y_sites"],
+                stitch_switch=store_data["wrmXpress_gui_obj"]["stitch_switch"],
+                well_col=store_data["wrmXpress_gui_obj"]["well_col"],
+                well_row=store_data["wrmXpress_gui_obj"]["well_row"],
+                mask=store_data["wrmXpress_gui_obj"]["mask"],
+                mask_diameter=store_data["wrmXpress_gui_obj"]["mask_diameter"],
+                pipeline_selection=store_data["wrmXpress_gui_obj"][
+                    "pipeline_selection"
+                ],
+                wavelengths=store_data["wrmXpress_gui_obj"]["wavelengths"],
+                pyrscale=store_data["wrmXpress_gui_obj"]["pyrscale"],
+                levels=store_data["wrmXpress_gui_obj"]["levels"],
+                winsize=store_data["wrmXpress_gui_obj"]["winsize"],
+                iterations=store_data["wrmXpress_gui_obj"]["iterations"],
+                poly_n=store_data["wrmXpress_gui_obj"]["poly_n"],
+                poly_sigma=store_data["wrmXpress_gui_obj"]["poly_sigma"],
+                flags=store_data["wrmXpress_gui_obj"]["flags"],
+                cellpose_model_segmentation=store_data["wrmXpress_gui_obj"][
+                    "cellpose_model_segmentation"
+                ],
+                type_segmentation=store_data["wrmXpress_gui_obj"][
+                    "type_segmentation"
+                ],
+                python_model_sigma=store_data["wrmXpress_gui_obj"][
+                    "python_model_sigma"
+                ],
+                wavelengths_segmentation=store_data["wrmXpress_gui_obj"][
+                    "wavelengths_segmentation"
+                ],
+                cellprofiler_pipeline_selection=store_data["wrmXpress_gui_obj"][
+                    "cellprofiler_pipeline_selection"
+                ],
+                cellpose_model_cellprofiler=store_data["wrmXpress_gui_obj"][
+                    "cellpose_model_cellprofiler"
+                ],
+                wavelengths_cellprofiler=store_data["wrmXpress_gui_obj"][
+                    "wavelengths_cellprofiler"
+                ],
+                wavelengths_tracking=store_data["wrmXpress_gui_obj"][
+                    "wavelengths_tracking"
+                ],
+                tracking_diameter=store_data["wrmXpress_gui_obj"]["tracking_diameter"],
+                tracking_minmass=store_data["wrmXpress_gui_obj"]["tracking_minmass"],
+                tracking_noisesize=store_data["wrmXpress_gui_obj"][
+                    "tracking_noisesize"
+                ],
+                tracking_searchrange=store_data["wrmXpress_gui_obj"][
+                    "tracking_searchrange"
+                ],
+                tracking_memory=store_data["wrmXpress_gui_obj"]["tracking_memory"],
+                tracking_adaptivestop=store_data["wrmXpress_gui_obj"][
+                    "tracking_adaptivestop"
+                ],
+                static_dx=store_data["wrmXpress_gui_obj"]["static_dx"],
+                static_dx_rescale=store_data["wrmXpress_gui_obj"]["static_dx_rescale"],
+                video_dx=store_data["wrmXpress_gui_obj"]["video_dx"],
+                video_dx_format=store_data["wrmXpress_gui_obj"]["video_dx_format"],
+                video_dx_rescale=store_data["wrmXpress_gui_obj"]["video_dx_rescale"],
+                mounted_volume=store_data["wrmXpress_gui_obj"]["mounted_volume"],
+                plate_name=store_data["wrmXpress_gui_obj"]["plate_name"],
+                well_selection_list=store_data["wrmXpress_gui_obj"][
+                    "well_selection_list"
+                ],
+            )
 
-            # checks to ensure that plate name and volume contains characters
-            if platename in check_cases:
-                error_occured = True
-                error_messages.append("Plate/Folder name is missing.")  # error message
-            if volume in check_cases:
-                error_occured = True
-                error_messages.append("Volume path is missing.")  # error message
-
-            # ensures that plate name and volume contains characters
-            if volume not in check_cases and platename not in check_cases:
-
-                # splits plate name into a list of characters
-                platename_parts = list(platename)
-                if len(platename_parts) > 0:
-
-                    # ensures plate name does not contain spaces or slashes
-                    has_invalid_chars = any(
-                        letter == " " or letter == "/" for letter in platename_parts
-                    )
-                    if has_invalid_chars == True:
-                        error_occured = True
-                        error_messages.append(
-                            "Plate/Folder name contains invalid characters. A valid platename only contains letters, numbers, underscores ( _ ), and dashs ( - )."
-                        )
-
-                # splits volume into a list of characters
-                volume_parts = list(volume)
-                if len(volume_parts) > 0:
-
-                    # obtains last character of volume
-                    volume_parts_end = volume_parts[-1]
-
-                    # ensures last character of volume is not a forbidden character
-                    if volume_parts_end in check_cases:
-                        error_occured = True
-                        error_messages.append(
-                            "Volume path contains invalid characters. A valid path only contains letters, numbers, underscores ( _ ), dashes ( - ), and slashes ( / )."
-                        )
-
-                    # ensures volume does not contain spaces
-                    has_invalid_characters = any(
-                        letter == " " for letter in volume_parts
-                    )
-                    if has_invalid_characters == True:
-                        error_occured = True
-                        error_messages.append(
-                            "Volume path contains invalid characters. A valid path only contains letters, numbers, underscores ( _ ), dashes ( - ), and slashes ( / )."
-                        )
-
-                # check to see if volume, plate, and input directories exist
-                # obtain and full plate name path
-                platename_path = Path(volume, platename)
-                plate_base = platename.split("_", 1)[0]
-
-                # ensure all of these file paths exist (volume, input path, and plate name path)
-                if not os.path.exists(volume):
-                    error_occured = True
-                    error_messages.append("The volume path does not exist.")
-
-                # check to see if the plate name path exists
-                if not os.path.exists(platename_path):
-                    error_occured = True
-                    error_messages.append("No Plate/Folder in the volume.")
-
-                # check to see if imagexpress mode is selected
-                # if so, ensure that an .htd file exists
-                if filestructure == "imagexpress":
-                    HTD_file = Path(platename_path, f"{plate_base}.HTD")
-                    htd_file = Path(platename_path, f"{plate_base}.htd")
-                    if not os.path.exists(htd_file) or not os.path.exists(HTD_file):
-                        error_occured = True
-                        error_messages.append("No .HTD file found in the Plate/Folder.")
-                if filestructure == "avi":
-                    avi_folder_path = Path(volume, platename)
-                    avi_pattern = f"{platename}_"
-                    matched_files_avi = list(
-                        avi_folder_path.glob(avi_pattern + "*.avi")
-                    )
-                    if not matched_files_avi:
-                        error_occured = True
-                        error_messages.append("No AVI files found in the Plate/Folder.")
-
-                # check to see if avi mode is selected for fecundity, and any
-                # of the cellprofiler modules, if it is thow an error
-                if filestructure == "avi" and pipeline in [
-                    "fecundity",
-                    "wormsize_intensity_cellpose",
-                    "mf_celltox",
-                    "feeding",
-                    "wormsize",
-                ]:
-                    error_occured = True
-                    error_messages.append(
-                        "AVI mode is not supported for the selected pipeline."
-                    )
-
-                plate_base = platename.split("_", 1)[0]
-
-                # Directory containing the TIFF files
-                folder_path = Path(volume, f"{platename}/TimePoint_1")
-                avi_folder_path = Path(volume, platename)
-                # Iterate through the wells that have been selected
-                for well in wells:
-                    # Construct a pattern to match files for the current well, ignoring suffixes
-                    pattern = f"{plate_base}_{well}"
-                    avi_pattern = f"{platename}_{well}"
-
-                    # Find all files in the directory that match the well pattern
-                    matched_files_TIF = list(folder_path.glob(pattern + "*.TIF"))
-                    matched_files_tif = list(folder_path.glob(pattern + "*.tif"))
-                    matched_files_avi = list(
-                        avi_folder_path.glob(avi_pattern + "*.avi")
-                    )
-                    matched_files = (
-                        matched_files_tif + matched_files_avi + matched_files_TIF
-                    )
-                    # If no files match the current well, set error flags
-                    if not matched_files:
-                        error_occured = True
-                        error_messages.append(
-                            f"No images found for well {well}. This may result in unexpected errors or results."
-                        )
-            if pipeline is None:
-                error_occured = True
-                error_messages.append("No pipeline selected.")
-
-            if wells == []:
-                error_occured = True
-                error_messages.append("No wells selected.")
+            error_occured, error_messages, warning_occured, warning_messages = (
+                wrmXpress_gui_obj.validate()
+            )
 
             # check to see if there was an error message
             if error_occured == True:
+
+                # add error messages to the initial error messages
+                error_messages = initial_error_messages + error_messages
 
                 # formats the first line of the error message
                 error_messages[0] = html.H5(
@@ -618,122 +550,96 @@ def run_analysis(  # function to save the yaml file from the sections in the con
         except Exception as e:
             return "danger", True, f"An unexpected error occurred: {str(e)}", "danger"
 
-        diagnosticdx = "True"  # set diagnosticdx to True
+        # diagnosticdx = "True"  # set diagnosticdx to True
 
         # if no error messages are found, write the configuration to a YAML file
-        config = prep_yaml(
-            imagingmode,
-            filestructure,
-            multiwellrows,
-            multiwellcols,
-            multiwelldetection,
-            xsites,
-            ysites,
-            stitchswitch,
-            mask,
-            maskdiameter,
-            species,
-            stages,
-            wells,
-            volume,
-            pipeline,
-            staticdx,
-            staticdxrescale,
-            videodx,
-            videodxformat,
-            videodxrescale,
-            wavelength,
-            pyrscale,
-            levels,
-            winsize,
-            iterations,
-            poly_n,
-            poly_sigma,
-            flags,
-        )
+        # config = prep_yaml(
+        #     store_data
+        #     )
 
-        output_file = Path(volume, platename + ".yml")
+        config = wrmXpress_gui_obj.prep_yml()
+
+        output_file = Path(
+            store_data["wrmXpress_gui_obj"]["mounted_volume"],
+            store_data["wrmXpress_gui_obj"]["plate_name"] + ".yml",
+        )
 
         # dump preview data to YAML file
         with open(output_file, "w") as yaml_file:
             yaml.dump(config, yaml_file, default_flow_style=False)
+
+        if warning_occured == True:
+
+            # add error messages to the initial error messages
+            warning_messages = initial_minor_error_messages + warning_messages
+
+            # formats the first line of the error message
+            warning_messages[0] = html.H5(
+                f"{warning_messages[0]}", className="alert-heading"
+            )
+
+            # format the content of the error messages
+            for i in range(1, len(warning_messages)):
+                warning_messages[i] = html.P(
+                    f"{i}. {warning_messages[i]}", className="mb-0"
+                )
+
+            return "warning", True, warning_messages, "warning"
 
         # return success message
         return "success", True, f"Configuration written to {output_file}", "success"
 
 
 @callback(
-    Output("configure-input-preview", "src"),
-    Output("configure-input-preview", "style"),
-    Output("configure-input-text", "children"),
+    Output("cellprofiler-input-preview", "src"),
+    Output("cellprofiler-input-preview", "style"),
+    Output("cellprofiler-input-text", "children"),
     Input("pipeline-selection", "value"),
+    Input("cellprofiler-pipeline-selection", "value"),
     prevent_initial_call=True,  # Preventing callback from running before any action is taken
 )
 # updating the image preview based on the selected pipeline
-def update_figure_based_on_selection(module_initial):
+def update_figure_based_on_selection(module_initial, cellprofiler_pipeline_selection):
     """
     This function will load the image module for the selected pipeline.
-    =======================================================================================================
-    Arguments:
-        - module : str : The selected module
-        - store : dict : The stored values
-    =======================================================================================================
-    Returns:
-        - fig : The image module for the selected pipeline
     """
 
-    if module_initial == "motility":
-        fig = "assets/configure_assets/motility/A01/img/20210819-p01-NJW_753_A01_motility.png"
-        return (
-            fig,
-            {"width": "40%"},
-            'The motility pipeline exports a "flow cloud" as a diagnostic and saves a single value as output.',
-        )
+    if  "cellprofiler" in module_initial:
+        if cellprofiler_pipeline_selection == "wormsize_intensity_cellpose":
+            fig = "assets/configure_assets/wormsize_intensity_cellpose/A01/img/20220408-p01-MGC_A01.png"
+            return (
+                fig,
+                {"width": "100%"},
+                "The wormsize/intensity (Cellpose) pipeline exports straightened worms as a diagnostic and saves many values per worm as output.",
+            )
 
-    elif module_initial == "fecundity":
-        fig = "assets/configure_assets/fecundity/A01/img/20210906-p01-NJW_857_A01_binary.png"
-        return (
-            fig,
-            {"width": "40%"},
-            "The fecundity pipeline exports a segmented image as a diagnostic and saves a single value as output.",
-        )
+        elif cellprofiler_pipeline_selection == "mf_celltox":
+            fig = "assets/configure_assets/mf_celltox/viability.png"
+            return (
+                fig,
+                {"width": "40%"},
+                "The viability pipeline exports a segmented image as a diagnostic and saves a single value as output.",
+            )
 
-    elif module_initial == "tracking":
-        fig = "assets/configure_assets/tracking/20240307-p01-RVH_A05_tracks.png"
-        return (
-            fig,
-            {"width": "40%"},
-            "The tracking pipeline exports tracks as a diagnostic and saves a single value per track as output.",
-        )
+        elif cellprofiler_pipeline_selection == "feeding":
+            fig = "assets/configure_assets/feeding/A01/img/20210823-p01-KJG_795_A01.png"
+            return (
+                fig,
+                {"width": "100%"},
+                "The feeding pipeline exports straightened worms (with fluorescence) as a diagnostic and saves many values per worm as output.",
+            )
 
-    elif module_initial == "wormsize_intensity_cellpose":
-        fig = "assets/configure_assets/wormsize_intensity_cellpose/A01/img/20220408-p01-MGC_A01.png"
+        elif cellprofiler_pipeline_selection == "wormsize":
+            fig = "assets/configure_assets/wormsize/A01/img/straightened.png"
+            return (
+                fig,
+                {"width": "60%"},
+                "The wormsize pipeline exports straightened worms as a diagnostic and saves many values per worm as output.",
+            )
+        
+    else: # if no pipeline is selected
         return (
-            fig,
-            {"width": "100%"},
-            "The wormsize/intensity (Cellpose) pipeline exports straightened worms as a diagnostic and saves many values per worm as output.",
-        )
-
-    elif module_initial == "mf_celltox":
-        fig = "assets/configure_assets/mf_celltox/viability.png"
-        return (
-            fig,
-            {"width": "40%"},
-            "The viability pipeline exports a segmented image as a diagnostic and saves a single value as output.",
-        )
-
-    elif module_initial == "feeding":
-        fig = "assets/configure_assets/feeding/A01/img/20210823-p01-KJG_795_A01.png"
-        return (
-            fig,
-            {"width": "100%"},
-            "The feeding pipeline exports straightened worms (with fluorescence) as a diagnostic and saves many values per worm as output.",
-        )
-
-    elif module_initial == "wormsize":
-        fig = "assets/configure_assets/wormsize/A01/img/straightened.png"
-        return (
-            fig,
-            {"width": "60%"},
-            "The wormsize pipeline exports straightened worms as a diagnostic and saves many values per worm as output.",
+            "",
+            {"display": "none"},
+            "Please select a pipeline to view the input image.",
         )
