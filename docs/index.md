@@ -72,17 +72,17 @@ Custom metadata types can be added. Metadata will be merged with raw output afte
 3. **Preview** will allow you to preview the output of the pipeline's analysis on well A01 (or on the first well selected).
 4. **Run** is where the final pipeline will be run on all of the selected wells. Logs are written dynamically to the screen but also to the working directory.
 
+After running, raw data or data merged with metadata can be found in `{working_directory/output/}. The {working_directory/work/} folder will contain log files and some intermediary images. {working_directory/input/} will contain the copied and pre-processed input files copied from {working_directory/}. The wrmXpress GUI never edits or deletes the original images in {working_directory/}.
+
 ### Video walkthrough
 
 <div style="padding:49.12% 0 0 0;position:relative;"><iframe src="https://player.vimeo.com/video/986779390?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479" frameborder="0" allow="autoplay; fullscreen; picture-in-picture; clipboard-write" style="position:absolute;top:0;left:0;width:100%;height:100%;" title="wrmXpress GUI Walkthrough"></iframe></div><script src="https://player.vimeo.com/api/player.js"></script>
 
 ### Example data
 
-Validated example data can be downloaded in the GUI by clicking Zenodo button at the bottom left-hand corner of the interface. In the popup, select the plates to download. After downloading, move the plate folder into the working directory set in step 1 of the [installation/startup instructions above]()
+Validated example data can be downloaded in the GUI by clicking Zenodo button at the bottom left-hand corner of the interface. In the popup, select the plates to download. After downloading, move the plate folder into the working directory set in step 1 of the [installation/startup instructions above](#installing-and-starting-the-gui).
 
-## Developers
-
-wrmXpress is entirely open-source. The code for the back-end is maintained by the [Zamanian Lab](https://www.zamanianlab.org/) at the University of Wisconsin-Madison and can be found [here](https://github.com/zamanianlab/wrmXpress). The code for the front-end is maintained by the [Wheeler Lab](https://wheelerlab.bio/) at the University of Wisconsin-Eau Claire and can be found [here](https://github.com/wheelerlab-uwec/wrmXpress-gui).
+![Download example data](img/download.png){: style="width:100%"}
 
 ## Getting support
 
@@ -90,6 +90,12 @@ To receive support for either the GUI or running wrmXpress remotely, please subm
 
 - [wrmXpress back-end](https://github.com/zamanianlab/wrmXpress)
 - [wrmXpress GUI](https://github.com/wheelerlab-uwec/wrmXpress-gui)
+
+Log files for preview/run attempts will be written to the `work/` directory and should be included in any raised Issue.
+
+## Developers
+
+wrmXpress is entirely open-source. The code for the back-end is maintained by the [Zamanian Lab](https://www.zamanianlab.org/) at the University of Wisconsin-Madison and can be found [here](https://github.com/zamanianlab/wrmXpress). The code for the front-end is maintained by the [Wheeler Lab](https://wheelerlab.bio/) at the University of Wisconsin-Eau Claire and can be found [here](https://github.com/wheelerlab-uwec/wrmXpress-gui).
 
 ## Citing wrmXpress
 
