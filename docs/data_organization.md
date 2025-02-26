@@ -11,8 +11,8 @@ Inside a plate folder, there are two options for organizing the images, either a
 Compatible with the following pipelines:
 
 - [Motility](configuration/pipelines/motility.md)
-- [Fecundity](configuration/pipelines/fecundity.md)
-- [Toxicity](configuration/pipelines/toxicity.md)
+- [Segmentation](configuration/pipelines/segmentation.md)
+- [Viability](configuration/pipelines/viability.md)
 - [Feeding](configuration/pipelines/feeding.md)
 - [Development](configuration/pipelines/development.md)
 - [Tracking](configuration/pipelines/tracking.md)

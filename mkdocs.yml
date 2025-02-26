@@ -13,8 +13,8 @@ nav:
     - Pipeline Selection:
       - Motility: configuration/pipelines/motility.md
       - Development: configuration/pipelines/development.md
-      - Fecundity: configuration/pipelines/fecundity.md
-      - Toxicity: configuration/pipelines/toxicity.md
+      - Fecundity: configuration/pipelines/segmentation.md
+      - Viability: configuration/pipelines/viability.md
       - Feeding: configuration/pipelines/feeding.md
       - Tracking: configuration/pipelines/tracking.md
     - Run Diagnostics: configuration/dx.md

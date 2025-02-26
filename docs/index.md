@@ -12,10 +12,12 @@ Back-end: ![GitHub Release](https://img.shields.io/github/v/release/zamanianlab/
 wrmXpress is a suite of tools to analyze images and videos of free-living and parasitic flatworms and nematodes. It is designed to work out-of-the-box with data generated with a Molecular Devices ImageXpress high-content imager, but will work with any image type that is organized in an idiosyncratic manner (described in [Data Organization](data_organization.md)). Analytical pipelines featured in wrmXpress include:
 
 - [Optical Flow (Motility)](configuration/pipelines/optical_flow.md)
-- [Fecundity](configuration/pipelines/fecundity.md)
-- [Toxicity](configuration/pipelines/toxicity.md)
-- [Feeding](configuration/pipelines/feeding.md)
-- [Development](configuration/pipelines/development.md)
+- [Segmentation](configuration/pipelines/segmentation.md)
+  - Segmentation is used for fecundity experiments or to estimate the number of worms in a well to assist in normalization of optical flow data
+- [Custom CellProfiler pipelines]:
+  - [Viability](configuration/pipelines/viability.md)
+  - [Feeding](configuration/pipelines/feeding.md)
+  - [Development](configuration/pipelines/development.md)
 - [Tracking](configuration/pipelines/tracking.md)
 
 Some pipelines require specific experimental procedures to generate the proper data (i.e., the Feeding pipline requires images of worms that have been fed fluorescent dyes), while other pipelines are generalizable across multiple worm species, stages, and imaging environments. Detailed documentation for each pipeline can be found at the corresponding links above.
