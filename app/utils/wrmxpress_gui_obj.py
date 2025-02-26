@@ -166,7 +166,7 @@ class WrmXpressGui:
         if self.mask in ["circular", "square"] and not self.mask_diameter:
             self.warning_occurred = True
             self.warning_messages.append(
-                "Mask diameter is missing. Default value (0) will be used."
+                "Mask diameter was not set. Default value (0) will be used."
             )
 
     def validate_multi_well_mode(self):
@@ -229,7 +229,7 @@ class WrmXpressGui:
                 if not getattr(self, param):
                     self.warning_occurred = True
                     self.warning_messages.append(
-                        f"{param} is missing. Default value ({default}) will be used."
+                        f"{param} was not set. Default value ({default}) will be used."
                     )
 
         if (
@@ -239,7 +239,7 @@ class WrmXpressGui:
         ):
             self.warning_occurred = True
             self.warning_messages.append(
-                "Python model sigma wasn't set. Default value (0.25) will be used."
+                "Python model sigma was not set. Default value (0.25) will be used."
             )
 
         if "tracking" in self.pipeline_selection:
@@ -256,7 +256,7 @@ class WrmXpressGui:
                 if not getattr(self, param):
                     self.warning_occurred = True
                     self.warning_messages.append(
-                        f"{param} is missing. Default value ({default}) will be used."
+                        f"{param} was not set. Default value ({default}) will be used."
                     )
             
             try:
