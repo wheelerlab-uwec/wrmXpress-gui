@@ -4,7 +4,6 @@
 ####                                                                ####
 ########################################################################
 
-from app.components.metadata_layout import selection_table
 import dash_bootstrap_components as dbc
 from dash import html
 
@@ -53,7 +52,7 @@ run_time_settings = dbc.AccordionItem(
                                     placeholder="Path",
                                     type="text",
                                     persistence=True,
-                                    persistence_type="memory",
+                                    persistence_type="session",
                                     style={
                                         "flex": "2"
                                     },  # Make the input take remaining space
@@ -97,7 +96,7 @@ run_time_settings = dbc.AccordionItem(
                                     placeholder="Name",
                                     type="text",
                                     persistence=True,
-                                    persistence_type="memory",
+                                    persistence_type="session",
                                     style={"flex": "2"},
                                 ),
                             ],
@@ -157,8 +156,9 @@ run_time_settings = dbc.AccordionItem(
                 ),
             ]
         ),
-        # Placeholder for selection_table, assuming imported from another module
-        selection_table,
+        html.Div(
+            # initializing selection table id which will be populated in later
+            id="well-selection-table"),
         html.Br(),  # Line break for spacing
         html.Div(
             [  # Div for displaying the list of wells to be analyzed

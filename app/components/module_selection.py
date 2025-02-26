@@ -35,7 +35,7 @@ module_selection = dbc.AccordionItem(
                                         value=[],
                                         switch=True,
                                         persistence=True,
-                                        persistence_type="memory",
+                                        persistence_type="session",
                                     ),
                                 ]
                             ),
@@ -92,14 +92,14 @@ module_selection = dbc.AccordionItem(
                                                                                     ],
                                                                                     value="w1",
                                                                                     persistence=True,
-                                                                                    persistence_type="memory",
+                                                                                    persistence_type="session",
                                                                                 ),
                                                                                 # dbc.Input(
                                                                                 #     id="wavelengths",
                                                                                 #     placeholder="Wavelength",
                                                                                 #     type="text",
                                                                                 #     persistence=True,
-                                                                                #     persistence_type="memory",
+                                                                                #     persistence_type="session",
                                                                                 #     style={"display": "flex"},
                                                                                 # ),
                                                                             ],
@@ -119,7 +119,7 @@ module_selection = dbc.AccordionItem(
                                                                                 placeholder="0.5",
                                                                                 type="number",
                                                                                 persistence=True,
-                                                                                persistence_type="memory",
+                                                                                persistence_type="session",
                                                                                 style={
                                                                                     "display": "flex"
                                                                                 },
@@ -140,7 +140,7 @@ module_selection = dbc.AccordionItem(
                                                                                 placeholder="5",
                                                                                 type="number",
                                                                                 persistence=True,
-                                                                                persistence_type="memory",
+                                                                                persistence_type="session",
                                                                                 style={
                                                                                     "display": "flex"
                                                                                 },
@@ -161,7 +161,7 @@ module_selection = dbc.AccordionItem(
                                                                                 placeholder="20",
                                                                                 type="number",
                                                                                 persistence=True,
-                                                                                persistence_type="memory",
+                                                                                persistence_type="session",
                                                                                 style={
                                                                                     "display": "flex"
                                                                                 },
@@ -182,7 +182,7 @@ module_selection = dbc.AccordionItem(
                                                                                 placeholder="7",
                                                                                 type="number",
                                                                                 persistence=True,
-                                                                                persistence_type="memory",
+                                                                                persistence_type="session",
                                                                                 style={
                                                                                     "display": "flex"
                                                                                 },
@@ -203,7 +203,7 @@ module_selection = dbc.AccordionItem(
                                                                                 placeholder="5",
                                                                                 type="number",
                                                                                 persistence=True,
-                                                                                persistence_type="memory",
+                                                                                persistence_type="session",
                                                                                 style={
                                                                                     "display": "flex"
                                                                                 },
@@ -225,7 +225,7 @@ module_selection = dbc.AccordionItem(
                                                                                 step=0.1,
                                                                                 type="number",
                                                                                 persistence=True,
-                                                                                persistence_type="memory",
+                                                                                persistence_type="session",
                                                                                 style={
                                                                                     "display": "flex"
                                                                                 },
@@ -246,7 +246,7 @@ module_selection = dbc.AccordionItem(
                                                                                 placeholder="0",
                                                                                 type="number",
                                                                                 persistence=True,
-                                                                                persistence_type="memory",
+                                                                                persistence_type="session",
                                                                                 style={
                                                                                     "display": "flex"
                                                                                 },
@@ -310,7 +310,7 @@ module_selection = dbc.AccordionItem(
                                                                                 ],
                                                                                 value="cellpose",
                                                                                 persistence=True,
-                                                                                persistence_type="memory",
+                                                                                persistence_type="session",
                                                                                 style={
                                                                                     "display": "flex"
                                                                                 },
@@ -348,7 +348,7 @@ module_selection = dbc.AccordionItem(
                                                                                 ],
                                                                                 value="celegans_20220830",
                                                                                 persistence=True,
-                                                                                persistence_type="memory",
+                                                                                persistence_type="session",
                                                                                 style={
                                                                                     "display": "flex"
                                                                                 },
@@ -373,7 +373,7 @@ module_selection = dbc.AccordionItem(
                                                                                 placeholder="0.2",
                                                                                 type="number",
                                                                                 persistence=True,
-                                                                                persistence_type="memory",
+                                                                                persistence_type="session",
                                                                                 style={
                                                                                     "display": "flex"
                                                                                 },
@@ -419,7 +419,7 @@ module_selection = dbc.AccordionItem(
                                                                                 ],
                                                                                 value="w1",
                                                                                 persistence=True,
-                                                                                persistence_type="memory",
+                                                                                persistence_type="session",
                                                                                 style={
                                                                                     "display": "flex"
                                                                                 },
@@ -493,7 +493,7 @@ module_selection = dbc.AccordionItem(
                                                                                     ],
                                                                                     value="wormsize_intensity_cellpose",
                                                                                     persistence=True,
-                                                                                    persistence_type="memory",
+                                                                                    persistence_type="session",
                                                                                 ),
                                                                             ]
                                                                         ),
@@ -534,7 +534,7 @@ module_selection = dbc.AccordionItem(
                                                                                 ],
                                                                                 value="w1",
                                                                                 persistence=True,
-                                                                                persistence_type="memory",
+                                                                                persistence_type="session",
                                                                                 style={
                                                                                     "display": "flex"
                                                                                 },
@@ -575,7 +575,7 @@ module_selection = dbc.AccordionItem(
                                                                                 ],
                                                                                 value=None,
                                                                                 persistence=True,
-                                                                                persistence_type="memory",
+                                                                                persistence_type="session",
                                                                                 style={
                                                                                     "display": "flex",
                                                                                 },
@@ -647,7 +647,7 @@ module_selection = dbc.AccordionItem(
                                                                                 ],
                                                                                 value="w1",
                                                                                 persistence=True,
-                                                                                persistence_type="memory",
+                                                                                persistence_type="session",
                                                                                 style={
                                                                                     "display": "flex"
                                                                                 },
@@ -668,7 +668,7 @@ module_selection = dbc.AccordionItem(
                                                                                 placeholder="35",
                                                                                 type="number",
                                                                                 persistence=True,
-                                                                                persistence_type="memory",
+                                                                                persistence_type="session",
                                                                                 style={
                                                                                     "display": "flex"
                                                                                 },
@@ -689,7 +689,7 @@ module_selection = dbc.AccordionItem(
                                                                                 placeholder="1200",
                                                                                 type="number",
                                                                                 persistence=True,
-                                                                                persistence_type="memory",
+                                                                                persistence_type="session",
                                                                                 style={
                                                                                     "display": "flex"
                                                                                 },
@@ -710,7 +710,7 @@ module_selection = dbc.AccordionItem(
                                                                                 placeholder="2",
                                                                                 type="number",
                                                                                 persistence=True,
-                                                                                persistence_type="memory",
+                                                                                persistence_type="session",
                                                                                 style={
                                                                                     "display": "flex"
                                                                                 },
@@ -731,7 +731,7 @@ module_selection = dbc.AccordionItem(
                                                                                 placeholder="45",
                                                                                 type="number",
                                                                                 persistence=True,
-                                                                                persistence_type="memory",
+                                                                                persistence_type="session",
                                                                                 style={
                                                                                     "display": "flex"
                                                                                 },
@@ -752,7 +752,7 @@ module_selection = dbc.AccordionItem(
                                                                                 placeholder="25",
                                                                                 type="number",
                                                                                 persistence=True,
-                                                                                persistence_type="memory",
+                                                                                persistence_type="session",
                                                                                 style={
                                                                                     "display": "flex"
                                                                                 },
@@ -773,7 +773,7 @@ module_selection = dbc.AccordionItem(
                                                                                 placeholder="30",
                                                                                 type="number",
                                                                                 persistence=True,
-                                                                                persistence_type="memory",
+                                                                                persistence_type="session",
                                                                                 style={
                                                                                     "display": "flex"
                                                                                 },

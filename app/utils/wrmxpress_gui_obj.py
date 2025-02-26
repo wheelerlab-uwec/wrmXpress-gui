@@ -194,6 +194,11 @@ class WrmXpressGui:
                 self.error_messages.append(
                     "The number of y sites for the multi-site plate is missing."
                 )
+            if self.file_structure == "avi":
+                self.error_occurred = True
+                self.error_messages.append(
+                    "Multi Site imaging with AVIs is not currently supported."
+                )
 
     def validate_cellprofiler_cellpose_combos(self):
         if (
