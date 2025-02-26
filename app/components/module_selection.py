@@ -31,26 +31,6 @@ module_selection = dbc.AccordionItem(
                                                 "value": "cellprofiler",
                                             },
                                             {"label": "Tracking", "value": "tracking"},
-                                            # {"label": "Fecundity", "value": "fecundity"},
-                                            # {
-                                            #     "label": [
-                                            #         html.I("C. elegans"),
-                                            #         " size and intensity (Cellpose)",
-                                            #     ],
-                                            #     "value": "wormsize_intensity_cellpose",
-                                            # },
-                                            # {
-                                            #     "label": "Microfilariae viability",
-                                            #     "value": "mf_celltox",
-                                            # },
-                                            # {
-                                            #     "label": [html.I("C. elegans"), " feeding"],
-                                            #     "value": "feeding",
-                                            # },
-                                            # {
-                                            #     "label": [html.I("C. elegans"), " size"],
-                                            #     "value": "wormsize",
-                                            # },
                                         ],
                                         value=[],
                                         switch=True,
@@ -310,7 +290,36 @@ module_selection = dbc.AccordionItem(
                                                             [
                                                                 dbc.Row(
                                                                     [
-                                                                        # cellpose model selection
+                                                                        dbc.Col(
+                                                                            html.P(
+                                                                                "Segmentation type:"
+                                                                            )
+                                                                        ),
+                                                                        dbc.Col(
+                                                                            dbc.Select(
+                                                                                id="type-segmentation",
+                                                                                options=[
+                                                                                    {
+                                                                                        "label": "cellpose",
+                                                                                        "value": "cellpose",
+                                                                                    },
+                                                                                    {
+                                                                                        "label": "python",
+                                                                                        "value": "python",
+                                                                                    },
+                                                                                ],
+                                                                                value="cellpose",
+                                                                                persistence=True,
+                                                                                persistence_type="memory",
+                                                                                style={
+                                                                                    "display": "flex"
+                                                                                },
+                                                                            ),
+                                                                        ),
+                                                                    ],
+                                                                ),
+                                                                dbc.Row(
+                                                                    [
                                                                         dbc.Col(
                                                                             html.P(
                                                                                 "Cellpose model:"
@@ -346,41 +355,13 @@ module_selection = dbc.AccordionItem(
                                                                             ),
                                                                         ),
                                                                     ],
+                                                                    id="cellpose-model-segmentation-row",
+                                                                    style={
+                                                                        "display": "flex"
+                                                                    },
                                                                 ),
                                                                 dbc.Row(
                                                                     [
-                                                                        # cellpose model type
-                                                                        dbc.Col(
-                                                                            html.P(
-                                                                                "Segmentation type:"
-                                                                            )
-                                                                        ),
-                                                                        dbc.Col(
-                                                                            dbc.Select(
-                                                                                id="cellpose-model-type-segmentation",
-                                                                                options=[
-                                                                                    {
-                                                                                        "label": "cellpose",
-                                                                                        "value": "cellpose",
-                                                                                    },
-                                                                                    {
-                                                                                        "label": "python",
-                                                                                        "value": "python",
-                                                                                    },
-                                                                                ],
-                                                                                value="cellpose",
-                                                                                persistence=True,
-                                                                                persistence_type="memory",
-                                                                                style={
-                                                                                    "display": "flex"
-                                                                                },
-                                                                            ),
-                                                                        ),
-                                                                    ],
-                                                                ),
-                                                                dbc.Row(
-                                                                    [
-                                                                        # cellpose model type
                                                                         dbc.Col(
                                                                             html.P(
                                                                                 "Python Model Sigma:"
@@ -406,7 +387,6 @@ module_selection = dbc.AccordionItem(
                                                                 ),
                                                                 dbc.Row(
                                                                     [
-                                                                        # cellpose wavelength selection
                                                                         dbc.Col(
                                                                             html.P(
                                                                                 "Wavelength:"
@@ -460,7 +440,7 @@ module_selection = dbc.AccordionItem(
                                                             id="segmentation-input-preview",
                                                         ),
                                                         html.P(
-                                                            "The fecundity pipeline exports a segmented image as a diagnostic and saves a single value as output.",
+                                                            "The segmentation pipeline exports a segmented image as a diagnostic and saves a single value as output.",
                                                             id="segmentation-input-text",
                                                         ),
                                                     ],

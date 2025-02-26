@@ -71,6 +71,7 @@ def handle_pipeline_selections(pipeline_selection):
         Output("static-dx-rescale", "style"),
         Output("video-dx-options", "style"),
         Output("python-model-sigma-row", "style"),
+        Output("cellpose-model-segmentation-row", "style")
     ],
     [
         Input("imaging-mode", "value"),
@@ -78,7 +79,7 @@ def handle_pipeline_selections(pipeline_selection):
         Input("mask", "value"),
         Input("static-dx", "value"),
         Input("video-dx", "value"),
-        Input("cellpose-model-type-segmentation", "value"),
+        Input("type-segmentation", "value"),
     ],
 )
 # appearing selections upon meeting certain critera
@@ -88,7 +89,7 @@ def update_options_visibility(
     mask,
     static_dx,
     video_dx,
-    cellprofiler_pipeline_selection,
+    segmentation_type,
 ):
     """
     This function will display the multi-well options and additional options based on the imaging mode and file structure selected.
@@ -100,6 +101,7 @@ def update_options_visibility(
     static_dx_options_style = {"display": "none"}
     video_dx_options_style = {"display": "none"}
     python_model_sigma_row = {"display": "none"}
+    cellpose_model_segmentation_row = {"display": "flex"}
 
     if imaging_mode == "multi-well":  # if multi-well is selected
         # display the multi-well options
@@ -122,8 +124,10 @@ def update_options_visibility(
     if video_dx:
         video_dx_options_style = {"display": "flex"}
 
-    if cellprofiler_pipeline_selection == "python":
+    if segmentation_type == "python":
         python_model_sigma_row = {"display": "flex"}
+        cellpose_model_segmentation_row = {"display": "none"}
+
 
     return (
         multi_well_options_style,
@@ -133,7 +137,8 @@ def update_options_visibility(
         static_dx_options_style,
         video_dx_options_style,
         python_model_sigma_row,
-    )  # return the styles
+        cellpose_model_segmentation_row
+    )  
 
 
 @callback(
@@ -218,7 +223,7 @@ def toggle_cellpose_model_select(pipeline_value):
     Input("poly_sigma", "value"),
     Input("flags", "value"),
     Input("cellpose-model-segmentation", "value"),
-    Input("cellpose-model-type-segmentation", "value"),
+    Input("type-segmentation", "value"),
     Input("python-model-sigma", "value"),
     Input("wavelengths-segmentation", "value"),
     Input("cellprofiler-pipeline-selection", "value"),
