@@ -486,9 +486,30 @@ def copy_files_to_input_directory(
                             dest_dir.mkdir(parents=True, exist_ok=True)
                             shutil.copy(file_path, dest_dir)
         elif file_structure == "avi":
-            dest_dir = platename_input_dir
-            dest_dir.mkdir(parents=True, exist_ok=True)
-            shutil.copy(Path(img_dir, f"{plate_base}.avi"), dest_dir)
+            # One AVI for a whole plate
+            if Path(img_dir, f"{plate_base}.avi").exists():
+                dest_dir = platename_input_dir
+                dest_dir.mkdir(parents=True, exist_ok=True)
+                shutil.copy(Path(img_dir, f"{plate_base}.avi"), dest_dir)
+            # One AVI per well
+            else:
+                for well in wells:
+                    for file_type in file_types:
+                        pattern = (
+                                f"{plate_base}_{well}*"
+                                if htd_file
+                                else f"{platename}_{well}*"
+                            )
+                        search_pattern = Path(
+                                img_dir,
+                                pattern + file_type,
+                            )
+                        for file_path in glob.glob(str(search_pattern)):
+                                dest_dir = (
+                                    Path(platename_input_dir)
+                                )
+                                dest_dir.mkdir(parents=True, exist_ok=True)
+                                shutil.copy(file_path, dest_dir)
     except Exception as e:
         print(f"Error copying files to input directory: {e}")
 
