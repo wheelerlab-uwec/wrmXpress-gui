@@ -527,6 +527,7 @@ def create_figure_from_filepath(img_path, scale="gray", max_pixels=178956970):
     Image.MAX_IMAGE_PIXELS = 1000000000  # Increase the limit to 1 billion pixels
     
     # Try opening the image with PIL
+    
     try:
         img = Image.open(img_path)
         # Calculate thumbnail size to limit memory use but maintain aspect ratio

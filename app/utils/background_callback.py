@@ -7,6 +7,8 @@ import subprocess
 import time
 import shlex
 import re
+import dash
+import plotly.graph_objects as go
 
 from app.utils.callback_functions import (
     update_yaml_file,
@@ -93,9 +95,19 @@ def run_wrmXpress_analysis(store, set_progress, wrmXpress_gui_obj):
         print("Running wrmXpress.")
 
         docker_output = []
+        fig = None
+        
+        empty_fig = go.Figure()
+        empty_fig.update_layout(
+            # title="Loading...", 
+            xaxis={"visible": False}, 
+            yaxis={"visible": False},
+            annotations=[{"text": "Loading...", "xref": "paper", "yref": "paper", "showarrow": False, "font": {"size": 20}}]
+        )
 
         # Process all lines from the subprocess
         for line in iter(process.stdout.readline, ""):
+            wrmXpress_gui_obj.set_progress_running = True
             docker_output.append(line)
             file.write(line)
             file.flush()
@@ -105,7 +117,8 @@ def run_wrmXpress_analysis(store, set_progress, wrmXpress_gui_obj):
                     len(re.findall(r"\b" + "|".join(new_store["wells"]) + r"\b", line))
                     == 1
                 ):
-                    updated_running_wells(
+                    
+                    fig = updated_running_wells(
                         set_progress, line, store, docker_output, wrmXpress_gui_obj
                     )
 
@@ -115,11 +128,12 @@ def run_wrmXpress_analysis(store, set_progress, wrmXpress_gui_obj):
 
             if wrmXpress_gui_obj.set_progress_running:
                 docker_output_formatted = "".join(docker_output)
+                
                 set_progress(
                     (
                         wrmXpress_gui_obj.set_progress_current_number,
                         wrmXpress_gui_obj.set_progress_total_number,
-                        wrmXpress_gui_obj.set_progress_figure,
+                        fig if fig else empty_fig,
                         f"```{wrmXpress_gui_obj.set_progress_image_path}```",
                         f"```{docker_output_formatted}```",
                     )
@@ -151,15 +165,16 @@ def updated_running_wells(set_progress, line, store, docker_output, wrmXpress_gu
 
     well_being_analyzed, progress = line.split(" ")
     current_number, total_number = progress.split("/")
-    plate_base = store["platename"].split("_", 1)[0]
+    plate_base = store["platename"].split("_", 1)[0] if "_" in store["platename"] else store["platename"]
     well_base_path = Path(
-        store["wrmXpress_gui_obj"]["mounted_volume"],
+        store["wrmXpress_gui_obj"]["mounted_volume"], "input",
         f"{store['wrmXpress_gui_obj']['plate_name']}/TimePoint_1/{plate_base}_{well_being_analyzed}",
     )
     # Use rglob with case-insensitive pattern matching for .TIF and .tif
     file_paths = list(
         well_base_path.parent.rglob(well_base_path.name + "*[._][tT][iI][fF]")
     )
+    
     # Sort the matching files to find the one with the lowest suffix number
     if file_paths:
         file_paths_sorted = sorted(file_paths, key=lambda x: x.stem)
@@ -187,6 +202,7 @@ def updated_running_wells(set_progress, line, store, docker_output, wrmXpress_gu
         wrmXpress_gui_obj.set_processing_arguments(
             current_number, total_number, fig, img_path
         )
+        return fig
 
 
 def preamble_run_wrmXpress_avi_selection(store):

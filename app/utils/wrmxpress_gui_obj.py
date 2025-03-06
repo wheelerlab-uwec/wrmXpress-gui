@@ -6,6 +6,7 @@ import yaml
 import shlex
 import subprocess
 import glob
+import re
 import shutil
 from pathlib import Path
 from app.utils.callback_functions import (
@@ -121,10 +122,10 @@ class WrmXpressGui:
         self.set_progress_current_number = None
         self.set_progress_total_number = None
         self.set_progress_figure = None
-        self.set_progress_image_path = None
+        self.set_progress_image_path = ''
         self.set_progress_docker_output = None
 
-    # In[3]: Object Functions to stroe and retrieve data as dictionary and json for the GUI
+    # In[3]: Object Functions to store and retrieve data as dictionary and json for the GUI
     def to_dict(self):
         return self.__dict__
 
@@ -348,6 +349,113 @@ class WrmXpressGui:
                     self.error_occurred = True
                     self.error_messages.append("No AVI file found in the Plate/Folder.")
 
+    def validate_htd_file_cols_and_rows(self):
+        """
+        Validate that plate dimensions in the HTD file match expected dimensions.
+        Populates error_messages and warning_messages as appropriate.
+        """
+        plate_base = self.plate_name.split("_", 1)[0]
+        htd_file = Path(self.mounted_volume, self.plate_name, f"{plate_base}.HTD")
+        
+        if not htd_file.exists():
+            self.error_occurred = True
+            self.error_messages.append(f"HTD file not found: {htd_file}")
+            return
+        
+        # Read file with multiple encoding attempts
+        htd_data = self._read_file_with_multiple_encodings(htd_file)
+        if htd_data is None:
+            return  # Error already set in _read_file_with_multiple_encodings
+        
+        # Parse HTD data using a more robust approach
+        plate_info = self._parse_htd_data(htd_data)
+        
+        # Validate dimensions against expected values
+        self._validate_plate_dimensions(plate_info)
+        
+    def _read_file_with_multiple_encodings(self, file_path):
+        """Helper method to attempt reading a file with different encodings."""
+        encodings = ["utf-8", "utf-16", "iso-8859-1", "latin-1"]
+        
+        for encoding in encodings:
+            try:
+                with open(file_path, "r", encoding=encoding) as f:
+                    return f.read()
+            except UnicodeDecodeError:
+                continue
+            except Exception as e:
+                self.warning_occurred = True
+                self.warning_messages.append(f"Error reading file with {encoding}: {str(e)}")
+        
+        self.error_occurred = True
+        self.error_messages.append("Failed to read HTD file. Please check the file encoding.")
+        return None
+
+    def _parse_htd_data(self, htd_content):
+        """Parse HTD file content to extract relevant information."""
+        plate_info = {
+            'x_wells': None,
+            'y_wells': None,
+            'description': None,
+            'plate_type': None,
+            'time_points': None
+        }
+        
+        # Define patterns for each key we want to extract
+        patterns = {
+            'x_wells': r'"XWells"\s*,\s*(\d+)',
+            'y_wells': r'"YWells"\s*,\s*(\d+)',
+            'description': r'"Description"\s*,\s*"([^"]*)"',
+            'plate_type': r'"PlateType"\s*,\s*(\d+)',
+            'time_points': r'"TimePoints"\s*,\s*(\d+)'
+        }
+        
+        # Extract each value using regex
+        for key, pattern in patterns.items():
+            match = re.search(pattern, htd_content)
+            if match:
+                try:
+                    # Convert numeric values to integers
+                    if key in ['x_wells', 'y_wells', 'plate_type', 'time_points']:
+                        plate_info[key] = int(match.group(1))
+                    else:
+                        plate_info[key] = match.group(1)
+                except (ValueError, IndexError):
+                    self.warning_occurred = True
+                    self.warning_messages.append(f"Failed to parse {key} from HTD file.")
+        
+        # Check if required values were extracted
+        for key in ['x_wells', 'y_wells']:
+            if plate_info[key] is None:
+                self.warning_occurred = True
+                self.warning_messages.append(f"Failed to extract {key} from HTD file.")
+        
+        return plate_info
+
+    def _validate_plate_dimensions(self, plate_info):
+        """Validate that plate dimensions match expected values."""
+        x_wells = plate_info.get('x_wells')
+        y_wells = plate_info.get('y_wells')
+        
+        # Use default values if necessary
+        expected_cols = self.well_col or 12
+        expected_rows = self.well_row or 8
+        
+        # Validate dimensions if we were able to extract them
+        if x_wells is not None and x_wells != expected_cols:
+            self.error_occurred = True
+            self.error_messages.append(
+                f"Number of columns in the HTD file ({x_wells}) does not match "
+                f"the number of columns selected ({expected_cols})."
+            )
+        
+        if y_wells is not None and y_wells != expected_rows:
+            self.error_occurred = True
+            self.error_messages.append(
+                f"Number of rows in the HTD file ({y_wells}) does not match "
+                f"the number of rows selected ({expected_rows})."
+            )
+
     def validate(self):
         self.validate_volume()
         self.validate_platename()
@@ -366,6 +474,7 @@ class WrmXpressGui:
         if platename_path:
             if self.file_structure == "imagexpress":
                 self.validate_imagexpress_mode(platename_path)
+                self.validate_htd_file_cols_and_rows()
             elif self.file_structure == "avi":
                 self.validate_avi_mode()
 
@@ -994,9 +1103,13 @@ class WrmXpressGui:
         output_directory = Path(self.mounted_volume, "output")
         plate_base = self.plate_name.split("_", 1)[0]
 
+        if self.pipeline_selection == "cellprofiler":
+            self.pipeline_selection = ['cellprofiler']
+
         # Derive selected pipelines
         selected_pipelines = [
-            "optical_flow" if p == "motility" else p for p in self.pipeline_selection
+            "optical_flow" if p == "motility" else p
+            for p in self.pipeline_selection
         ]
         if self.static_dx:
             selected_pipelines.append("static_dx")
@@ -1006,7 +1119,7 @@ class WrmXpressGui:
         # Initialize output files if not already done
         self.output_files_exist = False
         self.output_files = []
-
+        
         # Search for output files in the specified pipelines
         for pipeline in selected_pipelines:
             pipeline_dir = Path(output_directory, pipeline)
@@ -1018,7 +1131,7 @@ class WrmXpressGui:
 
             # Check for plate_base consistency in file names
             matching_files = [file for file in files if plate_base in file.name]
-
+            
             if matching_files:
                 self.output_files_exist = True
                 self.output_files.extend(matching_files)
