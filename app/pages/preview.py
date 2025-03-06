@@ -152,17 +152,17 @@ def update_preview_image(n_clicks, store):
                 return f"```{img_path}```", fig  # Return the path and the figure
 
             else:  # checking for other file extensions
-                img_path_s1 = Path(
-                    volume, f"{platename}/TimePoint_1/{plate_base}_{first_well}_s1.TIF"
-                )
+                # img_path_s1 = Path(
+                #     volume, f"{platename}/TimePoint_1/{plate_base}_{first_well}_s1.TIF"
+                # )
                 img_path_w1 = Path(
-                    volume, f"{platename}/TimePoint_1/{plate_base}_{first_well}_w1.TIF"
+                    volume, "input", f"{platename}/TimePoint_1/{plate_base}_{first_well}_w1.TIF"
                 )
-                if os.path.exists(img_path_s1):
-                    # Open the image and create a figure
-                    fig = create_figure_from_filepath(img_path_s1)
-                    return f"```{img_path_s1}```", fig
-                elif os.path.exists(img_path_w1):
+                # if os.path.exists(img_path_s1):
+                #     # Open the image and create a figure
+                #     fig = create_figure_from_filepath(img_path_s1)
+                #     return f"```{img_path_s1}```", fig
+                if os.path.exists(img_path_w1):
                     # Open the image and create a figure
                     fig = create_figure_from_filepath(img_path_w1)
                     return f"```{img_path_w1}```", fig
