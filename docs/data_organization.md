@@ -4,20 +4,22 @@ The ImageXpress by Molecular Devices has an opinionated data structure, and wrmX
 
 Each experiment should include a root directory with the plate name formated as `YYYYMMDD-p##-XYZ` where `p##` is a plate number and `XYZ` are the investigator's initials. The plate name may also include a random integer/index appended in the format `_###`.
 
-Inside a plate folder, there are two options for organizing the images, either as an individual TIF image for each well stored in a directory of each time point (total number of images = # time points x # wells x # wavelengths) or as a single AVI video for each well (total number of videos = # wells).
+1. As an [individual TIF image](#tif-files-imagexpress-default) for each well stored in a directory of each time point (total number of images = # time points x # wells x # wavelengths)
+2. As a [single AVI video for each well](#single-avi-per-well) (total number of videos = # wells)
+3. As a [single AVI video for the entire plate](#single-avi-per-plate)
 
 ## TIF files (ImageXpress default)
 
 Compatible with the following pipelines:
 
-- [Motility](configuration/pipelines/motility.md)
+- [Motility](configuration/pipelines/optical_flow.md)
 - [Segmentation](configuration/pipelines/segmentation.md)
 - [Viability](configuration/pipelines/viability.md)
 - [Feeding](configuration/pipelines/feeding.md)
 - [Development](configuration/pipelines/development.md)
 - [Tracking](configuration/pipelines/tracking.md)
 
-Detailed data structure expectactions for each pipeline can be found in the relevant pipeline documentation.
+Detailed data structure expectations for each pipeline can be found in the relevant pipeline documentation.
 
 Inside of the plate directory should be separate directories for each time point formatted as `TimePoint_#` and starting with `TimePoint_1`. If no additional time points were included in the experiment, then the only folder inside of the root directory will be `TimePoint_1`.
 
@@ -37,7 +39,7 @@ Example of these data structures are shown below:
 
 Compatible with the following pipelines:
 
-- [Motility](configuration/pipelines/motility.md)
+- [Motility](configuration/pipelines/optical_flow.md)
 - [Tracking](configuration/pipelines/tracking.md)
 
 ### Single AVI per well
@@ -46,12 +48,12 @@ Some pipelines accept AVI video files instead TIF files within time point folder
 
 ![AVI structure](img/avi_structure.png){: style="width:75%"}
 
-In this case, the AVI file structure needs to be selected in Configure - [Instrument Settings](configuration/instrument_settings.md). During analysis, the files may be rearranged to include the time point/TIF structure described above. If so, it is recommended that subsequent analyses should  maintain the reorganized structure and adjust the configuration selections accordingly.
+In this case, the file structure should be set to AVI in Configure - [Instrument Settings](configuration/instrument_settings.md). During analysis, the files will be rearranged to include the time point/TIF structure described above. After a first run, it is recommended that subsequent analyses should maintain the reorganized structure and adjust the configuration selections accordingly. To do so, move the files with the updated structure from `input/` to the root plate folder.
 
 ### Single AVI per plate
 
-Alternatively, an AVI file of an entire plate can be provided, and wrmXpress can crop wells and analyze them individually. In this case, the roote plate folder should contain a single AVI file in the format `{plate name}.AVI`, as below:
+Alternatively, an AVI file of an entire plate can be provided, and wrmXpress can crop wells and analyze them individually. In this case, the root plate folder should contain a single AVI file in the format `{plate name}.AVI`, as below:
 
 ![AVI structure](img/avi_structure_plate.png){: style="width:75%"}
 
-In this case, the file structure should be set to AVI and the imaging mode should be set to Multi Well in Configure - [Instrument Settings](configuration/instrument_settings.md). In plate format, include the number of columns and the wells in the plate. The plate will then be cropped in accordance with these settings. After cropping, the files will be rearranged to include the time point/TIF structure described above.
+In this case, the file structure should be set to AVI and the imaging mode should be set to Multi Well in Configure - [Instrument Settings](configuration/instrument_settings.md). In plate format, include the number of columns and rows in the plate. The plate will then be cropped in accordance with these settings. After cropping, the files will be rearranged to include the time point/TIF structure described above.

@@ -10,9 +10,9 @@ Detailed procedures for preparing and recording videos of filarial nematode micr
 
 ## Configuration of the GUI
 
-Motility in wrmXpress is measured using Farneback's dense optical flow algorithm implemented by [OpenCV](https://docs.opencv.org/4.6.0/dc/d6b/group__video__track.html#ga5d10ebbd59fe09c5f650289ec0ece5af). This is in contrast to other published tools for measuring worm motility, which use the Lucas-Kanade algorithm that focuses on keypoints. Motility can run on data in the ImageXpress file structure or the AVI file structure (see [Expected input](#expected-input) below).
+Motility in wrmXpress is measured using Farneback's dense optical flow algorithm implemented in [OpenCV](https://docs.opencv.org/4.6.0/dc/d6b/group__video__track.html#ga5d10ebbd59fe09c5f650289ec0ece5af). This is in contrast to other published tools for measuring worm motility, which use the Lucas-Kanade algorithm that focuses on keypoints. Motility can run on data in the ImageXpress file structure or the AVI file structure (see [Expected input](#expected-input) below).
 
-In Pipeline Selection, choose Optical Flow. Additionally, the OpenCV function includes six parameters that can be adjusted. The following is taken directly from the OpenCV docs:
+In Pipeline Selection, choose Optical Flow. The OpenCV function includes six parameters that can be adjusted. The following is taken directly from the OpenCV docs:
 
 1. `pyrScale` (Default = 0.5): The image scale (<1) to build pyramids for each image; pyr_scale=0.5 means a classical pyramid, where each next layer is twice smaller than the previous one. Past wrmXpress users have used 0.9 for adult *Brugia* and *Schistosoma* and 0.5 for all other worms.
 2. `levels` (Default = 3): The number of pyramid layers including the initial image; levels=1 means that no extra layers are created and only the original images are used. Past wrmXpress users have used 10 for adult *Brugia* and *Schistosoma* and 3 for all other worms.
@@ -78,4 +78,4 @@ In [Instrument Settings](../instrument_settings.md), choose AVI + Single Well or
 
 ## Expected output
 
-A CSV file with at least two columns: Well and Total Motility. Variation in the number of worms per well can be corrected for by dividing the motility value by the area value, which can be calculated with the Segementation pipeline. If using Metadata, there will be an additional column for each provided metadata CSV.
+A CSV file with at least two columns: Well and Total Motility. Variation in the number of worms per well can be corrected for by dividing the motility value by the area value, which can be calculated with the [Segementation](segmentation.md) pipeline. If using [Metadata](../../metadata.md), there will be an additional column for each provided metadata CSV.
