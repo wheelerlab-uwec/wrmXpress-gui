@@ -294,7 +294,7 @@ def run_analysis(
     This function runs the analysis of the first well if the first well has not been run before and the button has been clicked
     """
     try:
-        
+
         # Check if the store is empty or has None values for essential elements
         if not store_data:
             return (
@@ -369,9 +369,9 @@ def run_analysis(
             plate_name=store_data["wrmXpress_gui_obj"]["plate_name"],
             well_selection_list=store_data["wrmXpress_gui_obj"]["well_selection_list"],
         )
-        
+
         error_occured, error_message, _, _ = wrmXpress_gui_obj.validate()
-        
+
         if error_occured:
             print('error_occured', error_message)
             return (
@@ -383,7 +383,7 @@ def run_analysis(
 
         # Check if the button has been clicked
         if nclicks:
-        
+
             wrmXpress_gui_obj.analysis_setup("preview")
 
             return (
@@ -396,4 +396,10 @@ def run_analysis(
             # return preview_callback_functions(store_data)
 
     except Exception as e:
-        return f"```{str(e)}```", {}, True, f"```{str(e)}```", True
+        return (
+            f"```An error occured: {str(e)}, please check the configuration, and log files```",
+            {},
+            True,
+            f"```An error occured: {str(e)}, please check the configuration, and log files```",
+            True,
+        )
