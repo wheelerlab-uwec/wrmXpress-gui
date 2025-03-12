@@ -7,7 +7,7 @@ Detailed procedures for preparing and recording images of filarial nematode micr
 
 ## Configuration of the GUI
 
-Viability can be analyzed using a generic [Segmentation](segmentation.md) pipeline directed to the proper wavelength (if using a fluorescent indicator). For microfilaria viability specifically, there is also a Cell Profiler pipeline available.
+Viability can be analyzed using a generic [Segmentation](segmentation.md) pipeline directed to the proper wavelength (if using a fluorescent indicator). For microfilaria viability specifically, there is also a CellProfiler pipeline available.
 
 ## Expected input
 
@@ -37,4 +37,4 @@ All experiments should include a single wavelength. Multisite images should be s
 
 ## Expected output
 
-A CSV file with many columns of Cell Profiler output. If using [Metadata](), there will be an additional column for each provided metadata data frame.
+A CSV file with at least two columns or many columns of CellProfiler output, depending on the selected pipeline. If using [Metadata](../../metadata.md), there will be an additional column for each provided metadata data frame.

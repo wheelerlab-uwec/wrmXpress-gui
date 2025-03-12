@@ -5,6 +5,7 @@ from pathlib import Path
 import os
 import dash
 from dash.long_callback import DiskcacheLongCallbackManager
+import time
 
 # importing utils
 from app.utils.callback_functions import send_ctrl_c, create_figure_from_filepath, construct_img_path
@@ -24,6 +25,16 @@ dash.register_page(__name__, long_callback_manager=long_callback_manager)
 layout = run_layout
 
 # In[3]: Callbacks
+
+
+# Callback to keep updating the dummy component
+@callback(
+    Output("force-loading-output", "children"), Input("loading-interval", "n_intervals")
+)
+def keep_loading(n):
+    time.sleep(0.5)
+    return f""
+
 
 @callback(Output("cancel-analysis", "n_clicks"), Input("cancel-analysis", "n_clicks"))
 def cancel_analysis(n_clicks):

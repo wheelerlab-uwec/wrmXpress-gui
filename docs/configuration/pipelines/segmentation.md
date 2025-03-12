@@ -1,9 +1,9 @@
 # Segmentation (Fecundity and other use-cases)
 
-The segmentation pipeline provides different tools for segmenting foreground from background. This pipeline has been used for Fecundity experiments, to normalize motility measurement, and for various other use-cases that require estimating the amount of worms in a well. The segmentation pipeline can use a simple Python-based algorithm that finds edges, blurs, and converts to binary or a more complex deep-learning model with Cellpose.
+The segmentation pipeline provides different tools for segmenting foreground from background. This pipeline has been used for fecundity experiments, to normalize motility measurement, and for various other use-cases that require estimating the amount of worms in a well. The segmentation pipeline can use a simple Python-based algorithm that finds edges, blurs, and converts to binary or a more complex deep-learning model with Cellpose.
 
 /// note | Experimental protocols
-Detailed procedures for preparing and recording images of filarial nematode or schistosome progeny can be found at the following links***
+Detailed procedures for preparing and recording images of filarial nematode or schistosome progeny can be found at the following links:
 
 - [Multivariate screening of *Brugia* spp. adults](https://protocolexchange.researchsquare.com/article/pex-1918/v2)
 - [wrmXpress: A modular package for high-throughput image analysis of parasitic and free-living worms](https://journals.plos.org/plosntds/article?id=10.1371/journal.pntd.0010937#sec002)
@@ -55,4 +55,4 @@ Each well should include all the progeny from a single parent.
 
 ## Expected output
 
-A CSV file with at least two columns: Well and Segmented Area. Variation in the number of worms per well can be corrected for by diving the motility value by the area value. If using [Metadata](), there will be an additional column for each provided metadata data frame.
+A CSV file with at least two columns: Well and Segmented Area. Variation in the number of worms per well can be corrected for by diving the motility value by the area value. If using [Metadata](../../metadata.md), there will be an additional column for each provided metadata data frame.

@@ -17,6 +17,7 @@ import tifffile as tiff
 from skimage import exposure
 from zenodo_get import zenodo_get
 import subprocess
+import time
 
 # In[2]: Helper functions
 
@@ -525,8 +526,9 @@ def create_figure_from_filepath(img_path, scale="gray", max_pixels=178956970):
 
     warnings.filterwarnings("ignore", category=Image.DecompressionBombWarning)
     Image.MAX_IMAGE_PIXELS = 1000000000  # Increase the limit to 1 billion pixels
-    
+
     # Try opening the image with PIL
+
     try:
         img = Image.open(img_path)
         # Calculate thumbnail size to limit memory use but maintain aspect ratio
@@ -587,6 +589,8 @@ def create_figure_from_filepath(img_path, scale="gray", max_pixels=178956970):
         margin=dict(l=0, r=0, t=0, b=0),
         xaxis=dict(showticklabels=False),
         yaxis=dict(showticklabels=False),
+        plot_bgcolor="white",
+        paper_bgcolor="white",
     )
 
     return fig
@@ -660,3 +664,24 @@ def construct_img_path(volume, selection, plate_base, wells, wavelength):
     )
     # Attempt to find a valid file with supported extensions
     return next(base_path.parent.glob(f"{base_path.stem}.*"), None)
+
+
+def wait_for_file(file_path, timeout=30, interval=1):
+    """
+    Waits for the specified file to be created, checking at given intervals.
+
+    Parameters:
+    - file_path (Path): The path of the file to wait for.
+    - timeout (int): Maximum time in seconds to wait.
+    - interval (int): Time interval in seconds between checks.
+
+    Returns:
+    - bool: True if file is found, False if timeout occurs.
+    """
+    start_time = time.time()
+    while not file_path.exists():
+        if time.time() - start_time > timeout:
+            # print(f"Timeout: {file_path} not found after {timeout} seconds.")
+            return False
+        time.sleep(interval)
+    return True

@@ -7,7 +7,7 @@ from pathlib import Path
 import os
 
 # importing utils
-from app.utils.callback_functions import create_figure_from_filepath
+from app.utils.callback_functions import create_figure_from_filepath, wait_for_file
 from app.utils.preview_callback_functions import preview_callback_functions
 from app.components.preview_layout import preview_layout
 from app.utils.wrmxpress_gui_obj import WrmXpressGui
@@ -146,23 +146,23 @@ def update_preview_image(n_clicks, store):
             img_path = Path(
                 volume, f"{platename}/TimePoint_1/{plate_base}_{first_well}.TIF"
             )
-            if os.path.exists(img_path):
+            if os.path.exists(img_path) or wait_for_file(img_path, interval=15):
                 # Open the image and create a figure
                 fig = create_figure_from_filepath(img_path)
                 return f"```{img_path}```", fig  # Return the path and the figure
 
             else:  # checking for other file extensions
-                img_path_s1 = Path(
-                    volume, f"{platename}/TimePoint_1/{plate_base}_{first_well}_s1.TIF"
-                )
+                # img_path_s1 = Path(
+                #     volume, f"{platename}/TimePoint_1/{plate_base}_{first_well}_s1.TIF"
+                # )
                 img_path_w1 = Path(
-                    volume, f"{platename}/TimePoint_1/{plate_base}_{first_well}_w1.TIF"
+                    volume, "input", f"{platename}/TimePoint_1/{plate_base}_{first_well}_w1.TIF"
                 )
-                if os.path.exists(img_path_s1):
-                    # Open the image and create a figure
-                    fig = create_figure_from_filepath(img_path_s1)
-                    return f"```{img_path_s1}```", fig
-                elif os.path.exists(img_path_w1):
+                # if os.path.exists(img_path_s1):
+                #     # Open the image and create a figure
+                #     fig = create_figure_from_filepath(img_path_s1)
+                #     return f"```{img_path_s1}```", fig
+                if os.path.exists(img_path_w1) or wait_for_file(img_path_w1):
                     # Open the image and create a figure
                     fig = create_figure_from_filepath(img_path_w1)
                     return f"```{img_path_w1}```", fig
@@ -185,6 +185,7 @@ def update_preview_image(n_clicks, store):
                 return f"```{img_path}```", fig
 
     # Default return if no conditions are met
+    print('img not found')
     return "", {}
 
 
@@ -293,7 +294,7 @@ def run_analysis(
     This function runs the analysis of the first well if the first well has not been run before and the button has been clicked
     """
     try:
-        
+
         # Check if the store is empty or has None values for essential elements
         if not store_data:
             return (
@@ -368,9 +369,9 @@ def run_analysis(
             plate_name=store_data["wrmXpress_gui_obj"]["plate_name"],
             well_selection_list=store_data["wrmXpress_gui_obj"]["well_selection_list"],
         )
-        
+
         error_occured, error_message, _, _ = wrmXpress_gui_obj.validate()
-        
+
         if error_occured:
             print('error_occured', error_message)
             return (
@@ -382,7 +383,7 @@ def run_analysis(
 
         # Check if the button has been clicked
         if nclicks:
-        
+
             wrmXpress_gui_obj.analysis_setup("preview")
 
             return (
@@ -395,4 +396,10 @@ def run_analysis(
             # return preview_callback_functions(store_data)
 
     except Exception as e:
-        return f"```{str(e)}```", {}, True, f"```{str(e)}```", True
+        return (
+            f"```An error occured: {str(e)}, please check the configuration, and log files```",
+            {},
+            True,
+            f"```An error occured: {str(e)}, please check the configuration, and log files```",
+            True,
+        )
