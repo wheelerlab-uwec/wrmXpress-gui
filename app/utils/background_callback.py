@@ -96,13 +96,27 @@ def run_wrmXpress_analysis(store, set_progress, wrmXpress_gui_obj):
 
         docker_output = []
         fig = None
-        
+
         empty_fig = go.Figure()
         empty_fig.update_layout(
-            # title="Loading...", 
             xaxis={"visible": False}, 
             yaxis={"visible": False},
-            annotations=[{"text": "Loading...", "xref": "paper", "yref": "paper", "showarrow": False, "font": {"size": 20}}]
+            plot_bgcolor="rgba(0,0,0,0)",  # Transparent background
+            paper_bgcolor="rgba(0,0,0,0)",  # Transparent background
+            images=[
+                {
+                    "source": "https://raw.githubusercontent.com/zamanianlab/wrmXpress/810989c45ce7fe0f2b2722b2634a39af98a7626f/img/logo/gummy.png",
+                    "xref": "paper",
+                    "yref": "paper",
+                    "x": 0.5,
+                    "y": 0.5,
+                    "xanchor": "center",
+                    "yanchor": "middle",
+                    "layer": "below",
+                    "sizex": 1,
+                    "sizey": 1,
+                }
+            ]
         )
 
         # Process all lines from the subprocess
@@ -117,7 +131,7 @@ def run_wrmXpress_analysis(store, set_progress, wrmXpress_gui_obj):
                     len(re.findall(r"\b" + "|".join(new_store["wells"]) + r"\b", line))
                     == 1
                 ):
-                    
+
                     fig = updated_running_wells(
                         set_progress, line, store, docker_output, wrmXpress_gui_obj
                     )
@@ -128,13 +142,13 @@ def run_wrmXpress_analysis(store, set_progress, wrmXpress_gui_obj):
 
             if wrmXpress_gui_obj.set_progress_running:
                 docker_output_formatted = "".join(docker_output)
-                
+
                 set_progress(
                     (
                         wrmXpress_gui_obj.set_progress_current_number,
                         wrmXpress_gui_obj.set_progress_total_number,
                         fig if fig else empty_fig,
-                        f"```{wrmXpress_gui_obj.set_progress_image_path}```",
+                        f"```{wrmXpress_gui_obj.set_progress_image_path}```", # image path -- update this if we want a message about waiting for wrmxpress while running
                         f"```{docker_output_formatted}```",
                     )
                 )
