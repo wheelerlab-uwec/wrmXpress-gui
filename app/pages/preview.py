@@ -7,7 +7,7 @@ from pathlib import Path
 import os
 
 # importing utils
-from app.utils.callback_functions import create_figure_from_filepath
+from app.utils.callback_functions import create_figure_from_filepath, wait_for_file
 from app.utils.preview_callback_functions import preview_callback_functions
 from app.components.preview_layout import preview_layout
 from app.utils.wrmxpress_gui_obj import WrmXpressGui
@@ -146,7 +146,7 @@ def update_preview_image(n_clicks, store):
             img_path = Path(
                 volume, f"{platename}/TimePoint_1/{plate_base}_{first_well}.TIF"
             )
-            if os.path.exists(img_path):
+            if os.path.exists(img_path) or wait_for_file(img_path, interval=15):
                 # Open the image and create a figure
                 fig = create_figure_from_filepath(img_path)
                 return f"```{img_path}```", fig  # Return the path and the figure
@@ -162,7 +162,7 @@ def update_preview_image(n_clicks, store):
                 #     # Open the image and create a figure
                 #     fig = create_figure_from_filepath(img_path_s1)
                 #     return f"```{img_path_s1}```", fig
-                if os.path.exists(img_path_w1):
+                if os.path.exists(img_path_w1) or wait_for_file(img_path_w1):
                     # Open the image and create a figure
                     fig = create_figure_from_filepath(img_path_w1)
                     return f"```{img_path_w1}```", fig
@@ -185,6 +185,7 @@ def update_preview_image(n_clicks, store):
                 return f"```{img_path}```", fig
 
     # Default return if no conditions are met
+    print('img not found')
     return "", {}
 
 

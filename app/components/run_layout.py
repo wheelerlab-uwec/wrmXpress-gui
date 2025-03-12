@@ -254,6 +254,46 @@ run_layout = dbc.ModalBody(
                                         ),
                                         dbc.Row(
                                             [
+                                                # Invisible interval to force loading
+                                                dcc.Interval(
+                                                    id="loading-interval",
+                                                    interval=500,
+                                                    n_intervals=0,
+                                                ),
+                                                dbc.Alert(
+                                                    id="before-first-view-of-analysis-alert",
+                                                    color="light",
+                                                    is_open=False,
+                                                    children=[
+                                                        dcc.Loading(
+                                                            id="before-first-loading-img-run-analysis",
+                                                            type="cube",
+                                                            color="#3b4d61",
+                                                            children=[
+                                                                html.Div(
+                                                                    [
+                                                                        dcc.Graph(
+                                                                            # Image analysis preview
+                                                                            id="image-analysis-preview",
+                                                                            figure={
+                                                                                "layout": layout
+                                                                            },
+                                                                            style={
+                                                                                "padding": "0px",
+                                                                                "height": "100%",
+                                                                                "width": "100%",
+                                                                            },
+                                                                        ),
+                                                                    ],
+                                                                    id = "force-loading-output",
+                                                                ),
+                                                                    ],
+
+                                                            style={"padding": "0px"},
+                                                        ),
+                                                    ],
+                                                    style={"padding": "0px"},
+                                                ),
                                                 dbc.Alert(
                                                     id="first-view-of-analysis-alert",
                                                     color="light",

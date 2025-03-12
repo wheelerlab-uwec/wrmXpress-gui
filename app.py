@@ -138,6 +138,8 @@ app.layout = html.Div(
         Output("image-analysis-preview", "figure"),
         Output("progress-message-run-page-for-analysis", "children"),
         Output("progress-message-run-page-markdown", "children"),
+        Output("first-view-of-analysis-alert", "is_open"),
+        Output("before-first-view-of-analysis-alert", "is_open"),
     ],
     prevent_initial_call=True,
     allow_duplicate=True,

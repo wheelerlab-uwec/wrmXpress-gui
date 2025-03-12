@@ -97,26 +97,29 @@ def run_wrmXpress_analysis(store, set_progress, wrmXpress_gui_obj):
         docker_output = []
         fig = None
 
+        # Define the figure with the GIF
         empty_fig = go.Figure()
         empty_fig.update_layout(
-            xaxis={"visible": False}, 
+            xaxis={"visible": False},
             yaxis={"visible": False},
             plot_bgcolor="rgba(0,0,0,0)",  # Transparent background
             paper_bgcolor="rgba(0,0,0,0)",  # Transparent background
-            images=[
-                {
-                    "source": "https://raw.githubusercontent.com/zamanianlab/wrmXpress/810989c45ce7fe0f2b2722b2634a39af98a7626f/img/logo/gummy.png",
-                    "xref": "paper",
-                    "yref": "paper",
-                    "x": 0.5,
-                    "y": 0.5,
-                    "xanchor": "center",
-                    "yanchor": "middle",
-                    "layer": "below",
-                    "sizex": 1,
-                    "sizey": 1,
-                }
-            ]
+        )
+
+        # Add the GIF to the figure
+        empty_fig.add_layout_image(
+            dict(
+                source="/assets/gummy.gif",  # Ensure the GIF is in the assets folder
+                x=0.5,
+                y=0.5,
+                xref="paper",
+                yref="paper",
+                sizex=3,
+                sizey=3,
+                xanchor="center",
+                yanchor="middle",
+                layer="below",
+            )
         )
         wrmXpress_gui_obj.set_progress_image_path = "Please wait while wrmXpress is running..."
 
@@ -151,6 +154,8 @@ def run_wrmXpress_analysis(store, set_progress, wrmXpress_gui_obj):
                         fig if fig else empty_fig,
                         f"```{wrmXpress_gui_obj.set_progress_image_path}```", # image path -- update this if we want a message about waiting for wrmxpress while running
                         f"```{docker_output_formatted}```",
+                        bool(fig),
+                        not bool(fig),
                     )
                 )
         # Ensure all output is processed and the subprocess has finished
@@ -211,6 +216,8 @@ def updated_running_wells(set_progress, line, store, docker_output, wrmXpress_gu
                 fig,
                 f"```{str(img_path)}```",
                 f"```{docker_output_formatted}```",
+                True,
+                False
             )
         )
 
