@@ -121,7 +121,7 @@ def run_wrmXpress_analysis(store, set_progress, wrmXpress_gui_obj):
                 layer="below",
             )
         )
-        wrmXpress_gui_obj.set_progress_image_path = "Please wait while wrmXpress is running..."
+        wrmXpress_gui_obj.set_progress_image_path = "Please wait while wrmXpress initializes and pre-processes input images......"
 
         # Process all lines from the subprocess
         for line in iter(process.stdout.readline, ""):

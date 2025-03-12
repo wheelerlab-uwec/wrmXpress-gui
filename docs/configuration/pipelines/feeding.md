@@ -10,7 +10,7 @@ Detailed procedures for preparing and recording images of *Caenorhabditis elegan
 
 ## Configuration of the GUI
 
-The Feeding analysis is implemented via a CellProfiler pipeline that uses a custom [Worm Toolbox](https://cellprofiler.org/wormtoolbox) model. In Pipeline Selection, choose CellProfiler and select the Feeding pipeline. Additionally, select the appropriate Cellpose model for worm identification.
+The Feeding analysis is implemented via a CellProfiler pipeline that uses a custom [Worm Toolbox](https://cellprofiler.org/wormtoolbox) model. In Pipeline Selection, choose CellProfiler and select the Feeding pipeline. 
 
 /// warning | Custom worm models
 Performance of the pipeline will vary based on the magnification used to take the images. If you are interested in training your own Worm Toolbox model, please reach out to the [wrmXpress developers](../../index.md#getting-support).
