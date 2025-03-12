@@ -840,8 +840,8 @@ class WrmXpressGui:
             # **static_dx_params,
             # **video_dx_params,
         }
-
-        if self.file_structure == "imagexpress":
+        
+        if self.file_structure == "imagexpress" and self.pipeline_selection == "cellprofiler" and self.cellprofiler_pipeline_selection != 'feeding':
             params = self.get_wavelengths_from_files(params)
 
         return {
