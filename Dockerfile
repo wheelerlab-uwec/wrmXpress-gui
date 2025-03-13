@@ -47,4 +47,4 @@ EXPOSE 9000
 # ENTRYPOINT ["/usr/local/bin/_entrypoint.sh", "/bin/bash", "-c", "while true; do sleep 30; done"]
 
 # This is for running the GUI when the container starts
-ENTRYPOINT ["/usr/local/bin/_entrypoint.sh", "python", "app.py"]
+ENTRYPOINT ["/usr/local/bin/_entrypoint.sh", "python", "/root/wrmxpress-gui/app.py"]
