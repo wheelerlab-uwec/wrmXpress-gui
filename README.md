@@ -10,10 +10,10 @@ A Dash GUI for wrmXpress
 ![Docker Image Size (tag)](https://img.shields.io/docker/image-size/wheelern/wrmxpress_gui/latest)
 ![Docker Pulls](https://img.shields.io/docker/pulls/wheelern/wrmxpress_gui)
 
-<!-- ## Testing
+## Testing
 
-![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/wheelerlab-uwec/wrmxpress-gui/dash-test.yml)
--![Code coverage](https://wheelerlab-uwec.github.io/wrmxpress-gui/badges/coverage.svg) - -->
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/wheelerlab-uwec/wrmxpress-gui/python-tests.yml)
+![Codecov](https://img.shields.io/codecov/c/github/wheelerlab-uwec/wrmxpress-gui)
 
 ## Installation and usage
 

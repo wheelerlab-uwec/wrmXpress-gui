@@ -1,0 +1,47 @@
+name: Python Tests
+
+on:
+  push:
+    branches: [ main, add-github-actions-ci ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.9]
+
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Micromamba
+      uses: mamba-org/setup-micromamba@v1
+      with:
+        micromamba-version: 'latest'
+        environment-file: mm_wrmxpress_gui.yml
+        init-shell: bash
+        cache-environment: true
+        post-cleanup: 'all'
+    
+    - name: Install test dependencies
+      shell: bash -el {0}
+      run: |
+        micromamba install -c conda-forge pytest pytest-cov
+    
+    - name: Test with pytest
+      shell: bash -el {0}
+      run: |
+        pytest tests/test_utils.py tests/test_components.py -v --cov=app
+    
+    - name: Generate coverage report
+      shell: bash -el {0}
+      run: |
+        pytest --cov=app --cov-report=xml
+    
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./coverage.xml
+        fail_ci_if_error: false

@@ -1,0 +1,62 @@
+name: UI Tests
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  # Allow manually triggering the workflow
+  workflow_dispatch:
+
+jobs:
+  ui-tests:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Micromamba
+      uses: mamba-org/setup-micromamba@v1
+      with:
+        micromamba-version: 'latest'
+        environment-file: mm_wrmxpress_gui.yml
+        init-shell: bash
+        cache-environment: true
+        post-cleanup: 'all'
+    
+    - name: Install test dependencies
+      shell: bash -el {0}
+      run: |
+        micromamba install -c conda-forge pytest selenium pytest-cov pytest-xvfb
+        pip install dash[testing]
+    
+    # Setup Firefox for Selenium tests
+    - name: Setup Firefox
+      uses: browser-actions/setup-firefox@v1
+      
+    # Setup Chrome for Selenium tests
+    - name: Setup Chrome
+      uses: browser-actions/setup-chrome@v1
+    
+    # Install WebDriver
+    - name: Install WebDriver
+      shell: bash -el {0}
+      run: |
+        pip install webdriver-manager
+    
+    # Create test_data directory
+    - name: Create test data directory
+      run: mkdir -p tests/test_data
+      
+    # Create a .env file for tests
+    - name: Create environment file
+      run: |
+        echo "TEST_MODE=ci" > .env
+      
+    # Skip integration tests for now, this job will be implemented later
+    - name: Run placeholder for UI tests
+      shell: bash -el {0}
+      run: |
+        echo "UI tests are currently skipped - will be implemented in the future."
+        echo "The current implementation runs component and utility tests."
+        pytest tests/test_components.py -v
