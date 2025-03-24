@@ -25,31 +25,34 @@ wrmXpress is entirely open-source. The code for the back-end is maintained by th
 
 ## Citing wrmXpress
 
-When using the wrmXrpress backend on a remote machine, please cite:
+When using the wrmXrpress back-end on a remote machine, please cite:
 
-    @ARTICLE{Wheeler2022-ou,
-      title    = "{wrmXpress}: A modular package for high-throughput image analysis
-                  of parasitic and free-living worms",
-      author   = "Wheeler, Nicolas J and Gallo, Kendra J and Rehborg, Elena J G and
-                  Ryan, Kaetlyn T and Chan, John D and Zamanian, Mostafa",
-      journal  = "PLoS Negl. Trop. Dis.",
-      volume   =  16,
-      number   =  11,
-      pages    = "e0010937",
-      month    =  nov,
-      year     =  2022,
-      language = "en"
-    }
+    @article{Wheeler2022,
+      title     = {wrmXpress: A modular package for high-throughput image analysis of parasitic and free-living worms},
+      author    = {Wheeler, Nicolas J. AND Gallo, Kendra J. AND Rehborg, Elena J. G. AND Ryan, Kaetlyn T. AND Chan, John D. AND Zamanian, Mostafa},
+      journal   = {PLOS Neglected Tropical Diseases},
+      volume    = {16},
+      number    = {11},
+      pages     = {1-15},
+      year      = {2022},
+      month     = {11},
+      doi       = {10.1371/journal.pntd.0010937},
+      publisher = {Public Library of Science},
+      doi       = {https://doi.org/10.1371/journal.pntd.0010937},
+      url       = {https://journals.plos.org/plosntds/article?id=10.1371/journal.pntd.0010937},
 
-When using the GUI, please site the backend (above) as well as this repository:
+}
 
-    @software{Caterer2024,
-      author = {Caterer, Zachary and Horejsi, Rachel and Weber, Carly and Mathisen, Blake and 
-      Nelson, Chase and Bagatta, Maggie and Coughlin, Ireland and Wettstein, Megan and 
-      Zamanian, Mostafa and Wheeler, Nicolas J.},
-      title = {A graphical user interface for wrmXpress democratizes phenotypic screening of 
-      parasitic worms},
-      date = {2024-07-18},
-      url = {https://github.com/wheelerlab-uwec/wrmXpress-gui},
-      version = {v1.0.0}
+When using the GUI, please site the back-end (above) as well as the following:
+
+    @article{Caterer2025,
+      title    = {A graphical user interface for wrmXpress 2.0 streamlines helminth phenotypic screening},
+      author   = {Zachary Caterer and Rachel V. Horejsi and Carly Weber and Blake Mathisen and Chase N. Nelson and Maggie Bagatta and Ireland Coughlin and Megan Wettstein and Ankit Kulshrestha and Hui Siang Benjamin Lee and Leonardo R. Nunn and Mostafa Zamanian and Nicolas J. Wheeler}
+      journal  = {International Journal for Parasitology: Drugs and Drug Resistance},
+      volume   = {27},
+      pages    = {100588},
+      year     = {2025},
+      issn     = {2211-3207},
+      doi      = {https://doi.org/10.1016/j.ijpddr.2025.100588},
+      url      = {https://www.sciencedirect.com/science/article/pii/S2211320725000119},
     }
