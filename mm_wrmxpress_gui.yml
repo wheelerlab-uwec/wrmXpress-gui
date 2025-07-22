@@ -52,3 +52,4 @@ dependencies:
     - cellprofiler==4.2.8
     - cellpose==3.0.9
     - wxPython>=4.1.0,<5
+    - dash[diskcache]
