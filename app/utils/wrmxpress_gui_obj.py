@@ -122,10 +122,10 @@ class WrmXpressGui:
         self.set_progress_current_number = None
         self.set_progress_total_number = None
         self.set_progress_figure = None
-        self.set_progress_image_path = ''
+        self.set_progress_image_path = ""
         self.set_progress_docker_output = None
 
-        self.preview_first_well_image_filepath=None
+        self.preview_first_well_image_filepath = None
 
     # In[3]: Object Functions to store and retrieve data as dictionary and json for the GUI
     def to_dict(self):
@@ -263,8 +263,16 @@ class WrmXpressGui:
                     )
 
             try:
-                tracking_diameter = self.tracking_diameter if self.tracking_diameter is not None else defaults["tracking_diameter"]
-                tracking_noisesize = self.tracking_noisesize if self.tracking_noisesize is not None else defaults["tracking_noisesize"]
+                tracking_diameter = (
+                    self.tracking_diameter
+                    if self.tracking_diameter is not None
+                    else defaults["tracking_diameter"]
+                )
+                tracking_noisesize = (
+                    self.tracking_noisesize
+                    if self.tracking_noisesize is not None
+                    else defaults["tracking_noisesize"]
+                )
 
                 if int(tracking_diameter) <= int(tracking_noisesize):
                     self.error_occurred = True
@@ -297,7 +305,9 @@ class WrmXpressGui:
 
             if not htd_files and not HTD_files:
                 self.error_occurred = True
-                self.error_messages.append("No .HTD file found in the Plate/Folder with ImageXpress file structure. You may have selected the wrong file structure.")
+                self.error_messages.append(
+                    "No .HTD file found in the Plate/Folder with ImageXpress file structure. You may have selected the wrong file structure."
+                )
 
             # Validate subdirectories
             subdirectories = [x for x in platename_path.iterdir() if x.is_dir()]
@@ -311,14 +321,22 @@ class WrmXpressGui:
                         )
 
     def validate_static_dx_mode(self):
-        if len(self.static_dx) == 1 and not self.static_dx_rescale:
+        if (
+            self.static_dx is not None
+            and len(self.static_dx) == 1
+            and not self.static_dx_rescale
+        ):
             self.warning_occurred = True
             self.warning_messages.append(
                 "Static DX rescale multiplier is missing, default value (1) will be used."
             )
 
     def validate_video_dx_mode(self):
-        if len(self.video_dx) == 1 and not self.video_dx_rescale:
+        if (
+            self.video_dx is not None
+            and len(self.video_dx) == 1
+            and not self.video_dx_rescale
+        ):
             self.warning_occurred = True
             self.warning_messages.append(
                 "Video DX rescale multiplier is missing, default value (0.5) will be used."
@@ -387,29 +405,33 @@ class WrmXpressGui:
                 continue
             except Exception as e:
                 self.warning_occurred = True
-                self.warning_messages.append(f"Error reading file with {encoding}: {str(e)}")
+                self.warning_messages.append(
+                    f"Error reading file with {encoding}: {str(e)}"
+                )
 
         self.error_occurred = True
-        self.error_messages.append("Failed to read HTD file. Please check the file encoding.")
+        self.error_messages.append(
+            "Failed to read HTD file. Please check the file encoding."
+        )
         return None
 
     def _parse_htd_data(self, htd_content):
         """Parse HTD file content to extract relevant information."""
         plate_info = {
-            'x_wells': None,
-            'y_wells': None,
-            'description': None,
-            'plate_type': None,
-            'time_points': None
+            "x_wells": None,
+            "y_wells": None,
+            "description": None,
+            "plate_type": None,
+            "time_points": None,
         }
 
         # Define patterns for each key we want to extract
         patterns = {
-            'x_wells': r'"XWells"\s*,\s*(\d+)',
-            'y_wells': r'"YWells"\s*,\s*(\d+)',
-            'description': r'"Description"\s*,\s*"([^"]*)"',
-            'plate_type': r'"PlateType"\s*,\s*(\d+)',
-            'time_points': r'"TimePoints"\s*,\s*(\d+)'
+            "x_wells": r'"XWells"\s*,\s*(\d+)',
+            "y_wells": r'"YWells"\s*,\s*(\d+)',
+            "description": r'"Description"\s*,\s*"([^"]*)"',
+            "plate_type": r'"PlateType"\s*,\s*(\d+)',
+            "time_points": r'"TimePoints"\s*,\s*(\d+)',
         }
 
         # Extract each value using regex
@@ -418,16 +440,18 @@ class WrmXpressGui:
             if match:
                 try:
                     # Convert numeric values to integers
-                    if key in ['x_wells', 'y_wells', 'plate_type', 'time_points']:
+                    if key in ["x_wells", "y_wells", "plate_type", "time_points"]:
                         plate_info[key] = int(match.group(1))
                     else:
                         plate_info[key] = match.group(1)
                 except (ValueError, IndexError):
                     self.warning_occurred = True
-                    self.warning_messages.append(f"Failed to parse {key} from HTD file.")
+                    self.warning_messages.append(
+                        f"Failed to parse {key} from HTD file."
+                    )
 
         # Check if required values were extracted
-        for key in ['x_wells', 'y_wells']:
+        for key in ["x_wells", "y_wells"]:
             if plate_info[key] is None:
                 self.warning_occurred = True
                 self.warning_messages.append(f"Failed to extract {key} from HTD file.")
@@ -436,8 +460,8 @@ class WrmXpressGui:
 
     def _validate_plate_dimensions(self, plate_info):
         """Validate that plate dimensions match expected values."""
-        x_wells = plate_info.get('x_wells')
-        y_wells = plate_info.get('y_wells')
+        x_wells = plate_info.get("x_wells")
+        y_wells = plate_info.get("y_wells")
 
         # Use default values if necessary
         expected_cols = self.well_col or 12
@@ -500,7 +524,7 @@ class WrmXpressGui:
             self.well_selection_list = self.well_selection_list
 
         # if length of well selection is 96, then change to "All"
-        if len(self.well_selection_list) == 96:
+        if self.well_selection_list is not None and len(self.well_selection_list) == 96:
             self.well_selection_list = ["All"]
 
     def set_default_multi_well_row_and_col(self):
@@ -528,25 +552,33 @@ class WrmXpressGui:
 
     def create_static_dx_dict(self):
         self.static_dx_dict = {
-            "run": eval_bool(self.static_dx[0]) if len(self.static_dx) == 1 else False,
+            "run": (
+                eval_bool(self.static_dx[0])
+                if self.static_dx is not None and len(self.static_dx) == 1
+                else False
+            ),
             "rescale_multiplier": (
                 get_default_value(self.static_dx_rescale, 1)
-                if len(self.static_dx) == 1
+                if self.static_dx is not None and len(self.static_dx) == 1
                 else 1
             ),
         }
 
     def create_video_dx_dict(self):
         self.video_dx_dict = {
-            "run": eval_bool(self.video_dx[0]) if len(self.video_dx) == 1 else False,
+            "run": (
+                eval_bool(self.video_dx[0])
+                if self.video_dx is not None and len(self.video_dx) == 1
+                else False
+            ),
             "format": (
                 get_default_value(self.video_dx_format, "avi")
-                if len(self.video_dx) == 1
+                if self.video_dx is not None and len(self.video_dx) == 1
                 else "avi"
             ),
             "rescale_multiplier": (
                 get_default_value(self.video_dx_rescale, 0.5)
-                if len(self.video_dx) == 1
+                if self.video_dx is not None and len(self.video_dx) == 1
                 else 0.5
             ),
         }
@@ -840,8 +872,12 @@ class WrmXpressGui:
             # **static_dx_params,
             # **video_dx_params,
         }
-        
-        if self.file_structure == "imagexpress" and self.pipeline_selection == "cellprofiler" and self.cellprofiler_pipeline_selection != 'feeding':
+
+        if (
+            self.file_structure == "imagexpress"
+            and self.pipeline_selection == "cellprofiler"
+            and self.cellprofiler_pipeline_selection != "feeding"
+        ):
             params = self.get_wavelengths_from_files(params)
 
         return {
@@ -890,7 +926,6 @@ class WrmXpressGui:
             wells=wells_to_process,
             platename=self.plate_name,
             file_structure=self.file_structure,
-            
         )
 
     def clean_and_create_directories(self, input_path, work_path, output_path=None):
@@ -959,13 +994,19 @@ class WrmXpressGui:
 
     def get_first_well(self):
 
-        if len(self.well_selection_list) == 1 and self.well_selection_list[0] != "All":
+        if (
+            self.well_selection_list is not None
+            and len(self.well_selection_list) == 1
+            and self.well_selection_list[0] != "All"
+        ):
             print("First well is not All")
             first_well = self.well_selection_list[0]
         elif self.well_selection_list == ["All"]:
             first_well = "A01"
-        else:
+        elif self.well_selection_list is not None and len(self.well_selection_list) > 0:
             first_well = self.well_selection_list[0]
+        else:
+            first_well = "A01"  # default fallback
 
         return first_well
 
@@ -1083,7 +1124,8 @@ class WrmXpressGui:
         ]
 
         output_directory = [
-            Path(self.mounted_volume, "output", f"{pipeline}", 'img') for pipeline in pipeline
+            Path(self.mounted_volume, "output", f"{pipeline}", "img")
+            for pipeline in pipeline
         ]
         pipeline_directory = pipeline_directory + output_directory
 
@@ -1101,7 +1143,7 @@ class WrmXpressGui:
 
                 # Search for the first matching .tiff file
                 first_well_image = next(pipe.glob(tiff_file_pattern), None)
-                
+
                 if first_well_image:
                     self.preview_first_well_image_filepath = first_well_image
                     return True
@@ -1119,12 +1161,11 @@ class WrmXpressGui:
         plate_base = self.plate_name.split("_", 1)[0]
 
         if self.pipeline_selection == "cellprofiler":
-            self.pipeline_selection = ['cellprofiler']
+            self.pipeline_selection = ["cellprofiler"]
 
         # Derive selected pipelines
         selected_pipelines = [
-            "optical_flow" if p == "motility" else p
-            for p in self.pipeline_selection
+            "optical_flow" if p == "motility" else p for p in self.pipeline_selection
         ]
         if self.static_dx:
             selected_pipelines.append("static_dx")
@@ -1146,7 +1187,11 @@ class WrmXpressGui:
                 continue  # Skip if the directory doesn't exist
 
             # Collect PNG and TIF files
-            files = list(pipeline_dir.glob("*.PNG")) + list(pipeline_dir.glob("*.TIF")) + list(pipeline_dir.glob("*.tiff"))
+            files = (
+                list(pipeline_dir.glob("*.PNG"))
+                + list(pipeline_dir.glob("*.TIF"))
+                + list(pipeline_dir.glob("*.tiff"))
+            )
 
             if pipeline_img_dir.exists():
                 files = list(pipeline_img_dir.glob("*.tiff"))
@@ -1199,7 +1244,11 @@ class WrmXpressGui:
         if len(returned_files) >= 1:
             for file in returned_files:
                 # first well in well selection list is in the file name
-                if self.well_selection_list[0] in str(file):
+                if (
+                    self.well_selection_list is not None
+                    and len(self.well_selection_list) > 0
+                    and self.well_selection_list[0] in str(file)
+                ):
                     return file
 
         return returned_files
